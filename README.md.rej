@@ -1,0 +1,11 @@
+diff a/README.md b/README.md	(rejected hunks)
+@@ -1,8 +1,7 @@
+ # Source code for self-hosted Cardinal apps
+ 
+ This monorepo contains the source code for all self-hosted [Cardinal
+-apps](https://cardinalapps.io). It is updated automatically on every push to
+-`main` of a private upstream repository.
++apps](https://cardinalapps.io). It tracks a private upstream repository.
+ 
+ ## Workspace
+ 
