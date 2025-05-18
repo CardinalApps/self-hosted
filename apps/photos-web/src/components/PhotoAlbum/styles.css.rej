@@ -1,0 +1,18 @@
+diff a/apps/photos-web/src/components/PhotoAlbum/styles.css b/apps/photos-web/src/components/PhotoAlbum/styles.css	(rejected hunks)
+@@ -70,12 +70,10 @@
+     left: 0;
+     right: 0;
+     bottom: 0;
+-    background: {
+-      color: var(--bg-3);
+-      repeat: repeat;
+-      size: cover;
+-      position: center center;
+-    }
++    background-color: var(--bg-3);
++    background-repeat: repeat;
++    background-size: cover;
++    background-position: center center;
+   }
+ }
+ 
