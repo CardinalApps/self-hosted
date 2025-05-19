@@ -3,8 +3,8 @@ diff a/libraries/ui/src/components/forms/FormField/FormField.css b/libraries/ui/
      margin-bottom: 10px;
      font-weight: 800;
      color: var(--text-color-1);
--    display: inline-block;
-+    //display: inline-block;
+-    //display: inline-block;
++    /* display: inline-block; */
      user-select: none;
    }
  

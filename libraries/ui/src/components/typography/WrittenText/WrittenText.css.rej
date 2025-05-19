@@ -1,0 +1,14 @@
+diff a/libraries/ui/src/components/typography/WrittenText/WrittenText.css b/libraries/ui/src/components/typography/WrittenText/WrittenText.css	(rejected hunks)
+@@ -50,9 +50,9 @@
+     font-size: 16px;
+     line-height: 1.4em;
+ 
+-    // &:first-of-type {
+-    //   margin-bottom: 20px;
+-    // }
++    /* &:first-of-type {
++      margin-bottom: 20px;
++    } */
+   }
+ 
+   ul, ol {
