@@ -1,0 +1,15 @@
+diff a/libraries/ui/src/components/interaction/Alert/Alert.css b/libraries/ui/src/components/interaction/Alert/Alert.css	(rejected hunks)
+@@ -68,6 +68,13 @@
+     outline: none;
+     margin-left: 12px;
+   }
++
++  .alert-controls-col {
++
++    button {
++      white-space: nowrap;
++    }
++  }
+ }
+ 
+ @media (max-width: 768px) {
