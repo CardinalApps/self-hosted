@@ -1,9 +1,9 @@
 services:
   auth-server:
     container_name: cardinal-auth-server
-    env_file:
-      - ../../servers/auth/.env
-    image: cardinalapps/auth-server:dev
+    # env_file:
+    #   - ../../servers/auth/.env
+    image: cardinalapps/auth-server:latest
     restart: always
     network_mode: host
 
