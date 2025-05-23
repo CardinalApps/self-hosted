@@ -1,7 +1,7 @@
 diff a/.github/workflows/code-validation.yaml b/.github/workflows/code-validation.yaml	(rejected hunks)
 @@ -1,4 +1,4 @@
--name: Code Validation
-+name: 🩻 Code Validation
+-name: 🩻 Code Validation
++name: 🛁 Code Validation
  
  on: push
  
