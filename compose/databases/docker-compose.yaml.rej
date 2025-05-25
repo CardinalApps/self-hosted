@@ -1,25 +1,28 @@
 diff a/compose/databases/docker-compose.yaml b/compose/databases/docker-compose.yaml	(rejected hunks)
-@@ -13,6 +13,17 @@ services:
+@@ -24,6 +24,20 @@ services:
        database-network:
-         ipv4_address: 172.20.0.4
+         ipv4_address: 172.20.0.3
  
-+  # Database for the auth server
-+  cardinal-auth-dev:
-+    container_name: cardinal-db-auth-server
-+    image: mongo:7.0.12
++  # Database for the CMS
++  cardinal-cms-dev:
++    container_name: cardinal-db-cms
++    image: postgres:16.3
 +    restart: always
++    environment:
++      POSTGRES_USER: developer
++      POSTGRES_PASSWORD: developer
 +    volumes:
-+      - cardinal-auth-server:/data/db
++      - cardinal-cms:/var/lib/postgresql/data
 +    networks:
 +      database-network:
-+        ipv4_address: 172.20.0.3
++        ipv4_address: 172.20.0.2
 +
  # Local static network for all databases
  networks:
    database-network:
-@@ -23,3 +34,5 @@ networks:
- volumes:
-   cardinal-media-server-pg-db-data:
+@@ -36,3 +50,5 @@ volumes:
      name: "cardinal-media-server-pg-db-data"
-+  cardinal-auth-server:
-+    name: "cardinal-auth-server-db-data"
+   cardinal-auth-server:
+     name: "cardinal-auth-server-db-data"
++  cardinal-cms:
++    name: "cardinal-cms-db-data"

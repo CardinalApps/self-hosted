@@ -6727,6 +6727,14 @@ packages:
       ajv:
         optional: true
 
+  ajv-formats@3.0.1:
+    resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+
   ajv-keywords@3.5.2:
     resolution: {integrity: sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==}
     peerDependencies:
@@ -22270,7 +22278,7 @@ snapshots:
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/runtime': 7.21.0
+      '@babel/runtime': 7.27.1
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -22768,15 +22776,15 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3))(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)':
+  '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@9.20.1)(typescript@5.7.3))(eslint@9.20.1)(typescript@5.7.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 7.18.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
+      '@typescript-eslint/parser': 7.18.0(eslint@9.20.1)(typescript@5.7.3)
       '@typescript-eslint/scope-manager': 7.18.0
-      '@typescript-eslint/type-utils': 7.18.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
-      '@typescript-eslint/utils': 7.18.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
+      '@typescript-eslint/type-utils': 7.18.0(eslint@9.20.1)(typescript@5.7.3)
+      '@typescript-eslint/utils': 7.18.0(eslint@9.20.1)(typescript@5.7.3)
       '@typescript-eslint/visitor-keys': 7.18.0
-      eslint: 9.20.1(jiti@1.21.7)
+      eslint: 9.20.1
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
@@ -22786,15 +22794,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/eslint-plugin@8.22.0(@typescript-eslint/parser@8.22.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3))(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)':
+  '@typescript-eslint/eslint-plugin@8.22.0(@typescript-eslint/parser@8.22.0(eslint@9.20.1)(typescript@5.7.3))(eslint@9.20.1)(typescript@5.7.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.22.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.22.0(eslint@9.20.1)(typescript@5.7.3)
       '@typescript-eslint/scope-manager': 8.22.0
-      '@typescript-eslint/type-utils': 8.22.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
-      '@typescript-eslint/utils': 8.22.0(eslint@9.20.1(jiti@1.21.7))(typescript@5.7.3)
+      '@typescript-eslint/type-utils': 8.22.0(eslint@9.20.1)(typescript@5.7.3)
+      '@typescript-eslint/utils': 8.22.0(eslint@9.20.1)(typescript@5.7.3)
       '@typescript-eslint/visitor-keys': 8.22.0
-      eslint: 9.20.1(jiti@1.21.7)
+      eslint: 9.20.1
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
@@ -23440,6 +23448,13 @@ snapshots:
       uri-js: 4.4.1
 
   ajv@8.12.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+      uri-js: 4.4.1
+
+  ajv@8.13.0:
     dependencies:
       fast-deep-equal: 3.1.3
       json-schema-traverse: 1.0.0
@@ -25830,7 +25845,7 @@ snapshots:
       array.prototype.tosorted: 1.1.4
       doctrine: 2.1.0
       es-iterator-helpers: 1.2.1
-      eslint: 9.20.1(jiti@1.21.7)
+      eslint: 9.20.1
       estraverse: 5.3.0
       hasown: 2.0.2
       jsx-ast-utils: 3.3.5
@@ -29815,6 +29830,10 @@ snapshots:
       brace-expansion: 2.0.1
 
   minimatch@8.0.4:
+    dependencies:
+      brace-expansion: 2.0.1
+
+  minimatch@9.0.3:
     dependencies:
       brace-expansion: 2.0.1
 
