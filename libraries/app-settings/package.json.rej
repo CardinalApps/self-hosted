@@ -1,0 +1,10 @@
+diff a/libraries/app-settings/package.json b/libraries/app-settings/package.json	(rejected hunks)
+@@ -5,7 +5,7 @@
+   "version": "0.1.25",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "private": true,
+-  "type": "module",
++  "type": "commonjs",
+   "scripts": {
+     "dev": "tsc --watch",
+     "lint": "eslint src",

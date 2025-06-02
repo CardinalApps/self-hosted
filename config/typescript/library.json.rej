@@ -1,0 +1,10 @@
+diff a/config/typescript/library.json b/config/typescript/library.json	(rejected hunks)
+@@ -3,7 +3,7 @@
+   "extends": "./base.json",
+   "compilerOptions": {
+     "module": "commonjs",
+-    "target": "es6",
++    "target": "ES2021",
+     "declaration": true,
+     "noImplicitAny": true,
+     "removeComments": true,
