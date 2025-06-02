@@ -1,10 +1,28 @@
 diff a/package.json b/package.json	(rejected hunks)
-@@ -6,7 +6,7 @@
-   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+@@ -7,7 +7,7 @@
    "private": true,
    "scripts": {
--    "dev": "turbo run dev --ui=tui",
-+    "dev": "turbo run dev --ui=tui --concurrency=25",
-     "dev:woms": "turbo run dev --ui=tui --filter=!@cardinalapps/media-server",
+     "dev": "turbo run dev --ui=tui --concurrency=25",
+-    "dev:woms": "turbo run dev --ui=tui --filter=!@cardinalapps/media-server",
++    "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
      "lint": "turbo run lint --continue -- --max-warnings 0",
      "typecheck": "turbo run typecheck --continue",
+     "build": "turbo run build",
+@@ -27,6 +27,16 @@
+     "node": ">=18"
+   },
+   "pnpm": {
+-    "onlyBuiltDependencies": ["esbuild", "@nestjs/core", "better-sqlite3", "sharp"]
++    "onlyBuiltDependencies": [
++      "@nestjs/core",
++      "@swc/core",
++      "@parcel/watcher",
++      "@strapi/strapi",
++      "better-sqlite3",
++      "core-js",
++      "core-js-pure",
++      "esbuild",
++      "sharp"
++    ]
+   }
+ }
