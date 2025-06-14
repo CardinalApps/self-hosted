@@ -1,0 +1,10 @@
+diff a/apps/cinema-web/src/components/NoContentMessage/NoContentMessage.tsx b/apps/cinema-web/src/components/NoContentMessage/NoContentMessage.tsx	(rejected hunks)
+@@ -31,7 +31,7 @@ function NoContentMessage({
+         bg={1}
+         header={icon}
+         footer={showUnavailableMessage
+-          ? <Button href={`https://forums.cardinalapps.io`} target="_blank" solid={true}>
++          ? <Button href={`https://cardinalapps.io`} target="_blank" solid={true}>
+               {i18n['unavailable-button']['en']}
+             </Button>
+           : button

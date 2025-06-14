@@ -1,0 +1,10 @@
+diff a/apps/music-web/src/components/NoContentMessage/i18n.json b/apps/music-web/src/components/NoContentMessage/i18n.json	(rejected hunks)
+@@ -3,7 +3,7 @@
+     "en": "Coming soon"
+   },
+   "unavailable-desc": {
+-    "en": "This feature is in development. Get involved on the <a href='https://forums.cardinalapps.io' target='_blank'>Forums</a>."
++    "en": "This feature is in development."
+   },
+   "unavailable-button": {
+     "en": "Vote now"

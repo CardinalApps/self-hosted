@@ -1,52 +1,12 @@
 diff a/README.md b/README.md	(rejected hunks)
-@@ -9,8 +9,6 @@ This workspace is built with pnpm and Turborepo.
- 
- ### Packages
- 
--Workspace packages exist in a few top level directories: `/apps`, `/config`, `/libraries`, and `/servers`.
--
- | Package        | Directory    | Dev Port        | Description                                                                          |
- |----------------|--------------|-----------------|--------------------------------------------------------------------------------------|
- | `cinema-web`   | `/apps`      | `3096`          | [Cardinal Cinema](https://cardinalapps.io/cardinal-cinema) web app                   |
-@@ -24,21 +22,16 @@ Workspace packages exist in a few top level directories: `/apps`, `/config`, `/l
- | `ui`           | `/libraries` | `3099`          | React UI & component library with Storybook                                          |
- | `media`        | `/servers`   | `3080`, `24800` | Monolithic [Media Server](https://cardinalapps.io/cardinal-media-server)             |
- 
--These top level directories are not part of the workspace:
--
--- `/compose` - Docker Compose files for the dev env
--- `/docs` - Developer documentation
--
- ## Development
- 
--### 0. Environment
-+### 1. Environment
- 
- Your machine will need:
- 
- 1. Node.js >=18.17.0
- 2. Docker
- 
--### 1. Initialize the workspace
-+### 2. Run all dev apps
- 
-   ```bash
-   # Install pnpm on your machine
-@@ -50,16 +43,9 @@ Your machine will need:
-   # Start the development databases
-   $ cd /compose/databases
-   $ docker compose up -d
--  ```
- 
--### 2. Start apps in development mode
--
--  ```bash
--  # Run the whole dev env from the monorepo root
-+  # From the monorepo root, start the apps
+@@ -48,10 +48,6 @@ Your machine will need:
    $ pnpm dev
--
--  # Or run the dev env without the media server
--  $ pnpm dev:woms
    ```
  
- ## Contributors
+-## Contributors
+-
+-Feedback and suggestions are welcome in the form of [Forum posts](https://forums.cardinalapps.io) or GitHub issues.
+-
+ ## License
+ 
+ This software is licensed under CC BY-NC-NC 4.0. [[HTML](https://creativecommons.org/licenses/by-nc-nd/4.0/)]

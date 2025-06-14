@@ -1,0 +1,16 @@
+diff a/libraries/ui/src/components/features/AppBase/i18n.ts b/libraries/ui/src/components/features/AppBase/i18n.ts	(rejected hunks)
+@@ -2,13 +2,7 @@ import { StringList } from "../../../types/i18n"
+ 
+ const i18n: StringList = {
+   "long-load-time-message": {
+-    "en": "If it hasn't loaded by now then something probably isn't working. If there are no error messages on the screen already then you can check for one in the Network tab of your browser developer tools.",
+-  },
+-  "long-load-time-message-2": {
+-    "en": "You are at the right URL, but your Media Server cannot be reached.",
+-  },
+-  "get-help-on": {
+-    "en": "Get help in the <a href='https://forums.cardinalapps.io' target='_blank'>Community Forums</a>.",
++    "en": "If it hasn't loaded by now then something probably isn't working.",
+   },
+   "dev-tools.title": {
+     "en": "Developer tools",

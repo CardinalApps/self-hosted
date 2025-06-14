@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/features/AppBase/AppLoading.tsx b/libraries/ui/src/components/features/AppBase/AppLoading.tsx	(rejected hunks)
+@@ -22,8 +22,6 @@ export default function AppLoading() {
+       {showLongLoadWarning
+         ? <div className="message">
+             <p>{i18n['long-load-time-message']['en']}</p>
+-            <p>{i18n['long-load-time-message-2']['en']}</p>
+-            <p dangerouslySetInnerHTML={{ __html: i18n['get-help-on']['en'] }} />
+           </div>
+         : <></>
+       }
