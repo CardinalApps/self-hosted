@@ -15,6 +15,14 @@ services:
     restart: always
     network_mode: host
 
+  website:
+    container_name: cardinal-website
+    environment:
+      - MODE=prod
+    image: cardinalapps/website:latest
+    restart: always
+    network_mode: host
+
   status:
     container_name: cardinal-status
     env_file:
