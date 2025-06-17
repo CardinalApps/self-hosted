@@ -1,0 +1,21 @@
+diff a/libraries/ui/src/components/layout/Modal/Modal.css b/libraries/ui/src/components/layout/Modal/Modal.css	(rejected hunks)
+@@ -21,10 +21,6 @@
+     .modal-underlay {
+       opacity: 0.4;
+     }
+-
+-    .modal-center {
+-      transform: translateY(0px) !important;
+-    }
+   }
+ 
+   .modal-underlay {
+@@ -41,8 +37,6 @@
+ 
+   .modal-center {
+     position: relative;
+-    transition: all 400ms;
+-    transform: translateY(6px);
+     z-index: 2;
+   }
+ 

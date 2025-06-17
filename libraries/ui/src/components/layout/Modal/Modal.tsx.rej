@@ -1,0 +1,35 @@
+diff a/libraries/ui/src/components/layout/Modal/Modal.tsx b/libraries/ui/src/components/layout/Modal/Modal.tsx	(rejected hunks)
+@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
+ import type { PropsWithChildren, ReactNode } from 'react'
+ import { useDispatch } from 'react-redux'
+ import { createPortal } from 'react-dom'
++import { motion } from 'framer-motion'
+ 
+ import Loading from '../Loading'
+ 
+@@ -76,7 +77,15 @@ const Modal = ({
+       (
+         <>
+           <div className="modal-underlay" onClick={() => clickOutsideToClose ? handleClose() : null} />
+-          <div className="modal-center">
++          <motion.div
++            className="modal-center"
++            initial={{
++              top: 8,
++            }}
++            animate={{
++              top: 0,
++            }}
++          >
+             <button ref={closeButtonRef} className="modal-close" onClick={handleClose}>
+               <i className="fas fa-times" />
+             </button>
+@@ -88,7 +97,7 @@ const Modal = ({
+                 }
+               </Card>
+             </div>
+-          </div>
++          </motion.div>
+         </>
+       ),
+       document.querySelector('#modal-layer-portal'),

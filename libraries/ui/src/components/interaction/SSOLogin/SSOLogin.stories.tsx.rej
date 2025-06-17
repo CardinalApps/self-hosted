@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.stories.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.stories.tsx	(rejected hunks)
+@@ -54,7 +54,6 @@ export const Default = () => {
+         <button type="button" style={{ marginRight: 10 }} onClick={() => dispatch(fetchUser())}>Login with locally stored cloud JWT</button>
+         <button type="button" style={{ marginRight: 10 }} onClick={() => { if (loggedIn) dispatch(cloudUserLogout()) }}>Log out</button>
+       </p>
+-      <p style={{ paddingTop: 200 }}>This component is intentionally disabled on <em>http://components.cardinalapps.io</em></p>
+     </>
+   )
+ }
