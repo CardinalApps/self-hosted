@@ -1,0 +1,120 @@
+diff a/apps/music-web/src/pages/Tracks/Tracks.tsx b/apps/music-web/src/pages/Tracks/Tracks.tsx	(rejected hunks)
+@@ -1,5 +1,4 @@
+-import { useState } from 'react'
+-//import { useVirtualizer } from '@tanstack/react-virtual'
++import { useState, useMemo } from 'react'
+ 
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+ import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
+@@ -7,15 +6,17 @@ import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+ import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+ import { DEFAULT_PAGINATION } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Pagination'
+ import { DEFAULT_ORDER } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Order'
++import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
+ 
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ 
+ import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
+ 
++import i18n from './i18n.json'
++
+ import './styles.css'
+ 
+ import { HOME_SERVER_HOST } from '../../env'
+-import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
+ 
+ const TOOLBAR_DEFAULTS = {
+   pagination: DEFAULT_PAGINATION,
+@@ -38,67 +39,28 @@ function TracksPage() {
+     order: toolbarValues.order as 'asc' | 'desc',
+   })
+   const [musicTracks = []] = musicTracksResponse || []
+-  const virtualTracks = musicTracks.map((musicTrack, i) => {
+-    const artwork = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+-    return (
+-      <MusicTrack
+-        key={i}
+-        musicTrackId={musicTrack?.id}
+-        trackTitle={musicTrack?.title}
+-        releaseTitle={musicTrack?.release?.title}
+-        artistName={musicTrack?.artists?.[0]?.name}
+-        artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
+-      />
+-    )
+-  })
+ 
+-  // return (
+-  //   <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title']['en']}>
+-  //     <Toolbar
+-  //       items={[
+-  //         {
+-  //           slug: 'pagination',
+-  //           render: 'pagination',
+-  //         },
+-  //         {
+-  //           slug: 'order',
+-  //           initialValue: 'desc',
+-  //           render: 'order',
+-  //         },
+-  //         {
+-  //           slug: 'sort',
+-  //           render: 'sort',
+-  //         },
+-  //       ]}
+-  //       numShowingItems={toolbarValues.pagination.take}
+-  //       numArchiveItems={totalMusicTracks}
+-  //       onInit={(values) => setToolbarValues(values)}
+-  //       onChange={(values) => setToolbarValues(values)}
+-  //       onReset={(values) => setToolbarValues(values)}
+-  //     />
+-  //     {musicTracksLoading
+-  //       ? <Loading />
+-  //       : musicTracks.map((musicTrack, i) => {
+-  //         const artwork = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+-  //         return (
+-  //           <MusicTrack
+-  //             key={i}
+-  //             musicTrackId={musicTrack?.id}
+-  //             trackTitle={musicTrack?.title}
+-  //             releaseTitle={musicTrack?.release?.title}
+-  //             artistName={musicTrack?.artists?.[0]?.name}
+-  //             artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
+-  //           />
+-  //         )
+-  //       })
+-  //     }
+-  //   </AppPage>
+-  // )
++  const virtualTracks = useMemo(
++    () => musicTracks.map((musicTrack, i) => {
++      const artwork = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
++      return (
++        <MusicTrack
++          key={i}
++          musicTrackId={musicTrack?.id}
++          trackTitle={musicTrack?.title}
++          releaseTitle={musicTrack?.release?.title}
++          artistName={musicTrack?.artists?.[0]?.name}
++          artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
++        />
++      )
++    }),
++    [],
++  )
+ 
+   return (
+     <AppPage
+       layout={PAGE_LAYOUT.virtual}
+-      pageTitle="Layout: virtual scroll"
++      pageTitle={i18n['title']['en']}
+       restoreScrollPoint={false}
+       toolbar={(
+         <Toolbar
+@@ -134,7 +96,6 @@ function TracksPage() {
+           itemWidth={'100%'}
+           viewName={virtualViewName}
+           scrollRestorationKey={virtualViewName}
+-          //useVirtualizer={useVirtualizer}
+         />
+       )}
+     />

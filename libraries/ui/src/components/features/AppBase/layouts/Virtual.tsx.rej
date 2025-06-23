@@ -1,38 +1,103 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx b/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx	(rejected hunks)
-@@ -40,12 +40,13 @@ function Virtual({
+@@ -1,4 +1,4 @@
+-import { useEffect, useRef, useState } from 'react'
++import { useEffect, useRef } from 'react'
+ import type { PropsWithChildren, ReactNode } from 'react'
+ import { useDispatch, useSelector } from 'react-redux'
+ import { useVirtualizer } from '@tanstack/react-virtual'
+@@ -7,11 +7,8 @@ import clsx from 'clsx'
+ import {
+   layoutActions,
+   layoutSelectors,
+-  SIDEBAR_MODE,
+ } from '../../../../store/slices/layout'
+ 
+-import useWidowSize from '../../../../hooks/useWindowSize'
+-
+ type VirtualProps = {
+   className?: string | string[],
+   toolbarName?: string,
+@@ -27,7 +24,6 @@ type VirtualProps = {
+  */
+ function Virtual({
+   className,
+-  toolbarName,
+   items,
+   viewName,
+   itemHeight,
+@@ -36,23 +32,9 @@ function Virtual({
+   ...props
+ }: PropsWithChildren<VirtualProps>) {
+   const dispatch = useDispatch()
+-  const windowSize = useWidowSize()
    const boxRef = useRef(null)
    const parentRef = useRef(null)
  
--  const titleHeight = 60
-+  const titleHeight = 40
-   const headerHeight = 73
-   const toolbarHeight = toolbarName
-     ? window.innerWidth < 768 ? 58 : 78
-     : 0
- 
-+  // todo should be 870
-   const calcVirtualHeight = () => (
-     (windowSize.height || window?.innerHeight)
-     - headerHeight
-@@ -65,6 +66,12 @@ function Virtual({
+-  const titleHeight = 40
+-  const headerHeight = 73
+-  const toolbarHeight = toolbarName
+-    ? window.innerWidth < 768 ? 58 : 78
+-    : 0
+-
+-  // todo should be 870
+-  const calcVirtualHeight = () => (
+-    (windowSize.height || window?.innerHeight)
+-    - headerHeight
+-    - titleHeight
+-    - toolbarHeight
+-  ) || 0
+   const calcItemsPerRow = () => {
+     if (itemWidth === '100%') {
+       return 1
+@@ -65,19 +47,8 @@ function Virtual({
+     }
    }
    const calcNumRows = () => Math.ceil(items.length / calcItemsPerRow())
- 
-+  console.log('a', (windowSize.height || window?.innerHeight))
-+  console.log('headerHeight', headerHeight)
-+  console.log('titleHeight', titleHeight)
-+  console.log('toolbarHeight', toolbarHeight)
-+  console.log('calcVirtualHeight', calcVirtualHeight())
-+
-   const [virtualHeight, setVirtualHeight] = useState(calcVirtualHeight())
+-
+-  console.log('a', (windowSize.height || window?.innerHeight))
+-  console.log('headerHeight', headerHeight)
+-  console.log('titleHeight', titleHeight)
+-  console.log('toolbarHeight', toolbarHeight)
+-  console.log('calcVirtualHeight', calcVirtualHeight())
+-
+-  const [virtualHeight, setVirtualHeight] = useState(calcVirtualHeight())
    const scrollPoints = useSelector(layoutSelectors.scrollPoints)
  
-@@ -146,7 +153,7 @@ function Virtual({
+-  const sidebarMode = useSelector(layoutSelectors.sidebarMode)
+-  const sidebarIsCollapsed = sidebarMode === SIDEBAR_MODE.collapsed
+-
+   const handleScrollChange = (instance) => {
+     const startRow = instance?.range?.startIndex + 1
+     const endRow = instance?.range?.endIndex + 1
+@@ -112,23 +83,6 @@ function Virtual({
+     return slice
+   }
+ 
+-  /**
+-   * Recalculate on resize.
+-   */
+-  useEffect(() => {
+-    setVirtualHeight(calcVirtualHeight())
+-  }, [windowSize.height, windowSize.width, calcVirtualHeight()])
+-
+-  /**
+-   * Recalculate after sidebar change.
+-   */
+-  useEffect(() => {
+-    const timeout = setTimeout(() => {
+-      setVirtualHeight(calcVirtualHeight())
+-    }, 400)
+-    return () => clearTimeout(timeout)
+-  }, [sidebarIsCollapsed])
+-
+   /**
+    * Save page scroll location.
+    */
+@@ -153,7 +107,6 @@ function Virtual({
          ref={parentRef}
          className={clsx('virtual-root')}
          style={{
--          height: virtualHeight,
-+          //height: virtualHeight,
+-          //height: virtualHeight,
            width: '100%',
            overflow: 'auto',
            position: 'relative',
