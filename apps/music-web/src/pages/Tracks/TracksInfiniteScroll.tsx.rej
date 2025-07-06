@@ -1,0 +1,35 @@
+diff a/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx b/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx	(rejected hunks)
+@@ -1,12 +1,13 @@
+ import { useState } from 'react'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
+-import { Order } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Order/Order'
+ import {
+   MusicTrackType,
+   TRACKS_PER_RTK_PAGE,
++  TracksSortParams,
+   useGetInfiniteMusicTracksInfiniteQuery,
+ } from '@cardinalapps/ui/src/store/apis/musicTracks'
++import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
+ import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
+ import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+ 
+@@ -33,6 +34,8 @@ function TracksInfiniteScroll({
+     skip: initialPage * TRACKS_PER_RTK_PAGE,
+   })
+ 
++  console.log(toolbarValues)
++
+   const {
+     data,
+     isSuccess,
+@@ -44,7 +47,8 @@ function TracksInfiniteScroll({
+     isFetchingPreviousPage,
+   } = useGetInfiniteMusicTracksInfiniteQuery(
+     {
+-      order: toolbarValues?.order as Order,
++      sort: toolbarValues?.sort as TracksSortParams,
++      order: toolbarValues?.order as CommonOrderParams,
+     },
+     { initialPageParam },
+   )

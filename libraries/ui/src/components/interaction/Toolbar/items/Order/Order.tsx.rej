@@ -1,31 +1,23 @@
 diff a/libraries/ui/src/components/interaction/Toolbar/items/Order/Order.tsx b/libraries/ui/src/components/interaction/Toolbar/items/Order/Order.tsx	(rejected hunks)
-@@ -8,8 +8,13 @@ import i18n from './i18n'
+@@ -3,18 +3,15 @@ import { useSelector } from 'react-redux'
+ import { settingsSelectors } from '../../../../../store/slices/settings'
+ import { layoutSelectors } from '../../../../../store/slices/layout'
+ 
++import { CommonOrderParams } from '../../../../../store/types/api'
++
+ import i18n from './i18n'
+ 
  import './Order.css'
  import { ToolbarItemProps, ToolbarItem } from '../../types'
  
-+export enum Order {
-+  ASC = 'asc',
-+  DESC = 'desc',
-+}
-+
+-export enum Order {
+-  ASC = 'asc',
+-  DESC = 'desc',
+-}
+-
  export const SLUG = ToolbarItem.ORDER
--export const DEFAULT_VALUE = 'asc'
-+export const DEFAULT_VALUE = Order.ASC
+-export const DEFAULT_VALUE = Order.ASC
++export const DEFAULT_VALUE: CommonOrderParams = 'asc'
  
  /**
   * This toolbar item is used for setting the order (ascending or descending) of
-@@ -18,7 +23,7 @@ export const DEFAULT_VALUE = 'asc'
-  * asc = A-z, 0-9
-  * desc = z-A, 9-0
-  */
--const Order = ({
-+const ToolbarOrder = ({
-   toolbarName,
-   onChange = () => {},
- }: ToolbarItemProps) => {
-@@ -47,4 +52,4 @@ const Order = ({
-   )
- }
- 
--export default Order
-+export default ToolbarOrder

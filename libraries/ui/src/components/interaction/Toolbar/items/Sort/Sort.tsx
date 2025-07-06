@@ -36,7 +36,7 @@ interface SortToolbarItemProps extends ToolbarItemProps {
  * content. Pages can choose which default directives to support, and can extend
  * the directives with custom ones.
  */
-const Sort = ({
+const ToolbarSort = ({
   toolbarName,
   item,
   onChange = () => {},
@@ -90,4 +90,4 @@ const Sort = ({
   )
 }
 
-export default Sort
+export default ToolbarSort
