@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/interaction/SidebarNav/SidebarNav.css b/libraries/ui/src/components/interaction/SidebarNav/SidebarNav.css	(rejected hunks)
+@@ -194,7 +194,7 @@
+       right: -4px;
+       bottom: 6px;
+       opacity: 0;
+-      box-shadow: var(--box-shadow-3);
++      border: 1px solid var(--border-color-3);
+       border-radius: 24px;
+       background-color: var(--bg-1);
+       transition: all 400ms;
