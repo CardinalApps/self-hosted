@@ -1,0 +1,7 @@
+diff a/libraries/ui/src/store/types/api.ts b/libraries/ui/src/store/types/api.ts	(rejected hunks)
+@@ -7,3 +7,5 @@ export type SortParams = {
+   order?: 'asc' | 'desc',
+   orderBy?: 'name' | 'createdAt',
+ }
++
++export type RTKPage = [Record<string, unknown>[], number]

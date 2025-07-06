@@ -1,0 +1,17 @@
+diff a/libraries/ui/src/store/index.ts b/libraries/ui/src/store/index.ts	(rejected hunks)
+@@ -52,6 +52,7 @@ import createDefaultStore from './utils/createDefaultStore'
+ import deletePendingRTKCache from './utils/deletePendingRTKCache'
+ import triggerLifecycle from './utils/triggerLifecycle'
+ import { getStorageKey } from './utils/getStorageKey'
++import deleteInfiniteQueryCache from './utils/deleteInfiniteQueryCache'
+ 
+ /**
+  * All apps use a store of this shape.
+@@ -93,6 +94,7 @@ const createStore = () => {
+ 
+   merge(preloadedState, cachedStore)
+   deletePendingRTKCache(preloadedState)
++  deleteInfiniteQueryCache(preloadedState)
+ 
+   // Before store init lifecycle
+   triggerLifecycle(preloadedState, [

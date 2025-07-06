@@ -1,0 +1,21 @@
+diff a/libraries/ui/src/components/features/AppBase/AppPage.tsx b/libraries/ui/src/components/features/AppBase/AppPage.tsx	(rejected hunks)
+@@ -36,7 +36,6 @@ function AppPage({
+   children,
+   restoreScrollPoint = true,
+   toolbar,
+-  virtualLayout,
+   style,
+   ...props
+ }: PropsWithChildren<AppPageProps>) {
+@@ -91,10 +90,7 @@ function AppPage({
+           {toolbar}
+         </div>
+       )}
+-      {layout === PAGE_LAYOUT.virtual && !!virtualLayout
+-        ? virtualLayout
+-        : children
+-      }
++      {children}
+     </div>
+   )
+ }

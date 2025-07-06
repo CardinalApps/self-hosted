@@ -1,0 +1,80 @@
+diff a/libraries/ui/src/store/apis/musicTracks.ts b/libraries/ui/src/store/apis/musicTracks.ts	(rejected hunks)
+@@ -6,6 +6,10 @@ import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHead
+ import { HOME_SERVER_HOST } from '../../../env'
+ import { PaginationParams, SortParams } from '../types/api'
+ 
++import { getNextPageParam, getPreviousPageParam } from '../utils/infiniteScroll'
++
++export const TRACKS_PER_RTK_PAGE = 40
++
+ export type MusicTrackType = {
+   id: number,
+   title: string,
+@@ -30,12 +34,46 @@ export const musicTracksApi = createApi({
+   }),
+   endpoints: (builder) => ({
+     /**
+-     * Queries.
++     * Infinite scroll.
++     */
++    getInfiniteMusicTracks: builder.infiniteQuery<
++      [MusicTrackType[], number],
++      SortParams & {
++        release?: boolean,
++        metadata?: boolean
++      },
++      PaginationParams
++    >({
++      infiniteQueryOptions: {
++        initialPageParam: {
++          take: TRACKS_PER_RTK_PAGE,
++          skip: 0,
++        },
++        maxPages: 4,
++        getNextPageParam,
++        getPreviousPageParam,
++      },
++      query({ queryArg, pageParam }) {
++        const { release, metadata, order, orderBy } = queryArg
++        const { take, skip } = pageParam
++        return queryParams('/music/tracks', {
++          ...(take && { take }),
++          ...(typeof skip !== 'undefined' && { skip }),
++          ...(order && { order }),
++          ...(orderBy && { orderBy }),
++          ...(release && { release }),
++          ...(metadata && { metadata }),
++        })
++      },
++    }),
++
++    /**
++     * Get many.
+      */
+     getMusicTracks: builder.query<
+       [MusicTrackType[], number],
+       PaginationParams & SortParams & {
+-        release?: boolean
++        release?: boolean,
+         metadata?: boolean
+       }
+     >({
+@@ -50,6 +88,10 @@ export const musicTracksApi = createApi({
+         })
+       },
+     }),
++
++    /**
++     * Get one.
++     */
+     getMusicTrack: builder.query<
+       MusicTrackType,
+       { id: number }
+@@ -62,6 +104,7 @@ export const musicTracksApi = createApi({
+ })
+ 
+ export const {
++  useGetInfiniteMusicTracksInfiniteQuery,
+   useGetMusicTracksQuery,
+   useLazyGetMusicTracksQuery,
+   useGetMusicTrackQuery,

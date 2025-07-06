@@ -1,53 +1,97 @@
 diff a/apps/music-web/src/pages/Tracks/Tracks.tsx b/apps/music-web/src/pages/Tracks/Tracks.tsx	(rejected hunks)
-@@ -1,11 +1,10 @@
--import { useState, useMemo } from 'react'
-+import { useMemo } from 'react'
- 
+@@ -1,58 +1,19 @@
+-import { useMemo } from 'react'
+-
  import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
- import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
- import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+-import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
+-import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
  import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
--import { DEFAULT_PAGINATION } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Pagination'
--import { DEFAULT_ORDER } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Order'
-+import { Order } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Order/Order'
+-import { Order } from '@cardinalapps/ui/src/components/interaction/Toolbar/items/Order/Order'
  import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
  
  import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
-@@ -17,16 +16,13 @@ import i18n from './i18n.json'
+ 
+-import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
++import TracksInfiniteScroll from './TracksInfiniteScroll'
+ 
+ import i18n from './i18n.json'
+ 
  import './styles.css'
  
- import { HOME_SERVER_HOST } from '../../env'
--
--const TOOLBAR_DEFAULTS = {
--  pagination: DEFAULT_PAGINATION,
--  order: DEFAULT_ORDER,
--}
-+import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
-+import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
+-import { HOME_SERVER_HOST } from '../../env'
+-import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+-import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
++const TOOLBAR_NAME = 'tracks-toolbar'
++const VIRTUAL_VIEW_NAME = 'tracks-page'
  
  function TracksPage() {
-   const toolbarName = 'tracks-toolbar'
-   const virtualViewName = 'virtual-tracks'
--  const [toolbarValues] = useState(TOOLBAR_DEFAULTS)
-+  const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
- 
-   const {
-     data: musicTracksResponse,
-@@ -36,7 +32,7 @@ function TracksPage() {
-   } = useGetMusicTracksQuery({
-     take: 99999,
-     skip: 0,
--    order: toolbarValues.order as 'asc' | 'desc',
-+    order: toolbarValues?.order as Order,
-   })
-   const [musicTracks = []] = musicTracksResponse || []
- 
-@@ -54,7 +50,7 @@ function TracksPage() {
-         />
-       )
-     }),
--    [],
-+    [musicTracks],
-   )
- 
+-  const toolbarName = 'tracks-toolbar'
+-  const virtualViewName = 'virtual-tracks'
+-  const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
+-
+-  const {
+-    data: musicTracksResponse,
+-    // isLoading: musicTracksLoading,
+-    // error: musicTracksError,
+-    // refetch: refretchMusicTracks,
+-  } = useGetMusicTracksQuery({
+-    take: 99999,
+-    skip: 0,
+-    order: toolbarValues?.order as Order,
+-  })
+-  const [musicTracks = []] = musicTracksResponse || []
+-
+-  const virtualTracks = useMemo(
+-    () => musicTracks.map((musicTrack, i) => {
+-      const artwork = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+-      return (
+-        <MusicTrack
+-          key={i}
+-          musicTrackId={musicTrack?.id}
+-          trackTitle={musicTrack?.title}
+-          releaseTitle={musicTrack?.release?.title}
+-          artistName={musicTrack?.artists?.[0]?.name}
+-          artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
+-        />
+-      )
+-    }),
+-    [musicTracks],
+-  )
+-
    return (
+     <AppPage
+       layout={PAGE_LAYOUT.virtual}
+@@ -60,8 +21,8 @@ function TracksPage() {
+       restoreScrollPoint={false}
+       toolbar={(
+         <Toolbar
+-          name={toolbarName}
+-          virtualViewName={virtualViewName}
++          name={TOOLBAR_NAME}
++          virtualViewName={VIRTUAL_VIEW_NAME}
+           items={[
+             {
+               slug: 'order',
+@@ -85,16 +46,12 @@ function TracksPage() {
+           ]}
+         />
+       )}
+-      virtualLayout={(
+-        <VirtualLayout
+-          items={virtualTracks}
+-          itemHeight={61}
+-          itemWidth={'100%'}
+-          viewName={virtualViewName}
+-          scrollRestorationKey={virtualViewName}
+-        />
+-      )}
+-    />
++    >
++      <TracksInfiniteScroll
++        virtualViewName={VIRTUAL_VIEW_NAME}
++        toolbarName={TOOLBAR_NAME}
++      />
++    </AppPage>
+   )
+ }
+ 

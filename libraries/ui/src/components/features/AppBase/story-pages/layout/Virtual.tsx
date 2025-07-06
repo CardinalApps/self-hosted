@@ -82,17 +82,16 @@ function VirtualPage() {
           ]}
         />
       )}
-      virtualLayout={(
-        <VirtualLayout
-          toolbarName={toolbarName}
-          items={fixedItems}
-          itemHeight={itemHeight}
-          itemWidth={itemWidth}
-          viewName={virtualViewName}
-          scrollRestorationKey={virtualViewName}
-        />
-      )}
-    />
+    >
+      <VirtualLayout
+        name="demo-page"
+        toolbarName={toolbarName}
+        //items={fixedItems}
+        itemHeight={itemHeight}
+        itemWidth={itemWidth}
+        scrollRestorationKey={virtualViewName}
+      />
+    </AppPage>
   )
 }
 

@@ -1,103 +1,253 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx b/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useEffect, useRef, useState } from 'react'
-+import { useEffect, useRef } from 'react'
+@@ -1,6 +1,5 @@
+-import { useEffect, useRef } from 'react'
++import { useEffect, useLayoutEffect, useRef, useState } from 'react'
  import type { PropsWithChildren, ReactNode } from 'react'
- import { useDispatch, useSelector } from 'react-redux'
+-import { useDispatch, useSelector } from 'react-redux'
  import { useVirtualizer } from '@tanstack/react-virtual'
-@@ -7,11 +7,8 @@ import clsx from 'clsx'
- import {
+ import clsx from 'clsx'
+ 
+@@ -8,34 +7,67 @@ import {
    layoutActions,
    layoutSelectors,
--  SIDEBAR_MODE,
  } from '../../../../store/slices/layout'
++import { useAppSelector } from '../../../../hooks/useAppSelector'
++import { useAppDispatch } from '../../../../hooks/useAppDispatch'
++import { PaginationParams, RTKPage } from '../../../../store/types/api'
  
--import useWidowSize from '../../../../hooks/useWindowSize'
--
  type VirtualProps = {
++  virtualViewName: string,
    className?: string | string[],
    toolbarName?: string,
-@@ -27,7 +24,6 @@ type VirtualProps = {
+-  items: Array<ReactNode>,
+-  viewName: string,
++  data: {
++    pages: RTKPage[],
++    pageParams: PaginationParams[],
++  },
++  isSuccess: boolean,
+   itemHeight: number,
+   itemWidth: number | '100%',
+   scrollRestorationKey?: string,
++  hasNextPage: boolean,
++  hasPreviousPage: boolean,
++  fetchNextPage: () => void,
++  fetchPreviousPage: () => void,
++  isFetchingNextPage: boolean,
++  isFetchingPreviousPage: boolean,
++  getRowItems?: (rowIndex: number) => ReactNode,
+ }
+ 
+ /**
+- * All scaffold pages in the app should be wrapped with this.
++ * When paired with RTK infinite scroll queries, this implements bi-directional
++ * virtualized scrolling.
   */
- function Virtual({
+-function Virtual({
++function VirtualLayout({
++  virtualViewName,
    className,
--  toolbarName,
-   items,
-   viewName,
+-  items,
+-  viewName,
++  data,
++  getRowItems,
++  isSuccess,
    itemHeight,
-@@ -36,23 +32,9 @@ function Virtual({
+   itemWidth,
+-  scrollRestorationKey,
++  hasNextPage,
++  hasPreviousPage,
++  fetchNextPage,
++  fetchPreviousPage,
++  isFetchingNextPage,
++  isFetchingPreviousPage,
    ...props
  }: PropsWithChildren<VirtualProps>) {
-   const dispatch = useDispatch()
--  const windowSize = useWidowSize()
+-  const dispatch = useDispatch()
++  const dispatch = useAppDispatch()
    const boxRef = useRef(null)
-   const parentRef = useRef(null)
+-  const parentRef = useRef(null)
++  const parentRef = useRef<HTMLDivElement>(null)
++  const { [virtualViewName]: virtualView } = useAppSelector(layoutSelectors.virtualViews)
++  const [initialOffset] = useState(virtualView?.offset || 0)
  
--  const titleHeight = 40
--  const headerHeight = 73
--  const toolbarHeight = toolbarName
--    ? window.innerWidth < 768 ? 58 : 78
--    : 0
--
--  // todo should be 870
--  const calcVirtualHeight = () => (
--    (windowSize.height || window?.innerHeight)
--    - headerHeight
--    - titleHeight
--    - toolbarHeight
--  ) || 0
-   const calcItemsPerRow = () => {
+-  const calcItemsPerRow = () => {
++  const { pages = [], pageParams = [] } = data || {}
++  const cachedRTKData = pages.flatMap((res) => res[0])
++  const totalItems = pages?.[0]?.[1] || 0
++  const leadingPageParams = pageParams[pageParams.length - 1]
++  const trailingPageParams = pageParams[0]
++
++  /**
++   * Determine how many items go in each row for the current screen size.
++   */
++  const itemsPerRow = (): number => {
      if (itemWidth === '100%') {
        return 1
-@@ -65,19 +47,8 @@ function Virtual({
+     } else {
+@@ -46,60 +78,90 @@ function Virtual({
+       )) || 1
      }
    }
-   const calcNumRows = () => Math.ceil(items.length / calcItemsPerRow())
--
--  console.log('a', (windowSize.height || window?.innerHeight))
--  console.log('headerHeight', headerHeight)
--  console.log('titleHeight', titleHeight)
--  console.log('toolbarHeight', toolbarHeight)
--  console.log('calcVirtualHeight', calcVirtualHeight())
--
--  const [virtualHeight, setVirtualHeight] = useState(calcVirtualHeight())
-   const scrollPoints = useSelector(layoutSelectors.scrollPoints)
+-  const calcNumRows = () => Math.ceil(items.length / calcItemsPerRow())
+-  const scrollPoints = useSelector(layoutSelectors.scrollPoints)
  
--  const sidebarMode = useSelector(layoutSelectors.sidebarMode)
--  const sidebarIsCollapsed = sidebarMode === SIDEBAR_MODE.collapsed
--
-   const handleScrollChange = (instance) => {
+-  const handleScrollChange = (instance) => {
++  /**
++   * Cache the virtual position for reinitialization on page reload.
++   */
++  const onVirtualChange = (instance) => {
      const startRow = instance?.range?.startIndex + 1
      const endRow = instance?.range?.endIndex + 1
-@@ -112,23 +83,6 @@ function Virtual({
-     return slice
+-    const start = startRow - 1 <= 0 ? 1 : ((startRow - 1) * calcItemsPerRow()) + 1
+-    const end = Math.min(((endRow) * calcItemsPerRow()), items.length)
++    const start = startRow - 1 <= 0 ? 1 : ((startRow - 1) * itemsPerRow()) + 1
++    const end = Math.min(((endRow) * itemsPerRow()), totalItems)
+     dispatch(layoutActions.setVirtualView({
+-      name: viewName,
++      name: virtualViewName,
+       value: {
+         start,
+         end,
+-        total: items.length,
++        offset: instance.scrollOffset,
++        total: totalItems,
+       },
+     }))
    }
  
--  /**
--   * Recalculate on resize.
--   */
--  useEffect(() => {
--    setVirtualHeight(calcVirtualHeight())
--  }, [windowSize.height, windowSize.width, calcVirtualHeight()])
--
--  /**
--   * Recalculate after sidebar change.
--   */
--  useEffect(() => {
--    const timeout = setTimeout(() => {
--      setVirtualHeight(calcVirtualHeight())
--    }, 400)
--    return () => clearTimeout(timeout)
--  }, [sidebarIsCollapsed])
+   const rowVirtualizer = useVirtualizer({
+-    count: calcNumRows(),
+-    getScrollElement: () => parentRef.current,
++    count: Math.ceil(totalItems / itemsPerRow()),
+     estimateSize: () => itemHeight,
+-    overscan: 5,
++    getScrollElement: () => parentRef.current,
++    overscan: 4,
+     gap: 20,
+     paddingStart: 1,
+     paddingEnd: 20,
+-    initialOffset: scrollPoints?.[scrollRestorationKey] as number || 0,
+-    onChange: handleScrollChange,
++    onChange: onVirtualChange,
+   })
+ 
+-  const getRowItems = (rowIndex: number) => {
+-    const start = Math.floor(rowIndex * calcItemsPerRow())
+-    const end = Math.ceil(start + calcItemsPerRow())
+-    const slice = items.slice(start, end)
+-    return slice
+-  }
 -
    /**
-    * Save page scroll location.
+-   * Save page scroll location.
++   * As the user scrolls, keep just enough query data in memory to render the
++   * virtual rows. This keeps only +1 page of overflow data in memory in each
++   * direction.
++   * 
++   * For the first load to work correctly, the RTK query must correctly
++   * reinitialize itself using its cached state.
     */
-@@ -153,7 +107,6 @@ function Virtual({
-         ref={parentRef}
-         className={clsx('virtual-root')}
-         style={{
--          //height: virtualHeight,
-           width: '100%',
-           overflow: 'auto',
-           position: 'relative',
+   useEffect(() => {
+-    if (!rowVirtualizer.isScrolling) {
+-      dispatch(layoutActions.saveScrollPoint({ name: scrollRestorationKey, px: rowVirtualizer.scrollOffset }))
++    const virtualItems = [...rowVirtualizer.getVirtualItems()]
++    const firstItem = virtualItems[0]
++    const lastItem = virtualItems[virtualItems.length - 1]
++
++    if (!firstItem || virtualItems.length >= totalItems) {
++      return
++    }
++
++    const offset = 0
++    const nextPageTrigger = leadingPageParams.skip - offset
++    const prevPageTrigger = trailingPageParams.skip + offset
++
++    if (
++      lastItem.index > nextPageTrigger
++      && hasNextPage
++      && !isFetchingNextPage
++    ) {
++      fetchNextPage()
+     }
+-  }, [rowVirtualizer.isScrolling])
++
++    if (
++      firstItem.index < prevPageTrigger
++      && hasPreviousPage
++      && !isFetchingPreviousPage
++    ) {
++      fetchPreviousPage()
++    }
++  }, [
++    hasNextPage,
++    hasPreviousPage,
++    fetchNextPage,
++    fetchPreviousPage,
++    isFetchingNextPage,
++    isFetchingPreviousPage,
++    cachedRTKData.length,
++    rowVirtualizer.getVirtualItems(),
++  ])
+ 
+   /**
+-   * Respond to changes to our scroll position in the store.
++   * Set initial offset after the RTK query has loaded.
+    */
+-  useEffect(() => {
+-    if (scrollPoints?.[scrollRestorationKey] !== rowVirtualizer.scrollOffset) {
+-      rowVirtualizer.scrollToOffset(scrollPoints?.[scrollRestorationKey] as number)
+-    }
+-  }, [scrollPoints])
++  useLayoutEffect(() => {
++    rowVirtualizer.scrollToOffset(initialOffset)
++  }, [isSuccess])
+ 
+   return (
+     <div {...props} className={clsx('virtual-layout', className)}>
+@@ -120,25 +182,29 @@ function Virtual({
+             position: 'relative',
+           }}
+         >
+-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+-            return (
+-              <div
+-                key={virtualRow.index}
+-                className="virtual-row"
+-                data-row-index={virtualRow.index}
+-                style={{
+-                  height: `${virtualRow.size}px`,
+-                  transform: `translateY(${virtualRow.start}px)`,
+-                }}
+-              >
+-                {getRowItems(virtualRow.index)}
+-              </div>
+-            )
+-          })}
++          {
++            data
++            && !!cachedRTKData?.length
++            && rowVirtualizer.getVirtualItems().map((virtualRow) => {
++              return (
++                <div
++                  key={virtualRow.index}
++                  className="virtual-row"
++                  data-row-index={virtualRow.index}
++                  style={{
++                    height: `${virtualRow.size}px`,
++                    transform: `translateY(${virtualRow.start}px)`,
++                  }}
++                >
++                  {getRowItems(virtualRow.index)}
++                </div>
++              )
++            },
++          )}
+         </div>
+       </div>
+     </div>
+   )
+ }
+ 
+-export default Virtual
++export default VirtualLayout

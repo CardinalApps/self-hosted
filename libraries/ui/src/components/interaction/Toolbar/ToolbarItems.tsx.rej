@@ -1,0 +1,49 @@
+diff a/libraries/ui/src/components/interaction/Toolbar/ToolbarItems.tsx b/libraries/ui/src/components/interaction/Toolbar/ToolbarItems.tsx	(rejected hunks)
+@@ -61,6 +61,7 @@ const ToolbarItems = ({
+   const windowSize = useWindowSize()
+   const { lang } = useSelector(settingsSelectors.current)
+   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
++  const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+ 
+   /**
+    * Return an instance of a built-in toolbar component.
+@@ -133,7 +134,6 @@ const ToolbarItems = ({
+    * (e.g., photos, albums, etc).
+    */
+   const itemName = function() {
+-    const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+     const total = virtualViewName ? virtualView?.total : numArchiveItems
+     return total === 1
+       ? itemNameSingular ? itemNameSingular : i18n['item.singular.default'][lang]
+@@ -145,7 +145,6 @@ const ToolbarItems = ({
+    * `numArchiveItems`.
+    */
+   const SimpleCountGroup = function() {
+-    const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+     if (!numArchiveItems) {
+       return <></>
+     }
+@@ -171,7 +170,6 @@ const ToolbarItems = ({
+    * virtual layout.
+    */
+   const VirtualLayoutGroup = function() {
+-    const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+     return (
+       !!virtualView?.start && !!virtualView?.end && !!virtualView?.total &&
+         <div className="toolbar-group">
+@@ -190,7 +188,6 @@ const ToolbarItems = ({
+    * Shows the current selection of items.
+    */
+   const SelectionGroup = function() {
+-    const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+     const total = virtualViewName ? virtualView?.total : numArchiveItems
+     return (
+       /* Controls for the selected items */
+@@ -224,7 +221,6 @@ const ToolbarItems = ({
+    * Render all of the items provided by the Toolbar `items` prop.
+    */
+   const ProvidedItemsGroup = function() {
+-    const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+     const total = virtualViewName ? virtualView?.total : numArchiveItems
+     return (
+       !!items.length && groupedItems().map((group, i) => {

@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/store/slices/layout/index.ts b/libraries/ui/src/store/slices/layout/index.ts	(rejected hunks)
+@@ -7,6 +7,7 @@ import { STORE_KEY, SIDEBAR_MODE, PAGE_LAYOUT } from './constants'
+ export type VirtualView = {
+   total: number,
+   start: number,
++  offset: number,
+   end: number,
+ }
+ 
