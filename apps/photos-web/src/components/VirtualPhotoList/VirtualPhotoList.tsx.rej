@@ -1,0 +1,10 @@
+diff a/apps/photos-web/src/components/VirtualPhotoList/VirtualPhotoList.tsx b/apps/photos-web/src/components/VirtualPhotoList/VirtualPhotoList.tsx	(rejected hunks)
+@@ -625,7 +625,7 @@ function VirtualPhotoList({
+         {({ width, height }) => (
+           <List
+             ref={(ref) => listRef.current = ref }
+-            className={clsx('list', `virtual-list-${'photos-archive'}`, listClassName)}
++            className={clsx('virtual-list', `virtual-list-${'photos-archive'}`, listClassName)}
+             width={width || 0}
+             height={height || 0}
+             //deferredMeasurementCache={cellMeasureCache}

@@ -1,0 +1,7 @@
+diff a/apps/photos-web/src/components/VirtualPhotoList/styles.css b/apps/photos-web/src/components/VirtualPhotoList/styles.css	(rejected hunks)
+@@ -1,4 +1,4 @@
+-.list {
++.virtual-list {
+   margin-left: -10px;
+   padding-left: 30px;
+   position: relative;
