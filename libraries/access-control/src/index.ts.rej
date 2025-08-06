@@ -1,0 +1,117 @@
+diff a/libraries/access-control/src/index.ts b/libraries/access-control/src/index.ts	(rejected hunks)
+@@ -1,3 +1,12 @@
++/**
++ * All possible roles. Roles are used to bundle capabilities.
++ */
++export enum Role {
++  OWNER = 'owner',
++  CONSUMER = 'consumer',
++  GUEST = 'guest',
++}
++
+ /**
+  * Capabilities are booleans that restrict access to things.
+  */
+@@ -6,43 +15,75 @@ export type CapabilityValue = boolean
+ /**
+  * All possible capabilities.
+  */
+-export enum Capabilities {
++export enum Capability {
++  // music
++  LOG_INTO_MUSIC_APP = 'log_into_music_app',
+   LIST_MUSIC_TRACKS = 'list_music_tracks',
+-}
++  PLAY_MUSIC = 'play_music',
+ 
+-/**
+- * An object of capabilities assigned to a specific user.
+- */
+-export type CapabilitiesAssignment = {
+-  [cap: string]: CapabilityValue,
+-}
++  // photos
++  LOG_INTO_PHOTOS_APP = 'log_into_photos_app',
+ 
+-/**
+- * All possible roles. Roles are used to bundle capabilities.
+- */
+-export enum Role {
+-  OWNER = 'owner',
+-  CONSUMER = 'consumer',
+-  GUEST = 'guest',
++  // cinema
++  LOG_INTO_CINEMA_APP = 'log_into_cinema_app',
++
++  // admin
++  LOG_INTO_ADMIN_APP = 'log_into_admin_app',
+ }
+ 
+ /**
+- * Default capability for the Owner role.
++ * Arrays of capabilities are assigned to users.
+  */
+-export const DefaultGuestCapabilities = {
+-  [Capabilities.LIST_MUSIC_TRACKS]: true,
+-} as const
++export type CapabilitiesAssignment = Capability[]
+ 
+-/**
+- * Default capability for the Owner role.
+- */
+-export const DefaultConsumerCapabilities = {
++const DefaultGuestCapabilities: CapabilitiesAssignment = [
++  Capability.LIST_MUSIC_TRACKS,
++  Capability.PLAY_MUSIC,
++]
++
++const DefaultConsumerCapabilities: CapabilitiesAssignment = [
+   ...DefaultGuestCapabilities,
++] as const
++
++const DefaultOwnerCapabilities: CapabilitiesAssignment = [
++  ...DefaultConsumerCapabilities,
++] as const
++
++export const DefaultCapabilities = {
++  [Role.GUEST]: DefaultGuestCapabilities,
++  [Role.CONSUMER]: DefaultConsumerCapabilities,
++  [Role.OWNER]: DefaultOwnerCapabilities,
+ } as const
+ 
++export interface UserDuck {
++  role?: string
++  capabilities?: CapabilitiesAssignment
++}
++
+ /**
+- * Default capability for the Owner role.
++ * This access control class is used to check what a single user can do.
+  */
+-export const DefaultOwnerCapabilities = {
+-  ...DefaultGuestCapabilities,
+-} as const
++export class AC {
++  // either the role or a caps list is needed
++  constructor(user: UserDuck) {
++    if (!user.role && !user?.capabilities?.length) {
++      this.capabilities = []
++    } else {
++      this.user = user
++
++      // use given caps, or load default caps for the role
++      if (user?.capabilities?.length) {
++        this.capabilities = user.capabilities
++      } else if (Object.values(Role).includes(user.role as Role)) {
++        this.capabilities = DefaultCapabilities[user.role as Role]
++      }
++    }
++  }
++
++  user: UserDuck
++  capabilities: CapabilitiesAssignment
++
++  can(cap: Capability) {
++    return this.capabilities.includes(cap)
++  }
++}
