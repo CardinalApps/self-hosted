@@ -1,0 +1,60 @@
+diff a/servers/media/src/utils/jwt.ts b/servers/media/src/utils/jwt.ts	(rejected hunks)
+@@ -1,5 +1,11 @@
++import * as fs from 'fs'
++import * as crypto from 'crypto'
++import * as fsExtra from 'fs-extra'
++import { Logger } from '@nestjs/common'
+ import jwtDecode from 'jwt-decode'
+ 
++import { envVar, getAppDir } from './env'
++
+ export type LocalUserJWTPayload = {
+   uid: string,
+   role: string,
+@@ -58,3 +64,46 @@ export const getCardinalTolkienFromHeaders = (headers): string | undefined | nul
+ export const getJWTPayload = (JWT): Record<string, unknown> => {
+   return jwtDecode(JWT)
+ }
++
++export const generateSigningSecret = () => {
++  return crypto.randomBytes(64).toString('hex')
++}
++
++/**
++ * Returns the JWT signing secret.
++ * 
++ * 1. If a secret is given in the env vars, use it.
++ * 2. If a cached secret exists in the OS, use it.
++ * 3. If one does not exist, generate it and use it.
++ * 4. If that fails, use the fallback (less secure but functional).
++ */
++export const getSigningSecret = () => {
++  const override = envVar('SIGNING_SECRET', null) as string | null
++
++  if (override) {
++    return override
++  }
++
++  const fileOnClientMachine = getAppDir('signing_secret_DO_NOT_SHARE')
++  const fallback = '340f94ad046a7539058f25c7f46036b4b9bd840313ab4496b4da194df0cb6bb5408a23998b5fa9843cf424e9f514662c5a4d5b19fedb6efd49b286bcaf67b2a0'
++
++  try {
++    fsExtra.ensureFileSync(fileOnClientMachine)
++    const cached = fs.readFileSync(fileOnClientMachine, 'utf-8')
++
++    if (cached) {
++      return cached
++    }
++
++    Logger.log('Generating signing secret.', 'Environment')
++
++    const newSecret = generateSigningSecret()
++    fs.writeFileSync(fileOnClientMachine, newSecret)
++
++    return newSecret
++  } catch (error) {
++    console.error(error)
++    Logger.warn('Using fallback signing secret. This is less secure.', 'Environment')
++    return fallback
++  }
++}
