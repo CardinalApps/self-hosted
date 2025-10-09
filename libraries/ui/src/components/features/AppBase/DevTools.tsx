@@ -56,7 +56,7 @@ export default function AppLoading() {
             <span>{i18n['dev-tools.go-to']['en']}</span>
             <Select
               multi={false}
-              //onChange={(v) => { if (v) navigate(v) }}
+              onChange={(v) => { if (v) navigate(v) }}
               options={{
                 '/': '/',
                 '/login': '/login',

@@ -1,26 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/DevTools.tsx b/libraries/ui/src/components/features/AppBase/DevTools.tsx	(rejected hunks)
-@@ -1,6 +1,5 @@
--import { useState } from 'react'
-+import { useContext, useState } from 'react'
- import { useSelector, useDispatch } from 'react-redux'
--import { useNavigate, useLocation } from 'react-router-dom'
- import { motion, useDragControls } from 'framer-motion'
- 
- import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
-@@ -12,14 +11,14 @@ import Select from '../../forms/Select'
- import Button from '../../interaction/Button'
- import TextInput from '../../forms/TextInput'
- import H6 from '../../typography/H6'
-+import { RouterContext } from '../../../context/router'
- 
- import i18n from './i18n'
- 
+@@ -18,7 +18,7 @@ import i18n from './i18n'
  import './AppBase.css'
  
  export default function AppLoading() {
--  const navigate = useNavigate()
--  const location = useLocation()
-+  const { location } = useContext(RouterContext)
+-  const { location } = useContext(RouterContext)
++  const { location, navigate } = useContext(RouterContext)
    const dispatch = useDispatch()
    const dragControls = useDragControls()
    const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
