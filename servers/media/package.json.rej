@@ -1,9 +1,16 @@
 diff a/servers/media/package.json b/servers/media/package.json	(rejected hunks)
-@@ -74,6 +74,7 @@
-     "semver": "^7.5.4",
-     "sharp": "^0.32.0",
-     "typeorm": "^0.3.20",
-+    "typeorm-naming-strategies": "^4.1.0",
-     "ua-parser-js": "^1.0.37",
-     "uuid": "^11.0.5"
-   },
+@@ -13,10 +13,10 @@
+     "build:bin": "pkg --config ./package.json --out-path ./bin/prod ./dist/main.js",
+     "build:bin:dev": "pkg --debug --config ./package.json --out-path ./bin/dev ./dist/main.js",
+     "bundle": "pnpm bundle:admin && pnpm bundle:photos && pnpm bundle:music && pnpm bundle:cinema",
+-    "bundle:admin": "rm -rf ./public/admin && rsync -av --progress ../../apps/admin-web/dist/* ./public/admin && rsync -av --progress ../../apps/admin-web/package.json ./public/admin",
+-    "bundle:photos": "rm -rf ./public/photos && rsync -av --progress ../../apps/photos-web/dist/* ./public/photos && rsync -av --progress ../../apps/photos-web/package.json ./public/photos",
+-    "bundle:music": "rm -rf ./public/music && rsync -av --progress ../../apps/music-web/dist/* ./public/music && rsync -av --progress ../../apps/music-web/package.json ./public/music",
+-    "bundle:cinema": "rm -rf ./public/cinema && rsync -av --progress ../../apps/cinema-web/dist/* ./public/cinema && rsync -av --progress ../../apps/cinema-web/package.json ./public/cinema",
++    "bundle:admin": "rm -rf ./public/admin && rsync -av --progress ../../apps/admin-web/dist/admin/* ./public/admin && rsync -av --progress ../../apps/admin-web/package.json ./public/admin",
++    "bundle:photos": "rm -rf ./public/photos && rsync -av --progress ../../apps/photos-web/dist/photos/* ./public/photos && rsync -av --progress ../../apps/photos-web/package.json ./public/photos",
++    "bundle:music": "rm -rf ./public/music && rsync -av --progress ../../apps/music-web/dist/music/* ./public/music && rsync -av --progress ../../apps/music-web/package.json ./public/music",
++    "bundle:cinema": "rm -rf ./public/cinema && rsync -av --progress ../../apps/cinema-web/dist/cinema/* ./public/cinema && rsync -av --progress ../../apps/cinema-web/package.json ./public/cinema",
+     "start": "nest start",
+     "start:pg": "CARDINAL_POSTGRES=true nest start",
+     "start:debug": "nest start --debug --watch",
