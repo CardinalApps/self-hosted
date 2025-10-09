@@ -1,9 +1,10 @@
 diff a/apps/music-web/package.json b/apps/music-web/package.json	(rejected hunks)
-@@ -16,6 +16,7 @@
+@@ -11,7 +11,7 @@
+     "dev": "vite --host 0.0.0.0 --port 3094 --clearScreen false",
+     "lint": "eslint src",
+     "typecheck": "tsc --noEmit",
+-    "build": "vite build",
++    "build": "vite build && cp ./serve.json ./dist/serve.json",
+     "serve": "serve dist"
    },
    "dependencies": {
-     "@cardinalapps/app-settings": "workspace:*",
-+    "@cardinalapps/dtos": "workspace:*",
-     "@cardinalapps/ui": "workspace:*",
-     "@reduxjs/toolkit": "2.6.1",
-     "@tanstack/react-virtual": "3.11.3",

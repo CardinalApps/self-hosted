@@ -1,0 +1,9 @@
+diff a/apps/music-web/vite.config.ts b/apps/music-web/vite.config.ts	(rejected hunks)
+@@ -4,4 +4,7 @@ import { defineConfig } from "vite"
+ export default defineConfig({
+   plugins: [react()],
+   base: '/music',
++  build: {
++    outDir: 'dist/music',
++  },
+ })
