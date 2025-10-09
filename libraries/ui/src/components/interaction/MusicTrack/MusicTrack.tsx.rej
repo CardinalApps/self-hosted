@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx	(rejected hunks)
+@@ -1,12 +1,12 @@
+-import type { PropsWithChildren } from 'react'
++import { useContext, type PropsWithChildren } from 'react'
+ import { useDispatch, useSelector } from 'react-redux'
+-import { Link } from 'react-router-dom'
+ 
+ import Icon from '../../typography/Icon'
+ import MusicPlaybackButton from '../MusicPlaybackButton'
+ 
+ //import { settingsSelectors } from '../../../store/slices/settings'
+ import { musicActions, musicSelectors } from '../../../store/slices/music'
++import { RouterContext } from '../../../context/router'
+ 
+ import './MusicTrack.css'
+ 
+@@ -36,6 +36,7 @@ const MusicTrack = ({
+   plays,
+ }: PropsWithChildren<MusicTrackProps>) => {
+   const dispatch = useDispatch()
++  const { Link } = useContext(RouterContext)
+   //const { lang } = useSelector(settingsSelectors.current)
+   const playing = useSelector(musicSelectors.playing)
+ 

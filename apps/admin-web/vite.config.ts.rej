@@ -1,0 +1,14 @@
+diff a/apps/admin-web/vite.config.ts b/apps/admin-web/vite.config.ts	(rejected hunks)
+@@ -4,4 +4,12 @@ import { defineConfig } from "vite"
+ export default defineConfig({
+   plugins: [react()],
+   base: '/admin',
++  build: {
++    outDir: 'dist/admin',
++  },
++  // experimental: {
++  //   renderBuiltUrl(filename) {
++  //     return '/admin/' + filename
++  //   },
++  // },
+ })

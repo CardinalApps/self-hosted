@@ -1,9 +1,9 @@
 diff a/servers/media/src/main.ts b/servers/media/src/main.ts	(rejected hunks)
-@@ -156,7 +156,6 @@ async function startup() {
-     Logger.log(`│ Cinema app......................${(ip+':'+PORT+'/cinema').padEnd(31)}│`, 'Welcome')
-     Logger.log(`│ API specification...............${(ip+':'+PORT+'/api/docs').padEnd(31)}│`, 'Welcome')
-     Logger.log('│ Manage your Cardinal account....account.cardinalapps.io        │', 'Welcome')
--    Logger.log('│ Join the Community Forums.......forums.cardinalapps.io         │', 'Welcome')
-     Logger.log('│ Get help using the apps.........help.cardinalapps.io           │', 'Welcome')
-     Logger.log('╰────────────────────────────────────────────────────────────────╯', 'Welcome')
-   }
+@@ -106,6 +106,7 @@ async function startup() {
+       'http://127.0.0.1:3090',      // Media Server web app
+       'http://192.168.2.97:3090',   // Media Server web app
+       'http://localhost:3099',      // Component Library development
++      'http://localhost:3000',      // Local prod web app tests
+     ],
+     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+   })

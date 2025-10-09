@@ -1,0 +1,36 @@
+diff a/libraries/ui/src/components/features/AppBase/AppScaffold.tsx b/libraries/ui/src/components/features/AppBase/AppScaffold.tsx	(rejected hunks)
+@@ -1,7 +1,6 @@
+-import { useRef } from 'react'
++import { useContext, useRef } from 'react'
+ import type { PropsWithChildren, ReactNode } from 'react'
+ import { useSelector, useDispatch } from 'react-redux'
+-import { Routes, Route, useLocation } from 'react-router-dom'
+ import clsx from 'clsx'
+ 
+ import AppPageNotFound from './AppPageNotFound'
+@@ -14,8 +13,8 @@ import { DirectoryTreeSidebarPortal, DirectoryTreeMobileButton } from '../../int
+ import H1 from '../../typography/H1'
+ 
+ import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
+-
+ import { SCROLL_RESTORATION_KEYS, PAGE_LAYOUT } from '../../../store/slices/layout'
++import { RouterContext } from '../../../context/router'
+ 
+ export type SidebarOptions = {
+   overflow: boolean,
+@@ -36,6 +35,7 @@ function AppScaffold({
+   enableGlobalAudioPlayer = false,
+ }: PropsWithChildren<AppScaffoldProps>) {
+   const dispatch = useDispatch()
++  const { Routes, Route, location } = useContext(RouterContext)
+   const throttleRef = useRef(null)
+   const pageScrollRef = useRef(null)
+   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
+@@ -43,7 +43,6 @@ function AppScaffold({
+   const pageTitle = useSelector(layoutSelectors.pageTitle)
+   const pageDocLink = useSelector(layoutSelectors.pageDocLink)
+   const mobileFileBrowserIsOpen = useSelector(layoutSelectors.mobileFileBrowserIsOpen)
+-  const location = useLocation()
+   const scrollKey = `${SCROLL_RESTORATION_KEYS.page}:${location.pathname}`
+ 
+   /**

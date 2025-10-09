@@ -1,0 +1,25 @@
+diff a/libraries/ui/src/components/features/AppHeader/AppHeader.tsx b/libraries/ui/src/components/features/AppHeader/AppHeader.tsx	(rejected hunks)
+@@ -1,6 +1,5 @@
+ import { useSelector } from 'react-redux'
+-import type { PropsWithChildren, ReactNode } from 'react'
+-import { Link } from 'react-router-dom'
++import { useContext, type PropsWithChildren, type ReactNode } from 'react'
+ 
+ import H2 from '../../typography/H2'
+ import BrandLogo from '../../layout/BrandLogo'
+@@ -11,6 +10,7 @@ import UserMenu from '../../interaction/UserMenu'
+ import homeServerUserLogout from '../../../store/slices/homeServerUser/thunks/logout'
+ import { settingsSelectors } from '../../../store/slices/settings'
+ import { useAppDispatch } from '../../../hooks/useAppDispatch'
++import { RouterContext } from '../../../context/router'
+ 
+ import CloudStatusIcon from './componenets/CloudStatusIcon'
+ import ActivityIcon from './componenets/ActivityIcon'
+@@ -41,6 +41,7 @@ const AppHeader = ({
+   appName,
+ }: PropsWithChildren<AppHeaderProps>) => {
+   const dispatch = useAppDispatch()
++  const { Link } = useContext(RouterContext)
+   const { lang, open_apps_in_new_tab } = useSelector(settingsSelectors.current)
+ 
+   const logoText = () => {

@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
+@@ -1,11 +1,10 @@
+-import { useState } from 'react'
++import { useContext, useState } from 'react'
+ import type { PropsWithChildren } from 'react'
+-//import { useDispatch, useSelector } from 'react-redux'
+-import { Link } from 'react-router-dom'
+ import clsx from 'clsx'
+ 
+ import Icon from '../../typography/Icon'
+ import MusicPlaybackButton from '../MusicPlaybackButton'
++import { RouterContext } from '../../../context/router'
+ 
+ //import { settingsSelectors } from '../../../store/slices/settings'
+ 
+@@ -31,7 +30,7 @@ const MusicRelease = ({
+   artistName,
+   artistLink,
+ }: PropsWithChildren<MusicReleaseProps>) => {
+-  //const dispatch = useDispatch()
++  const { Link } = useContext(RouterContext)
+   //const { lang } = useSelector(settingsSelectors.current)
+   const [showInner, setShowInner] = useState<boolean>()
+   const trackIdsInRelease = tracks.map((track) => track.id).filter((track) => !!track)

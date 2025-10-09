@@ -1,0 +1,20 @@
+diff a/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.tsx b/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.tsx	(rejected hunks)
+@@ -1,8 +1,8 @@
+-import type { PropsWithChildren } from 'react'
++import { useContext, type PropsWithChildren } from 'react'
+ import { useSelector } from 'react-redux'
+-import { Link } from 'react-router-dom'
+ import clsx from 'clsx'
+ 
++import { RouterContext } from '../../../context/router'
+ import { settingsSelectors } from '../../../store/slices/settings'
+ 
+ import i18n from './i18n'
+@@ -24,6 +24,7 @@ const MusicArtist = ({
+   numReleases,
+   numTracks,
+ }: PropsWithChildren<MusicArtistProps>) => {
++  const { Link } = useContext(RouterContext)
+   const { lang } = useSelector(settingsSelectors.current)
+ 
+   const optionalLink = (children) => {

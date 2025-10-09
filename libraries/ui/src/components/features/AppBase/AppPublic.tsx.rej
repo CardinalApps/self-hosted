@@ -1,0 +1,21 @@
+diff a/libraries/ui/src/components/features/AppBase/AppPublic.tsx b/libraries/ui/src/components/features/AppBase/AppPublic.tsx	(rejected hunks)
+@@ -1,9 +1,9 @@
+-import type { PropsWithChildren, ReactNode } from 'react'
+-import { Routes, Route, Navigate } from 'react-router-dom'
++import { useContext, type PropsWithChildren, type ReactNode } from 'react'
+ 
+ import AppLogin from './AppLogin'
+ 
+ import { routes } from './routes'
++import { RouterContext } from '../../../context/router'
+ 
+ type AppPublicProps = {
+   publicRoutes: ReactNode,
+@@ -17,6 +17,7 @@ function AppPublic({
+   publicRoutes,
+   loginWithCardinalButton,
+ }: PropsWithChildren<AppPublicProps>) {
++  const { Routes, Route, Navigate } = useContext(RouterContext)
+   return (
+     <Routes>
+       {publicRoutes ? publicRoutes : null}

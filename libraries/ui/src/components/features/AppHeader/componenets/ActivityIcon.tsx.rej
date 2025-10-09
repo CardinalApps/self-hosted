@@ -1,0 +1,23 @@
+diff a/libraries/ui/src/components/features/AppHeader/componenets/ActivityIcon.tsx b/libraries/ui/src/components/features/AppHeader/componenets/ActivityIcon.tsx	(rejected hunks)
+@@ -1,5 +1,4 @@
+-import { useEffect } from 'react'
+-import { Link } from 'react-router-dom'
++import { useContext, useEffect } from 'react'
+ 
+ import { settingsSelectors } from '../../../../store/slices/settings'
+ import { indexingSelectors, SSEIndexingUpdate } from '../../../../store/slices/indexing'
+@@ -20,12 +19,14 @@ import MenuButton from '../../../interaction/MenuButton'
+ 
+ import i18n from '../i18n'
+ import globalI18n from '../../../../i18n/global'
++import { RouterContext } from '../../../../context/router'
+ 
+ /**
+  * Activity icon.
+  */
+ const ActivityIcon = () => {
+   const dispatch = useAppDispatch()
++  const { Link } = useContext(RouterContext)
+   const { lang, open_apps_in_new_tab } = useAppSelector(settingsSelectors.current)
+   const indexingServiceState = useAppSelector(indexingSelectors.serverState)
+   const numFilesFound = useAppSelector(indexingSelectors.filesFound)

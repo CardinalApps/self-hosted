@@ -1,0 +1,11 @@
+diff a/apps/admin-web/src/components/Nav/Nav.tsx b/apps/admin-web/src/components/Nav/Nav.tsx	(rejected hunks)
+@@ -7,7 +7,8 @@ import * as routes from '../../routes'
+ import i18n from './i18n.json'
+ 
+ function Nav({ children }: PropsWithChildren) {
+-  const { pathname } = useLocation()
++  //const { pathname } = useLocation()
++  const { pathname } = { pathname: '' }
+   const [activeItem, setActiveItem] = useState(window.location.pathname)
+ 
+   useEffect(() => {

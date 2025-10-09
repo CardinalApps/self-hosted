@@ -1,20 +1,134 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -47,7 +47,7 @@ import useHowler from '../../../hooks/useHowler'
- import { useAppDispatch } from '../../../hooks/useAppDispatch'
+@@ -1,7 +1,7 @@
+ import { useEffect, useRef } from 'react'
+ import type { ReactNode } from 'react'
+ import { useSelector } from 'react-redux'
+-import { useNavigate, useLocation } from 'react-router-dom'
++import { RouterContext } from '../../../context/router'
+ import clsx from 'clsx'
  
- import { getJWT, JWT_TYPE } from '../../../lib/auth/jwt'
--import { AppBasePaths, CardinalApp } from '../../../lib/env/cardinal'
-+import { CardinalApp } from '../../../lib/env/cardinal'
+ import {
+@@ -60,6 +60,13 @@ type AppBaseProps = {
+   id?: string,
+   name?: string,
+   version?: string,
++  Router: unknown,
++  Routes: unknown,
++  Route: unknown,
++  Navigate: unknown,
++  Link: unknown,
++  navigate: (path: string) => void,
++  location: Record<string, string>,
+   cardinalAppId?: string,
+   cardinalAppPermissions?: string,
+   authStorage?: 'localStorage' | 'sessionStorage',
+@@ -88,6 +95,13 @@ function AppBase({
+   id,
+   name,
+   version,
++  Router,
++  Routes,
++  Route,
++  Navigate,
++  Link,
++  navigate,
++  location,
+   cardinalAppId,
+   cardinalAppPermissions,
+   //authStorage = 'localStorage',
+@@ -108,8 +122,6 @@ function AppBase({
+ }: AppBaseProps) {
+   useServerSideEvents()
+   useHowler()
+-  const navigate = useNavigate()
+-  const location = useLocation()
+   const dispatch = useAppDispatch()
+   const appRef = useRef(null)
+   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
+@@ -260,45 +272,47 @@ function AppBase({
+   }, [version])
  
- import { routes } from './routes'
+   return (
+-    <div
+-      ref={appRef}
+-      id={id}
+-      className={clsx('app-base')}
+-      data-theme={theme}
+-      data-path={location.pathname}
+-      data-sidebar-mode={sidebarMode}
+-      data-mobile-nav-open={mobileNavIsOpen}
+-    >
+-      <ContextMenuRightClickSurface disabled={!enable_custom_context_menu}>
+-        <ContextMenuDOMLayer className="base-context-menu-layer" items={topLevelContextMenuItems}>
+-          <>
+-            <Toaster className="toaster" />
+-            <ModalLayer />
+-            <PhotoViewerLayer />
+-            <DrawerLayer />
+-            {!!developer_mode && <DevTools />}
+-            {health
+-              ? homeServerUserLoggedIn
+-                ? <AppPrivate
+-                    header={header || defaultHeader}
+-                    sidebarOptions={sidebarOptions}
+-                    settingsPanel={settingsPanel}
+-                    privateRoutes={privateRoutes}
+-                    publicRoutes={publicRoutes}
+-                    privateScaffoldRoutes={privateScaffoldRoutes}
+-                    loginWithCardinalButton={ssoButton}
+-                    enableGlobalAudioPlayer={enableGlobalAudioPlayer}
+-                  />
+-                : <AppPublic
+-                    publicRoutes={publicRoutes}
+-                    loginWithCardinalButton={ssoButton}
+-                  />
+-              : <AppLoading />
+-            }
+-          </>
+-        </ContextMenuDOMLayer>
+-      </ContextMenuRightClickSurface>
+-    </div>
++    <RouterContext.Provider value={{ Router, Routes, Route, Navigate, Link, navigate, location }}>
++      <div
++        ref={appRef}
++        id={id}
++        className={clsx('app-base')}
++        data-theme={theme}
++        data-path={location.pathname}
++        data-sidebar-mode={sidebarMode}
++        data-mobile-nav-open={mobileNavIsOpen}
++      >
++        <ContextMenuRightClickSurface disabled={!enable_custom_context_menu}>
++          <ContextMenuDOMLayer className="base-context-menu-layer" items={topLevelContextMenuItems}>
++            <>
++              <Toaster className="toaster" />
++              <ModalLayer />
++              <PhotoViewerLayer />
++              <DrawerLayer />
++              {!!developer_mode && <DevTools />}
++              {health
++                ? homeServerUserLoggedIn
++                  ? <AppPrivate
++                      header={header || defaultHeader}
++                      sidebarOptions={sidebarOptions}
++                      settingsPanel={settingsPanel}
++                      privateRoutes={privateRoutes}
++                      publicRoutes={publicRoutes}
++                      privateScaffoldRoutes={privateScaffoldRoutes}
++                      loginWithCardinalButton={ssoButton}
++                      enableGlobalAudioPlayer={enableGlobalAudioPlayer}
++                    />
++                  : <AppPublic
++                      publicRoutes={publicRoutes}
++                      loginWithCardinalButton={ssoButton}
++                    />
++                : <AppLoading />
++              }
++            </>
++          </ContextMenuDOMLayer>
++        </ContextMenuRightClickSurface>
++      </div>
++    </RouterContext.Provider>
+   )
+ }
  
-@@ -96,7 +96,8 @@ function AppBase({
-   kioskMode = false,
-   basePath = '',
-   topLevelContextMenuItems,
--  onHomeServerRequiresFirstTimeSetup = () => window.location.href = window.location.origin + AppBasePaths[CardinalApp.ADMIN],
-+  onHomeServerRequiresFirstTimeSetup = () => console.log('a'),
-+  //onHomeServerRequiresFirstTimeSetup = () => window.location.href = window.location.origin + AppBasePaths[CardinalApp.ADMIN],
-   header,
-   sidebarOptions,
-   enableGlobalAudioPlayer,

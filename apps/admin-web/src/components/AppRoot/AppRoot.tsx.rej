@@ -1,59 +1,121 @@
 diff a/apps/admin-web/src/components/AppRoot/AppRoot.tsx b/apps/admin-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
 @@ -1,4 +1,4 @@
--import { Route } from 'react-router-dom'
-+import { Route, useNavigate } from 'react-router-dom'
+-import { Route, useNavigate } from 'react-router-dom'
++import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation } from 'react-router-dom'
  
  import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
  
-@@ -9,6 +9,7 @@ import Overview from '../../pages/Overview'
- import Indexing from '../../pages/Indexing'
- import Jobs from '../../pages/Jobs'
- import Libraries from '../../pages/Libraries'
-+import FirstTimeSetup from '../../pages/FirstTimeSetup'
+@@ -21,18 +21,31 @@ import i18n from './i18n.json'
+ import '@cardinalapps/ui/public/styles/global.css'
+ import '../../styles/app.css'
  
- import * as routes from '../../routes'
- 
-@@ -25,6 +26,8 @@ import '../../styles/app.css'
++console.log('ooab14')
++
+ /**
+  * The app root component is the very top of this Cardinal app. It handles setting
   * up the AppBase.
   */
  function AppRoot() {
-+  const navigate = useNavigate()
-+
+   const navigate = useNavigate()
++  const location = useLocation()
+ 
    return (
++    <>
++    llllllllllllllllllllllasssssssssss
      <AppBase
        app={CardinalApp.ADMIN}
-@@ -32,6 +35,9 @@ function AppRoot() {
+       id="cardinal-admin"
        basePath="/admin"
++      Router={Router}
++      Routes={Routes}
++      Navigate={Navigate}
++      Route={Route}
++      Link={Link}
++      navigate={navigate}
++      // @ts-expect-error
++      location={location}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
        cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-+      onHomeServerRequiresFirstTimeSetup={() => {
-+        navigate(routes.FIRST_TIME_SETUP)
-+      }}
-       topLevelContextMenuItems={[
-         {
-           groupName: i18n['app.context-menu-group-name']['en'],
-@@ -49,8 +55,22 @@ function AppRoot() {
+       onHomeServerRequiresFirstTimeSetup={() => {
+@@ -55,43 +68,44 @@ function AppRoot() {
        }}
        enableGlobalAudioPlayer={true}
        settingsPanel={<SettingsPanel />}
--      publicRoutes={<></>}
--      privateRoutes={<></>}
-+      publicRoutes={
-+        <>
-+          <Route
-+            path={routes.FIRST_TIME_SETUP}
-+            element={<FirstTimeSetup />}
-+          />
-+        </>
-+      }
-+      privateRoutes={
-+        <>
-+          <Route
-+            path={routes.FIRST_TIME_SETUP}
-+            element={<FirstTimeSetup />}
-+          />
-+        </>
-+      }
-       privateScaffoldRoutes={
-         <>
-           <Route
+-      publicRoutes={
+-        <>
+-          <Route
+-            path={routes.FIRST_TIME_SETUP}
+-            element={<FirstTimeSetup />}
+-          />
+-        </>
+-      }
+-      privateRoutes={
+-        <>
+-          <Route
+-            path={routes.FIRST_TIME_SETUP}
+-            element={<FirstTimeSetup />}
+-          />
+-        </>
+-      }
+-      privateScaffoldRoutes={
+-        <>
+-          <Route
+-            path={routes.ROOT}
+-            element={<Overview />}
+-          />
+-          <Route
+-            path={routes.INDEXING}
+-            element={<Indexing />}
+-          />
+-          <Route
+-            path={routes.JOBS}
+-            element={<Jobs />}
+-          />
+-          <Route
+-            path={routes.LIBRARIES}
+-            element={<Libraries />}
+-          />
+-        </>
+-      }
+-    />
++        publicRoutes={
++          <>
++            <Route
++              path={routes.FIRST_TIME_SETUP}
++              element={<FirstTimeSetup />}
++            />
++          </>
++        }
++        privateRoutes={
++          <>
++            <Route
++              path={routes.FIRST_TIME_SETUP}
++              element={<FirstTimeSetup />}
++            />
++          </>
++        }
++        privateScaffoldRoutes={
++          <>
++            <Route
++              path={routes.ROOT}
++              element={<Overview />}
++            />
++            <Route
++              path={routes.INDEXING}
++              element={<Indexing />}
++            />
++            <Route
++              path={routes.JOBS}
++              element={<Jobs />}
++            />
++            <Route
++              path={routes.LIBRARIES}
++              element={<Libraries />}
++            />
++          </>
++        }
++      />
++    </>
+   )
+ }
+ 

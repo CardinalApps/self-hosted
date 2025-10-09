@@ -1,21 +1,27 @@
 diff a/libraries/ui/src/components/features/AppBase/AppPage.tsx b/libraries/ui/src/components/features/AppBase/AppPage.tsx	(rejected hunks)
-@@ -36,7 +36,6 @@ function AppPage({
-   children,
-   restoreScrollPoint = true,
-   toolbar,
--  virtualLayout,
-   style,
+@@ -1,7 +1,6 @@
+-import { useEffect } from 'react'
++import { useContext, useEffect } from 'react'
+ import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
+ import { useDispatch, useSelector } from 'react-redux'
+-import { useLocation } from 'react-router-dom'
+ import clsx from 'clsx'
+ 
+ import {
+@@ -12,6 +11,7 @@ import {
+   SCROLL_RESTORATION_KEYS,
+   SIDEBAR_MODE,
+ } from '../../../store/slices/layout'
++import { RouterContext } from '../../../context/router'
+ 
+ type AppPageProps = {
+   layout?: string,
+@@ -40,7 +40,7 @@ function AppPage({
    ...props
  }: PropsWithChildren<AppPageProps>) {
-@@ -91,10 +90,7 @@ function AppPage({
-           {toolbar}
-         </div>
-       )}
--      {layout === PAGE_LAYOUT.virtual && !!virtualLayout
--        ? virtualLayout
--        : children
--      }
-+      {children}
-     </div>
-   )
- }
+   const dispatch = useDispatch()
+-  const location = useLocation()
++  const { location } = useContext(RouterContext)
+   const scrollKey = `${SCROLL_RESTORATION_KEYS.page}:${location.pathname}`
+   const scrollPoints = useSelector(layoutSelectors.scrollPoints)
+   const userSelectedSidebarMode = useSelector(layoutSelectors.userSelectedSidebarMode)
