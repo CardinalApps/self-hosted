@@ -1,17 +1,9 @@
 diff a/apps/photos-web/src/components/AppRoot/AppRoot.tsx b/apps/photos-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -35,15 +35,10 @@ function AppRoot() {
-       app={CardinalApp.PHOTOS}
-       id="cardinal-photos"
-       basePath="/photos"
--      // @ts-expect-error
-       Router={Router}
--      // @ts-expect-error
+@@ -39,6 +39,7 @@ function AppRoot() {
        Routes={Routes}
--      // @ts-expect-error
        Navigate={Navigate}
--      // @ts-expect-error
        Route={Route}
--      // @ts-expect-error
++      // @ts-expect-error
        Link={Link}
        navigate={navigate}
        location={location}

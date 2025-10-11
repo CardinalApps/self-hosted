@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/interaction/UserMenu/UserMenu.tsx b/libraries/ui/src/components/interaction/UserMenu/UserMenu.tsx	(rejected hunks)
+@@ -198,7 +198,7 @@ const UserMenu = ({
+                     </nav>
+                   </motion.div>
+                 </>
+-              : undefined
++              : null
+             }
+           </AnimatePresence>
+         </div>

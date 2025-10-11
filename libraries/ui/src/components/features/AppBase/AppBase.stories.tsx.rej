@@ -1,38 +1,21 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.stories.tsx b/libraries/ui/src/components/features/AppBase/AppBase.stories.tsx	(rejected hunks)
-@@ -11,7 +11,6 @@ import StandardLayout from './story-pages/layout/Standard'
- import FixedLayout from './story-pages/layout/Fixed'
- import ThinLayout from './story-pages/layout/Thin'
- import FullLayout from './story-pages/layout/Full'
--import VirtualLayout from './story-pages/layout/Virtual'
- import FileBrowserLayout from './story-pages/layout/Files'
+@@ -1,5 +1,5 @@
+ import type { Meta } from '@storybook/react'
+-import { Route, MemoryRouter, useLocation, Link, useNavigate } from 'react-router-dom'
++import { Route, Routes, Navigate, Router, MemoryRouter, useLocation, Link, useNavigate } from 'react-router-dom'
  
- // Feature test pages
-@@ -123,17 +122,6 @@ const DemoApp = () => {
-               </Link>
-             </li>
- 
--            {/* Virtual layout */}
--            <li
--              className={location.pathname === `/${PAGE_LAYOUT["virtual"]}` ? 'active' : ''}
--              key="virtual-layout"
--            >
--              <Link to={`/${PAGE_LAYOUT["virtual"]}`}>
--                <i className="fas fa-border-all" />
--                <span>Layout: virtual</span>
--              </Link>
--            </li>
--
-             {/* File Browser */}
-             <li
-               className={location.pathname === `/${PAGE_LAYOUT["files"]}` ? 'active' : ''}
-@@ -287,10 +275,6 @@ const DemoApp = () => {
-               path={`/${PAGE_LAYOUT["full"]}`}
-               element={<FullLayout />}
-             />
--            <Route
--              path={`/${PAGE_LAYOUT["virtual"]}`}
--              element={<VirtualLayout />}
--            />
-             <Route
-               path={`/${PAGE_LAYOUT["files"]}`}
-               element={<FileBrowserLayout />}
+ import AppBase from './AppBase'
+ import AppPage from './AppPage'
+@@ -57,6 +57,12 @@ const DemoApp = () => {
+         app={CardinalApp.MUSIC}
+         id="demo-home-server"
+         name="Sandbox App"
++        Router={Router}
++        Routes={Routes}
++        Navigate={Navigate}
++        Route={Route}
++        // @ts-expect-error
++        Link={Link}
+         version="0.1.2"
+         kioskMode={true}
+         cardinalAppId="59068b7c-2c67-4d98-aef7-44d37914b86f"

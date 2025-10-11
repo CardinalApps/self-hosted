@@ -1,20 +1,15 @@
 diff a/apps/admin-web/src/components/AppRoot/AppRoot.tsx b/apps/admin-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -34,13 +34,17 @@ function AppRoot() {
+@@ -34,13 +34,9 @@ function AppRoot() {
        app={CardinalApp.ADMIN}
        id="cardinal-admin"
        basePath="/admin"
-+      // @ts-expect-error
-       Router={Router}
-+      // @ts-expect-error
-       Routes={Routes}
-+      // @ts-expect-error
-       Navigate={Navigate}
-+      // @ts-expect-error
-       Route={Route}
-+      // @ts-expect-error
-       Link={Link}
-       navigate={navigate}
 -      // @ts-expect-error
-       location={location}
-       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+       Router={Router}
+-      // @ts-expect-error
+       Routes={Routes}
+-      // @ts-expect-error
+       Navigate={Navigate}
+-      // @ts-expect-error
+       Route={Route}
+       // @ts-expect-error
+       Link={Link}

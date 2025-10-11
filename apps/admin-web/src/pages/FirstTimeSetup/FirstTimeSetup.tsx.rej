@@ -1,10 +1,18 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx b/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx	(rejected hunks)
-@@ -111,7 +111,7 @@ function FirstTimeSetup() {
-    * Exit the First Time Setup once the setup is complete.
-    */
-   useEffect(() => {
--    if (homeServerUserLoggedIn) {
-+    if (homeServerUserLoggedIn && health !== 'not_setup') {
-       dispatch(homeServerActions.setFirstTimeSetupComplete(true))
-       navigate(routes.LOGIN)
-     }
+@@ -1,6 +1,6 @@
+ import { useState, useEffect } from 'react'
+ import { useNavigate } from 'react-router-dom'
+-import { motion, AnimatePresence } from 'framer-motion'
++import { motion, AnimatePresence, TargetAndTransition } from 'framer-motion'
+ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ 
+@@ -43,7 +43,7 @@ function FirstTimeSetup() {
+   const [ssoJWTOfFutureOwner, setSsoJWTOfFutureOwner] = useState()
+ 
+   const fadeOutDuration = 0.4
+-  const cardAnimation = { opacity: 1, transition: { duration: 0.3, type: 'tween' } }
++  const cardAnimation: TargetAndTransition = { opacity: 1, transition: { duration: 0.3, type: 'tween' } }
+ 
+   /**
+    * Set next step after allowing enough time for current step to animate out.

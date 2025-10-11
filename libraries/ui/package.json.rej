@@ -1,10 +1,19 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
+@@ -23,7 +23,7 @@
+     "@tanstack/react-virtual": "3.11.3",
+     "clsx": "^2.1.1",
+     "date-fns": "2.30.0",
+-    "framer-motion": "12.5.0",
++    "framer-motion": "12.23.22",
+     "howler": "2.2.4",
+     "leaflet": "1.9.3",
+     "lodash.merge": "^4.6.2",
 @@ -52,7 +52,7 @@
      "@storybook/react-vite": "^8.5.6",
      "@storybook/test": "^8.5.6",
      "@types/ms": "^2.1.0",
--    "@types/react": "^19.0.8",
-+    "@types/react": "^18.2.0",
+-    "@types/react": "^18.2.0",
++    "@types/react": "^18.2.79",
      "@types/react-dom": "^19.0.3",
      "@vitejs/plugin-react": "^4.3.4",
      "eslint": "9.20.1",

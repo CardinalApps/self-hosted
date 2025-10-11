@@ -1,34 +1,15 @@
 diff a/apps/cinema-web/src/components/AppRoot/AppRoot.tsx b/apps/cinema-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { Route } from 'react-router-dom'
-+import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation } from 'react-router-dom'
- 
- import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
- 
-@@ -28,11 +28,26 @@ import '../../styles/app.css'
-  * up the AppBase.
-  */
- function AppRoot() {
-+  const navigate = useNavigate()
-+  const location = useLocation()
-+
-   return (
-     <AppBase
+@@ -36,13 +36,9 @@ function AppRoot() {
        app={CardinalApp.CINEMA}
        id="cardinal-cinema"
        basePath="/cinema"
-+      // @ts-expect-error
-+      Router={Router}
-+      // @ts-expect-error
-+      Routes={Routes}
-+      // @ts-expect-error
-+      Navigate={Navigate}
-+      // @ts-expect-error
-+      Route={Route}
-+      // @ts-expect-error
-+      Link={Link}
-+      navigate={navigate}
-+      location={location}
-       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-       onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
+-      // @ts-expect-error
+       Router={Router}
+-      // @ts-expect-error
+       Routes={Routes}
+-      // @ts-expect-error
+       Navigate={Navigate}
+-      // @ts-expect-error
+       Route={Route}
+       // @ts-expect-error
+       Link={Link}

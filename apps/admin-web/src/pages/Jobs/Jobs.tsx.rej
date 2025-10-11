@@ -1,0 +1,18 @@
+diff a/apps/admin-web/src/pages/Jobs/Jobs.tsx b/apps/admin-web/src/pages/Jobs/Jobs.tsx	(rejected hunks)
+@@ -1,6 +1,6 @@
+ import { useState, useEffect } from 'react'
+ import { useSelector, useDispatch } from 'react-redux'
+-import { motion, AnimatePresence } from 'framer-motion'
++import { motion, AnimatePresence, Variants } from 'framer-motion'
+ import clsx from 'clsx'
+ 
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+@@ -169,7 +169,7 @@ function Jobs() {
+                 initial="initial"
+                 animate="open"
+                 exit="exit"
+-                variants={newJobVariants}
++                variants={newJobVariants as Variants}
+               >
+                 <StartJob
+                   jobType={jobToStart}
