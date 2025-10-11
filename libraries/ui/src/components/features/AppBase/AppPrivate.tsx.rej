@@ -1,18 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/AppPrivate.tsx b/libraries/ui/src/components/features/AppBase/AppPrivate.tsx	(rejected hunks)
-@@ -1,7 +1,6 @@
--import { useEffect } from 'react'
-+import { useContext, useEffect } from 'react'
- import type { PropsWithChildren, ReactNode } from 'react'
- import { useSelector } from 'react-redux'
--import { Routes, Route, useNavigate } from 'react-router-dom'
- import { motion, Variants } from 'framer-motion'
- 
- import AppLogin from './AppLogin'
-@@ -11,6 +10,7 @@ import type { SidebarOptions } from './AppScaffold'
+@@ -10,7 +10,7 @@ import type { SidebarOptions } from './AppScaffold'
  import { settingsSelectors } from '../../../store/slices/settings'
  
  import { routes } from './routes'
-+import { RouterContext } from '../../../context/router'
+-import { RouterContext } from '../../../context/router'
++import { RouterContext, RouterContextType } from '../../../context/router'
  
  type AppPrivateProps = {
    header: ReactNode,
@@ -20,17 +12,8 @@ diff a/libraries/ui/src/components/features/AppBase/AppPrivate.tsx b/libraries/u
    loginWithCardinalButton,
    enableGlobalAudioPlayer,
  }: PropsWithChildren<AppPrivateProps>) {
--  const navigate = useNavigate()
-+  const { Routes, Route, navigate } = useContext(RouterContext)
+-  const { Routes, Route, navigate } = useContext(RouterContext)
++  const { Routes, Route, navigate } = useContext<RouterContextType>(RouterContext)
    const { startPage } = useSelector(settingsSelectors.current)
  
    const variants: Variants = {
-@@ -69,7 +69,7 @@ function AppPrivate({
-    */
-   useEffect(() => {
-     if (startPage && !window.location.href.includes(startPage as string)) {
--      navigate(startPage)
-+      navigate(startPage as string)
-     }
-   }, [])
- 

@@ -1,10 +1,10 @@
 diff a/apps/photos-web/package.json b/apps/photos-web/package.json	(rejected hunks)
-@@ -11,7 +11,7 @@
-     "dev": "vite --host 0.0.0.0 --port 3092 --clearScreen false",
-     "lint": "eslint src",
-     "typecheck": "tsc --noEmit",
--    "build": "vite build",
-+    "build": "vite build && cp ./serve.json ./dist/serve.json",
-     "serve": "serve dist"
-   },
-   "dependencies": {
+@@ -38,7 +38,7 @@
+     "@cardinalapps/typescript-config": "workspace:*",
+     "@eslint/js": "9.20.0",
+     "@types/ms": "^2.1.0",
+-    "@types/react": "^19.0.8",
++    "@types/react": "^18.2.0",
+     "@types/react-dom": "^18.2.0",
+     "@types/react-redux": "7.1.34",
+     "@vitejs/plugin-react": "^4.3.4",

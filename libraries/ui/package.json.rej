@@ -1,9 +1,10 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
-@@ -15,6 +15,7 @@
-   },
-   "dependencies": {
-     "@cardinalapps/app-settings": "workspace:*",
-+    "@cardinalapps/dtos": "workspace:*",
-     "@reduxjs/toolkit": "2.6.1",
-     "@storybook/manager-api": "^8.5.8",
-     "@storybook/preview-api": "^8.5.8",
+@@ -52,7 +52,7 @@
+     "@storybook/react-vite": "^8.5.6",
+     "@storybook/test": "^8.5.6",
+     "@types/ms": "^2.1.0",
+-    "@types/react": "^19.0.8",
++    "@types/react": "^18.2.0",
+     "@types/react-dom": "^19.0.3",
+     "@vitejs/plugin-react": "^4.3.4",
+     "eslint": "9.20.1",
