@@ -1,16 +1,9 @@
 diff a/servers/media/package.json b/servers/media/package.json	(rejected hunks)
-@@ -13,10 +13,10 @@
+@@ -10,6 +10,7 @@
+     "dev:pg": "NODE_ENV=development RELEASE_CHANNEL=development INDEXING_LOG_LEVEL=20 JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 HTTP_LOG_LEVEL=20 CARDINAL_POSTGRES=true POSTGRES_HOST=172.20.0.4 POSTGRES_USER=developer POSTGRES_PASSWORD=developer PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
+     "prebuild": "rimraf dist",
+     "build": "nest build",
++    "build:bundled-apps": "pnpm --dir apps/admin-web build && pnpm --dir apps/cinema-web build && pnpm --dir apps/music-web build && pnpm --dir apps/photos-web build",
      "build:bin": "pkg --config ./package.json --out-path ./bin/prod ./dist/main.js",
      "build:bin:dev": "pkg --debug --config ./package.json --out-path ./bin/dev ./dist/main.js",
      "bundle": "pnpm bundle:admin && pnpm bundle:photos && pnpm bundle:music && pnpm bundle:cinema",
--    "bundle:admin": "rm -rf ./public/admin && rsync -av --progress ../../apps/admin-web/dist/* ./public/admin && rsync -av --progress ../../apps/admin-web/package.json ./public/admin",
--    "bundle:photos": "rm -rf ./public/photos && rsync -av --progress ../../apps/photos-web/dist/* ./public/photos && rsync -av --progress ../../apps/photos-web/package.json ./public/photos",
--    "bundle:music": "rm -rf ./public/music && rsync -av --progress ../../apps/music-web/dist/* ./public/music && rsync -av --progress ../../apps/music-web/package.json ./public/music",
--    "bundle:cinema": "rm -rf ./public/cinema && rsync -av --progress ../../apps/cinema-web/dist/* ./public/cinema && rsync -av --progress ../../apps/cinema-web/package.json ./public/cinema",
-+    "bundle:admin": "rm -rf ./public/admin && rsync -av --progress ../../apps/admin-web/dist/admin/* ./public/admin && rsync -av --progress ../../apps/admin-web/package.json ./public/admin",
-+    "bundle:photos": "rm -rf ./public/photos && rsync -av --progress ../../apps/photos-web/dist/photos/* ./public/photos && rsync -av --progress ../../apps/photos-web/package.json ./public/photos",
-+    "bundle:music": "rm -rf ./public/music && rsync -av --progress ../../apps/music-web/dist/music/* ./public/music && rsync -av --progress ../../apps/music-web/package.json ./public/music",
-+    "bundle:cinema": "rm -rf ./public/cinema && rsync -av --progress ../../apps/cinema-web/dist/cinema/* ./public/cinema && rsync -av --progress ../../apps/cinema-web/package.json ./public/cinema",
-     "start": "nest start",
-     "start:pg": "CARDINAL_POSTGRES=true nest start",
-     "start:debug": "nest start --debug --watch",

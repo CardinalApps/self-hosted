@@ -13,7 +13,7 @@
     "lint": "turbo run lint --continue -- --max-warnings 0",
     "typecheck": "turbo run typecheck --continue",
     "build": "turbo run build",
-    "build:media-server:bin": "turbo run build && pnpm --dir servers/media bundle && pnpm --dir servers/media build:bin",
+    "build:media-server:bin": "turbo run build && pnpm --dir servers/media build:bundled-apps && pnpm --dir servers/media bundle && pnpm --dir servers/media build:bin",
     "build:media-server:image": "pnpm build:media-server:bin && docker build -f Dockerfile.media-server -t cardinalapps/media-server:stable .",
     "build:cms:image": "docker build -f ./servers/cms/Dockerfile -t cardinalapps/cms:latest .",
     "build:auth-server:image": "docker build -f Dockerfile.auth-server -t cardinalapps/auth-server:latest .",
