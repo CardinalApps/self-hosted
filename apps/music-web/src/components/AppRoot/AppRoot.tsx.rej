@@ -1,34 +1,29 @@
 diff a/apps/music-web/src/components/AppRoot/AppRoot.tsx b/apps/music-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { Route } from 'react-router-dom'
-+import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation } from 'react-router-dom'
- 
- import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
- 
-@@ -27,11 +27,26 @@ import '../../styles/app.css'
-  * up the AppBase.
-  */
- function AppRoot() {
-+  const navigate = useNavigate()
-+  const location = useLocation()
-+
-   return (
-     <AppBase
+@@ -35,18 +35,15 @@ function AppRoot() {
        app={CardinalApp.MUSIC}
        id="cardinal-music"
        basePath="/music"
-+      // @ts-expect-error
-+      Router={Router}
-+      // @ts-expect-error
-+      Routes={Routes}
-+      // @ts-expect-error
-+      Navigate={Navigate}
-+      // @ts-expect-error
-+      Route={Route}
-+      // @ts-expect-error
-+      Link={Link}
-+      navigate={navigate}
-+      location={location}
+-      // @ts-expect-error
+-      Router={Router}
+-      // @ts-expect-error
+-      Routes={Routes}
+-      // @ts-expect-error
+-      Navigate={Navigate}
+-      // @ts-expect-error
+-      Route={Route}
+-      // @ts-expect-error
+-      Link={Link}
+-      navigate={navigate}
+-      location={location}
++      router={{
++        Router,
++        Routes,
++        Navigate,
++        Route,
++        location,
++        navigate,
++        Link,
++      }}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
        cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
        onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}

@@ -1,10 +1,75 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -148,6 +148,8 @@ function AppBase({
+@@ -1,16 +1,7 @@
+ import { useEffect, useRef } from 'react'
+ import type { ReactNode } from 'react'
+ import { useSelector } from 'react-redux'
+-import {
+-  RouterContext,
+-  RouterContextNavigateFunction,
+-  RouterContextLocation,
+-  RouterContextLink,
+-  RouterContextNavigate,
+-  RouterContextRoute,
+-  RouterContextRoutes,
+-  RouterContextRouter,
+-} from '../../../context/router'
++import { RouterContext, RouterContextType } from '../../../context/router'
+ import clsx from 'clsx'
+ 
+ import {
+@@ -69,13 +60,7 @@ type AppBaseProps = {
+   id?: string,
+   name?: string,
+   version?: string,
+-  Router: RouterContextRouter,
+-  Routes: RouterContextRoutes,
+-  Route: RouterContextRoute,
+-  Navigate: RouterContextNavigate,
+-  Link: RouterContextLink,
+-  navigate: RouterContextNavigateFunction,
+-  location: RouterContextLocation,
++  router: RouterContextType,
+   cardinalAppId?: string,
+   cardinalAppPermissions?: string,
+   authStorage?: 'localStorage' | 'sessionStorage',
+@@ -104,13 +89,7 @@ function AppBase({
+   id,
+   name,
+   version,
+-  Router,
+-  Routes,
+-  Route,
+-  Navigate,
+-  Link,
+-  navigate,
+-  location,
++  router,
+   cardinalAppId,
+   cardinalAppPermissions,
+   //authStorage = 'localStorage',
+@@ -132,6 +111,7 @@ function AppBase({
+   useServerSideEvents()
+   useHowler()
+   const dispatch = useAppDispatch()
++  const { navigate } = router
+   const appRef = useRef(null)
+   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
+   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
+@@ -148,8 +128,6 @@ function AppBase({
      developer_mode = initialDeveloperMode,
    } = useSelector(settingsSelectors.current)
  
-+  console.log(location)
-+
+-  console.log(location)
+-
    const ssoButton = (
      <SSOLogin
        appId={cardinalAppId}
+@@ -283,7 +261,7 @@ function AppBase({
+   }, [version])
+ 
+   return (
+-    <RouterContext.Provider value={{ Router, Routes, Route, Navigate, Link, navigate, location }}>
++    <RouterContext.Provider value={router}>
+       <div
+         ref={appRef}
+         id={id}

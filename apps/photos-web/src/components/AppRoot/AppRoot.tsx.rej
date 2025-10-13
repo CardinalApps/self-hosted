@@ -1,9 +1,25 @@
 diff a/apps/photos-web/src/components/AppRoot/AppRoot.tsx b/apps/photos-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -39,6 +39,7 @@ function AppRoot() {
-       Routes={Routes}
-       Navigate={Navigate}
-       Route={Route}
-+      // @ts-expect-error
-       Link={Link}
-       navigate={navigate}
-       location={location}
+@@ -35,14 +35,15 @@ function AppRoot() {
+       app={CardinalApp.PHOTOS}
+       id="cardinal-photos"
+       basePath="/photos"
+-      Router={Router}
+-      Routes={Routes}
+-      Navigate={Navigate}
+-      Route={Route}
+-      // @ts-expect-error
+-      Link={Link}
+-      navigate={navigate}
+-      location={location}
++      router={{
++        Router,
++        Routes,
++        Navigate,
++        Route,
++        location,
++        navigate,
++        Link,
++      }}
+       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
+       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+       onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}

@@ -1,48 +1,35 @@
 diff a/libraries/ui/src/context/router.tsx b/libraries/ui/src/context/router.tsx	(rejected hunks)
-@@ -1,32 +1,31 @@
+@@ -1,14 +1,22 @@
++/**
++ * @file All router functionality is provided by each app separately, and then
++ * shared with the UI layer. This allows for one shared <Router> context in the
++ * app.
++ */
++
  import { createContext } from 'react'
--import { type JSX } from 'react/jsx-runtime'
++import { LinkProps } from 'react-router-dom'
  
--export type RouterContextRouter = JSX.Element
--export type RouterContextRoutes = JSX.Element
--export type RouterContextRoute = JSX.Element
--export type RouterContextNavigate = JSX.Element
--export type RouterContextLink = JSX.Element
-+export type RouterContextRouter = (props) => React.ReactElement | null
-+export type RouterContextRoutes = (props) => React.ReactElement | null
-+export type RouterContextRoute = (props) => React.ReactElement | null
-+export type RouterContextNavigate = (props) => React.ReactElement | null
-+export type RouterContextLink = (props) => React.ReactElement | null
+ export type RouterContextRouter = (props) => React.ReactElement | null
+ export type RouterContextRoutes = (props) => React.ReactElement | null
+ export type RouterContextRoute = (props) => React.ReactElement | null
+ export type RouterContextNavigate = (props) => React.ReactElement | null
+-export type RouterContextLink = (props) => React.ReactElement | null
++export type RouterContextLink = React.ForwardRefExoticComponent<LinkProps & React.RefAttributes<HTMLAnchorElement>>
  export type RouterContextNavigateFunction = (path: string) => void
  
++// react-router-dom actually has this typed as `any`
  // eslint-disable-next-line @typescript-eslint/no-explicit-any
- export type RouterContextLocation = any // react-router-dom actually has this typed as `any`
+-export type RouterContextLocation = any // react-router-dom actually has this typed as `any`
++export type RouterContextLocation = any
  
  export type RouterContextType = {
--  Router: JSX.Element,
--  Routes: JSX.Element,
--  Route: JSX.Element,
-+  Router: RouterContextRouter,
-+  Routes: RouterContextRoutes,
-+  Route: RouterContextRoute,
-   Navigate: RouterContextNavigate,
--  Link: RouterContextNavigate,
-+  Link: RouterContextLink,
-   navigate: RouterContextNavigateFunction,
-   location: RouterContextLocation,
- }
- 
- const defaultContext: RouterContextType = {
--  Router: <></>,
--  Routes: <></>,
--  Route: <></>,
--  Navigate: <></>,
--  Link: <></>,
-+  Router: () => null,
-+  Routes: () => null,
-+  Route: () => null,
-+  Navigate: () => null,
-+  Link: () => null,
+   Router: RouterContextRouter,
+@@ -25,7 +33,7 @@ const defaultContext: RouterContextType = {
+   Routes: () => null,
+   Route: () => null,
+   Navigate: () => null,
+-  Link: () => null,
++  Link: null,
    navigate: () => {},
    location: {},
  }
