@@ -26,7 +26,7 @@ const i18n: StringList = {
     "en": "Dispatch",
   },
   "dev-tools.tolkien.warning": {
-    "en": "Do not share your JWTs, they are equivalent to your password.",
+    "en": "Do not share your JWTs, they are equivalent to your password [test].",
   },
   "dev-tools.copy-cloud-tolkien.button": {
     "en": "Copy cloud JWT",
