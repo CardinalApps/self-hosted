@@ -1,0 +1,12 @@
+diff a/servers/media/public/index.html b/servers/media/public/index.html	(rejected hunks)
+@@ -8,7 +8,7 @@
+     <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
+     <meta name="msapplication-TileColor" content="#da532c">
+     <script type="text/javascript">
+-      window.location.href = window.location.origin + '/dashboard/'
++      window.location.href = window.location.origin + '/admin/'
+     </script>
+   </head>
+-</html>
+\ No newline at end of file
++</html>
