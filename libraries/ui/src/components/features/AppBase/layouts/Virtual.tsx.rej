@@ -1,19 +1,12 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx b/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx	(rejected hunks)
-@@ -33,7 +33,7 @@ type VirtualProps = {
- }
+@@ -160,7 +160,9 @@ function VirtualLayout({
+    * Set initial offset after the RTK query has loaded.
+    */
+   useLayoutEffect(() => {
+-    rowVirtualizer.scrollToOffset(initialOffset)
++    setTimeout(() => {
++      rowVirtualizer.scrollToOffset(initialOffset)
++    }, 20)
+   }, [isSuccess])
  
- /**
-- * When paired with RTK infinite scroll queries, this implements bi-directional
-+ * When paired with RTK infinite scroll queries, this implements bidirectional
-  * virtualized scrolling.
-  */
- function VirtualLayout({
-@@ -109,8 +109,6 @@ function VirtualLayout({
-     onChange: onVirtualChange,
-   })
- 
--  console.log('cachedRTKData', cachedRTKData)
--
-   /**
-    * As the user scrolls, keep just enough query data in memory to render the
-    * virtual rows. This keeps only +1 page of overflow data in memory in each
+   return (

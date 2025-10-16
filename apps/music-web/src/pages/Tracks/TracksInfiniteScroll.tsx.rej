@@ -1,18 +1,28 @@
 diff a/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx b/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx	(rejected hunks)
-@@ -27,15 +27,13 @@ function TracksInfiniteScroll({
- }: TracksInfiniteScrollProps) {
+@@ -3,11 +3,11 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
+ import {
+   MusicTrackType,
+-  TRACKS_PER_RTK_PAGE,
+   TracksSortParams,
+   useGetInfiniteMusicTracksInfiniteQuery,
+ } from '@cardinalapps/ui/src/store/apis/musicTracks'
+ import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
++import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
+ import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
+ import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+ 
+@@ -28,10 +28,10 @@ function TracksInfiniteScroll({
    const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
    const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
--  const [initialRow] = useState(virtualViewValues?.start || 1)
-+  const [initialRow] = useState(virtualViewValues?.start || 1) // fixme should the 1 here be a 0?
-   const initialPage = Math.floor((initialRow) / TRACKS_PER_RTK_PAGE)
+   const [initialRow] = useState(virtualViewValues?.start || 1) // fixme should the 1 here be a 0?
+-  const initialPage = Math.floor((initialRow) / TRACKS_PER_RTK_PAGE)
++  const initialPage = Math.floor((initialRow) / ITEMS_PER_RTK_PAGE)
    const [initialPageParam] = useState({
-     take: TRACKS_PER_RTK_PAGE,
-     skip: initialPage * TRACKS_PER_RTK_PAGE,
+-    take: TRACKS_PER_RTK_PAGE,
+-    skip: initialPage * TRACKS_PER_RTK_PAGE,
++    take: ITEMS_PER_RTK_PAGE,
++    skip: initialPage * ITEMS_PER_RTK_PAGE,
    })
  
--  console.log(toolbarValues)
--
    const {
-     data,
-     isSuccess,

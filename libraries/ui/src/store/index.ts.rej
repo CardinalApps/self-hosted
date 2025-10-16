@@ -1,25 +1,41 @@
 diff a/libraries/ui/src/store/index.ts b/libraries/ui/src/store/index.ts	(rejected hunks)
-@@ -31,6 +31,7 @@ import { musicTracksApi } from './apis/musicTracks'
+@@ -27,11 +27,11 @@ import { photoAlbumsApi } from './apis/photoAlbums'
+ import { jobsApi } from './apis/jobs'
+ import { jobTasksApi } from './apis/jobTasks'
+ import { librariesApi } from './apis/libraries'
+-import { musicTracksApi } from './apis/musicTracks'
  import { musicReleasesApi } from './apis/musicReleases'
  import { musicArtistsApi } from './apis/musicArtists'
  import { runsApi } from './apis/runs'
-+import { versionsApi } from './apis/versions'
+ import { versionsApi } from './apis/versions'
++import { baseApi } from './apis/base'
  
  /**
   * Middleware
-@@ -79,6 +80,7 @@ const slices = {
-   [musicTracksApi.reducerPath]: musicTracksApi,
+@@ -77,10 +77,10 @@ const slices = {
+   [jobTasksApi.reducerPath]: jobTasksApi,
+   [runsApi.reducerPath]: runsApi,
+   [librariesApi.reducerPath]: librariesApi,
+-  [musicTracksApi.reducerPath]: musicTracksApi,
    [musicReleasesApi.reducerPath]: musicReleasesApi,
    [musicArtistsApi.reducerPath]: musicArtistsApi,
-+  [versionsApi.reducerPath]: versionsApi,
+   [versionsApi.reducerPath]: versionsApi,
++  [baseApi.reducerPath]: baseApi,
  }
  
  const rootReducer = combineSlices(...Object.values(slices))
-@@ -114,6 +116,7 @@ const createStore = () => {
-         musicTracksApi.middleware,
+@@ -113,13 +113,13 @@ const createStore = () => {
+         jobTasksApi.middleware,
+         runsApi.middleware,
+         librariesApi.middleware,
+-        musicTracksApi.middleware,
          musicReleasesApi.middleware,
          musicArtistsApi.middleware,
-+        versionsApi.middleware,
+         versionsApi.middleware,
          resetMiddleware.middleware,
          sseFactoryResetMiddleware.middleware,
          sseLatestEventMiddleware.middleware,
++        baseApi.middleware,
+       )
+     },
+     preloadedState,

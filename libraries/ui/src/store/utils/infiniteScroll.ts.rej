@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/store/utils/infiniteScroll.ts b/libraries/ui/src/store/utils/infiniteScroll.ts	(rejected hunks)
+@@ -1,5 +1,7 @@
+ import { PaginationParams, RTKPage } from "../types/api"
+ 
++export const ITEMS_PER_RTK_PAGE = 40
++
+ /**
+  * Drop-in function for RTK's infinite query function by the same name.
+  */
