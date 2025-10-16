@@ -1,0 +1,16 @@
+diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.stories.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.stories.tsx	(rejected hunks)
+@@ -17,12 +17,12 @@ export const Default = () => {
+   return (
+     <MemoryRouter>
+       <MusicRelease
+-        musicTrackToPlayId={1}
++        tracks={[{ id: 1 }]}
+         artwork="/sample/cover.jpg"
+         releaseTitle="The Perils of Time Travel"
+         artistName="Thank You Scientist"
+         releaseYear="2011"
+-        releaseLink="#"
++        releaseLink="/"
+         artistLink="#"
+       />
+     </MemoryRouter>
