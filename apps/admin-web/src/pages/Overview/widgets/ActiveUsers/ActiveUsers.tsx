@@ -43,7 +43,7 @@ function ActiveUsers({ reload }: ActiveUsersProps) {
         ? <Loading className={'loading'} />
         : <div>
             {activeUsers.length
-              ? <div className={activeUsers}>
+              ? <div className={'activeUsers'}>
                   {activeUsers.map((user) => {
                     return (
                       <div key={user.userId} className={'activeUser'}>
@@ -54,7 +54,7 @@ function ActiveUsers({ reload }: ActiveUsersProps) {
                         <p className={'timeAgo'}>{formatTimeAgo(user.activityStatusUpdatedAt)}</p>
                         {user.designation === 'guest_account'
                           ? <p className={'name'}>{i18n['active-users.guest-account'][lang]}</p>
-                          : !!user.cachedCloudUser?.publicName && <p className={'name'}>{user.cachedCloudUser?.publicName}</p> || '(None)'
+                          : <p className={'name'}>{!!user.cachedCloudUser?.publicName && user.cachedCloudUser?.publicName || 'Cardinal User'}</p>
                         }
                       </div>
                     )

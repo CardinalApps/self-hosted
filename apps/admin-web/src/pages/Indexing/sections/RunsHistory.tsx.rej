@@ -1,0 +1,10 @@
+diff a/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx b/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx	(rejected hunks)
+@@ -106,7 +106,7 @@ function RunsHistory() {
+                       <p className={'date'}>
+                         {i18n['run.status.date'][lang].replace('{date}', formatDate(run?.createdAt))}
+                       </p>
+-                      <div className={status}>
++                      <div className={'status'}>
+                         {run?.status === 'completed' &&
+                           <div className={'good'}>
+                             <span>{i18n['run.status.success'][lang]}</span>
