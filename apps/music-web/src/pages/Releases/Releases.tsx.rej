@@ -1,0 +1,83 @@
+diff a/apps/music-web/src/pages/Releases/Releases.tsx b/apps/music-web/src/pages/Releases/Releases.tsx	(rejected hunks)
+@@ -1,36 +1,58 @@
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+-import Button from '@cardinalapps/ui/src/components/interaction/Button'
+-
+-import NoContentMessage from '../../components/NoContentMessage'
++import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
++import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
+ 
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ 
++import ReleasesInfiniteScroll from './ReleasesInfiniteScroll'
++
+ import i18n from './i18n.json'
++
+ import './styles.css'
+ 
+-import { HOME_SERVER_HOST } from '../../env'
++const TOOLBAR_NAME = 'tracks-toolbar'
++const VIRTUAL_VIEW_NAME = 'tracks-page'
+ 
+-function Releases() {
++function ReleasesPage() {
+   return (
+-    <AppPage layout={PAGE_LAYOUT.fixed} pageTitle={i18n['title']['en']}>
+-      <div className="releases">
+-        <section>
+-          <NoContentMessage
+-            showUnavailableMessage={true}
+-            icon={<i className="fas fa-upload" />}
+-            title={i18n['no-releases-card-title']['en']}
+-            button={
+-              <Button href={`${HOME_SERVER_HOST}/admin/media`} target="_blank" solid={true}>
+-                {i18n['no-releases-button']['en']}
+-              </Button>
+-            }
+-          >
+-            <p>{i18n['no-releases-card-message']['en']}</p>
+-          </NoContentMessage>
+-        </section>
+-      </div>
++    <AppPage
++      layout={PAGE_LAYOUT.virtual}
++      pageTitle={i18n['title']['en']}
++      restoreScrollPoint={false}
++      toolbar={(
++        <Toolbar
++          name={TOOLBAR_NAME}
++          virtualViewName={VIRTUAL_VIEW_NAME}
++          items={[
++            {
++              slug: 'order',
++              render: ToolbarItem.ORDER,
++            },
++            {
++              slug: 'sort',
++              render: ToolbarItem.SORT,
++              initialValue: 'number',
++              options: [
++                {
++                  label: 'Number',
++                  value: 'number',
++                },
++                {
++                  label: 'Random',
++                  value: 'random',
++                },
++              ],
++            },
++          ]}
++        />
++      )}
++    >
++      <ReleasesInfiniteScroll
++        virtualViewName={VIRTUAL_VIEW_NAME}
++        toolbarName={TOOLBAR_NAME}
++      />
+     </AppPage>
+   )
+ }
+ 
+-export default Releases
++export default ReleasesPage

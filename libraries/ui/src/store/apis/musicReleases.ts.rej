@@ -1,0 +1,165 @@
+diff a/libraries/ui/src/store/apis/musicReleases.ts b/libraries/ui/src/store/apis/musicReleases.ts	(rejected hunks)
+@@ -1,18 +1,30 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+-import { HOME_SERVER_HOST } from '../../../env'
+-import { PaginationParams, SortParams } from '../types/api'
++import { CommonOrderParams, CommonSortParams, PaginationParams, SortParams } from '../types/api'
++import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
++import { baseApi } from './base'
+ 
+-type MusicRelease = {
++export type ReleasesSortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
++export type MusicReleaseType = {
+   id: string,
+   title: string,
+   tracks: Array<{
+     id: number,
+     [key: string]: unknown,
+   }>,
++  artist: {
++    id: number,
++    name: string,
++    [key: string]: unknown,
++  },
++  artists: Array<{
++    id: number,
++    [key: string]: unknown,
++  }>,
++  genres: Array<{
++    id: string,
++    name: string,
++  }>,
+   thumbnails: Array<{
+     size: string,
+     relativeSrc: string,
+@@ -20,52 +32,83 @@ type MusicRelease = {
+   [key: string]: unknown,
+ }
+ 
+-export const musicReleasesApi = createApi({
+-  reducerPath: 'musicReleasesApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['MusicReleases'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    /**
+-     * Queries.
+-     */
+-    getMusicReleases: builder.query<
+-      [MusicRelease[], number],
+-      PaginationParams & SortParams & {
+-        tracks?: boolean,
+-        genres?: boolean,
+-        artists?: boolean,
+-        thumbnails?: boolean,
+-      }
+-    >({
+-      query: ({ take, skip, order, orderBy, tracks, genres, artists, thumbnails }) => {
+-        return queryParams('/music/releases', {
+-          ...(take && { take }),
+-          ...(skip && { skip }),
+-          ...(order && { order }),
+-          ...(orderBy && { orderBy }),
+-          ...(tracks && { tracks }),
+-          ...(genres && { genres }),
+-          ...(artists && { artists }),
+-          ...(thumbnails && { thumbnails }),
+-        })
+-      },
+-    }),
+-    getMusicRelease: builder.query<
+-      MusicRelease,
+-      { id: string }
+-    >({
+-      query: ({ id }) => {
+-        return queryParams(`/music/release/${id}`)
+-      },
++export const musicReleasesApi = baseApi
++  .enhanceEndpoints({
++    addTagTypes: ['list', 'MusicRelease'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      /**
++       * Infinite scroll.
++       */
++      getInfiniteMusicReleases: builder.infiniteQuery<
++        [MusicReleaseType[], number],
++        {
++          sort?: ReleasesSortParams,
++          order?: CommonOrderParams,
++        },
++        PaginationParams
++      >({
++        infiniteQueryOptions: {
++          initialPageParam: {
++            take: ITEMS_PER_RTK_PAGE,
++            skip: 0,
++          },
++          maxPages: 4,
++          getNextPageParam,
++          getPreviousPageParam,
++        },
++        query({ queryArg, pageParam }) {
++          const { sort, order } = queryArg
++          const { take, skip } = pageParam
++          return queryParams('/music/releases', {
++            ...(typeof skip !== 'undefined' && { skip }),
++            ...(take && { take }),
++            ...(sort && { order }),
++            ...(order && { order }),
++            thumbnails: true,
++          })
++        },
++      }),
++
++      /**
++       * Queries.
++       */
++      getMusicReleases: builder.query<
++        [MusicReleaseType[], number],
++        PaginationParams & SortParams & {
++          tracks?: boolean,
++          genres?: boolean,
++          artists?: boolean,
++          thumbnails?: boolean,
++        }
++      >({
++        query: ({ take, skip, order, orderBy, tracks, genres, artists, thumbnails }) => {
++          return queryParams('/music/releases', {
++            ...(take && { take }),
++            ...(skip && { skip }),
++            ...(order && { order }),
++            ...(orderBy && { orderBy }),
++            ...(tracks && { tracks }),
++            ...(genres && { genres }),
++            ...(artists && { artists }),
++            ...(thumbnails && { thumbnails }),
++          })
++        },
++      }),
++      getMusicRelease: builder.query<
++        MusicReleaseType,
++        { id: string }
++      >({
++        query: ({ id }) => {
++          return queryParams(`/music/release/${id}`)
++        },
++      }),
+     }),
+-  }),
+-})
++  })
+ 
+ export const {
++  useGetInfiniteMusicReleasesInfiniteQuery,
+   useGetMusicReleaseQuery,
+   useGetMusicReleasesQuery,
+   useLazyGetMusicReleaseQuery,
