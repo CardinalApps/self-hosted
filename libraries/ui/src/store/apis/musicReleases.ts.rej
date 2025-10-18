@@ -1,10 +1,32 @@
 diff a/libraries/ui/src/store/apis/musicReleases.ts b/libraries/ui/src/store/apis/musicReleases.ts	(rejected hunks)
-@@ -67,6 +67,8 @@ export const musicReleasesApi = baseApi
-             ...(sort && { order }),
-             ...(order && { order }),
-             thumbnails: true,
-+            metadata: true,
-+            tracks: true,
-           })
-         },
-       }),
+@@ -1,6 +1,6 @@
+ import queryParams from '../../lib/net/queryParams'
+ 
+-import { CommonOrderParams, CommonSortParams, PaginationParams, SortParams } from '../types/api'
++import { CommonOrderParams, CommonSortParams, PaginationParams } from '../types/api'
+ import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
+ import { baseApi } from './base'
+ 
+@@ -10,6 +10,7 @@ export type MusicReleaseType = {
+   title: string,
+   tracks: Array<{
+     id: number,
++    trackNumber: number,
+     [key: string]: unknown,
+   }>,
+   artist: {
+@@ -78,11 +79,13 @@ export const musicReleasesApi = baseApi
+        */
+       getMusicReleases: builder.query<
+         [MusicReleaseType[], number],
+-        PaginationParams & SortParams & {
++        PaginationParams & {
+           tracks?: boolean,
+           genres?: boolean,
+           artists?: boolean,
+           thumbnails?: boolean,
++          order?: CommonOrderParams,
++          orderBy?: 'name' | 'createdAt',
+         }
+       >({
+         query: ({ take, skip, order, orderBy, tracks, genres, artists, thumbnails }) => {

@@ -1,0 +1,23 @@
+diff a/libraries/ui/src/store/apis/jobs.ts b/libraries/ui/src/store/apis/jobs.ts	(rejected hunks)
+@@ -4,7 +4,7 @@ import queryParams from '../../lib/net/queryParams'
+ import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+ import { HOME_SERVER_HOST } from '../../../env'
+-import { PaginationParams, SortParams } from '../types/api'
++import { CommonOrderParams, PaginationParams } from '../types/api'
+ 
+ export type JobStatus = 'draft' | 'preparing' | 'in_queue' | 'running' | 'paused' | 'canceled' | 'completed' | 'errored'
+ 
+@@ -49,9 +49,11 @@ export const jobsApi = createApi({
+ 
+     getJobs: builder.query<
+       [Job[], number],
+-      PaginationParams & SortParams & {
++      PaginationParams & {
+         status: JobStatus[]
+         type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails'
++        order?: CommonOrderParams,
++        orderBy?: 'name' | 'createdAt',
+       }
+     >({
+       query: ({ take, skip, status, type, order, orderBy }) => {

@@ -1,22 +1,32 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
-@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
+@@ -1,4 +1,4 @@
+-import { useContext, useState } from 'react'
++import { useContext, useEffect, useState } from 'react'
  import type { PropsWithChildren } from 'react'
  import clsx from 'clsx'
  
--import Icon from '../../typography/Icon'
-+//import Icon from '../../typography/Icon'
- import MusicPlaybackButton from '../MusicPlaybackButton'
- import { RouterContext } from '../../../context/router'
+@@ -12,7 +12,7 @@ import './MusicRelease.css'
  
-@@ -50,9 +50,9 @@ const MusicRelease = ({
-           <div className="col music-track-play-pause">
-             <MusicPlaybackButton musicTrackIds={trackIdsInRelease} musicTrackIdToPlay={trackIdsInRelease?.[0]} />
-           </div>
--          <div className="col music-track-favorite">
-+          {/* <div className="col music-track-favorite">
-             <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />
--          </div>
-+          </div> */}
-         </div>
-       </div>
-       <div className="meta">
+ type MusicReleaseProps = {
+   artwork: string,
+-  tracks?: { id: number }[],
++  tracks?: { id: number, trackNumber: number }[],
+   releaseTitle?: string,
+   releaseYear?: string,
+   releaseLink?: string,
+@@ -32,7 +32,14 @@ const MusicRelease = ({
+   const { Link } = useContext(RouterContext)
+   //const { lang } = useSelector(settingsSelectors.current)
+   const [showInner, setShowInner] = useState<boolean>()
+-  const trackIdsInRelease = tracks.map((track) => track.id).filter((track) => !!track)
++  const [tracksInOrder, setTracksInOrder] = useState(tracks)
++  const trackIdsInRelease = tracksInOrder.map((track) => track.id).filter((track) => !!track)
++
++  useEffect(() => {
++    const ordered = [...tracks]
++    ordered.sort((a, b) => a?.trackNumber > b?.trackNumber ? 1 : -1)
++    setTracksInOrder(ordered)
++  }, [tracks])
+ 
+   return (
+     <div className={clsx(`music-release`, !!showInner && 'show', !artwork && 'no-artwork')}>

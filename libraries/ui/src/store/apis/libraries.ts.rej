@@ -1,0 +1,22 @@
+diff a/libraries/ui/src/store/apis/libraries.ts b/libraries/ui/src/store/apis/libraries.ts	(rejected hunks)
+@@ -4,7 +4,7 @@ import queryParams from '../../lib/net/queryParams'
+ import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+ import { HOME_SERVER_HOST } from '../../../env'
+-import { PaginationParams, SortParams } from '../types/api'
++import { CommonOrderParams, PaginationParams } from '../types/api'
+ 
+ export type Library = {
+   id: string,
+@@ -27,7 +27,10 @@ export const librariesApi = createApi({
+      */
+     getLibraries: builder.query<
+       Library[],
+-      PaginationParams & SortParams
++      PaginationParams & {
++        order?: CommonOrderParams,
++        orderBy?: 'name' | 'createdAt',
++      }
+     >({
+       query: ({ take, skip, order, orderBy }) => {
+         return queryParams('/libraries', {

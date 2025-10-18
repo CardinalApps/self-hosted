@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/store/apis/musicArtists.ts b/libraries/ui/src/store/apis/musicArtists.ts	(rejected hunks)
+@@ -4,7 +4,7 @@ import queryParams from '../../lib/net/queryParams'
+ import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+ import { HOME_SERVER_HOST } from '../../../env'
+-import { PaginationParams, SortParams } from '../types/api'
++import { CommonOrderParams, PaginationParams } from '../types/api'
+ 
+ type MusicArtist = {
+   id: number,
+@@ -28,10 +28,12 @@ export const musicArtistsApi = createApi({
+      */
+     getMusicArtists: builder.query<
+       [MusicArtist[], number],
+-      PaginationParams & SortParams & {
++      PaginationParams & {
+         tracks?: boolean,
+         metadata?: boolean,
+         releases?: boolean,
++        order?: CommonOrderParams,
++        orderBy?: 'name' | 'createdAt',
+       }
+     >({
+       query: ({ take, skip, order, orderBy, tracks, metadata, releases }) => {
