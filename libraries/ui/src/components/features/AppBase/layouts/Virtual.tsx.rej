@@ -1,12 +1,150 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx b/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx	(rejected hunks)
-@@ -160,7 +160,9 @@ function VirtualLayout({
-    * Set initial offset after the RTK query has loaded.
-    */
-   useLayoutEffect(() => {
--    rowVirtualizer.scrollToOffset(initialOffset)
-+    setTimeout(() => {
-+      rowVirtualizer.scrollToOffset(initialOffset)
-+    }, 20)
+@@ -9,6 +9,7 @@ import {
+ } from '../../../../store/slices/layout'
+ import { useAppSelector } from '../../../../hooks/useAppSelector'
+ import { useAppDispatch } from '../../../../hooks/useAppDispatch'
++import useElementSize from '../../../../hooks/useElementSize'
+ import { PaginationParams, RTKPage } from '../../../../store/types/api'
+ 
+ type VirtualProps = {
+@@ -19,6 +20,7 @@ type VirtualProps = {
+     pages: RTKPage[],
+     pageParams: PaginationParams[],
+   },
++  getItem: (data: Record<string, unknown>) => ReactNode,
+   isSuccess: boolean,
+   itemHeight: number,
+   itemWidth: number | '100%',
+@@ -29,7 +31,18 @@ type VirtualProps = {
+   fetchPreviousPage: () => void,
+   isFetchingNextPage: boolean,
+   isFetchingPreviousPage: boolean,
+-  getRowItems?: (rowIndex: number) => ReactNode,
++}
++
++/**
++ * Determine how many items go in each row for the current screen size.
++ */
++const calcItemsPerRow = (boxWidth, itemWidth): number => {
++  if (itemWidth === '100%') {
++    return 1
++  } else {
++    // Expect a numeric value if not `100%`
++    return Math.floor(boxWidth / (itemWidth + 20)) || 1
++  }
+ }
+ 
+ /**
+@@ -40,7 +53,7 @@ function VirtualLayout({
+   virtualViewName,
+   className,
+   data,
+-  getRowItems,
++  getItem,
+   isSuccess,
+   itemHeight,
+   itemWidth,
+@@ -54,30 +67,19 @@ function VirtualLayout({
+ }: PropsWithChildren<VirtualProps>) {
+   const dispatch = useAppDispatch()
+   const boxRef = useRef(null)
++  const { width: boxWidth } = useElementSize(boxRef)
+   const parentRef = useRef<HTMLDivElement>(null)
+   const { [virtualViewName]: virtualView } = useAppSelector(layoutSelectors.virtualViews)
+   const [initialOffset] = useState(virtualView?.offset || 0)
++  const [itemsPerRow, setItemsPerRow] = useState(calcItemsPerRow(boxWidth, itemWidth))
+ 
+   const { pages = [], pageParams = [] } = data || {}
+   const cachedRTKData = pages.flatMap((res) => res[0])
+   const totalItems = pages?.[0]?.[1] || 0
+   const leadingPageParams = pageParams[pageParams.length - 1]
+   const trailingPageParams = pageParams[0]
++  const numRows = Math.ceil(totalItems / itemsPerRow)
+ 
+-  /**
+-   * Determine how many items go in each row for the current screen size.
+-   */
+-  const itemsPerRow = (): number => {
+-    if (itemWidth === '100%') {
+-      return 1
+-    } else {
+-      // Expect a numeric value if not `100%`
+-      return Math.floor((
+-        boxRef.current?.getBoundingClientRect()?.width
+-        / (itemWidth + 20)
+-      )) || 1
+-    }
+-  }
+ 
+   /**
+    * Cache the virtual position for reinitialization on page reload.
+@@ -85,8 +87,8 @@ function VirtualLayout({
+   const onVirtualChange = (instance) => {
+     const startRow = instance?.range?.startIndex + 1
+     const endRow = instance?.range?.endIndex + 1
+-    const start = startRow - 1 <= 0 ? 1 : ((startRow - 1) * itemsPerRow()) + 1
+-    const end = Math.min(((endRow) * itemsPerRow()), totalItems)
++    const start = startRow - 1 <= 0 ? 1 : ((startRow - 1) * itemsPerRow) + 1
++    const end = Math.min(((endRow) * itemsPerRow), totalItems)
+     dispatch(layoutActions.setVirtualView({
+       name: virtualViewName,
+       value: {
+@@ -98,8 +100,24 @@ function VirtualLayout({
+     }))
+   }
+ 
++  /**
++   * Gets the items for a single row.
++   */
++  const getRowItems = (rowIndex: number) => {
++    // One item per row
++    if (itemsPerRow === 1) {
++      return getItem(cachedRTKData[rowIndex - trailingPageParams.skip])
++    }
++
++    // Multiple items per row
++    const startIndex = (rowIndex * itemsPerRow) - trailingPageParams.skip
++    const endIndex = Math.min(startIndex + itemsPerRow, cachedRTKData.length)
++    const rowItems = cachedRTKData.slice(startIndex, endIndex)
++    return rowItems.map((data) => getItem(data))
++  }
++
+   const rowVirtualizer = useVirtualizer({
+-    count: Math.ceil(totalItems / itemsPerRow()),
++    count: numRows,
+     estimateSize: () => itemHeight,
+     getScrollElement: () => parentRef.current,
+     overscan: 4,
+@@ -165,6 +183,20 @@ function VirtualLayout({
+     }, 20)
    }, [isSuccess])
  
++  /**
++   * Update the items per row when the width is resized.
++   */
++  useEffect(() => {
++    setItemsPerRow(calcItemsPerRow(boxWidth, itemWidth))
++  }, [boxWidth])
++
++  /**
++   * Trigger a rerender when the number of items per row changes.
++   */
++  useEffect(() => {
++    rowVirtualizer.measure()
++  }, [itemsPerRow])
++
    return (
+     <div {...props} className={clsx('virtual-layout', className)}>
+       <div
+@@ -190,9 +222,11 @@ function VirtualLayout({
+             && rowVirtualizer.getVirtualItems().map((virtualRow) => {
+               return (
+                 <div
++                  ref={rowVirtualizer.measureElement}
+                   key={virtualRow.index}
+                   className="virtual-row"
+                   data-row-index={virtualRow.index}
++                  data-index={virtualRow.index}
+                   style={{
+                     height: `${virtualRow.size}px`,
+                     transform: `translateY(${virtualRow.start}px)`,

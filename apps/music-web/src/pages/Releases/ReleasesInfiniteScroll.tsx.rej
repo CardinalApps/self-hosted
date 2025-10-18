@@ -1,93 +1,99 @@
 diff a/apps/music-web/src/pages/Releases/ReleasesInfiniteScroll.tsx b/apps/music-web/src/pages/Releases/ReleasesInfiniteScroll.tsx	(rejected hunks)
-@@ -8,12 +8,15 @@ import {
- } from '@cardinalapps/ui/src/store/apis/musicReleases'
- import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
- import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
-+import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
+@@ -11,10 +11,8 @@ import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScr
+ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
  import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
  import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
-+import useElementSize from '@cardinalapps/ui/src/hooks/useElementSize'
+-import useElementSize from '@cardinalapps/ui/src/hooks/useElementSize'
  
  import { HOME_SERVER_HOST } from '../../env'
-+import music from '@cardinalapps/ui/src/components/features/SettingsPanel/fields/music'
+-import music from '@cardinalapps/ui/src/components/features/SettingsPanel/fields/music'
  
--const ITEM_WIDTH = '100%'
-+const ITEM_WIDTH = 220
+ const ITEM_WIDTH = 220
  const ITEM_HEIGHT = 275
- 
- type TracksInfiniteScrollProps = {
-@@ -25,9 +28,10 @@ function ReleasesInfiniteScroll({
+@@ -28,7 +26,6 @@ function ReleasesInfiniteScroll({
    virtualViewName,
    toolbarName,
  }: TracksInfiniteScrollProps) {
-+  const { width: rowWidth } = useElementSize('.virtual-box')
+-  const { width: rowWidth } = useElementSize('.virtual-box')
    const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
    const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
--  const [initialRow] = useState(virtualViewValues?.start || 1) // fixme should the 1 here be a 0?
-+  const [initialRow] = useState(virtualViewValues?.start || 1)
-   const initialPage = Math.floor((initialRow) / ITEMS_PER_RTK_PAGE)
-   const [initialPageParam] = useState({
-     take: ITEMS_PER_RTK_PAGE,
-@@ -58,29 +62,43 @@ function ReleasesInfiniteScroll({
-   const cachedRTKData = pages.flatMap((res) => res[0])
-   const trailingPageParams = pageParams[0]
+   const [initialRow] = useState(virtualViewValues?.start || 1)
+@@ -58,47 +55,28 @@ function ReleasesInfiniteScroll({
+     },
+   )
  
--  const filter = (musicRelease: MusicReleaseType, key) => {
--    const artwork = musicRelease?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
--    return (
--      <MusicRelease
--        key={`item-${key}`}
--        tracks={[{ id: 1 }]}
--        artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
--        releaseTitle={musicRelease?.title}
--        artistName={musicRelease?.artist?.name}
--        releaseYear="2011"
--        releaseLink="/"
--        artistLink="#"
-+  console.log('cachedRTKData', cachedRTKData)
- 
--        // tracks={musicRelease?.id}
--        // trackTitle={musicRelease?.title}
--        // 
--        // 
--      />
--    )
-+  const filter = (musicReleases: MusicReleaseType[], key) => {
-+    return musicReleases.map((musicRelease) => {
-+      const artwork = musicRelease?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
-+      return (
-+        <MusicRelease
-+          key={`item-${musicRelease?.musicReleaseId}`}
-+          tracks={musicRelease?.tracks || []}
-+          artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
-+          releaseTitle={musicRelease?.title}
-+          artistName={musicRelease?.artist?.name}
-+          //releaseYear={musicRelease.year}
-+          releaseLink={getAppUrl('music', 'release', {
-+            params: {
-+              ':id': musicRelease?.musicReleaseId?.toString() || '',
-+            },
-+          })}
-+          artistLink={getAppUrl('music', 'artist', {
-+            params: {
-+              ':id': musicRelease?.artist?.musicArtistId?.toString() || '',
-+            },
-+          })}
-+        />
-+      )
-+    })
-   }
- 
-   const getRowItems = (rowIndex: number) => {
--    return filter(cachedRTKData[rowIndex - trailingPageParams.skip], rowIndex)
-+    console.log('rowIndex', rowIndex)
-+    const itemsPerRow = Math.floor(rowWidth / ITEM_WIDTH) || 1
-+    const startIndex = rowIndex - trailingPageParams.skip
-+    const endIndex = Math.min(startIndex + itemsPerRow, cachedRTKData.length - 1)
-+    // const start = cachedRTKData[startIndex]
-+    // const end = cachedRTKData[endIndex]
-+    const rowItems = filter(cachedRTKData.slice(startIndex, endIndex), rowIndex)
-+    return rowItems
+-  const { pages = [], pageParams = [] } = data || {}
+-  const cachedRTKData = pages.flatMap((res) => res[0])
+-  const trailingPageParams = pageParams[0]
+-
+-  console.log('cachedRTKData', cachedRTKData)
+-
+-  const filter = (musicReleases: MusicReleaseType[], key) => {
+-    return musicReleases.map((musicRelease) => {
+-      const artwork = musicRelease?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+-      return (
+-        <MusicRelease
+-          key={`item-${musicRelease?.musicReleaseId}`}
+-          tracks={musicRelease?.tracks || []}
+-          artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
+-          releaseTitle={musicRelease?.title}
+-          artistName={musicRelease?.artist?.name}
+-          //releaseYear={musicRelease.year}
+-          releaseLink={getAppUrl('music', 'release', {
+-            params: {
+-              ':id': musicRelease?.musicReleaseId?.toString() || '',
+-            },
+-          })}
+-          artistLink={getAppUrl('music', 'artist', {
+-            params: {
+-              ':id': musicRelease?.artist?.musicArtistId?.toString() || '',
+-            },
+-          })}
+-        />
+-      )
+-    })
+-  }
+-
+-  const getRowItems = (rowIndex: number) => {
+-    console.log('rowIndex', rowIndex)
+-    const itemsPerRow = Math.floor(rowWidth / ITEM_WIDTH) || 1
+-    const startIndex = rowIndex - trailingPageParams.skip
+-    const endIndex = Math.min(startIndex + itemsPerRow, cachedRTKData.length - 1)
+-    // const start = cachedRTKData[startIndex]
+-    // const end = cachedRTKData[endIndex]
+-    const rowItems = filter(cachedRTKData.slice(startIndex, endIndex), rowIndex)
+-    return rowItems
++  const getItem = (musicRelease: MusicReleaseType) => {
++    const artwork = musicRelease?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
++    return (
++      <MusicRelease
++        key={`item-${musicRelease?.musicReleaseId}`}
++        tracks={musicRelease?.tracks || []}
++        artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
++        releaseTitle={musicRelease?.title}
++        artistName={musicRelease?.artist?.name}
++        //releaseYear={musicRelease.year}
++        releaseLink={getAppUrl('music', 'release', {
++          params: {
++            ':id': musicRelease?.musicReleaseId?.toString() || '',
++          },
++        })}
++        artistLink={getAppUrl('music', 'artist', {
++          params: {
++            ':id': musicRelease?.artist?.musicArtistId?.toString() || '',
++          },
++        })}
++      />
++    )
    }
  
    return (
+@@ -107,7 +85,7 @@ function ReleasesInfiniteScroll({
+       itemHeight={ITEM_HEIGHT}
+       itemWidth={ITEM_WIDTH}
+       data={data}
+-      getRowItems={getRowItems}
++      getItem={getItem}
+       isSuccess={isSuccess}
+       hasNextPage={hasNextPage}
+       hasPreviousPage={hasPreviousPage}

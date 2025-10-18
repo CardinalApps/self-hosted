@@ -1,0 +1,18 @@
+diff a/libraries/ui/src/hooks/useElementSize.ts b/libraries/ui/src/hooks/useElementSize.ts	(rejected hunks)
+@@ -5,8 +5,14 @@ export type ElementSize = {
+   height: number,
+ }
+ 
+-export default function useElementSize(selector: string) {
+-  const element: HTMLElement | null = document.querySelector(selector)
++/**
++ * Returns the width and height of a DOM element. Accepts either a CSS selector
++ * string or a React ref object.
++ */
++export default function useElementSize(selector: string | React.RefObject<HTMLElement>) {
++  const element: HTMLElement | null = typeof selector === 'string'
++    ? document.querySelector(selector)
++    : selector.current
+   const [size, setSize] = useState<ElementSize>({ width: 0, height: 0 })
+ 
+   const updateSize = useCallback(() => {

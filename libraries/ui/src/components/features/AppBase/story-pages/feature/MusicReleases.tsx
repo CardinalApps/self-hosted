@@ -40,7 +40,7 @@ function MusicReleasesPage() {
                     artwork={thumb ? `${HOME_SERVER_HOST}${thumb}` : undefined}
                     tracks={release.tracks}
                     releaseTitle={release.title}
-                    artistName={release?.artists?.[0]?.name}
+                    artistName={release?.artists?.[0]?.name as string}
                   />
                 )
               })

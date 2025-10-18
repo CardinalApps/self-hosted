@@ -1,28 +1,38 @@
 diff a/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx b/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx	(rejected hunks)
-@@ -3,11 +3,11 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
- import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
- import {
-   MusicTrackType,
--  TRACKS_PER_RTK_PAGE,
-   TracksSortParams,
-   useGetInfiniteMusicTracksInfiniteQuery,
- } from '@cardinalapps/ui/src/store/apis/musicTracks'
- import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
-+import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
- import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
- import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+@@ -51,15 +51,11 @@ function TracksInfiniteScroll({
+     { initialPageParam },
+   )
  
-@@ -28,10 +28,10 @@ function TracksInfiniteScroll({
-   const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
-   const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
-   const [initialRow] = useState(virtualViewValues?.start || 1) // fixme should the 1 here be a 0?
--  const initialPage = Math.floor((initialRow) / TRACKS_PER_RTK_PAGE)
-+  const initialPage = Math.floor((initialRow) / ITEMS_PER_RTK_PAGE)
-   const [initialPageParam] = useState({
--    take: TRACKS_PER_RTK_PAGE,
--    skip: initialPage * TRACKS_PER_RTK_PAGE,
-+    take: ITEMS_PER_RTK_PAGE,
-+    skip: initialPage * ITEMS_PER_RTK_PAGE,
-   })
+-  const { pages = [], pageParams = [] } = data || {}
+-  const cachedRTKData = pages.flatMap((res) => res[0])
+-  const trailingPageParams = pageParams[0]
+-
+-  const filter = (musicTrack: MusicTrackType, key) => {
++  const getItem = (musicTrack: MusicTrackType) => {
+     const artwork = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+     return (
+       <MusicTrack
+-        key={`item-${key}`}
++        key={`item-${musicTrack?.musicTrackId}`}
+         musicTrackId={musicTrack?.id}
+         trackTitle={musicTrack?.title}
+         releaseTitle={musicTrack?.release?.title}
+@@ -69,17 +65,13 @@ function TracksInfiniteScroll({
+     )
+   }
  
-   const {
+-  const getRowItems = (rowIndex: number) => {
+-    return filter(cachedRTKData[rowIndex - trailingPageParams.skip], rowIndex)
+-  }
+-
+   return (
+     <VirtualLayout
+       virtualViewName={virtualViewName}
+       itemHeight={ITEM_HEIGHT}
+       itemWidth={ITEM_WIDTH}
+       data={data}
+-      getRowItems={getRowItems}
++      getItem={getItem}
+       isSuccess={isSuccess}
+       hasNextPage={hasNextPage}
+       hasPreviousPage={hasPreviousPage}
