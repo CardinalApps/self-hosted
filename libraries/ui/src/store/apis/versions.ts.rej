@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/store/apis/versions.ts b/libraries/ui/src/store/apis/versions.ts	(rejected hunks)
+@@ -7,7 +7,7 @@ import { HOME_SERVER_HOST } from '../../../env'
+ 
+ export const versionsApi = createApi({
+   reducerPath: 'versionsApi',
+-  refetchOnMountOrArgChange: false,
++  refetchOnMountOrArgChange: true,
+   tagTypes: ['Versions'],
+   baseQuery: fetchBaseQuery({
+     baseUrl: `${HOME_SERVER_HOST}/api/v1`,
