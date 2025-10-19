@@ -1,17 +1,26 @@
 diff a/libraries/ui/src/components/features/AppHeader/AppHeader.tsx b/libraries/ui/src/components/features/AppHeader/AppHeader.tsx	(rejected hunks)
-@@ -19,6 +19,7 @@ import i18n from './i18n'
+@@ -11,6 +11,7 @@ import homeServerUserLogout from '../../../store/slices/homeServerUser/thunks/lo
+ import { settingsSelectors } from '../../../store/slices/settings'
+ import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ import { RouterContext } from '../../../context/router'
++import { CardinalApp } from '../../../lib/env/cardinal'
+ 
+ import CloudStatusIcon from './componenets/CloudStatusIcon'
+ import ActivityIcon from './componenets/ActivityIcon'
+@@ -18,8 +19,6 @@ import ActivityIcon from './componenets/ActivityIcon'
+ import i18n from './i18n'
  
  import './AppHeader.css'
- import { CardinalApp } from '../../../lib/env/cardinal'
-+import { getAppUrl } from '../../../lib/net/router'
+-import { CardinalApp } from '../../../lib/env/cardinal'
+-import { getAppUrl } from '../../../lib/net/router'
  
  type AppHeaderProps = {
    app?: CardinalApp,
-@@ -83,6 +84,7 @@ const AppHeader = ({
+@@ -84,7 +83,6 @@ const AppHeader = ({
          </div>
        </div>
        <div className="right">
-+        <a href={getAppUrl('indexing', { app: 'admin' })}>test</a>
+-        <a href={getAppUrl('indexing', { app: 'admin' })}>test</a>
          <div className="icons">
            {/* Cloud status icon */}
            <div className="icon no-hover">
