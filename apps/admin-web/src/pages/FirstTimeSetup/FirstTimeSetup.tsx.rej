@@ -1,18 +1,31 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx b/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx	(rejected hunks)
-@@ -1,6 +1,6 @@
- import { useState, useEffect } from 'react'
- import { useNavigate } from 'react-router-dom'
--import { motion, AnimatePresence } from 'framer-motion'
-+import { motion, AnimatePresence, TargetAndTransition } from 'framer-motion'
- import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
- import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+@@ -30,6 +30,7 @@ function FirstTimeSetup() {
+   const dispatch = useAppDispatch()
+   const navigate = useNavigate()
+   const health = useAppSelector(homeServerSelectors.health)
++  const firstTimeSetupComplete = useAppSelector(homeServerSelectors.firstTimeSetupComplete)
+   const homeServerUserLoggedIn = useAppSelector(homeServerUserSelectors.loggedIn)
+   const [finishButtonState, setFinishButtonState] = useState<string>()
+   const [step, setStep] = useState(1)
+@@ -80,6 +81,7 @@ function FirstTimeSetup() {
+     })
+       .then((res: { localUser: { userId } }) => {
+         setFinishButtonState('')
++        dispatch(homeServerActions.setFirstTimeSetupComplete(true))
+         if (res?.localUser) {
+           dispatch(homeServerLogin({
+             userId: res.localUser.userId,
+@@ -111,11 +113,10 @@ function FirstTimeSetup() {
+    * Exit the First Time Setup once the setup is complete.
+    */
+   useEffect(() => {
+-    if (homeServerUserLoggedIn && health !== 'not_setup') {
+-      dispatch(homeServerActions.setFirstTimeSetupComplete(true))
++    if (homeServerUserLoggedIn && firstTimeSetupComplete) {
+       navigate(routes.LOGIN)
+     }
+-  }, [homeServerUserLoggedIn])
++  }, [homeServerUserLoggedIn, firstTimeSetupComplete])
  
-@@ -43,7 +43,7 @@ function FirstTimeSetup() {
-   const [ssoJWTOfFutureOwner, setSsoJWTOfFutureOwner] = useState()
- 
-   const fadeOutDuration = 0.4
--  const cardAnimation = { opacity: 1, transition: { duration: 0.3, type: 'tween' } }
-+  const cardAnimation: TargetAndTransition = { opacity: 1, transition: { duration: 0.3, type: 'tween' } }
- 
-   /**
-    * Set next step after allowing enough time for current step to animate out.
+   return (
+     <div className={'firstTimeSetup'}>

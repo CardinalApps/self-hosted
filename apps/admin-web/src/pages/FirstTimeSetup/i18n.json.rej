@@ -1,0 +1,10 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/i18n.json b/apps/admin-web/src/pages/FirstTimeSetup/i18n.json	(rejected hunks)
+@@ -78,7 +78,7 @@
+     "en": "(Go set a public name!)"
+   },
+   "help.title": {
+-    "en": "Community and help"
++    "en": "Getting help"
+   },
+   "help.message-p1": {
+     "en": "You are invited to join the <a href='https://forums.cardinalapps.io' target='_blank'>Community Forums<i class='fas fa-external-link-alt'></i></a>."

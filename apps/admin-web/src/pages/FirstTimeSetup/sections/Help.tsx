@@ -47,7 +47,7 @@ function Help({
             </>
           }
         >
-          <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['help.message-p1'][lang] }} />
+          {/* <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['help.message-p1'][lang] }} /> */}
           <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['help.message-p2'][lang] }} />
         </Card>
       </motion.div>
