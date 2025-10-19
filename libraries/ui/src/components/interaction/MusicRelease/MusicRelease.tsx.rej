@@ -1,32 +1,18 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useContext, useState } from 'react'
-+import { useContext, useEffect, useState } from 'react'
- import type { PropsWithChildren } from 'react'
- import clsx from 'clsx'
+@@ -35,6 +35,7 @@ const MusicRelease = ({
+   const [tracksInOrder, setTracksInOrder] = useState(tracks)
+   const trackIdsInRelease = tracksInOrder.map((track) => track.id).filter((track) => !!track)
  
-@@ -12,7 +12,7 @@ import './MusicRelease.css'
- 
- type MusicReleaseProps = {
-   artwork: string,
--  tracks?: { id: number }[],
-+  tracks?: { id: number, trackNumber: number }[],
-   releaseTitle?: string,
-   releaseYear?: string,
-   releaseLink?: string,
-@@ -32,7 +32,14 @@ const MusicRelease = ({
-   const { Link } = useContext(RouterContext)
-   //const { lang } = useSelector(settingsSelectors.current)
-   const [showInner, setShowInner] = useState<boolean>()
--  const trackIdsInRelease = tracks.map((track) => track.id).filter((track) => !!track)
-+  const [tracksInOrder, setTracksInOrder] = useState(tracks)
-+  const trackIdsInRelease = tracksInOrder.map((track) => track.id).filter((track) => !!track)
-+
-+  useEffect(() => {
-+    const ordered = [...tracks]
-+    ordered.sort((a, b) => a?.trackNumber > b?.trackNumber ? 1 : -1)
-+    setTracksInOrder(ordered)
-+  }, [tracks])
- 
-   return (
-     <div className={clsx(`music-release`, !!showInner && 'show', !artwork && 'no-artwork')}>
++  // Fixme this doesn't seem to work consistently
+   useEffect(() => {
+     const ordered = [...tracks]
+     ordered.sort((a, b) => a?.trackNumber > b?.trackNumber ? 1 : -1)
+@@ -51,7 +52,7 @@ const MusicRelease = ({
+         onMouseLeave={() => setShowInner(false)}
+         style={{ ...(artwork && { backgroundImage: `url('${artwork}')` }) }}
+       >
+-        {!!releaseLink && <a href={releaseLink} tabIndex={-1} className="cover-link"></a>}
++        {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
+         {!artwork && <i className="no-artwork-icon far fa-image" />}
+         <div className="controls">
+           <div className="col music-track-play-pause">
