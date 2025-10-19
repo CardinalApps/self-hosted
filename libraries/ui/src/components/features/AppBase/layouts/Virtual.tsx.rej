@@ -1,77 +1,11 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx b/libraries/ui/src/components/features/AppBase/layouts/Virtual.tsx	(rejected hunks)
-@@ -2,15 +2,23 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
- import type { PropsWithChildren, ReactNode } from 'react'
- import { useVirtualizer } from '@tanstack/react-virtual'
- import clsx from 'clsx'
-+import Loading from '../../../layout/Loading'
- 
- import {
-   layoutActions,
-   layoutSelectors,
- } from '../../../../store/slices/layout'
-+import { getAppUrl } from '../../../../lib/net/router'
- import { useAppSelector } from '../../../../hooks/useAppSelector'
- import { useAppDispatch } from '../../../../hooks/useAppDispatch'
- import useElementSize from '../../../../hooks/useElementSize'
- import { PaginationParams, RTKPage } from '../../../../store/types/api'
-+import Card from '../../../layout/Card'
-+import Icon from '../../../typography/Icon'
-+import Button from '../../../interaction/Button'
-+
-+import i18n from '../i18n'
-+import H5 from '../../../typography/H5'
- 
- type VirtualProps = {
-   virtualViewName: string,
-@@ -22,6 +30,7 @@ type VirtualProps = {
-   },
-   getItem: (data: Record<string, unknown>) => ReactNode,
-   isSuccess: boolean,
-+  isLoading: boolean,
-   itemHeight: number,
-   itemWidth: number | '100%',
-   scrollRestorationKey?: string,
-@@ -55,6 +64,7 @@ function VirtualLayout({
-   data,
-   getItem,
-   isSuccess,
-+  isLoading,
-   itemHeight,
-   itemWidth,
-   hasNextPage,
-@@ -80,7 +90,6 @@ function VirtualLayout({
-   const trailingPageParams = pageParams[0]
-   const numRows = Math.ceil(totalItems / itemsPerRow)
- 
--
-   /**
+@@ -94,6 +94,9 @@ function VirtualLayout({
     * Cache the virtual position for reinitialization on page reload.
     */
-@@ -199,6 +208,27 @@ function VirtualLayout({
- 
-   return (
-     <div {...props} className={clsx('virtual-layout', className)}>
-+      {isLoading && <div className="virtual-loading"><Loading /></div>}
-+      {isSuccess && totalItems === 0 && (
-+        <div className="virtual-empty">
-+          <Card
-+            border={0}
-+            shadow={1}
-+            bg={1}
-+            header={<Icon fa="fas fa-exclamation-circle" />}
-+            footer={(
-+              <Button href={getAppUrl('admin', 'artists')} solid={true}>
-+                {i18n['virtual.empty.button']['en']}
-+              </Button>
-+            )}
-+          >
-+            <>
-+              <H5>{i18n['virtual.empty.title']['en']}</H5>
-+              <p dangerouslySetInnerHTML={{ __html: i18n['virtual.empty.desc']['en'] }} />
-+            </>
-+          </Card>
-+        </div>
-+      )}
-       <div
-         ref={parentRef}
-         className={clsx('virtual-root')}
+   const onVirtualChange = (instance) => {
++    if (!instance?.range) {
++      return
++    }
+     const startRow = instance?.range?.startIndex + 1
+     const endRow = instance?.range?.endIndex + 1
+     const start = startRow - 1 <= 0 ? 1 : ((startRow - 1) * itemsPerRow) + 1
