@@ -1,0 +1,12 @@
+diff a/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx b/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx	(rejected hunks)
+@@ -59,8 +59,8 @@ function ReleasesInfiniteScroll({
+         key={`item-${musicArtist?.musicArtistId}`}
+         name={musicArtist?.name}
+         image={'/music/images/placeholder.jpg'}
+-        numReleases={4}
+-        numTracks={36}
++        numReleases={musicArtist?.releases?.length || 0}
++        numTracks={musicArtist?.tracks?.length || 0}
+         link={getAppUrl('music', 'artist', {
+           params: {
+             ':id': musicArtist?.musicArtistId?.toString() || '',

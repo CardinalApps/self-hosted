@@ -1,0 +1,11 @@
+diff a/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.css b/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.css	(rejected hunks)
+@@ -32,6 +32,9 @@
+   .artist-name {
+     font-size: 18px;
+     font-weight: 600;
++    text-overflow: ellipsis;
++    white-space: nowrap;
++    overflow: hidden;
+   }
+ 
+   .artist-image {
