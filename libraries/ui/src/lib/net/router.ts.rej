@@ -1,10 +1,48 @@
 diff a/libraries/ui/src/lib/net/router.ts b/libraries/ui/src/lib/net/router.ts	(rejected hunks)
-@@ -74,7 +74,7 @@ export enum CinemaRoutes {
+@@ -58,6 +58,9 @@ export enum CinemaRoutes {
+ }
+ 
+ /**
++ * Returns a URL for any Cardinal app. If no app is sepcified in the options,
++ * the current app will be used.
++ * 
+  * Params are set like...
+  * 
+  *     {
+@@ -73,14 +76,22 @@ export enum CinemaRoutes {
+  *     /users/123
   */
  export const getAppUrl = (
-   app: keyof typeof BasePaths,
--  route: keyof typeof MusicRoutes,
-+  route: keyof typeof AdminRoutes | keyof typeof MusicRoutes | keyof typeof PhotoRoutes | keyof typeof CinemaRoutes,
+-  app: keyof typeof BasePaths,
+   route: keyof typeof AdminRoutes | keyof typeof MusicRoutes | keyof typeof PhotoRoutes | keyof typeof CinemaRoutes,
    options?: {
++    app?: keyof typeof BasePaths,
      params?: Record<string, string>,
    },
+ ): string => {
+-  const prefix = BasePaths[app]
+   let path = ''
++  let app = options?.app
++
++  // Get app based on current URL
++  if (!app) {
++    const currentUrlBase = window?.location?.pathname?.split('/')?.[1]
++    if (currentUrlBase in BasePaths) {
++      app = currentUrlBase as keyof typeof BasePaths
++    }
++  }
+ 
+   switch (app) {
+     case 'admin':
+@@ -97,7 +108,10 @@ export const getAppUrl = (
+       break
+   }
+ 
+-  let url = `${prefix}${path}`
++  // Only add the app prefix if the app is explicitly given in the options
++  let url = options?.app
++    ? `${BasePaths[options?.app]}/${path}`
++    : `${path}`
+ 
+   if (options?.params) {
+     for (const [key, value] of Object.entries(options.params)) {
