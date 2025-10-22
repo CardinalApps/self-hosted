@@ -1,19 +1,31 @@
 diff a/servers/media/src/modules/music-release/music-release.controller.ts b/servers/media/src/modules/music-release/music-release.controller.ts	(rejected hunks)
-@@ -82,7 +82,7 @@ export class MusicReleaseController {
-   }
+@@ -21,7 +21,7 @@ import { ApiSecurityTypes } from '../../guards/types'
+ import { MusicRelease } from './music-release.entity'
+ import { MusicReleaseService } from './music-release.service'
  
-   /**
--   * Returns the blob data of a release covers.
-+   * Returns the blob data of a release covers. Supports numeric row ID and musicReleaseId col.
-    */
-   @Get('/music/releases/:id/cover')
+-import { GetMusicArtistDto } from './dtos/GetMusicRelease.dto'
++import { GetMusicReleaseDto } from './dtos/GetMusicRelease.dto'
+ import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
+ 
+ import { EventService } from '../event/event.service'
+@@ -45,17 +45,14 @@ export class MusicReleaseController {
    @UseGuards(AuthGuard)
-@@ -93,7 +93,7 @@ export class MusicReleaseController {
-   })
    @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-   async getReleaseCoverBlob(
--    @Param('id') id: number,
-+    @Param('id') id: string | number,
-     @Query() query: GetMusicReleaseCover,
-   ): Promise<StreamableFile> {
-     const release = await this.musicReleaseService.get(id, {
+   async getMusicArtist(
+-    @Param() {
+-      id,
+-      artists = false,
+-      genres = false,
+-      tracks = false,
+-    }: GetMusicArtistDto,
++    @Param() { id }: { id: string },
++    @Query() { artists, tracks, genres, thumbnails }: GetMusicReleaseDto,
+   ): Promise<MusicRelease> {
+     const musicRelease = await this.musicReleaseService.get(id, {
+       artists,
+       genres,
+       tracks,
++      thumbnails,
+     })
+ 
+     if (!musicRelease) {

@@ -1,0 +1,35 @@
+diff a/libraries/ui/src/components/layout/Columns/Column.tsx b/libraries/ui/src/components/layout/Columns/Column.tsx	(rejected hunks)
+@@ -7,8 +7,11 @@ type ColumnProps = {
+   mediumCols?: number,
+   smallCols?: number,
+   minWidth?: number | string,
++  width?: number | string,
+   justifyContent?: 'space-between' | 'space-around' | 'flex-start' | 'flex-end' | 'center',
+   alignItems?: 'space-between' | 'space-around' | 'flex-start' | 'flex-end' | 'center',
++  grow?: boolean,
++  shrink?: boolean,
+   className?: string,
+   style?: CSSProperties,
+   children?: ReactNode,
+@@ -19,8 +22,11 @@ const Column = ({
+   mediumCols,
+   smallCols,
+   minWidth,
++  width,
+   justifyContent = 'center',
+   alignItems = 'center',
++  grow = false,
++  shrink = true,
+   className = '',
+   style,
+   children,
+@@ -36,6 +42,9 @@ const Column = ({
+         ...(justifyContent && { justifyContent }),
+         ...(alignItems && { alignItems }),
+         ...(minWidth && { minWidth }),
++        ...(width && { width }),
++        flexGrow: grow ? 1 : 0,
++        flexShrink: shrink ? 1 : 0,
+         ...style,
+       }}
+       {...props}

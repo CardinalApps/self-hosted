@@ -1,9 +1,30 @@
 diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.css b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.css	(rejected hunks)
-@@ -33,6 +33,7 @@
-     }
+@@ -48,6 +48,7 @@
+       }
  
-     .music-release {
-+      width: auto;
-       display: flex;
-       flex-wrap: nowrap;
-       align-items: center;
+       .music-release-title {
++        padding-right: 5px;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+@@ -61,7 +62,6 @@
+       }
+ 
+       .music-release-artist {
+-        padding-left: 5px;
+         display: flex;
+         flex-shrink: 0;
+         overflow: hidden;
+@@ -71,6 +71,12 @@
+     }
+   }
+ 
++  .music-track-number {
++    min-width: 37px;
++    text-align: center;
++    justify-content: center;
++  }
++
+   .music-track-play-pause {
+     width: 52px;
+     justify-content: center;

@@ -1,0 +1,19 @@
+diff a/apps/music-web/src/pages/Release/styles.css b/apps/music-web/src/pages/Release/styles.css	(rejected hunks)
+@@ -1,4 +1,15 @@
+-.release {
+-  height: 100%;
++.music-release-page {
+   position: relative;
++
++  .music-release {
++    width: 100%;
++
++    .music-release-art {
++      height: 300px
++    }
++  }
++
++  .music-release-track-list {
++    flex-wrap: wrap;
++  }
+ }

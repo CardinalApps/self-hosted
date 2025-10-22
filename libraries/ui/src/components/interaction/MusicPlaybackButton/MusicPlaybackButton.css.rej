@@ -1,0 +1,18 @@
+diff a/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.css b/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.css	(rejected hunks)
+@@ -11,6 +11,16 @@
+     background-color: var(--bg-4);
+   }
+ 
++  &.size-m {
++    width: 50px;
++    height: 50px;
++
++    button {
++      width: 50px;
++      height: 50px;
++    }
++  }
++
+   .loading-indicator {
+     display: flex;
+     align-items: center;

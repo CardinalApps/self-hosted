@@ -1,0 +1,35 @@
+diff a/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.tsx b/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.tsx	(rejected hunks)
+@@ -13,11 +13,14 @@ import i18n from './i18n'
+ 
+ import './MusicPlaybackButton.css'
+ 
++export type PlayButtonSizeType = 'm' | 's'
++
+ type MusicPlaybackButtonProps = {
+   musicTrackIds: number[],
+   musicTrackTitle?: string,
+   musicTrackIdToPlay: number,
+   solid?: boolean,
++  size?: PlayButtonSizeType,
+ }
+ 
+ /**
+@@ -35,6 +38,7 @@ const MusicPlaybackButton = ({
+   musicTrackIds,
+   musicTrackIdToPlay,
+   solid,
++  size = 's',
+ }: PropsWithChildren<MusicPlaybackButtonProps>) => {
+   const dispatch = useDispatch()
+   const { lang } = useSelector(settingsSelectors.current)
+@@ -66,7 +70,9 @@ const MusicPlaybackButton = ({
+   }
+ 
+   return (
+-    <div className={clsx('music-playback-button', !!solid && 'solid')}>
++    <div
++      className={clsx('music-playback-button', !!solid && 'solid', !!size && `size-${size}`)}
++    >
+       {(isLoading) &&
+         <Loading size="s" />
+       }

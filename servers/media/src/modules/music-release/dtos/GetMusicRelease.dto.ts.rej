@@ -1,0 +1,35 @@
+diff a/servers/media/src/modules/music-release/dtos/GetMusicRelease.dto.ts b/servers/media/src/modules/music-release/dtos/GetMusicRelease.dto.ts	(rejected hunks)
+@@ -1,22 +1,26 @@
+ import { Transform } from 'class-transformer'
+-import { IsBoolean, IsNumber, IsOptional } from 'class-validator'
++import { IsBoolean, IsOptional } from 'class-validator'
+ 
+-import { toNumber } from '../../../utils/transformers'
+-
+-export class GetMusicArtistDto {
+-  @Transform(toNumber)
+-  @IsNumber()
+-  id: number
++import { toBoolean } from '../../../utils/transformers'
+ 
++export class GetMusicReleaseDto {
++  @Transform(toBoolean)
+   @IsBoolean()
+   @IsOptional()
+   tracks?: boolean
+ 
++  @Transform(toBoolean)
+   @IsBoolean()
+   @IsOptional()
+   genres?: boolean
+ 
++  @Transform(toBoolean)
+   @IsBoolean()
+   @IsOptional()
+   artists?: boolean
++
++  @Transform(toBoolean)
++  @IsBoolean()
++  @IsOptional()
++  thumbnails?: boolean
+ }

@@ -1,25 +1,18 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.css b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.css	(rejected hunks)
-@@ -118,11 +118,23 @@
-     .release-name {
-       font-size: 14px;
-       font-weight: 500;
-+
-+      a {
-+        overflow: hidden;
-+        text-overflow: ellipsis;
-+        display: -webkit-box;
-+        -webkit-line-clamp: 2;
-+        line-clamp: 2; 
-+        -webkit-box-orient: vertical;
-+      }
-     }
+@@ -77,14 +77,9 @@
+     transition: opacity 100ms;
+     pointer-events: none;
  
-     .artist-name {
-       font-size: 13px;
-       font-weight: 400;
-+      white-space: nowrap;
-+      text-overflow: ellipsis;
-+      overflow: hidden;
-     }
+-    .music-playback-button {
+-      width: 30px;
+-      height: 30px;
+-    }
+-
+     button {
+-      width: 30px;
+-      height: 30px;
++      /* width: 35px;
++      height: 35px; */
+       pointer-events: all;
+       background-color: var(--bg-4);
  
-     .release-year {

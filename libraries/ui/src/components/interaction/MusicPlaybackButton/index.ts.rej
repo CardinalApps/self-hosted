@@ -1,0 +1,7 @@
+diff a/libraries/ui/src/components/interaction/MusicPlaybackButton/index.ts b/libraries/ui/src/components/interaction/MusicPlaybackButton/index.ts	(rejected hunks)
+@@ -1,3 +1,4 @@
+-import MusicPlaybackButton from './MusicPlaybackButton'
++import MusicPlaybackButton, { PlayButtonSizeType } from './MusicPlaybackButton'
+ 
++export type { PlayButtonSizeType }
+ export default MusicPlaybackButton

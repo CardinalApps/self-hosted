@@ -1,19 +1,15 @@
 diff a/libraries/ui/src/store/apis/musicReleases.ts b/libraries/ui/src/store/apis/musicReleases.ts	(rejected hunks)
-@@ -6,7 +6,7 @@ import { baseApi } from './base'
- 
- export type ReleasesSortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
- export type MusicReleaseType = {
--  id: string,
-+  id: number,
-   title: string,
-   tracks: Array<{
-     id: number,
-@@ -29,6 +29,8 @@ export type MusicReleaseType = {
-   thumbnails: Array<{
-     size: string,
-     relativeSrc: string,
-+    thumbnailId: string,
-+    id: number,
-   }>,
-   [key: string]: unknown,
- }
+@@ -108,7 +108,12 @@ export const musicReleasesApi = baseApi
+         { id: string }
+       >({
+         query: ({ id }) => {
+-          return queryParams(`/music/release/${id}`)
++          return queryParams(`/music/release/${id}`, {
++            tracks: true,
++            genres: true,
++            artists: true,
++            thumbnails: true,
++          })
+         },
+       }),
+     }),

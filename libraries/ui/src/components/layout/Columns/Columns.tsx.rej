@@ -1,25 +1,10 @@
 diff a/libraries/ui/src/components/layout/Columns/Columns.tsx b/libraries/ui/src/components/layout/Columns/Columns.tsx	(rejected hunks)
-@@ -9,6 +9,7 @@ type ColumnsProps = {
+@@ -9,7 +9,7 @@ type ColumnsProps = {
    flexWrap?: 'medium' | 'small',
    shrink?: boolean,
    grow?: boolean,
-+  gap?: number,
+-  gap?: number,
++  gap?: string | number,
    className?: string,
    style?: CSSProperties,
    children?: ReactNode,
-@@ -20,6 +21,7 @@ const Columns = ({
-   flexWrap,
-   shrink = true,
-   grow = false,
-+  gap,
-   className = '',
-   style,
-   children,
-@@ -37,6 +39,7 @@ const Columns = ({
-       style={{
-         ...(justifyContent && { justifyContent }),
-         ...(alignItems && { alignItems }),
-+        ...(gap && { gap }),
-         ...style,
-       }}
-       {...props}

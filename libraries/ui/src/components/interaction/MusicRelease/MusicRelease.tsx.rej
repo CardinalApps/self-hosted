@@ -1,68 +1,66 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
-@@ -5,15 +5,17 @@ import clsx from 'clsx'
+@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react'
+ import clsx from 'clsx'
+ 
  //import Icon from '../../typography/Icon'
- import MusicPlaybackButton from '../MusicPlaybackButton'
+-import MusicPlaybackButton from '../MusicPlaybackButton'
++import MusicPlaybackButton, { PlayButtonSizeType } from '../MusicPlaybackButton'
  import { RouterContext } from '../../../context/router'
-+import { useReleaseCover } from '../../../hooks/useReleaseCover'
+ import { useReleaseCover } from '../../../hooks/useReleaseCover'
  
- //import { settingsSelectors } from '../../../store/slices/settings'
- 
- import './MusicRelease.css'
- 
- type MusicReleaseProps = {
--  artwork: string,
-+  overrideArtwork?: string,
+@@ -15,11 +15,13 @@ type MusicReleaseProps = {
+   overrideArtwork?: string,
    tracks?: { id: number, trackNumber: number }[],
    releaseTitle?: string,
-+  releaseId?: number,
+-  releaseId?: number,
++  releaseId?: string | number,
    releaseYear?: string,
    releaseLink?: string,
    artistName?: string,
-@@ -21,9 +23,10 @@ type MusicReleaseProps = {
+   artistLink?: string,
++  coverSize?: { width?: number, height?: number },
++  playButtonSize?: PlayButtonSizeType,
  }
  
  const MusicRelease = ({
--  artwork,
-+  overrideArtwork,
-   tracks = [],
-   releaseTitle,
-+  releaseId,
-   releaseYear,
+@@ -31,6 +33,8 @@ const MusicRelease = ({
    releaseLink,
    artistName,
-@@ -34,6 +37,14 @@ const MusicRelease = ({
-   const [showInner, setShowInner] = useState<boolean>()
-   const [tracksInOrder, setTracksInOrder] = useState(tracks)
-   const trackIdsInRelease = tracksInOrder.map((track) => track.id).filter((track) => !!track)
-+  const coverSrc = useReleaseCover(releaseId)
-+
-+  const getArtwork = () => {
-+    if (overrideArtwork) {
-+      return overrideArtwork
-+    }
-+    return coverSrc
-+  }
+   artistLink,
++  coverSize = {},
++  playButtonSize,
+ }: PropsWithChildren<MusicReleaseProps>) => {
+   const { Link } = useContext(RouterContext)
+   //const { lang } = useSelector(settingsSelectors.current)
+@@ -46,7 +50,6 @@ const MusicRelease = ({
+     return coverSrc
+   }
  
-   // Fixme this doesn't seem to work consistently
+-  // Fixme this doesn't seem to work consistently
    useEffect(() => {
-@@ -43,17 +54,17 @@ const MusicRelease = ({
-   }, [tracks])
- 
-   return (
--    <div className={clsx(`music-release`, !!showInner && 'show', !artwork && 'no-artwork')}>
-+    <div className={clsx(`music-release`, !!showInner && 'show', !getArtwork() && 'no-artwork')}>
-       <div
-         className="music-release-art"
-         onFocus={() => setShowInner(true)}
+     const ordered = [...tracks]
+     ordered.sort((a, b) => a?.trackNumber > b?.trackNumber ? 1 : -1)
+@@ -61,13 +64,21 @@ const MusicRelease = ({
          onBlur={() => setShowInner(false)}
          onMouseEnter={() => setShowInner(true)}
          onMouseLeave={() => setShowInner(false)}
--        style={{ ...(artwork && { backgroundImage: `url('${artwork}')` }) }}
-+        style={{ ...(getArtwork() && { backgroundImage: `url('${getArtwork()}')` }) }}
+-        style={{ ...(getArtwork() && { backgroundImage: `url('${getArtwork()}')` }) }}
++        style={{ ...(getArtwork() && {
++          width: coverSize?.width,
++          height: coverSize?.height,
++          backgroundImage: `url('${getArtwork()}')` }),
++        }}
        >
          {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
--        {!artwork && <i className="no-artwork-icon far fa-image" />}
-+        {!getArtwork() && <i className="no-artwork-icon far fa-image" />}
+         {!getArtwork() && <i className="no-artwork-icon far fa-image" />}
          <div className="controls">
            <div className="col music-track-play-pause">
-             <MusicPlaybackButton musicTrackIds={trackIdsInRelease} musicTrackIdToPlay={trackIdsInRelease?.[0]} />
+-            <MusicPlaybackButton musicTrackIds={trackIdsInRelease} musicTrackIdToPlay={trackIdsInRelease?.[0]} />
++            <MusicPlaybackButton
++              size={playButtonSize}
++              musicTrackIds={trackIdsInRelease}
++              musicTrackIdToPlay={trackIdsInRelease?.[0]}
++            />
+           </div>
+           {/* <div className="col music-track-favorite">
+             <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />

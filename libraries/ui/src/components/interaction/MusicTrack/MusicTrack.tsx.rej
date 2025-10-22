@@ -1,36 +1,10 @@
 diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx	(rejected hunks)
-@@ -9,14 +9,15 @@ import { musicActions, musicSelectors } from '../../../store/slices/music'
- import { RouterContext } from '../../../context/router'
- 
- import './MusicTrack.css'
-+import { useReleaseCover } from '../../../hooks/useReleaseCover'
- 
- type MusicTrackProps = {
-   musicTrackId?: number,
-   trackNumber?: number,
-   trackTitle?: string,
-   releaseTitle?: string,
-+  releaseId?: number,
-   releaseLink?: string,
--  artwork?: string,
-   artistName?: string,
-   artistLink?: string,
-   duration?: string,
-@@ -28,8 +29,8 @@ const MusicTrack = ({
-   trackNumber,
-   trackTitle,
-   releaseTitle,
-+  releaseId,
-   releaseLink,
--  artwork,
-   artistName,
-   artistLink,
-   duration,
-@@ -39,6 +40,7 @@ const MusicTrack = ({
-   const { Link } = useContext(RouterContext)
-   //const { lang } = useSelector(settingsSelectors.current)
-   const playing = useSelector(musicSelectors.playing)
-+  const artwork = useReleaseCover(releaseId)
- 
-   const handleDoubleClick = (e) => {
-     if (
+@@ -61,7 +61,7 @@ const MusicTrack = ({
+       </div>
+       {!!trackNumber && <p className="col music-track-number">{trackNumber}.</p>}
+       <div className="col music-track-info">
+-        {!!releaseTitle && <p className="music-track-title">{trackTitle}</p>}
++        {!!trackTitle && <p className="music-track-title">{trackTitle}</p>}
+         {!!(releaseTitle || artistName) &&
+           <div className="music-release">
+             {!!releaseTitle &&

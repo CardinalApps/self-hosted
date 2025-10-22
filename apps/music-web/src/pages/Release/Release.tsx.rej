@@ -1,0 +1,81 @@
+diff a/apps/music-web/src/pages/Release/Release.tsx b/apps/music-web/src/pages/Release/Release.tsx	(rejected hunks)
+@@ -1,26 +1,75 @@
+-import { useContext } from 'react'
++import { useContext, useMemo } from 'react'
++
+ 
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
++import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
++import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
++import { Column, Columns } from '@cardinalapps/ui/src/components/layout/Columns'
++
+ import { RouterContext } from '@cardinalapps/ui/src/context/router'
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+-import { useReleaseCover } from '@cardinalapps/ui/src/hooks/useReleaseCover'
++import { useGetMusicReleaseQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
+ 
+ import i18n from './i18n.json'
+ 
+ import './styles.css'
++import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
+ 
+ function ReleasePage() {
+   const { useParams } = useContext(RouterContext)
+   const params = useParams()
+   const releaseId = params?.id as string
+-  const cover = useReleaseCover(releaseId)
++  const {
++    data,
++    // isLoading,
++    // isSuccess,
++  } = useGetMusicReleaseQuery({ id: releaseId })
++
++  console.log(data)
++
++  const artists = data?.artists || []
++  const genres = data?.genres || []
++  const tracksInOrder = useMemo(() => {
++    if (!data?.tracks) {
++      return []
++    }
++
++    return [...data.tracks].sort((a, b) => a.trackNumber - b.trackNumber)
++  }, [data?.tracks])
+ 
+   return (
+     <AppPage
++      className="music-release-page"
+       layout={PAGE_LAYOUT.standard}
+       pageTitle={i18n['music-release.title']['en']}
+     >
+-      <img src={cover} />
++      <Columns grow={true} gap="var(--gutter)" alignItems='flex-start'>
++        <Column minWidth={340}>
++          <MusicRelease
++            releaseId={releaseId}
++            tracks={data?.tracks || []}
++            playButtonSize="m"
++            coverSize={{
++              width: 340,
++              height: 340,
++            }}
++          />
++        </Column>
++        <Column className="music-release-track-list" grow={true}>
++          {tracksInOrder.map((musicTrack: MusicTrackType) => {
++            return (
++              <MusicTrack
++                key={musicTrack.id}
++                musicTrackId={musicTrack?.id}
++                trackTitle={musicTrack?.title}
++                releaseId={musicTrack?.release?.id}
++                trackNumber={musicTrack.trackNumber}
++                artistName={artists?.[0]?.name as string}
++              />
++            )
++          })}
++        </Column>
++      </Columns>
+     </AppPage>
+   )
+ }
