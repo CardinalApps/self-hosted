@@ -1,7 +1,18 @@
 diff a/.github/workflows/code-validation.yaml b/.github/workflows/code-validation.yaml	(rejected hunks)
-@@ -1,4 +1,4 @@
--name: 🩻 Code Validation
-+name: 🛁 Code Validation
- 
- on: push
- 
+@@ -28,3 +28,16 @@ jobs:
+       
+       - name: Typecheck
+         run: pnpm typecheck
++
++  tests:
++    name: Code tests
++    runs-on: ubuntu-latest
++    steps:
++      - name: Checkout
++        uses: actions/checkout@v4
++
++      - name: Init repo
++        uses: ./.github/actions/init-repo
++      
++      - name: Code tests
++        run: pnpm test
