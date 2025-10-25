@@ -1,59 +1,168 @@
 diff a/servers/media/src/modules/indexing/media/indexing.music.service.ts b/servers/media/src/modules/indexing/media/indexing.music.service.ts	(rejected hunks)
-@@ -74,17 +74,16 @@ export class MusicIndexingService {
+@@ -21,7 +21,6 @@ import {
+ } from '../types'
+ import { IndexingFallbacks } from '../enums'
+ 
+-import { matchNumberPrefix } from '../../../utils/regex'
+ import { sortableString } from '../../../utils/string'
+ import {
+   getMetadataType,
+@@ -56,6 +55,35 @@ export class MusicIndexingService {
+     private readonly eventService: EventService,
+   ) {}
+ 
++  /**
++   * Search the start of the string for a release year.
++   * 
++   * Examples:
++   * 
++   *   [2018] Album name
++   *   (2018) Album name
++   *   2018 Album name
++   *   2018-Album name
++   *   01 Track name
++   *   [20] Track name
++   *   (20) Track name
++   *   (20)-Track name
++   *   20 - Track name
++   *   20 -Track name
++   */
++  private matchNumberPrefix = /^(\[?|\(?)\d+(\]?|\)?)\s?( |-)\s?/i
++
++  /**
++   * Search the start of the string for a track and optional disc number.
++   * 
++   * Examples:
++   * 
++   *   9 Psychopomp.mp3
++   *   (09)-Psychopomp.mp3
++   *   1-04 - The Great Debate.flac
++   */
++  private matchTrackAndDiscPrefix = /^[[|()]?([0-9]+)[-_]?([0-9]*)/
++
+   /**
+    * Indexes a music track.
+    */
+@@ -74,9 +102,6 @@ export class MusicIndexingService {
        genres,
        queryRunner,
      )
-+    // if (release.title === 'Six Degrees of Inner Turbulence') {
-+    //   console.log('a')
-+    // }
-+    const trackNumber = this.determineTrackNumber(embeddedMetadata, folderStructureMetadata)
+-    // if (release.title === 'Six Degrees of Inner Turbulence') {
+-    //   console.log('a')
+-    // }
+     const trackNumber = this.determineTrackNumber(embeddedMetadata, folderStructureMetadata)
  
      const trackTitle = (
-       embeddedMetadata.find((meta) => meta.metaKey === 'title')?.metaValue
-       || folderStructureMetadata.find((meta) => meta.metaKey === 'trackName')?.metaValue
-       || IndexingFallbacks.UNKNOWN_TRACK
-     )
--    const trackNumber = (
--      (embeddedMetadata.find((meta) => meta.metaKey === 'track')?.metaValue as unknown as Record<string, unknown>)?.no
--      || folderStructureMetadata.find((meta) => meta.metaKey === 'trackNumber')?.metaValue
--      || 0
--    )
-     const discNumber = (
-       (embeddedMetadata.find((meta) => meta.metaKey === 'disk')?.metaValue as unknown as Record<string, unknown>)?.no
-       || folderStructureMetadata.find((meta) => meta.metaKey === 'discNumber')?.metaValue
-@@ -98,7 +97,7 @@ export class MusicIndexingService {
-       sortTitle: sortableString(trackTitle),
-       artists: artists,
-       release: release,
--      trackNumber: Number(trackNumber),
-+      trackNumber: trackNumber,
-       discNumber: Number(discNumber),
-       duration: Number(embeddedMetadata.find((meta) => meta.metaKey === 'duration')?.metaValue) || null,
-       bitrate: Number(embeddedMetadata.find((meta) => meta.metaKey === 'bitrate')?.metaValue) || null,
-@@ -546,4 +545,26 @@ export class MusicIndexingService {
+@@ -306,7 +331,7 @@ export class MusicIndexingService {
+       return null
+     }
  
-     return genreEntities
+-    const matched = matchNumberPrefix.exec(releaseNamePart)
++    const matched = this.matchNumberPrefix.exec(releaseNamePart)
+     let releaseYear = null
+ 
+     if (matched) {
+@@ -331,7 +356,7 @@ export class MusicIndexingService {
+       return null
+     }
+ 
+-    const releaseYear = matchNumberPrefix.exec(releaseNamePart)
++    const releaseYear = this.matchNumberPrefix.exec(releaseNamePart)
+ 
+     if (releaseYear) {
+       return releaseNamePart.replace(releaseYear[0], '')
+@@ -342,6 +367,8 @@ export class MusicIndexingService {
+ 
+   /**
+    * Looks for the track number in the folder structure.
++   * 
++   * https://help.cardinalapps.io/guides/cardinal-media-server/indexing/music#track-file-structure
+    */
+   findTrackNumberInFolderStructure(filePath: string): number | null {
+     const fileName = filePath.split(path.sep).pop()
+@@ -351,16 +378,9 @@ export class MusicIndexingService {
+       return null
+     }
+ 
+-    const matched = matchNumberPrefix.exec(withoutExtension)
+-    let trackNumber = null
+-
+-    if (matched) {
+-      const matchNumbers = /\d+/g
+-      const matchedNumbers = matchNumbers.exec(matched[0])
+-      trackNumber = Number(matchedNumbers[0])
+-    }
++    const trackAndDisc = this.getTrackAndDiscNumberFromFileName(fileName)
+ 
+-    return trackNumber
++    return trackAndDisc.track
    }
-+
+ 
+   /**
+@@ -374,7 +394,7 @@ export class MusicIndexingService {
+       return null
+     }
+ 
+-    const trackNumber = matchNumberPrefix.exec(withoutExtension)
++    const trackNumber = this.matchNumberPrefix.exec(withoutExtension)
+ 
+     if (trackNumber) {
+       return withoutExtension.replace(trackNumber[0], '')
+@@ -383,6 +403,40 @@ export class MusicIndexingService {
+     return withoutExtension
+   }
+ 
 +  /**
-+   * Analyzes all given metadata to find the track number.
++   * Many music file names start with something like this to indicate track and
++   * disc numbers:
++   * 
++   *   1 - song.mp3
++   *   01 - song.mp3
++   *   1-1 - song.mp3
++   *   02-4 - song.mp3
++   * 
++   * This method takes a file name and returns the parsed track and disc number.
 +   */
-+  determineTrackNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
-+    const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'track')
++  getTrackAndDiscNumberFromFileName(fileName): { track: number | null, disc: number | null } {
++    const result = { track: null, disc: null }
++    const trackAndDiscMatch = this.matchTrackAndDiscPrefix.exec(fileName)
 +
-+    if (fromEmbeddedMetadata.metadataType === 'object') {
-+      try {
-+        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
-+        if (parsed?.no) {
-+          return parsed.no
-+        }
-+      } catch (error) { /* noop */ }
++    if (!trackAndDiscMatch || !trackAndDiscMatch.length) {
++      return result
 +    }
 +
-+    const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'trackNumber')?.metaValue
++    const hasBothTrackAndDisc = trackAndDiscMatch[1] && trackAndDiscMatch[2]
 +
-+    if (fromFolderStructure) {
-+      return fromFolderStructure as unknown as number
++    if (hasBothTrackAndDisc) {
++      return {
++        disc: Number(trackAndDiscMatch[1]),
++        track: Number(trackAndDiscMatch[2]),
++      }
++    } else {
++      return {
++        disc: null,
++        track: Number(trackAndDiscMatch[1]),
++      }
 +    }
 +  }
++
+   /**
+    * Analyzes all the given metadata to find all of the artists associated with
+    * the release.
+@@ -547,7 +601,7 @@ export class MusicIndexingService {
+   }
+ 
+   /**
+-   * Analyzes all given metadata to find the track number.
++   * Analyzes all given metadata to find the track number. Defaults to 0 if nothing is found.
+    */
+   determineTrackNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
+     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'track')
+@@ -566,5 +620,7 @@ export class MusicIndexingService {
+     if (fromFolderStructure) {
+       return fromFolderStructure as unknown as number
+     }
++
++    return 0
+   }
  }

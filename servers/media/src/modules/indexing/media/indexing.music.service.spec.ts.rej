@@ -1,10 +1,14 @@
 diff a/servers/media/src/modules/indexing/media/indexing.music.service.spec.ts b/servers/media/src/modules/indexing/media/indexing.music.service.spec.ts	(rejected hunks)
-@@ -90,6 +90,8 @@ describe('MusicIndexingService', () => {
-           .toEqual(9)
+@@ -91,7 +91,11 @@ describe('MusicIndexingService', () => {
          expect(musicIndexingService.findTrackNumberInFolderStructure('/home/user1/music/Thank You Scientist/Stranger Heads Prevail/Psychopomp.mp3'))
            .toEqual(null)
-+        expect(musicIndexingService.findTrackNumberInFolderStructure('/home/user1/music/Dream Theater/[2002] Six Degrees of Inner Turbulence/1-04 - The Great Debate.flac'))
-+          .toEqual(null)
+         expect(musicIndexingService.findTrackNumberInFolderStructure('/home/user1/music/Dream Theater/[2002] Six Degrees of Inner Turbulence/1-04 - The Great Debate.flac'))
+-          .toEqual(null)
++          .toEqual(4)
++        expect(musicIndexingService.findTrackNumberInFolderStructure('/home/user1/music/Dream Theater/[2002] Six Degrees of Inner Turbulence/(2-7) - The Great Debate.flac'))
++          .toEqual(7)
++        expect(musicIndexingService.findTrackNumberInFolderStructure('/home/user1/music/Dream Theater/[2002] Six Degrees of Inner Turbulence/02-10 - The Great Debate.flac'))
++          .toEqual(10)
        })
      })
    })
