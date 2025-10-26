@@ -1,0 +1,36 @@
+diff a/apps/photos-web/src/components/VirtualPhotoList/thumbs/Image.tsx b/apps/photos-web/src/components/VirtualPhotoList/thumbs/Image.tsx	(rejected hunks)
+@@ -1,7 +1,6 @@
+ import Thumb from '@cardinalapps/ui/src/components/interaction/Thumb'
+ import { PhotoObject, PhotoViewerProps } from '@cardinalapps/ui/src/components/features/PhotoViewer/PhotoViewer'
+-
+-import { HOME_SERVER_HOST } from '../../../env'
++import { usePhotoThumbnail } from '@cardinalapps/ui/src/hooks/usePhotoThumbnail'
+ 
+ import '../styles.css'
+ 
+@@ -27,21 +26,22 @@ function VirtualPhotoListImage({
+ }: VirtualPhotoListImageProps) {
+   const url = new URL(window.location.href)
+   const thumb = photo?.thumbnail?.find((thumb) => thumb.size === 'small_nocrop')
+-  const peekImage = photo?.thumbnail?.find((thumb) => thumb.size === 'medium_nocrop')
+   const timeString = new Date(photo?.takenAt).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+   const isInitiallyOpen = url.searchParams.get(QUERY_PARAM_CURRENT_PHOTOVIEWER) === photo.photoId
++  const smallThumbBlob = usePhotoThumbnail(photo.photoId)
++  const mediumThumbBlob = usePhotoThumbnail(photo.photoId, 'medium_nocrop')
+ 
+   return (
+     <Thumb
+       w={`${thumb?.width}px`}
+       h={`100%`}
+-      src={`${HOME_SERVER_HOST}${thumb?.relativeSrc}`}
++      src={smallThumbBlob}
+       selectable={true}
+       lazyLoad={false}
+       onSelect={() => handlePhotoSelected(photo.id)}
+       onDeselect={() => handlePhotoDeselected(photo.id)}
+       selected={!!selectedPhotos.includes(photo.id)}
+-      peekImage={`${HOME_SERVER_HOST}${peekImage?.relativeSrc}`}
++      peekImage={mediumThumbBlob}
+       peekTopMax={90}
+       peekLeftMax={320}
+       peekRightMax={window?.innerWidth - 60}

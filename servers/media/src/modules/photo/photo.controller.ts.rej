@@ -1,0 +1,53 @@
+diff a/servers/media/src/modules/photo/photo.controller.ts b/servers/media/src/modules/photo/photo.controller.ts	(rejected hunks)
+@@ -32,9 +32,11 @@ import { GetPhotosDto } from './dtos/GetPhotos.dto'
+ import { GetPhotoDto } from './dtos/GetPhoto.dto'
+ import { GetPhotoBlobDto } from './dtos/GetPhotoBlob.dto'
+ import { UpdatePhotoParamsDto, UpdatePhotoBodyDto } from './dtos/UpdatePhoto.dto'
++import { getPhotoThumbnailDto } from './dtos/GetPhotoThumbnail.dto'
+ 
+ import { PhotoEvents } from './events'
+ 
++import { getAppDir } from '../../utils/env'
+ import { SupportedPhotoFileExtensions, canonicalExtension } from '../../utils/media'
+ import { PhotoTransformationHeaders } from '../../utils/headers'
+ 
+@@ -206,4 +208,39 @@ export class PhotoController {
+ 
+     return await this.photoService.getPhoto(id)
+   }
++
++  /**
++   * Returns the blob data of a photo thumbnail. Supports numeric row ID and photoId.
++   */
++  @Get('/photo/:id/thumbnail')
++  @UseGuards(AuthGuard)
++  @ApiTags('Photos')
++  @ApiOperation({ summary: 'Get a photo thumbnail.' })
++  @ApiOkResponse({
++    status: 200,
++  })
++  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  async getReleaseCoverBlob(
++    @Param('id') id: string,
++    @Query() query: getPhotoThumbnailDto,
++  ): Promise<StreamableFile> {
++    const photo = await this.photoService.getPhoto(id, {
++      thumbnail: true,
++    })
++
++    if (!photo) {
++      throw new NotFoundException('Photo not found.')
++    }
++
++    const thumbnail = photo.thumbnail?.find((thumb) => thumb.size === query.size)
++
++    if (!thumbnail) {
++      throw new NotFoundException('No thumbnail of this size found for this photo.')
++    }
++
++    const thumbnailFile = getAppDir(thumbnail.relativeSrc)
++    const file = fs.createReadStream(thumbnailFile)
++
++    return new StreamableFile(file)
++  }
+ }
