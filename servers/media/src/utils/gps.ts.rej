@@ -1,0 +1,10 @@
+diff a/servers/media/src/utils/gps.ts b/servers/media/src/utils/gps.ts	(rejected hunks)
+@@ -30,7 +30,7 @@ export function getDateFromGPSFormat(gpsDate: string, gpsTime: string): Date | n
+     gpsTime = gpsTime.replaceAll('/', ':')
+   }
+ 
+-  const parsed = new Date(`${gpsDate} ${gpsTime}`)
++  const parsed = new Date(`${gpsDate} ${gpsTime} UTC`)
+ 
+   // Check for a valid format
+   if (isNaN(Date.parse(parsed.toString()))) {
