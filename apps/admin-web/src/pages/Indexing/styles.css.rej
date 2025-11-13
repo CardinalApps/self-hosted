@@ -1,0 +1,19 @@
+diff a/apps/admin-web/src/pages/Indexing/styles.css b/apps/admin-web/src/pages/Indexing/styles.css	(rejected hunks)
+@@ -79,7 +79,7 @@
+       width: 100%;
+       padding: 10px 30px;
+       display: flex;
+-      flex-direction: column;
++      flex-direction: column !important;
+       flex-shrink: 0;
+ 
+       @media (max-width: 768px) {
+@@ -90,7 +90,7 @@
+     .progressCol {
+       width: 100%;
+       padding: 10px 30px;
+-      flex-direction: column;
++      flex-direction: column !important;
+       flex-shrink: 1;
+ 
+       @media (max-width: 768px) {
