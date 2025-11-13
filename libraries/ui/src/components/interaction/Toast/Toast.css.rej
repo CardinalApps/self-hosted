@@ -1,45 +1,12 @@
 diff a/libraries/ui/src/components/interaction/Toast/Toast.css b/libraries/ui/src/components/interaction/Toast/Toast.css	(rejected hunks)
-@@ -3,7 +3,7 @@
-   padding: 15px 15px 15px 30px;
-   display: flex;
-   gap: 15px;
--  border-radius: 4px;
-+  border-radius: 2px;
-   position: relative;
-   overflow: hidden;
-   box-shadow: var(--box-shadow-2);
-@@ -43,7 +43,7 @@
+@@ -57,8 +57,8 @@
+ 
+   .toast-title {
+     width: 100%;
+-    font-size: 16px;
+-    font-weight: 800;
++    font-size: 15px;
++    font-weight: 600;
+     position: relative;
    }
  
-   .toast-accent-bar {
--    width: 15px;
-+    width: 5px;
-     position: absolute;
-     top: 0;
-     left: 0;
-@@ -127,5 +127,25 @@
-     margin-top: 10px;
-     display: flex;
-     justify-content: flex-end;
-+
-+    /* &:nth-of-type(1) {
-+      display: flex;
-+    }
-+
-+    &:nth-of-type(2) {
-+      display: flex;
-+      transform: translateY(-15px) scale(0.9);
-+    }
-+
-+    &:nth-of-type(3) {
-+      display: flex;
-+      transform: translateY(-30px) scale(0.8);
-+    } */
-+  }
-+
-+  .toaster-controls {
-+    padding-top: 10px;
-+    display: flex;
-+    justify-content: flex-end;
-   }
- }
