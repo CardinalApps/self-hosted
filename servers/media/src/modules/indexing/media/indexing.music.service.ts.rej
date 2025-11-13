@@ -1,87 +1,9 @@
 diff a/servers/media/src/modules/indexing/media/indexing.music.service.ts b/servers/media/src/modules/indexing/media/indexing.music.service.ts	(rejected hunks)
-@@ -103,17 +103,13 @@ export class MusicIndexingService {
-       queryRunner,
-     )
-     const trackNumber = this.determineTrackNumber(embeddedMetadata, folderStructureMetadata)
-+    const discNumber = this.determineDiscNumber(embeddedMetadata, folderStructureMetadata)
+@@ -654,6 +654,6 @@ export class MusicIndexingService {
+       return fromFolderStructure as unknown as number
+     }
  
-     const trackTitle = (
-       embeddedMetadata.find((meta) => meta.metaKey === 'title')?.metaValue
-       || folderStructureMetadata.find((meta) => meta.metaKey === 'trackName')?.metaValue
-       || IndexingFallbacks.UNKNOWN_TRACK
-     )
--    const discNumber = (
--      (embeddedMetadata.find((meta) => meta.metaKey === 'disk')?.metaValue as unknown as Record<string, unknown>)?.no
--      || folderStructureMetadata.find((meta) => meta.metaKey === 'discNumber')?.metaValue
--      || 1
--    )
- 
-     // Update the music track with our preferred values
-     await queryRunner.manager.save(MusicTrack, {
-@@ -123,7 +119,7 @@ export class MusicIndexingService {
-       artists: artists,
-       release: release,
-       trackNumber: trackNumber,
--      discNumber: Number(discNumber),
-+      discNumber: discNumber,
-       duration: Number(embeddedMetadata.find((meta) => meta.metaKey === 'duration')?.metaValue) || null,
-       bitrate: Number(embeddedMetadata.find((meta) => meta.metaKey === 'bitrate')?.metaValue) || null,
-     })
-@@ -299,7 +295,18 @@ export class MusicIndexingService {
-     const matchNumbers = /\d+/g
-     const matchedNumbers = matchNumbers.exec(potentialDiscPart)
- 
--    return Number(matchedNumbers[0])
-+    if (matchedNumbers.length) {
-+      return Number(matchedNumbers[0])
-+    }
-+
-+    const fileName = filePath.split(path.sep).pop()
-+    const trackAndDisc = this.getTrackAndDiscNumberFromFileName(fileName)
-+
-+    if (trackAndDisc.disc) {
-+      return trackAndDisc.disc
-+    }
-+
-+    return null
+-    return 0
++    return 1
    }
- 
-   /**
-@@ -606,6 +613,7 @@ export class MusicIndexingService {
-   determineTrackNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
-     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'track')
- 
-+    // FIXME the entity transformer should be doing this
-     if (fromEmbeddedMetadata.metadataType === 'object') {
-       try {
-         const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
-@@ -623,4 +631,29 @@ export class MusicIndexingService {
- 
-     return 0
-   }
-+
-+  /**
-+   * Analyzes all given metadata to find the disc number. Defaults to 1 if nothing is found.
-+   */
-+  determineDiscNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
-+    const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'disk' || metadata?.metaKey === 'disc')
-+
-+    // FIXME the entity transformer should be doing this
-+    if (fromEmbeddedMetadata.metadataType === 'object') {
-+      try {
-+        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
-+        if (parsed?.no) {
-+          return parsed.no
-+        }
-+      } catch (error) { /* noop */ }
-+    }
-+
-+    const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'discNumber')?.metaValue
-+
-+    if (fromFolderStructure) {
-+      return fromFolderStructure as unknown as number
-+    }
-+
-+    return 0
-+  }
  }

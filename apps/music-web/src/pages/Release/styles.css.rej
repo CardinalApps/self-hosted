@@ -1,71 +1,56 @@
 diff a/apps/music-web/src/pages/Release/styles.css b/apps/music-web/src/pages/Release/styles.css	(rejected hunks)
-@@ -1,11 +1,68 @@
- .music-release-page {
-   position: relative;
-+  
-+  .release-page-cols {
-+    display: flex;
-+    gap: calc(var(--gutter) * 2);
-+
-+    .artwork-col {
-+    }
-+
-+    .data-col {
-+      flex-grow: 1;
-+    }
-+
-+    @media screen and (max-width: 1200px) {
-+      flex-direction: column;
-+
-+      .artwork-col {
-+        width: 100%;
-+        justify-content: center;
-+
-+        .music-release {
-+          display: flex;
-+          justify-content: center;
-+          text-align: center;
-+        }
-+      }
-+    }
-+  }
-+
-+  .release-meta {
-+    width: 100%;
-+    margin-bottom: calc(var(--gutter) * 2);
-+
-+    .release-name {
-+      font-size: 24px;
-+    }
-+
-+    .meta-section-title {
-+      margin-bottom: 8px;
-+      font-size: 13px;
-+      text-transform: uppercase;
-+      font-weight: 700;
-+      color: var(--text-color-4);
-+    }
-+
-+    .release-meta-list {
-+      width: 100%;
-+
-+      .item-list-item-name {
-+        width: 100%;
-+        display: flex;
-+        justify-content: space-between;
-+        strong {
-+          font-weight: 600;
-+        }
-+      }
-+    }
-+  }
+@@ -5,21 +5,34 @@
+     display: flex;
+     gap: calc(var(--gutter) * 2);
  
-   .music-release {
-     width: 100%;
+-    .artwork-col {
++    .release-left-col {
++
++      .release-artwork {
++        margin-bottom: var(--gutter);
++      }
++
++      .release-artists {
++        margin-bottom: var(--gutter);
++      }
++
++      .release-genres {
++        margin-bottom: var(--gutter);
++      }
+     }
  
-     .music-release-art {
--      height: 300px
-+      height: 300px;
+-    .data-col {
++    .release-right-col {
+       flex-grow: 1;
+     }
+ 
+     @media screen and (max-width: 1200px) {
++      gap: 0;
+       flex-direction: column;
+ 
+-      .artwork-col {
++      .release-left-col {
+         width: 100%;
+         justify-content: center;
+ 
+-        .music-release {
++        .release-artwork {
+           display: flex;
+           justify-content: center;
+           text-align: center;
+@@ -58,6 +71,15 @@
      }
    }
+ 
++  .release-disc-number {
++    margin-bottom: 10px;
++    font-size: 18px;
++  }
++
++  .release-disc-tracks {
++    margin-bottom: var(--gutter);
++  }
++
+   .music-release {
+     width: 100%;
  

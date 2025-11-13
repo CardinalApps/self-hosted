@@ -1,22 +1,10 @@
 diff a/apps/music-web/src/pages/Release/i18n.json b/apps/music-web/src/pages/Release/i18n.json	(rejected hunks)
-@@ -1,5 +1,20 @@
- {
-   "music-release.title": {
-     "en": "Music Release"
+@@ -16,5 +16,8 @@
+   },
+   "music-release.meta.discs": {
+     "en": "Discs"
 +  },
-+  "music-release.meta.artists": {
-+    "en": "Artists"
-+  },
-+  "music-release.meta.artists.none": {
-+    "en": "No artists"
-+  },
-+  "music-release.meta.meta": {
-+    "en": "Metadata"
-+  },
-+  "music-release.meta.tracks": {
-+    "en": "Tracks"
-+  },
-+  "music-release.meta.discs": {
-+    "en": "Discs"
++  "music-release.disc-number": {
++    "en": "Disc {num}"
    }
  }

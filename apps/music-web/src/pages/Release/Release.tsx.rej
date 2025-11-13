@@ -1,9 +1,84 @@
 diff a/apps/music-web/src/pages/Release/Release.tsx b/apps/music-web/src/pages/Release/Release.tsx	(rejected hunks)
-@@ -3,7 +3,6 @@ import { useContext, useMemo } from 'react'
- import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
- import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
- import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
--import { Column, Columns } from '@cardinalapps/ui/src/components/layout/Columns'
- 
- import { RouterContext } from '@cardinalapps/ui/src/context/router'
+@@ -8,8 +8,11 @@ import { RouterContext } from '@cardinalapps/ui/src/context/router'
  import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ import { useGetMusicReleaseQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
+ import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
++import H1 from '@cardinalapps/ui/src/components/typography/H1'
+ 
++import ReleaseArtists from './ReleaseArtists'
+ import ReleaseMeta from './ReleaseMeta'
++import ReleaseGenres from './ReleaseGenres'
+ 
+ import i18n from './i18n.json'
+ 
+@@ -26,9 +29,6 @@ function ReleasePage() {
+   } = useGetMusicReleaseQuery({ id: releaseId })
+ 
+   const artists = data?.artists || []
+-  //const genres = data?.genres || []
+-
+-  console.log(data)
+ 
+   /**
+    * Order tracks by disc then number.
+@@ -57,9 +57,12 @@ function ReleasePage() {
+       layout={PAGE_LAYOUT.standard}
+       pageTitle={i18n['music-release.title']['en']}
+     >
++      <H1 className="release-name">{data?.title}</H1>
+       <div className="release-page-cols">
+-        <div className="artwork-col">
++        <div className="release-left-col">
+           <MusicRelease
++            className="release-artwork"
++            hasControls={false}
+             hasArtwork={!!data?.thumbnails?.length}
+             releaseId={releaseId}
+             tracks={data?.tracks as MusicTrackType[] || []}
+@@ -68,23 +71,30 @@ function ReleasePage() {
+               height: 340,
+             }}
+           />
+-        </div>
+-        <div className="data-col">
++          <ReleaseArtists release={data} />
++          <ReleaseGenres release={data} />
+           <ReleaseMeta release={data} />
+-          {tracksbyDiscInOrder.map((disc) => {
+-            return disc.map((musicTrack: MusicTrackType) => {
+-              return (
+-                <MusicTrack
+-                  key={musicTrack.id}
+-                  musicTrackId={musicTrack?.id}
+-                  trackTitle={musicTrack?.title}
+-                  releaseId={musicTrack?.release?.id}
+-                  trackNumber={musicTrack.trackNumber}
+-                  artistName={artists?.[0]?.name as string}
+-                  hasArtwork={!!musicTrack.thumbnails?.length}
+-                />
+-              )
+-            })
++        </div>
++        <div className="release-right-col">
++          {tracksbyDiscInOrder.map((disc, i) => {
++            return (
++              <div key={`disc-${i}`} className="release-disc-tracks">
++                <p className="release-disc-number">{i18n['music-release.disc-number']['en'].replace('{num}', `${i + 1}`)}</p>
++                {disc.map((musicTrack: MusicTrackType) => {
++                  return (
++                    <MusicTrack
++                      key={musicTrack.id}
++                      musicTrackId={musicTrack?.id}
++                      trackTitle={musicTrack?.title}
++                      releaseId={musicTrack?.release?.id}
++                      trackNumber={musicTrack.trackNumber}
++                      artistName={artists?.[0]?.name as string}
++                      hasArtwork={!!musicTrack.thumbnails?.length}
++                    />
++                  )
++                })}
++              </div>
++            )
+           })}
+         </div>
+       </div>

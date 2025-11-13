@@ -1,55 +1,74 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
-@@ -88,29 +88,31 @@ const MusicRelease = ({
-           </div> */}
-         </div>
-       </div>
--      <div className="meta">
--        <div className="row">
--          {!!releaseTitle && (
--            <p className="release-name">
--              {releaseLink && releaseTitle && Link
--                ? <Link to={releaseLink}>{releaseTitle}</Link>
--                : releaseTitle
--              }
--            </p>
--          )}
--        </div>
--        <div className="row">
--          {!!artistName && (
--            <p className="artist-name">
--              {artistLink && artistName && Link
--                ? <Link to={artistLink}>{artistName}</Link>
--                : artistName
--              }
--            </p>
--          )}
--          {!!releaseYear && <p className="release-year">{releaseYear}</p>}
-+      {(releaseTitle || artistName || releaseYear) && (
-+        <div className="meta">
-+          <div className="row">
-+            {!!releaseTitle && (
-+              <p className="release-name">
-+                {releaseLink && releaseTitle && Link
-+                  ? <Link to={releaseLink}>{releaseTitle}</Link>
-+                  : releaseTitle
-+                }
-+              </p>
-+            )}
-+          </div>
-+          <div className="row">
-+            {!!artistName && (
-+              <p className="artist-name">
-+                {artistLink && artistName && Link
-+                  ? <Link to={artistLink}>{artistName}</Link>
-+                  : artistName
-+                }
-+              </p>
-+            )}
-+            {!!releaseYear && <p className="release-year">{releaseYear}</p>}
-+          </div>
-         </div>
--      </div>
-+      )}
-     </div>
-   )
+@@ -13,8 +13,10 @@ import { MusicTrackType } from '../../../store/apis/musicTracks'
+ import './MusicRelease.css'
+ 
+ type MusicReleaseProps = {
++  className?: string,
+   overrideArtwork?: string,
+   hasArtwork?: boolean,
++  hasControls?: boolean,
+   tracks?: MusicTrackType[],
+   releaseTitle?: string,
+   releaseId?: string | number,
+@@ -27,8 +29,10 @@ type MusicReleaseProps = {
  }
+ 
+ const MusicRelease = ({
++  className,
+   overrideArtwork,
+   hasArtwork = true,
++  hasControls = true,
+   tracks = [],
+   releaseTitle,
+   releaseId,
+@@ -60,13 +64,13 @@ const MusicRelease = ({
+   }, [tracks])
+ 
+   return (
+-    <div className={clsx(`music-release`, !!showInner && 'show', !getArtwork() && 'no-artwork')}>
++    <div className={clsx(`music-release`, className, !!showInner && 'show', !getArtwork() && 'no-artwork')}>
+       <div
+         className="music-release-art"
+-        onFocus={() => setShowInner(true)}
+-        onBlur={() => setShowInner(false)}
+-        onMouseEnter={() => setShowInner(true)}
+-        onMouseLeave={() => setShowInner(false)}
++        onFocus={() => hasControls ? setShowInner(true) : null}
++        onBlur={() => hasControls ? setShowInner(false) : null}
++        onMouseEnter={() => hasControls ?setShowInner(true) : null}
++        onMouseLeave={() => hasControls ? setShowInner(false) : null}
+         style={{ ...(getArtwork() && {
+           width: coverSize?.width,
+           height: coverSize?.height,
+@@ -75,18 +79,20 @@ const MusicRelease = ({
+       >
+         {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
+         {!getArtwork() && <i className="no-artwork-icon far fa-image" />}
+-        <div className="controls">
+-          <div className="col music-track-play-pause">
+-            <MusicPlaybackButton
+-              size={playButtonSize}
+-              musicTrackIds={trackIdsInRelease}
+-              musicTrackIdToPlay={trackIdsInRelease?.[0]}
+-            />
++        {!!hasControls && (
++          <div className="controls">
++            <div className="col music-track-play-pause">
++              <MusicPlaybackButton
++                size={playButtonSize}
++                musicTrackIds={trackIdsInRelease}
++                musicTrackIdToPlay={trackIdsInRelease?.[0]}
++              />
++            </div>
++            {/* <div className="col music-track-favorite">
++              <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />
++            </div> */}
+           </div>
+-          {/* <div className="col music-track-favorite">
+-            <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />
+-          </div> */}
+-        </div>
++        )}
+       </div>
+       {(releaseTitle || artistName || releaseYear) && (
+         <div className="meta">

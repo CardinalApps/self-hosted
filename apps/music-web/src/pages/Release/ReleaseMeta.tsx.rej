@@ -1,0 +1,77 @@
+diff a/apps/music-web/src/pages/Release/ReleaseMeta.tsx b/apps/music-web/src/pages/Release/ReleaseMeta.tsx	(rejected hunks)
+@@ -1,12 +1,7 @@
+ import Card from "@cardinalapps/ui/src/components/layout/Card"
+-import H1 from "@cardinalapps/ui/src/components/typography/H1"
+-import Tags from "@cardinalapps/ui/src/components/interaction/Tags/Tags"
+ import { MusicReleaseType } from "@cardinalapps/ui/src/store/apis/musicReleases"
+-import { TagProps } from "@cardinalapps/ui/src/components/interaction/Tags/Tag"
+ import List from "@cardinalapps/ui/src/components/interaction/List"
+ 
+-import { getAppUrl } from "@cardinalapps/ui/src/lib/net/router"
+-
+ type ReleaseMetaProps = {
+   release: MusicReleaseType,
+ }
+@@ -16,39 +11,30 @@ import i18n from './i18n.json'
+ function ReleaseMeta({
+   release,
+ }: ReleaseMetaProps) {
++  const countDiscs = () => {
++    const discs = release?.tracks?.map((track) => Number(track.discNumber) || 1) || []
++    const uniqueDiscs = Array.from(new Set(discs))
++    return uniqueDiscs.length
++  }
++
+   return (
+-    <Card className="release-meta">
+-      <H1 className="release-name">{release?.title}</H1>
+-      <div className="">
+-        <div className="">
+-          {release?.artists?.length
+-            ? <Tags
+-                tags={release.artists.map((artist) => ({
+-                  label: artist.name,
+-                  href: getAppUrl('artist', { params: { ':id': artist?.musicArtistId as string } }),
+-                }) as TagProps)}
+-              />
+-            : <p className="empty-meta">{i18n['music-release.meta.artists.none']['en']}</p>
+-          }
+-        </div>
+-        <div className="">
+-          <p className="meta-section-title">{i18n['music-release.meta.meta']['en']}</p>
+-          <List
+-            className="release-meta-list"
+-            layout="compact"
+-            items={[
+-              {
+-                name: <><strong>{i18n['music-release.meta.tracks']['en']}</strong> <span>{release?.tracks?.length.toString() || '0'}</span></>,
+-                title: i18n['music-release.meta.tracks']['en'],
+-              },
+-              {
+-                name:  <><strong>{i18n['music-release.meta.discs']['en']}</strong> <span>{release?.tracks?.length.toString() || '0'}</span></>,
+-                title: i18n['music-release.meta.discs']['en'],
+-              },
+-            ]}
+-          />
+-        </div>
+-      </div>
++    <Card className="release-meta" padding="thin">
++      <p className="meta-section-title">{i18n['music-release.meta.meta']['en']}</p>
++      <List
++        className="release-meta-list"
++        layout="compact"
++        items={[
++          {
++            name: <><strong>{i18n['music-release.meta.tracks']['en']}</strong> <span>{release?.tracks?.length.toString() || '0'}</span></>,
++            title: i18n['music-release.meta.tracks']['en'],
++            controls: ['add'],
++          },
++          {
++            name:  <><strong>{i18n['music-release.meta.discs']['en']}</strong> <span>{countDiscs()}</span></>,
++            title: i18n['music-release.meta.discs']['en'],
++          },
++        ]}
++      />
+     </Card>
+   )
+ }
