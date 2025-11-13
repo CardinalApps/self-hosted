@@ -1,67 +1,10 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -14,6 +14,7 @@ import './List.css'
- export type ListItemControls = 'add' | 'remove' | 'delete'
- export type ListItem = {
-   name: string | ReactNode,
-+  title?: string,
-   value?: string,
-   avatar?: {
-     type: 'image',
-@@ -29,12 +30,13 @@ export type ListItem = {
- 
- type ListProps = {
-   name?: string,
-+  className?: string,
-   items: ListItem[],
-   controls?: unknown[],
-+  layout?: 'default' | 'compact'
-   onAdd?: (item: ListItem) => void,
-   onRemove?: (item: ListItem) => void,
-   onDelete?: (item: ListItem) => void,
--  showOutline?: boolean,
- }
- 
- /**
-@@ -42,18 +44,19 @@ type ListProps = {
-  */
- const List = ({
-   name,
-+  className,
-   items = [],
-   controls = [],
-+  layout = 'default',
-   onAdd = () => {},
-   onRemove = () => {},
-   onDelete = () => {},
--  showOutline = true,
-   ...props
- }: ListProps) => {
-   const { lang } = useSelector(settingsSelectors.current)
- 
-   return (
--    <div className={clsx('item-list', showOutline && 'outline')} {...props} data-name={name}>
-+    <div {...props} className={clsx('item-list', className)} data-name={name} data-layout={layout}>
-       {items.length
-         ? <ul>
-             {items.map((item, index) => {
-@@ -78,12 +81,14 @@ const List = ({
-                       <Icon {...item.icon} />
+@@ -82,7 +82,7 @@ const List = ({
                      </span>
                    )}
--                  <span className="item-list-item-name" title={item?.name.toString()}>{item?.name}</span>
--                  <span className="item-list-item-controls">
--                    {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
--                    {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}
--                    {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => onDelete(item)} />}
--                  </span>
-+                  <span className="item-list-item-name" title={item?.title || item?.name.toString()}>{item?.name}</span>
-+                  {!!controls?.length && (
-+                    <span className="item-list-item-controls">
-+                      {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
-+                      {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}
-+                      {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => onDelete(item)} />}
-+                    </span>
-+                  )}
-                 </li>
-               )
-             })}
+                   <span className="item-list-item-name" title={item?.title || item?.name.toString()}>{item?.name}</span>
+-                  {!!controls?.length && (
++                  {!!controlsToUse?.length && (
+                     <span className="item-list-item-controls">
+                       {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
+                       {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}
