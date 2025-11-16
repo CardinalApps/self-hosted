@@ -1,71 +1,20 @@
 diff a/apps/music-web/src/components/AppRoot/AppRoot.tsx b/apps/music-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,19 +1,19 @@
--import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation } from 'react-router-dom'
-+import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
- 
- import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
-+import { MusicRoutes } from '@cardinalapps/ui/src/lib/net/router'
- 
- import Nav from '../Nav'
- import SettingsPanel from '../SettingsPanel'
- 
- import ListenNow from '../../pages/ListenNow'
+@@ -10,6 +10,7 @@ import ListenNow from '../../pages/ListenNow'
  import ReleasesPage from '../../pages/Releases'
-+import ReleasePage from '../../pages/Release'
+ import ReleasePage from '../../pages/Release'
  import ArtistsPage from '../../pages/Artists'
++import ArtistPage from '../../pages/Artist'
  import TracksPage from '../../pages/Tracks'
  import HistoryPage from '../../pages/History'
  import PlaylistsPage from '../../pages/Playlists'
- 
--import * as routes from '../../routes'
--
- import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
- import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
- 
-@@ -43,6 +43,8 @@ function AppRoot() {
-         location,
-         navigate,
-         Link,
-+        useLocation,
-+        useParams,
-       }}
-       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-@@ -69,27 +71,31 @@ function AppRoot() {
-       privateScaffoldRoutes={
-         <>
-           <Route
--            path={routes.ROOT}
-+            path={MusicRoutes.root}
-             element={<ListenNow />}
-           />
-           <Route
--            path={routes.RELEASES}
-+            path={MusicRoutes.releases}
-             element={<ReleasesPage />}
-           />
-           <Route
--            path={routes.ARTISTS}
-+            path={MusicRoutes.release}
-+            element={<ReleasePage />}
-+          />
-+          <Route
-+            path={MusicRoutes.artists}
+@@ -86,6 +87,10 @@ function AppRoot() {
+             path={MusicRoutes.artists}
              element={<ArtistsPage />}
            />
++          <Route
++            path={MusicRoutes.artist}
++            element={<ArtistPage />}
++          />
            <Route
--            path={routes.TRACKS}
-+            path={MusicRoutes.tracks}
+             path={MusicRoutes.tracks}
              element={<TracksPage />}
-           />
-           <Route
--            path={routes.HISTORY}
-+            path={MusicRoutes.history}
-             element={<HistoryPage />}
-           />
-           <Route
--            path={routes.PLAYLISTS}
-+            path={MusicRoutes.playlists}
-             element={<PlaylistsPage />}
-           />
-         </>

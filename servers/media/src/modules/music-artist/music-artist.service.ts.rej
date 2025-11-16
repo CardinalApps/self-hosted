@@ -1,0 +1,28 @@
+diff a/servers/media/src/modules/music-artist/music-artist.service.ts b/servers/media/src/modules/music-artist/music-artist.service.ts	(rejected hunks)
+@@ -8,7 +8,7 @@ import { MusicArtistMetadata } from './music-artist-metadata.entity'
+ import { EventService } from '../event/event.service'
+ 
+ import { GetMusicArtistsDto } from './dtos/GetMusicArtists.dto'
+-import { sortableString } from '../../utils/string'
++import { sortableString, isNumeric } from '../../utils/string'
+ 
+ @Injectable()
+ export class MusicArtistService {
+@@ -37,11 +37,13 @@ export class MusicArtistService {
+   /**
+    * Gets a single music artist.
+    */
+-  async get(id: number, relations = {}): Promise<MusicArtist | null> {
++  async get(id: number | string, relations = {}): Promise<MusicArtist | null> {
++    const where = isNumeric(id)
++      ? { id: id as number }
++      : { musicArtistId: id as string }
++
+     const musicArtist = await this.musicArtistRepository.find({
+-      where: {
+-        id: id,
+-      },
++      where,
+       relations: {
+         ...relations,
+       },

@@ -19,6 +19,7 @@ export type ErrorObject = {
   status?: number,
   error?: string,
   data?: {
+    error: string,
     statusCode: number,
     message: string,
   },
@@ -37,16 +38,16 @@ const ErrorPage = ({
 
   const getStrings = (): StringList => {
     let defaults = { name: '', message: '' }
-    if (error?.status === 404 || overrides.code === 404) {
+    if (error?.status === 404 || overrides?.code === 404) {
       defaults = {
         name: i18n['error-page.404.name'][lang],
         message: i18n['error-page.404.message'][lang],
       }
     }
     return {
-      name: overrides?.name || error?.data?.message || defaults.name,
+      name: overrides?.name || error?.data?.error || defaults.name,
       code: overrides?.code || error?.status,
-      message: overrides?.message || error?.error || defaults.message,
+      message: overrides?.message || error?.data?.message || error?.error || defaults.message,
     }
   }
 
