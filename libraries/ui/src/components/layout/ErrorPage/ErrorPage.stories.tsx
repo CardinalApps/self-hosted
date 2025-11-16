@@ -11,7 +11,7 @@ type Story = StoryObj<typeof meta>
 
 export const PageNotFound: Story = {
   args: {
-    type: '404',
+    overrides: { code: 404 },
   },
 }
 
