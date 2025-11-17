@@ -1,27 +1,19 @@
 diff a/libraries/ui/src/components/features/AppBase/AppScaffold.tsx b/libraries/ui/src/components/features/AppBase/AppScaffold.tsx	(rejected hunks)
-@@ -3,8 +3,6 @@ import type { PropsWithChildren, ReactNode } from 'react'
- import { useSelector, useDispatch } from 'react-redux'
- import clsx from 'clsx'
- 
--import AppPageNotFound from './AppPageNotFound'
--
- import Columns, { Column } from '../../layout/Columns'
- import DocLink from '../../interaction/DocLink'
+@@ -8,7 +8,7 @@ import DocLink from '../../interaction/DocLink'
  import SidebarNav from '../../interaction/SidebarNav'
-@@ -15,6 +13,7 @@ import H2 from '../../typography/H1'
+ import { GlobalAudioPlayer } from '../AudioPlayer'
+ import { DirectoryTreeSidebarPortal, DirectoryTreeMobileButton } from '../../interaction/DirectoryTree'
+-import H2 from '../../typography/H1'
++import H2 from '../../typography/H2'
+ 
  import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
  import { SCROLL_RESTORATION_KEYS, PAGE_LAYOUT } from '../../../store/slices/layout'
- import { RouterContext } from '../../../context/router'
-+import ErrorPage from '../../layout/ErrorPage'
- 
- export type SidebarOptions = {
-   overflow: boolean,
-@@ -108,7 +107,7 @@ function AppScaffold({
-           )}
-           <Routes>
-             {privateScaffoldRoutes ? privateScaffoldRoutes : null}
--            <Route path="*" element={<AppPageNotFound />} />
-+            <Route path="*" element={<ErrorPage overrides={{ code: 404 }} />} />
-           </Routes>
-         </main>
-       </section>
+@@ -97,7 +97,7 @@ function AppScaffold({
+             <section className={clsx('page-title-bar')}>
+               <Columns>
+                 <Column>
+-                  {!!pageTitle && <H2>{pageTitle}</H2>}
++                  {!!pageTitle && <H2 className="page-title">{pageTitle}</H2>}
+                 </Column>
+                 <Column>
+                   {!!pageDocLink && <DocLink href={pageDocLink} />}

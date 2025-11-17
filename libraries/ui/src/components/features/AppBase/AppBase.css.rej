@@ -1,12 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -323,6 +323,10 @@
- .app-page {
-   height: 100%;
- 
-+  &.loading {
-+    opacity: 0;
-+  }
-+
-   /* &.sidebar-is-collapsed {
-     height: 100%;
-     padding-top: 40px;
+@@ -277,7 +277,7 @@
+ .page-title-bar {
+   margin-bottom: 20px;
+   
+-  h1 {
++  .page-title {
+     margin-bottom: 0;
+     font-size: 16px;
+     font-weight: 700;
