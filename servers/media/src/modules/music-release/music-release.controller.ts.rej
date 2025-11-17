@@ -1,19 +1,10 @@
 diff a/servers/media/src/modules/music-release/music-release.controller.ts b/servers/media/src/modules/music-release/music-release.controller.ts	(rejected hunks)
-@@ -79,7 +79,7 @@ export class MusicReleaseController {
-   }
+@@ -51,7 +51,7 @@ export class MusicReleaseController {
+     const musicRelease = await this.musicReleaseService.get(id, {
+       artists,
+       genres,
+-      tracks,
++      ...(tracks ? { tracks: { metadata: true } } : false),
+       thumbnails,
+     })
  
-   /**
--   * Returns the blob data of a release covers. Supports numeric row ID and musicReleaseId col.
-+   * Returns the blob data of a release cover. Supports numeric row ID and musicReleaseId col.
-    */
-   @Get('/music/releases/:id/cover')
-   @UseGuards(AuthGuard)
-@@ -104,7 +104,7 @@ export class MusicReleaseController {
-     const thumbnail = release.thumbnails?.find((thumb) => thumb.size === query.size)
- 
-     if (!thumbnail) {
--      throw new NotFoundException('No thumbnail for this release.')
-+      throw new NotFoundException('No thumbnail of this size found for this release.')
-     }
- 
-     const thumbnailFile = getAppDir(thumbnail.relativeSrc)
