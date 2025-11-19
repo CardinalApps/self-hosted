@@ -7,6 +7,7 @@ import { PLAYBACK_STATE } from '../store/slices/music/constants'
 import { authorizedFetchHeaders, JWT_TYPE } from '../lib/auth/jwt'
 
 import { HOME_SERVER_HOST } from '../../env'
+import homeServerAPI from '../lib/homeserver/homeServerAPI'
 
 const howls = {}
 const streamUrl = (id) => `${HOME_SERVER_HOST}/api/v1/music/stream/${id}`
@@ -56,6 +57,15 @@ export default function useHowler() {
       },
     })
 
+    const saveMusicHistory = (progress: number) => {
+      homeServerAPI('/music/history', 'POST', {
+        body: {
+          trackId: player.trackId,
+          progress,
+        },
+      })
+    }
+
     howl.on('load', () => {
       // Howl may be destroyed before load is complete
       if (howl) {
@@ -65,7 +75,12 @@ export default function useHowler() {
     })
 
     howl.on('end', () => {
+      saveMusicHistory(1)
       dispatch(musicActions.stop(player.id))
+    })
+
+    howl.on('stop', () => {
+      saveMusicHistory((howl.seek() / howl.duration()) / 100)
     })
 
     return howl

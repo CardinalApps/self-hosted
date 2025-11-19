@@ -1,0 +1,8 @@
+diff a/servers/media/src/dtos/pagination.dto.ts b/servers/media/src/dtos/pagination.dto.ts	(rejected hunks)
+@@ -21,5 +22,5 @@ export class Pagination {
+   @Transform(({ value }) => String(value))
+   @IsOptional()
+   @IsIn(['asc', 'desc'])
+-  order?: string = 'desc'
++  order?: FindOptionsOrderValue = 'desc'
+ }

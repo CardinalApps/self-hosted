@@ -1,0 +1,10 @@
+diff a/servers/media/src/modules/music-history/music-history.controller.ts b/servers/media/src/modules/music-history/music-history.controller.ts	(rejected hunks)
+@@ -26,7 +26,7 @@ import { GetMusicHistoryEntriesDto } from './dtos/GetMusicHistoryEntries.dto'
+ 
+ import { MusicHistoryService } from './music-history.service'
+ 
+-@Controller('playback-history')
++@Controller('music/history')
+ export class MusicHistoryController {
+   constructor(
+     @InjectRepository(MusicHistory)
