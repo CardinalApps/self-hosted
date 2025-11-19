@@ -1,36 +1,12 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx	(rejected hunks)
-@@ -12,13 +12,12 @@ import { musicSelectors, musicActions } from '../../../store/slices/music'
- import { PLAYBACK_STATE } from '../../../store/slices/music/constants'
+@@ -67,7 +67,9 @@ const AudioPlayer = ({
+   useEffect(() => {
+     if (!playbackTimeInterval.current && howl) {
+       playbackTimeInterval.current = setInterval(() => {
+-        setPlaybackSeconds(howl.seek())
++        const seek = howl.seek()
++        setPlaybackSeconds(seek)
++        sessionStorage.setItem(`audio-player-${playerId}-seek`, seek)
+       }, 250)
+     }
  
- import { getHowl } from '../../../hooks/useHowler'
-+import { useReleaseCover } from '../../../hooks/useReleaseCover'
- 
- import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
- 
- import { secondsToMMSS } from '../../../lib/formatting/time'
- 
--import { HOME_SERVER_HOST } from '../../../../env'
--
- import './AudioPlayer.css'
- 
- type AudioPlayerProps = {
-@@ -48,7 +47,7 @@ const AudioPlayer = ({
-     isLoading: musicTrackLoading,
-   } = useGetMusicTrackQuery({ id: player.trackId })
-   const track = musicTrackResponse
--  const thumbnail = track?.release?.thumbnails?.find((thumb) => thumb?.size === 'small_nocrop')
-+  const coverSrc = useReleaseCover(track?.release?.id)
- 
-   const handlePlayClick = (id) => {
-     dispatch(musicActions.play({ trackId: id }))
-@@ -107,8 +106,8 @@ const AudioPlayer = ({
-       </div>
-       <div className="controls">
-         <div className={clsx('release-image', !track?.release?.thumbnails && 'no-image')}>
--          {thumbnail?.relativeSrc
--            ? <img src={`${HOME_SERVER_HOST}${thumbnail.relativeSrc}`} />
-+          {coverSrc
-+            ? <img src={coverSrc} />
-             : <Icon fa="fas fa-music" />
-           }
-         </div>

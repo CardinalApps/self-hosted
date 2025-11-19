@@ -57,11 +57,18 @@ export default function useHowler() {
       },
     })
 
-    const saveMusicHistory = (progress: number) => {
+    const saveMusicHistory = (progress?: number) => {
+      if (!progress) {
+        const cachedSeek = sessionStorage.getItem(`audio-player-${playerId}-seek`)
+        if (cachedSeek) {
+          progress = Number(cachedSeek) / (howl.duration())
+        }
+        sessionStorage.removeItem(`audio-player-${playerId}-seek`)
+      }
       homeServerAPI('/music/history', 'POST', {
         body: {
           trackId: player.trackId,
-          progress,
+          progress: progress || 0,
         },
       })
     }
@@ -80,7 +87,7 @@ export default function useHowler() {
     })
 
     howl.on('stop', () => {
-      saveMusicHistory((howl.seek() / howl.duration()) / 100)
+      saveMusicHistory()
     })
 
     return howl
