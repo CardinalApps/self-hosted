@@ -1,19 +1,17 @@
 diff a/servers/media/src/modules/music-track/music-track.service.ts b/servers/media/src/modules/music-track/music-track.service.ts	(rejected hunks)
-@@ -58,7 +58,7 @@ export class MusicTrackService {
-    * Returns all tracks according to the query.
+@@ -37,11 +37,11 @@ export class MusicTrackService {
+   /**
+    * Gets a single music track.
     */
-   async query(getMusicTracksDto: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
--    const { take, skip, order, orderBy, metadata, release, artists } = getMusicTracksDto
-+    const { take, skip, order, sort, metadata, release, artists } = getMusicTracksDto
-     return await this.musicTrackRepository.findAndCount({
-       take,
-       skip,
-@@ -68,7 +68,7 @@ export class MusicTrackService {
-         metadata: metadata,
+-  async get(id: number, relations = {}): Promise<MusicTrack | null> {
++  async get(id: number | string, relations = {}): Promise<MusicTrack | null> {
++    const where = typeof id === 'number' ? { id: id } : { musicTrackId: id }
++
+     const musicTrack = await this.musicTrackRepository.find({
+-      where: {
+-        id: id,
+-      },
++      where,
+       relations: {
+         ...relations,
        },
-       order: {
--        [orderBy]: order,
-+        [sort]: order,
-       },
-     })
-   }

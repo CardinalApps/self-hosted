@@ -1,0 +1,20 @@
+diff a/servers/media/src/modules/music-track/music-track.entity.ts b/servers/media/src/modules/music-track/music-track.entity.ts	(rejected hunks)
+@@ -14,6 +14,7 @@ import { File } from  '../indexing/entities/file.entity'
+ import { MusicArtist } from  '../music-artist/music-artist.entity'
+ import { MusicRelease } from  '../music-release/music-release.entity'
+ import { MusicTrackMetadata } from './music-track-metadata.entity'
++import { MusicHistory } from '../music-history/music-history.entity'
+ 
+ @Entity()
+ export class MusicTrack extends BaseEntity {
+@@ -54,6 +55,10 @@ export class MusicTrack extends BaseEntity {
+   @OneToMany(() => MusicTrackMetadata, (musicTrackMetadata) => musicTrackMetadata.track, { onDelete: 'CASCADE' })
+   @JoinColumn()
+   metadata?: MusicTrackMetadata[]
++
++  @OneToMany(() => MusicHistory, (musicHistory) => musicHistory.track, { onDelete: 'CASCADE' })
++  @JoinColumn()
++  history?: MusicHistory[]
+ }
+ 
+ export class MusicTrackComputed extends MusicTrack {

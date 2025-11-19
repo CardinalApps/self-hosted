@@ -1,66 +1,17 @@
 diff a/servers/media/src/modules/app/app.module.ts b/servers/media/src/modules/app/app.module.ts	(rejected hunks)
-@@ -1,6 +1,6 @@
- import { join } from 'path'
+@@ -26,6 +26,7 @@ import { ThumbnailModule } from '../thumbnail/thumbnail.module'
+ import { JobModule } from '../job/job.module'
+ import { RBACModule } from '../rbac/rbac.module'
+ import { LibraryModule } from '../library/library.module'
++import { MusicHistoryModule } from '../music-history/music-history.module'
  
--import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
-+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
- //import { APP_INTERCEPTOR } from '@nestjs/core'
- import { TypeOrmModule } from '@nestjs/typeorm'
- import { ScheduleModule } from '@nestjs/schedule'
-@@ -35,6 +35,7 @@ import { UserActivity } from '../../middleware/UserActivity.middleware'
- 
- //import { ExampleInterceptor } from '../../interceptors/example.interceptor'
- 
-+import { ReleaseChannels } from '../../utils/releaseChannels'
- //import { LogLevel } from '../../utils/logging'
- 
- import {
-@@ -45,6 +46,33 @@ import {
-   getSQLiteDatabaseLocation,
- } from '../../utils/env'
- 
-+const resolvePostgresHost = () => {
-+  const setByUser = envVar('POSTGRES_HOST', false)
-+
-+  if (setByUser) {
-+    return setByUser
-+  }
-+  if (!isContainerEnv()) {
-+    return '127.0.0.1'
-+  }
-+  if (getCurrentMode() === Mode.DEVELOPMENT) {
-+    // matches docker compose service name
-+    return 'cardinal-media-server-pg-dev'
-+  }
-+
-+  const releaseChannel = envVar('RELEASE_CHANNEL', false)
-+
-+  if (!releaseChannel) {
-+    return Logger.error('Cannot find PostgresSQL database server because RELEASE_CHANNEL is missing.', 'Database')
-+  }
-+  if (releaseChannel === ReleaseChannels.BETA) {
-+    // matches docker compose service name
-+    return 'cardinal-media-server-beta-postgres-db'
-+  }
-+  // matches docker compose service name
-+  return 'cardinal-media-server-stable-postgres-db'
-+}
-+
- @Module({
-   imports: [
-     // Initialize Nest modules
-@@ -52,13 +80,7 @@ import {
-     TypeOrmModule.forRoot(envVar('CARDINAL_POSTGRES', false)
-       ? {
-           type: 'postgres',
--          // FIXME CHS-61 use different pg host for beta mode (cardinal-beta-postgres)
--          host: isContainerEnv()
--            ? getCurrentMode() === Mode.DEVELOPMENT
--              ? envVar('POSTGRES_HOST', 'cardinal-media-server-pg-dev')
--              // Matches the default docker-compose.yaml service name set on the Help Site
--              : envVar('POSTGRES_HOST', 'cardinal-postgres')
--            : envVar('POSTGRES_HOST', '127.0.0.1'),
-+          host: resolvePostgresHost(),
-           port: envVar('POSTGRES_PORT', 5432),
-           username: envVar('POSTGRES_USER', 'cardinal'),
-           password: envVar('POSTGRES_PASSWORD', 'cardinal'),
+ import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
+ import { RevokeGuestSession } from '../../middleware/RevokeGuestSession.middleware'
+@@ -116,6 +117,7 @@ const resolvePostgresHost = () => {
+     JobModule,
+     RBACModule,
+     LibraryModule,
++    MusicHistoryModule,
+     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
+     ServeStaticModule.forRoot({
+       rootPath: join(__dirname, '..', '..', '..', 'public'),
