@@ -1,9 +1,10 @@
 diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.stories.tsx b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.stories.tsx	(rejected hunks)
-@@ -24,7 +24,6 @@ export const Default = () => {
-         artistName="Animals as Leaders"
-         duration="3:40"
-         plays={20}
--        artwork="/sample/cover.jpg"
-         artistLink="#"
-         releaseLink="#"
-       />
+@@ -17,7 +17,7 @@ export const Default = () => {
+   return (
+     <MemoryRouter>
+       <MusicTrack
+-        musicTrackId={1}
++        musicTrackId={'123'}
+         trackNumber={1}
+         trackTitle="Micro Aggressions"
+         releaseTitle="Parrhesia"

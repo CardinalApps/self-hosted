@@ -1,0 +1,22 @@
+diff a/libraries/app-settings/src/common/lang.ts b/libraries/app-settings/src/common/lang.ts	(rejected hunks)
+@@ -3,10 +3,18 @@ import i18n from '../i18n'
+ 
+ export const LANG_SLUG = 'lang'
+ 
++const langs = [
++  {
++    value: 'en',
++    label: 'English',
++  },
++]
++
+ export const langFactory: SettingsFieldFactory = (app: SupportedCardinalApp, lang: SupportedLang) => ({
+   slug: LANG_SLUG,
+   label: i18n?.['settings.language.title']?.[lang],
+-  type: 'swatches',
++  type: 'select',
+   storage: 'home_server',
+-  defaultValue: 'en',
++  defaultValue: langs[0].value,
++  options: langs,
+ })

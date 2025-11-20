@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Howl } from 'howler'
 
 import { getSetting } from '@cardinalapps/app-settings/src'
+import { SupportedLang } from '@cardinalapps/app-settings/src/types'
 import { musicSelectors, musicActions, Player } from '../store/slices/music'
 import { PLAYBACK_STATE } from '../store/slices/music/constants'
 import { authorizedFetchHeaders, JWT_TYPE } from '../lib/auth/jwt'
@@ -56,7 +57,7 @@ export default function useHowler() {
   const paused = useSelector(musicSelectors.paused)
   const pausedIds = useSelector(musicSelectors.pausedIds)
   const { lang, max_concurrent_audio_streams } = useSelector(settingsSelectors.current)
-  const { defaultValue: defaultMaxConcurrentAudioStreams } = useMemo(() => getSetting('max_concurrent_audio_streams')('music', lang), [])
+  const { defaultValue: defaultMaxConcurrentAudioStreams } = useMemo(() => getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang), [])
   const maxConcurrentAudioStreams = Number(max_concurrent_audio_streams || defaultMaxConcurrentAudioStreams)
 
   /**

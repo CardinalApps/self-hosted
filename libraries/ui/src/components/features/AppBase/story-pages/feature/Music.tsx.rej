@@ -1,28 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/story-pages/feature/Music.tsx b/libraries/ui/src/components/features/AppBase/story-pages/feature/Music.tsx	(rejected hunks)
-@@ -7,8 +7,6 @@ import MusicTrack from '../../../../interaction/MusicTrack'
- import { PAGE_LAYOUT } from '../../../../../store/slices/layout'
- import { useGetMusicTracksQuery } from '../../../../../store/apis/musicTracks'
- 
--import { HOME_SERVER_HOST } from '../../../../../../env'
--
- function MusicPage() {
-   const {
-     data: musicTracksResponse,
-@@ -25,16 +23,15 @@ function MusicPage() {
-       {musicTracksLoading
-         ? <Loading />
-         : musicTracks.map((musicTrack, i) => {
--          const thumb = musicTrack?.release?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+@@ -26,7 +26,7 @@ function MusicPage() {
            return (
              <MusicTrack
                key={i}
-               musicTrackId={musicTrack?.id}
+-              musicTrackId={musicTrack?.id}
++              musicTrackId={musicTrack?.musicTrackId}
                trackTitle={musicTrack?.title}
-+              releaseId={musicTrack?.release?.id}
+               releaseId={musicTrack?.release?.id}
                releaseTitle={musicTrack?.release?.title}
-               trackNumber={musicTrack.trackNumber}
-               artistName={musicTrack?.artists?.[0]?.name}
--              artwork={thumb ? `${HOME_SERVER_HOST}${thumb}` : undefined}
-             />
-           )
-         })

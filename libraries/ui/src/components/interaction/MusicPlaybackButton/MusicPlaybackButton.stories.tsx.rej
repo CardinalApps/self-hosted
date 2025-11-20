@@ -1,0 +1,16 @@
+diff a/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.stories.tsx b/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.stories.tsx	(rejected hunks)
+@@ -16,11 +16,11 @@ export const Play = () => {
+   return (
+     <>
+       <div style={{ padding: '10px 0' }}>
+-        <p>Hardcoded to use track ID 1. Use the Music page in the sandbox app for more advanced testing.</p>
++        <p>Demo does not work right now</p>
+       </div>
+       <MusicPlaybackButton
+-        musicTrackIds={[1]}
+-        musicTrackIdToPlay={1}
++        musicTrackIds={['123']}
++        musicTrackIdToPlay={'123'}
+       />
+     </>
+   )

@@ -1,0 +1,17 @@
+diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
+@@ -1,5 +1,6 @@
+ import { createAsyncThunk } from '@reduxjs/toolkit'
+ import { getSetting } from '@cardinalapps/app-settings/src'
++import { SupportedLang } from '@cardinalapps/app-settings/src/types'
+ import { v4 as uuid } from 'uuid'
+ 
+ import { AppDispatch, RootState } from '../../../'
+@@ -99,7 +100,7 @@ const playMusic = createAsyncThunk<
+ 
+   // If we are at the max concurrent players, save the playback history of the oldest ones before they are removed
+   const numPlayers = Object.values(state.music.players).length + workToDo.create.length
+-  const maxConcurrentPlayers = Number(state.settings.current[getSetting('max_concurrent_audio_streams')('music', lang).slug])
++  const maxConcurrentPlayers = Number(state.settings.current[getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang).slug])
+ 
+   if (numPlayers > maxConcurrentPlayers) {
+     const inOrderOfOldest = Object.values(state.music.players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
