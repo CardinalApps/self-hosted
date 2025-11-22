@@ -1,0 +1,9 @@
+diff a/docs/quick-start.md b/docs/quick-start.md	(rejected hunks)
+@@ -30,7 +30,3 @@ Your machine will need:
+   # In the monorepo root
+   $ pnpm dev
+   ```
+-
+-## 4. Access apps
+-
+-Open `localhost.html` in a web browser and use it as an app launchpad.
