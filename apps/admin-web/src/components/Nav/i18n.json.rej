@@ -1,0 +1,11 @@
+diff a/apps/admin-web/src/components/Nav/i18n.json b/apps/admin-web/src/components/Nav/i18n.json	(rejected hunks)
+@@ -2,6 +2,9 @@
+   "nav.overview": {
+     "en": "Overview"
+   },
++  "nav.users": {
++    "en": "Users"
++  },
+   "nav.indexing": {
+     "en": "Indexing"
+   },

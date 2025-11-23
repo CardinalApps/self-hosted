@@ -1,0 +1,79 @@
+diff a/apps/admin-web/src/pages/Libraries/Libraries.tsx b/apps/admin-web/src/pages/Libraries/Libraries.tsx	(rejected hunks)
+@@ -107,21 +107,21 @@ function Libraries() {
+     const rows = []
+     allLibraries.forEach((library) => {
+       rows.push([
+-        { props: { children:
+-          <p className={'name'}>
++        (
++          <Table.Col key="name">
+             {library.name}
+-          </p>,
+-        } },
+-        { props: { children:
+-          <p className={'paths'}>
++          </Table.Col>
++        ),
++        (
++          <Table.Col key="paths">
+             {library.paths?.length
+               ? library.paths.map((path) => <span key={path}>{path}</span>)
+               : <span>{i18n['libraries.no-paths'][lang]}</span>
+             }
+-          </p>,
+-        } },
+-        { props: { children:
+-          <div className={'users'}>
++          </Table.Col>
++        ),
++        (
++          <Table.Col key="users">
+             {allUsers?.length
+               ? <AvatarGroup avatars={getAvatars(allUsers)} />
+               : null
+@@ -133,15 +133,15 @@ function Libraries() {
+                   : i18n['libraries.table.user-count.plural'][lang].replace('{n}', library.users.length)
+                 : i18n['libraries.table.user-count.none'][lang]
+             } */}
+-          </div>,
+-        } },
+-        { props: { children:
+-          <p className={'controls'}>
++          </Table.Col>
++        ),
++        (
++          <Table.Col key="controls">
+             <Button onClick={() => setOpenLibrary(library)}>
+               {i18n['libraries.table.options-button'][lang]}
+             </Button>
+-          </p>,
+-        } },
++          </Table.Col>
++        ),
+       ])
+     })
+     return rows
+@@ -193,6 +193,8 @@ function Libraries() {
+     }
+   }, [updateLibraryResult])
+ 
++  console.log(tableBody())
++
+   return (
+     <AppPage className={'libraries'} layout={PAGE_LAYOUT.files} pageTitle={i18n['title'][lang]} pageDocLink="/guides/cardinal-media-server/libraries">
+       <DirectoryTree
+@@ -288,10 +290,10 @@ function Libraries() {
+         <div className={'librariesTable'}>
+           <Table
+             header={[
+-              { props: { children: i18n['libraries.table.header.name'][lang] } },
+-              { props: { children: i18n['libraries.table.header.path'][lang] } },
+-              { props: { children: i18n['libraries.table.header.access'][lang] } },
+-              { props: { children: null } },
++              i18n['libraries.table.header.name'][lang],
++              i18n['libraries.table.header.path'][lang],
++              i18n['libraries.table.header.access'][lang],
++              null,
+             ]}
+             body={tableBody()}
+             emptyMessage={i18n['libraries.table.empty-message'][lang]}

@@ -63,6 +63,25 @@ export const Buttons = () => {
   )
 }
 
+export const Buttons = () => {
+  return (
+    <List
+      name={'controls-list'}
+      items={[
+        { name: 'Item 1' },
+        { name: 'Item 2', value: 'item-2', controls: ['add', 'remove', 'delete'], avatar: { type: 'image', image: 'birb.jpg' } },
+        { name: 'Item 3', value: 'item-3', controls: ['add', 'remove', 'delete'] },
+        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', controls: ['add', 'remove', 'delete'], icon: { fa: 'fas fa-x-ray' } },
+        { name: 'Item 5', value: 'item-5', controls: ['add', 'remove', 'delete'] },
+        { name: 'Item 6', value: 'item-6', controls: ['add', 'remove', 'delete'] },
+      ]}
+      onAdd={(item) => console.log('onAdd', item)}
+      onRemove={(item) => console.log('onRemove', item)}
+      onDelete={(item) => console.log('onDelete', item)}
+    />
+  )
+}
+
 export const ControlsPending = () => {
   return (
     <List

@@ -1,11 +1,75 @@
 diff a/apps/admin-web/src/components/Nav/Nav.tsx b/apps/admin-web/src/components/Nav/Nav.tsx	(rejected hunks)
-@@ -7,8 +7,7 @@ import * as routes from '../../routes'
+@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
+ import type { PropsWithChildren } from 'react'
+ import { Link, useLocation } from 'react-router-dom'
+ 
+-import * as routes from '../../routes'
+-
  import i18n from './i18n.json'
++import { AdminRoutes } from '@cardinalapps/ui/src/lib/net/router'
  
  function Nav({ children }: PropsWithChildren) {
--  //const { pathname } = useLocation()
--  const { pathname } = { pathname: '' }
-+  const { pathname } = useLocation()
-   const [activeItem, setActiveItem] = useState(window.location.pathname)
+   const { pathname } = useLocation()
+@@ -18,21 +17,32 @@ function Nav({ children }: PropsWithChildren) {
+     <>
+       {/* Overview */}
+       <li
+-        className={activeItem === routes.ROOT ? 'active' : ''}
++        className={activeItem === AdminRoutes.root ? 'active' : ''}
+         key="overview"
+       >
+-        <Link to={routes.ROOT}>
++        <Link to={AdminRoutes.root}>
+           <i className="fas fa-chart-area" />
+           <span>{i18n['nav.overview']['en']}</span>
+         </Link>
+       </li>
  
-   useEffect(() => {
++      {/* Users */}
++      <li
++        className={activeItem === AdminRoutes.users ? 'active' : ''}
++        key="users"
++      >
++        <Link to={AdminRoutes.users}>
++          <i className="fas fa-user" />
++          <span>{i18n['nav.users']['en']}</span>
++        </Link>
++      </li>
++
+       {/* Indexing */}
+       <li
+-        className={`${activeItem === routes.INDEXING ? 'active' : ''}`}
++        className={`${activeItem === AdminRoutes.indexing ? 'active' : ''}`}
+         key="indexing"
+       >
+-        <Link to={routes.INDEXING}>
++        <Link to={AdminRoutes.indexing}>
+           <i className="fas fa-copy" />
+           <span>{i18n['nav.indexing']['en']}</span>
+         </Link>
+@@ -40,10 +50,10 @@ function Nav({ children }: PropsWithChildren) {
+ 
+       {/* Jobs */}
+       <li
+-        className={`${activeItem === routes.JOBS ? 'active' : ''}`}
++        className={`${activeItem === AdminRoutes.jobs ? 'active' : ''}`}
+         key="jobs"
+       >
+-        <Link to={routes.JOBS}>
++        <Link to={AdminRoutes.jobs}>
+           <i className="fas fa-hard-hat" style={{}} />
+           <span>{i18n['nav.jobs']['en']}</span>
+         </Link>
+@@ -51,10 +61,10 @@ function Nav({ children }: PropsWithChildren) {
+ 
+       {/* Libraries */}
+       <li
+-        className={`${activeItem === routes.LIBRARIES ? 'active' : ''}`}
++        className={`${activeItem === AdminRoutes.libraries ? 'active' : ''}`}
+         key="libraries"
+       >
+-        <Link to={routes.LIBRARIES}>
++        <Link to={AdminRoutes.libraries}>
+           <i className="fas fa-folder-open" style={{}} />
+           <span>{i18n['nav.libraries']['en']}</span>
+         </Link>

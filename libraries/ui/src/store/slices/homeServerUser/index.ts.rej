@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/store/slices/homeServerUser/index.ts b/libraries/ui/src/store/slices/homeServerUser/index.ts	(rejected hunks)
+@@ -12,6 +12,7 @@ import { CloudUser } from '../cloudUser'
+ export type HomeServerUser = {
+   designation?: string,
+   cachedCloudUser?: CloudUser,
++  userId?: string,
+   [key: string]: unknown,
+ }
+ 

@@ -1,0 +1,132 @@
+diff a/libraries/ui/src/components/interaction/Table/Table.stories.tsx b/libraries/ui/src/components/interaction/Table/Table.stories.tsx	(rejected hunks)
+@@ -15,48 +15,48 @@ type Story = StoryObj<typeof meta>
+ export const Basic: Story = {
+   args: {
+     header: [
+-      { props: { children: 'Name' } },
+-      { props: { children: 'Job' } },
+-      { props: { children: 'Country' } },
+-      { props: { children: 'Age' } },
+-      { props: { children: 'Actions' } },
++      <Table.Col>Name</Table.Col>,
++      <Table.Col>Job</Table.Col>,
++      <Table.Col>Country</Table.Col>,
++      <Table.Col>Age</Table.Col>,
++      <Table.Col>Actions</Table.Col>,
+     ],
+     body: [
+       [
+-        { props: { children: 'Walter' } },
+-        { props: { children: 'Teacher' } },
+-        { props: { children: 'United States' } },
+-        { props: { children: '41' } },
+-        { props: { children: <Button onClick={() => alert('Jesse we have to cook!')}>Speak</Button> } },
++        <Table.Col>Walter</Table.Col>,
++        <Table.Col>Teacher</Table.Col>,
++        <Table.Col>United States</Table.Col>,
++        <Table.Col>41</Table.Col>,
++        <Table.Col><Button onClick={() => alert('Jesse we have to cook!')}>Speak</Button></Table.Col>,
+       ],
+       [
+-        { props: { children: 'Jessie' } },
+-        { props: { children: 'DEA Informant' } },
+-        { props: { children: 'United States' } },
+-        { props: { children: '26' } },
+-        { props: { children: <Button onClick={() => alert('This is my own private domicile and I will not be harassed. Bitch!')}>Speak</Button> } },
++        <Table.Col>Jessie</Table.Col>,
++        <Table.Col>DEA Informant</Table.Col>,
++        <Table.Col>United States</Table.Col>,
++        <Table.Col>26</Table.Col>,
++        <Table.Col><Button onClick={() => alert('This is my own private domicile and I will not be harassed. Bitch!')}>Speak</Button></Table.Col>,
+       ],
+       [
+-        { props: { children: 'Flynn' } },
+-        { props: { children: 'Breakfast aficionado' } },
+-        { props: { children: 'United States' } },
+-        { props: { children: '16' } },
+-        { props: { children: <Button onClick={() => alert('*Throws up*')}>Speak</Button> } },
++        <Table.Col>Flynn</Table.Col>,
++        <Table.Col>Breakfast aficionado</Table.Col>,
++        <Table.Col>United States</Table.Col>,
++        <Table.Col>16</Table.Col>,
++        <Table.Col><Button onClick={() => alert('*Throws up*')}>Speak</Button></Table.Col>,
+       ],
+       [
+-        { props: { children: 'Gus' } },
+-        { props: { children: 'Chicken pimp' } },
+-        { props: { children: 'Chile' } },
+-        { props: { children: '46' } },
+-        { props: { children: <Button onClick={() => alert('POLLOS')}>Speak</Button> } },
++        <Table.Col>Gus</Table.Col>,
++        <Table.Col>Chicken pimp</Table.Col>,
++        <Table.Col>Chile</Table.Col>,
++        <Table.Col>46</Table.Col>,
++        <Table.Col><Button onClick={() => alert('POLLOS')}>Speak</Button></Table.Col>,
+       ],
+       [
+-        { props: { children: 'Holly' } },
+-        { props: { children: 'Satan' } },
+-        { props: { children: 'United States' } },
+-        { props: { children: '666' } },
+-        { props: { children: <Button onClick={() => alert('Í̧͇̻̩̋ͮ ̡͙͔̬̫̝͕̹ͣ̅W̙̲̪̫͕̙ͯ͘Î̶̥͖͈̭͇̮̻̱̊L̵͇͇͊̿ͯ̚L͙̭͕͚̗̯̐̅͡ͅ ̨͇͍̲͛͂̓ͣẸ̹̻̻̺̭̖̑͐͡A̓͏̝̝T͙͉̭̘͖͈̥̓̓͢ ̷͖͔͉͈͚ͯỲ̮͙͕̟ͮ̑ͪ͘O̵̤̹̗̘̼̔̍Ù̧̥͖͉ͬ̈́̈R̶̟̞ͨ̓ ̪̼̺̖̫̾ͨ̑͠S͇͓͇̝͈̫͍̓͢O͛ͤ̃̐͏̻̙̹͇̬Ȕ̡̬̳̪̘̉L̦̼̝̫̙̬͉̽͠')}>Speak</Button> } },
+-        { props: { children: <></> } },
++        <Table.Col>Holly</Table.Col>,
++        <Table.Col>Satan</Table.Col>,
++        <Table.Col>United States</Table.Col>,
++        <Table.Col>666</Table.Col>,
++        <Table.Col><Button onClick={() => alert('Í̧͇̻̩̋ͮ ̡͙͔̬̫̝͕̹ͣ̅W̙̲̪̫͕̙ͯ͘Î̶̥͖͈̭͇̮̻̱̊L̵͇͇͊̿ͯ̚L͙̭͕͚̗̯̐̅͡ͅ ̨͇͍̲͛͂̓ͣẸ̹̻̻̺̭̖̑͐͡A̓͏̝̝T͙͉̭̘͖͈̥̓̓͢ ̷͖͔͉͈͚ͯỲ̮͙͕̟ͮ̑ͪ͘O̵̤̹̗̘̼̔̍Ù̧̥͖͉ͬ̈́̈R̶̟̞ͨ̓ ̪̼̺̖̫̾ͨ̑͠S͇͓͇̝͈̫͍̓͢O͛ͤ̃̐͏̻̙̹͇̬Ȕ̡̬̳̪̘̉L̦̼̝̫̙̬͉̽͠')}>Speak</Button></Table.Col>,
++        <Table.Col><></></Table.Col>,
+       ],
+     ],
+   },
+@@ -72,11 +72,11 @@ export const withPagination = () => {
+ 
+     for (let i = 1; i <= 10; i++) {
+       body.push([
+-        { props: { children: faker.name.firstName() } },
+-        { props: { children: faker.name.lastName() } },
+-        { props: { children: faker.random.locale() } },
+-        { props: { children: faker.random.numeric(2, { allowLeadingZeros: true }) } },
+-        { props: { children: faker.company.name() } },
++        <Table.Col>{faker.name.firstName()}</Table.Col>,
++        <Table.Col>{faker.name.lastName()}</Table.Col>,
++        <Table.Col>{faker.random.locale()}</Table.Col>,
++        <Table.Col>{faker.random.numeric(2, { allowLeadingZeros: true })}</Table.Col>,
++        <Table.Col>{faker.company.name()}</Table.Col>,
+       ])
+     }
+ 
+@@ -96,11 +96,11 @@ export const withPagination = () => {
+     <div style={{ padding: 20, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+       <Table
+         header={[
+-          { props: { children: 'First Name' } },
+-          { props: { children: 'Last Name' } },
+-          { props: { children: 'Language' } },
+-          { props: { children: 'Age' } },
+-          { props: { children: 'Job' } },
++          <Table.Col>First Name</Table.Col>,
++          <Table.Col>Last Name</Table.Col>,
++          <Table.Col>Language</Table.Col>,
++          <Table.Col>Age</Table.Col>,
++          <Table.Col>Job</Table.Col>,
+         ]}
+         page={page}
+         maxPages={42}
+@@ -117,11 +117,11 @@ export const withPagination = () => {
+ export const Empty: Story = {
+   args: {
+     header: [
+-      { props: { children: 'Name' } },
+-      { props: { children: 'Job' } },
+-      { props: { children: 'Country' } },
+-      { props: { children: 'Age' } },
+-      { props: { children: 'Actions' } },
++      <Table.Col>Name</Table.Col>,
++      <Table.Col>Job</Table.Col>,
++      <Table.Col>Country</Table.Col>,
++      <Table.Col>Age</Table.Col>,
++      <Table.Col>Actions</Table.Col>,
+     ],
+     body: undefined,
+   },

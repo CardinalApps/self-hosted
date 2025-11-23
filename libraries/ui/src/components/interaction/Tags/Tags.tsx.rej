@@ -1,12 +1,9 @@
 diff a/libraries/ui/src/components/interaction/Tags/Tags.tsx b/libraries/ui/src/components/interaction/Tags/Tags.tsx	(rejected hunks)
-@@ -4,8 +4,8 @@ import Tag, { TagProps } from './Tag'
- 
- import './Tags.css'
- 
--type TagsProps = {
--  tags: TagProps[],
-+export type TagsProps = {
-+  tags: Array<TagProps | string>,
- }
- 
- /**
+@@ -34,6 +34,7 @@ const Tags = ({
+             label={params.label}
+             href={params.href}
+             icon={params?.icon}
++            color={params?.color}
+             onClick={params?.onClick}
+           />
+         )

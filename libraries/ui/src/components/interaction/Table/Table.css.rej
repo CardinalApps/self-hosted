@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/components/interaction/Table/Table.css b/libraries/ui/src/components/interaction/Table/Table.css	(rejected hunks)
+@@ -94,6 +94,7 @@
+       overflow: hidden;
+       z-index: 2;
+       transition: background-color 125ms;
++      vertical-align: middle;
+ 
+       &.highlight {
+         background-color: var(--bg-3);

@@ -1,49 +1,10 @@
 diff a/libraries/ui/src/components/typography/Icon/Icon.tsx b/libraries/ui/src/components/typography/Icon/Icon.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import type { PropsWithChildren, ReactNode, MouseEvent } from 'react'
-+import type { PropsWithChildren, ReactNode, MouseEvent, CSSProperties } from 'react'
- import clsx from 'clsx'
- 
- import './Icon.css'
-@@ -12,6 +12,7 @@ type IconProps = {
-   target?: string,
-   className?: string,
-   iconClassName?: string,
-+  style?: CSSProperties,
-   onClick?: (e: MouseEvent) => void,
- }
- 
-@@ -27,28 +28,29 @@ const Icon = ({
-   target,
-   className,
-   iconClassName,
-+  style,
-   onClick,
- }: PropsWithChildren<IconProps>) => {
-   const iconEl = fa
--    ? <i className={clsx('fa-icon', fa, iconClassName)} />
-+    ? <i className={clsx('fa-icon', fa, iconClassName)} style={style} />
-     : icon
- 
-   if (href) {
-     return (
--      <a href={href} className={clsx('app-icon', 'href-icon', className)} target={target} title={title} onClick={onClick} data-hover-type={hoverType}>
-+      <a href={href} className={clsx('app-icon', 'href-icon', className)} target={target} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
-         {iconEl}
-       </a>
-     )
-   } else {
-     if (onClick) {
-       return (
--        <button type="button" className={clsx('app-icon', 'button-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType}>
-+        <button type="button" className={clsx('app-icon', 'button-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
-           {iconEl}
-         </button>
+@@ -50,7 +50,7 @@ const Icon = ({
        )
      } else {
        return (
--        <span className={clsx('app-icon', 'span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType}>
-+        <span className={clsx('app-icon', 'span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
+-        <span className={clsx('app-icon', 'span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
++        <span className={clsx('span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
            {iconEl}
          </span>
        )

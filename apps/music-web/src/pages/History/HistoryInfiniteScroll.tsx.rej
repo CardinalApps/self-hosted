@@ -1,62 +1,19 @@
 diff a/apps/music-web/src/pages/History/HistoryInfiniteScroll.tsx b/apps/music-web/src/pages/History/HistoryInfiniteScroll.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useState } from 'react'
-+import { useContext, useState } from 'react'
- import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
- import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
- import {
-@@ -9,11 +9,15 @@ import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
- import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
+@@ -10,7 +10,7 @@ import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScr
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
-+import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
-+import User from '@cardinalapps/ui/src/components/interaction/User'
-+import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
-+import { RouterContext } from '@cardinalapps/ui/src/context/router'
+ import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
+-import User from '@cardinalapps/ui/src/components/interaction/User'
++import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
+ import { RouterContext } from '@cardinalapps/ui/src/context/router'
  
- import i18n from './i18n.json'
- 
- const ITEM_WIDTH = '100%'
--const ITEM_HEIGHT = 24
-+const ITEM_HEIGHT = 44
- 
- type MusicHistoryInfiniteScrollProps = {
-   virtualViewName: string,
-@@ -24,6 +28,7 @@ function MusicHistoryInfiniteScroll({
-   virtualViewName,
-   toolbarName,
- }: MusicHistoryInfiniteScrollProps) {
-+  const { Link } = useContext(RouterContext)
-   const { lang } = useAppSelector(settingsSelectors.current)
-   const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
-   const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
-@@ -53,10 +58,19 @@ function MusicHistoryInfiniteScroll({
-   )
- 
-   const getItem = (historyEntry: MusicHistoryEntryType) => {
--    console.log(historyEntry)
-     return (
-       <div className="music-history-entry">
--        <div>{historyEntry?.track?.title}</div>
-+        <div className="progress-bar" style={{ width: `${historyEntry.progress * 100}%` }}></div>
-+        <div className="cols">
-+          <div>{Math.round(historyEntry?.progress * 100)}%</div>
-+          <div>{<User user={historyEntry.user} avatarSize='xs' showName={false} />}</div>
-+          <div><Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link></div>
-+          <div className="date">
-+            <time title={formatDate(historyEntry?.createdAt)}>
-+              {formatTimeAgo(historyEntry?.createdAt)}
-+            </time>
-+          </div>
-+        </div>
-       </div>
-     )
-   }
-@@ -69,6 +83,7 @@ function MusicHistoryInfiniteScroll({
-         itemHeight={ITEM_HEIGHT}
-         itemWidth={ITEM_WIDTH}
-         data={data}
-+        gap={8}
-         getItem={getItem}
-         isSuccess={isSuccess}
-         isLoading={isLoading}
+@@ -63,7 +63,7 @@ function MusicHistoryInfiniteScroll({
+         <div className="progress-bar" style={{ width: `${historyEntry.progress * 100}%` }}></div>
+         <div className="cols">
+           <div>{Math.round(historyEntry?.progress * 100)}%</div>
+-          <div>{<User user={historyEntry.user} avatarSize='xs' showName={false} />}</div>
++          <div>{<UserTag user={historyEntry.user} avatarSize='xs' showName={false} />}</div>
+           <div><Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link></div>
+           <div className="date">
+             <time title={formatDate(historyEntry?.createdAt)}>

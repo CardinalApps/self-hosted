@@ -1,0 +1,16 @@
+diff a/libraries/ui/src/components/typography/Icon/Icon.css b/libraries/ui/src/components/typography/Icon/Icon.css	(rejected hunks)
+@@ -59,3 +59,14 @@
+     z-index: -1;
+   }
+ }
++
++.span-icon {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++
++  i {
++    font-size: 18px;
++    color: var(--text-color-2);
++  }
++}

@@ -163,4 +163,19 @@ Table.Col = (props: PropsWithChildren<TableColumnProps>) => {
   )
 }
 
+Table.Col = (props: PropsWithChildren<TableColumnProps>) => {
+  const { className, align, index = 0, onMouseEnter, onMouseLeave, children } = props
+  return (
+    <td
+      key={`col-${index}`}
+      className={className}
+      align={align}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {children}
+    </td>
+  )
+}
+
 export default Table

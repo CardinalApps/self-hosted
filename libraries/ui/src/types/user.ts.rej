@@ -1,0 +1,20 @@
+diff a/libraries/ui/src/types/user.ts b/libraries/ui/src/types/user.ts	(rejected hunks)
+@@ -1,8 +1,17 @@
++import { AvatarProps } from "../components/layout/Avatar/Avatar"
++
+ export type UserType = {
+   activityStatus: string,
+   activityStatusUpdatedAt: string,
+   cachedCloudUser?: {
+-    avatar?: object
++    userId?: string,
++    avatar?: AvatarProps,
++    createdAt?: string,
++    extraPermissions?: string[],
++    revokedPermissions?: string,
++    isDeleted?: boolean,
++    publicName?: string,
++    subscription?: string,
+   },
+   cachedCloudUserAt?: string,
+   cardinalId?: string,

@@ -1,10 +1,27 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -82,7 +82,7 @@ const List = ({
+@@ -12,7 +12,7 @@ import i18n from './i18n'
+ import './List.css'
+ 
+ export type ListItemControls = 'add' | 'remove' | 'delete'
+-export type ListItem = {
++export type ListItem = PropsWithChildren<{
+   name: string | ReactNode,
+   title?: string,
+   value?: string,
+@@ -26,7 +26,7 @@ export type ListItem = {
+   controls?: ListItemControls[],
+   pendingAdd?: boolean,
+   pendingDelete?: boolean,
+-}
++}>
+ 
+ type ListProps = {
+   name?: string,
+@@ -82,6 +82,7 @@ const List = ({
                      </span>
                    )}
                    <span className="item-list-item-name" title={item?.title || item?.name.toString()}>{item?.name}</span>
--                  {!!controls?.length && (
-+                  {!!controlsToUse?.length && (
++                  {item.children}
+                   {!!controlsToUse?.length && (
                      <span className="item-list-item-controls">
                        {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
-                       {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}

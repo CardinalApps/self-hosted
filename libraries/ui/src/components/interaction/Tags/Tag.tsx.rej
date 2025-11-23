@@ -1,16 +1,53 @@
 diff a/libraries/ui/src/components/interaction/Tags/Tag.tsx b/libraries/ui/src/components/interaction/Tags/Tag.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useContext, type PropsWithChildren } from 'react'
-+import { useContext } from 'react'
- import { RouterContext } from '../../../context/router'
+@@ -7,7 +7,8 @@ export type TagProps = {
+   icon?: string,
+   label: string,
+   href?: string,
+-  onClick: (e) => void,
++  color?: 'success' | 'warning' | 'danger',
++  onClick?: (e) => void,
+ }
  
- import './Tags.css'
-@@ -18,7 +18,7 @@ const Tag = ({
+ /**
+@@ -17,7 +18,8 @@ const Tag = ({
+   icon,
    label,
    href,
-   onClick = () => {},
--}: PropsWithChildren<TagProps>) => {
-+}: TagProps) => {
+-  onClick = () => {},
++  color,
++  onClick,
+ }: TagProps) => {
    const { Link } = useContext(RouterContext)
    if (href) {
-     return (
+@@ -25,6 +27,7 @@ const Tag = ({
+       <Link
+         to={href}
+         className="tag"
++        data-color={color}
+       >
+         {!!icon && <i className={icon} />}{label}
+       </Link>
+@@ -35,13 +38,22 @@ const Tag = ({
+         key={label}
+         className="tag"
+         type="button"
++        data-color={color}
+         onClick={(e) => onClick(e)}
+       >
+         {!!icon && <i className={icon} />}{label}
+       </button>
+     )
+   } else {
+-    return null
++    return (
++      <span
++        key={label}
++        className="tag"
++        data-color={color}
++      >
++        {!!icon && <i className={icon} />}{label}
++      </span>
++    )
+   }
+ }
+ 

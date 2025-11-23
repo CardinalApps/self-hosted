@@ -1,24 +1,33 @@
 diff a/libraries/ui/src/components/interaction/Tags/Tags.css b/libraries/ui/src/components/interaction/Tags/Tags.css	(rejected hunks)
-@@ -5,15 +5,15 @@
+@@ -4,6 +4,10 @@
+   align-items: center;
    gap: 6px;
  
++  button.tag:hover {
++    background-color: var(--bg-5);
++  }
++
    .tag {
--    padding: 12px 18px;
--    font-size: 14px;
--    font-weight: 800;
--    border-radius: 20px;
--    color: var(--text-color-1);
--    border: none;
-+    padding: 9px 20px;
-+    font-size: 13px;
-+    font-weight: 600;
-+    border-radius: 16px;
-+    color: var(--text-color-2);
-+    border: 1px solid var(--border-color-1);
-     cursor: pointer;
-     white-space: nowrap;
--    background-color: var(--bg-4);
-+    background-color: var(--bg-3);
+     padding: 9px 20px;
+     font-size: 13px;
+@@ -16,8 +20,18 @@
+     background-color: var(--bg-3);
      -webkit-appearance: none;
  
-     &:hover {
+-    &:hover {
+-      background-color: var(--bg-5);
++    &[data-color="success"] {
++      color: white;
++      border-color: var(--success-bg);
++      background-color: var(--success);
++    }
++    &[data-color="warning"] {
++      color: var(--warning);
++      background-color: var(--warning-bg);
++    }
++    &[data-color="danger"] {
++      color: var(--danger);
++      background-color: var(--danger-bg);
+     }
+ 
+     &.active {

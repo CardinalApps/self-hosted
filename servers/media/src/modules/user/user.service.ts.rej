@@ -1,0 +1,30 @@
+diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
+@@ -15,6 +15,7 @@ import { Roles, Designations } from './types'
+ import { CreateUser } from './dtos/CreateUser.dto'
+ 
+ import { CardinalApp } from '../../utils/apps'
++import { GetUsersDto } from './dtos/GetUsers.dto'
+ 
+ /**
+  * This class harmonizes the features of offline and online accounts.
+@@ -219,10 +220,17 @@ export class UserService {
+   }
+ 
+   /**
+-   * Returns an array of all users.
++   * Returns all users according to the query.
+    */
+-  async getUsers(): Promise<User[]> {
+-    return await this.userRepository.find()
++  async query(getMusicTracksDto: GetUsersDto): Promise<[User[], number]> {
++    const { take, skip, order, sort } = getMusicTracksDto
++    return await this.userRepository.findAndCount({
++      take,
++      skip,
++      order: {
++        [sort]: order,
++      },
++    })
+   }
+ 
+   /**

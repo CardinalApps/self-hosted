@@ -1,16 +1,62 @@
 diff a/apps/admin-web/src/components/AppRoot/AppRoot.tsx b/apps/admin-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation } from 'react-router-dom'
-+import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
+@@ -1,12 +1,14 @@
+ import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
  
  import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
++import { AdminRoutes } from '@cardinalapps/ui/src/lib/net/router'
  
-@@ -42,6 +42,8 @@ function AppRoot() {
-         location,
-         navigate,
-         Link,
-+        useParams,
-+        useLocation,
-       }}
-       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+ import Nav from '../Nav'
+ import SettingsPanel from '../SettingsPanel'
+ 
+ import Overview from '../../pages/Overview'
+ import Indexing from '../../pages/Indexing'
++import Users from '../../pages/Users'
+ import Jobs from '../../pages/Jobs'
+ import Libraries from '../../pages/Libraries'
+ import FirstTimeSetup from '../../pages/FirstTimeSetup'
+@@ -70,7 +72,7 @@ function AppRoot() {
+         publicRoutes={
+           <>
+             <Route
+-              path={routes.FIRST_TIME_SETUP}
++              path={AdminRoutes.first_time_setup}
+               element={<FirstTimeSetup />}
+             />
+           </>
+@@ -78,7 +80,7 @@ function AppRoot() {
+         privateRoutes={
+           <>
+             <Route
+-              path={routes.FIRST_TIME_SETUP}
++              path={AdminRoutes.first_time_setup}
+               element={<FirstTimeSetup />}
+             />
+           </>
+@@ -86,19 +88,23 @@ function AppRoot() {
+         privateScaffoldRoutes={
+           <>
+             <Route
+-              path={routes.ROOT}
++              path={AdminRoutes.root}
+               element={<Overview />}
+             />
+             <Route
+-              path={routes.INDEXING}
++              path={AdminRoutes.users}
++              element={<Users />}
++            />
++            <Route
++              path={AdminRoutes.indexing}
+               element={<Indexing />}
+             />
+             <Route
+-              path={routes.JOBS}
++              path={AdminRoutes.jobs}
+               element={<Jobs />}
+             />
+             <Route
+-              path={routes.LIBRARIES}
++              path={AdminRoutes.libraries}
+               element={<Libraries />}
+             />
+           </>
