@@ -140,15 +140,15 @@ function JobReport({
                   ? <>
                       <Table
                         header={[
-                          { props: { children: i18n['job.details.tasks.id'][lang] } },
-                          { props: { children: i18n['job.details.tasks.type'][lang] } },
-                          { props: { children: i18n['job.details.tasks.status'][lang] } },
+                          <Table.Col key="id">{i18n['job.details.tasks.id'][lang]}</Table.Col>,
+                          <Table.Col key="type">{i18n['job.details.tasks.type'][lang]}</Table.Col>,
+                          <Table.Col key="status">{i18n['job.details.tasks.status'][lang]}</Table.Col>,
                         ]}
                         body={jobTasks.map((task) => {
                           return [
-                            { props: { children: task.id } },
-                            { props: { children: task.type } },
-                            { props: { children: task.status } },
+                            <Table.Col key="id">{task.id}</Table.Col>,
+                            <Table.Col key="type">{task.type}</Table.Col>,
+                            <Table.Col key="status">{task.status}</Table.Col>,
                           ]
                         })}
                         page={jobTasksPage}
