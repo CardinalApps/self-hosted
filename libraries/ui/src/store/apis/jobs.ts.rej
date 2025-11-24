@@ -1,23 +1,160 @@
 diff a/libraries/ui/src/store/apis/jobs.ts b/libraries/ui/src/store/apis/jobs.ts	(rejected hunks)
-@@ -4,7 +4,7 @@ import queryParams from '../../lib/net/queryParams'
- import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+@@ -1,10 +1,7 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
  
- import { HOME_SERVER_HOST } from '../../../env'
--import { PaginationParams, SortParams } from '../types/api'
-+import { CommonOrderParams, PaginationParams } from '../types/api'
+-import { HOME_SERVER_HOST } from '../../../env'
+ import { CommonOrderParams, PaginationParams } from '../types/api'
++import { baseHomeServerApi } from './baseHomeServerApi'
  
  export type JobStatus = 'draft' | 'preparing' | 'in_queue' | 'running' | 'paused' | 'canceled' | 'completed' | 'errored'
  
-@@ -49,9 +49,11 @@ export const jobsApi = createApi({
+@@ -19,81 +16,78 @@ export type Job = {
+   completedAt: Date,
+ }
  
-     getJobs: builder.query<
-       [Job[], number],
--      PaginationParams & SortParams & {
-+      PaginationParams & {
-         status: JobStatus[]
-         type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails'
-+        order?: CommonOrderParams,
-+        orderBy?: 'name' | 'createdAt',
-       }
-     >({
-       query: ({ take, skip, status, type, order, orderBy }) => {
+-export const jobsApi = createApi({
+-  reducerPath: 'jobsApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['JobQueue', 'JobHistory', 'JobTypes'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    getJobTypes: builder.query<
+-      string[],
+-      void
+-    >({
+-      query: () => {
+-        return queryParams('/jobs/types')
+-      },
+-      providesTags: ['JobTypes'],
+-    }),
++export const jobsApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['JobQueue', 'JobHistory', 'JobTypes'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      getJobTypes: builder.query<
++        string[],
++        void
++      >({
++        query: () => {
++          return queryParams('/jobs/types')
++        },
++        providesTags: ['JobTypes'],
++      }),
+ 
+-    getJob: builder.query<
+-      Job,
+-      { id: string }
+-    >({
+-      query: ({ id }) => {
+-        return queryParams(`/job/${id}`)
+-      },
+-    }),
++      getJob: builder.query<
++        Job,
++        { id: string }
++      >({
++        query: ({ id }) => {
++          return queryParams(`/job/${id}`)
++        },
++      }),
+ 
+-    getJobs: builder.query<
+-      [Job[], number],
+-      PaginationParams & {
+-        status: JobStatus[]
+-        type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails'
+-        order?: CommonOrderParams,
+-        orderBy?: 'name' | 'createdAt',
+-      }
+-    >({
+-      query: ({ take, skip, status, type, order, orderBy }) => {
+-        return queryParams('/jobs', {
+-          take,
+-          skip,
+-          ...(status && { status }),
+-          ...(type && { type }),
+-          ...(order && { order }),
+-          ...(orderBy && { orderBy }),
+-        })
+-      },
+-      providesTags: ['JobQueue', 'JobHistory'],
+-    }),
++      getJobs: builder.query<
++        [Job[], number],
++        PaginationParams & {
++          status: JobStatus[]
++          type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails'
++          order?: CommonOrderParams,
++          orderBy?: 'name' | 'createdAt',
++        }
++      >({
++        query: ({ take, skip, status, type, order, orderBy }) => {
++          return queryParams('/jobs', {
++            take,
++            skip,
++            ...(status && { status }),
++            ...(type && { type }),
++            ...(order && { order }),
++            ...(orderBy && { orderBy }),
++          })
++        },
++        providesTags: ['JobQueue', 'JobHistory'],
++      }),
+ 
+-    startJob: builder.mutation<
+-      Job,
+-      Partial<Job>
+-    >({
+-      query: (body) => ({
+-        url: '/job',
+-        method: 'POST',
+-        body,
++      startJob: builder.mutation<
++        Job,
++        Partial<Job>
++      >({
++        query: (body) => ({
++          url: '/job',
++          method: 'POST',
++          body,
++        }),
++        invalidatesTags: ['JobQueue'],
+       }),
+-      invalidatesTags: ['JobQueue'],
+-    }),
+ 
+-    controlActiveJob: builder.mutation<
+-      Job,
+-      { jobId: string, body: Partial<Job> }
+-    >({
+-      query: ({ jobId, body }) => ({
+-        url: `/job/${jobId}`,
+-        method: 'PATCH',
+-        body,
++      controlActiveJob: builder.mutation<
++        Job,
++        { jobId: string, body: Partial<Job> }
++      >({
++        query: ({ jobId, body }) => ({
++          url: `/job/${jobId}`,
++          method: 'PATCH',
++          body,
++        }),
++        invalidatesTags: ['JobQueue', 'JobHistory'],
+       }),
+-      invalidatesTags: ['JobQueue', 'JobHistory'],
+     }),
+-  }),
+-})
++  })
+ 
+ export const {
+   useGetJobTypesQuery,

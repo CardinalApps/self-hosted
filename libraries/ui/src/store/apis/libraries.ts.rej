@@ -1,22 +1,148 @@
 diff a/libraries/ui/src/store/apis/libraries.ts b/libraries/ui/src/store/apis/libraries.ts	(rejected hunks)
-@@ -4,7 +4,7 @@ import queryParams from '../../lib/net/queryParams'
- import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+@@ -1,10 +1,7 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
  
- import { HOME_SERVER_HOST } from '../../../env'
--import { PaginationParams, SortParams } from '../types/api'
-+import { CommonOrderParams, PaginationParams } from '../types/api'
+-import { HOME_SERVER_HOST } from '../../../env'
+ import { CommonOrderParams, PaginationParams } from '../types/api'
++import { baseHomeServerApi } from './baseHomeServerApi'
  
  export type Library = {
    id: string,
-@@ -27,7 +27,10 @@ export const librariesApi = createApi({
-      */
-     getLibraries: builder.query<
-       Library[],
--      PaginationParams & SortParams
-+      PaginationParams & {
-+        order?: CommonOrderParams,
-+        orderBy?: 'name' | 'createdAt',
-+      }
-     >({
-       query: ({ take, skip, order, orderBy }) => {
-         return queryParams('/libraries', {
+@@ -13,75 +10,72 @@ export type Library = {
+   [key: string]: unknown,
+ }
+ 
+-export const librariesApi = createApi({
+-  reducerPath: 'librariesApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['AllLibraries', 'UserLibraries'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    /**
+-     * Queries.
+-     */
+-    getLibraries: builder.query<
+-      Library[],
+-      PaginationParams & {
+-        order?: CommonOrderParams,
+-        orderBy?: 'name' | 'createdAt',
+-      }
+-    >({
+-      query: ({ take, skip, order, orderBy }) => {
+-        return queryParams('/libraries', {
+-          ...(take && { take }),
+-          ...(skip && { skip }),
+-          ...(order && { order }),
+-          ...(orderBy && { orderBy }),
+-        })
+-      },
+-      providesTags: ['AllLibraries'],
+-    }),
++export const librariesApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['AllLibraries'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      /**
++       * Queries.
++       */
++      getLibraries: builder.query<
++        Library[],
++        PaginationParams & {
++          order?: CommonOrderParams,
++          orderBy?: 'name' | 'createdAt',
++        }
++      >({
++        query: ({ take, skip, order, orderBy }) => {
++          return queryParams('/libraries', {
++            ...(take && { take }),
++            ...(skip && { skip }),
++            ...(order && { order }),
++            ...(orderBy && { orderBy }),
++          })
++        },
++        providesTags: ['AllLibraries'],
++      }),
+ 
+-    /**
+-     * Mutations.
+-     */
+-    createLibrary: builder.mutation<
+-      Library,
+-      Partial<Library>
+-    >({
+-      query: (body) => ({
+-        url: '/library',
+-        method: 'POST',
+-        body,
++      /**
++       * Mutations.
++       */
++      createLibrary: builder.mutation<
++        Library,
++        Partial<Library>
++      >({
++        query: (body) => ({
++          url: '/library',
++          method: 'POST',
++          body,
++        }),
++        invalidatesTags: ['AllLibraries'],
+       }),
+-      invalidatesTags: ['AllLibraries'],
+-    }),
+ 
+-    updateLibrary: builder.mutation<
+-      Library,
+-      { id: string, body: Partial<Library> }
+-    >({
+-      query: ({ id, body }) => ({
+-        url: `/library/${id}`,
+-        method: 'PATCH',
+-        body: { ...body },
++      updateLibrary: builder.mutation<
++        Library,
++        { id: string, body: Partial<Library> }
++      >({
++        query: ({ id, body }) => ({
++          url: `/library/${id}`,
++          method: 'PATCH',
++          body: { ...body },
++        }),
++        invalidatesTags: ['AllLibraries'],
+       }),
+-      invalidatesTags: ['AllLibraries'],
+-    }),
+ 
+-    deleteLibrary: builder.mutation<
+-      void,
+-      string
+-    >({
+-      query: (id) => ({
+-        url: `/library/${id}`,
+-        method: 'DELETE',
++      deleteLibrary: builder.mutation<
++        void,
++        string
++      >({
++        query: (id) => ({
++          url: `/library/${id}`,
++          method: 'DELETE',
++        }),
++        invalidatesTags: ['AllLibraries'],
+       }),
+-      invalidatesTags: ['AllLibraries'],
+     }),
+-  }),
+-})
++  })
+ 
+ export const {
+   useGetLibrariesQuery,

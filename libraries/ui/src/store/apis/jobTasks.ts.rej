@@ -1,0 +1,91 @@
+diff a/libraries/ui/src/store/apis/jobTasks.ts b/libraries/ui/src/store/apis/jobTasks.ts	(rejected hunks)
+@@ -1,9 +1,6 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import { queryParams } from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+-import { HOME_SERVER_HOST } from '../../../env'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ 
+ export const GET_JOB_TASKS_DEFAULT_OPTIONS = {
+   take: 24,
+@@ -11,46 +8,40 @@ export const GET_JOB_TASKS_DEFAULT_OPTIONS = {
+   order: 'desc',
+ }
+ 
+-export const jobTasksApi = createApi({
+-  reducerPath: 'jobTasksApi',
+-  tagTypes: ['JobTasks'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  refetchOnFocus: true,
+-  refetchOnMountOrArgChange: true,
+-  endpoints: (builder) => ({
+-
+-    /**
+-     * Get a job task.
+-     */
+-    // getJobTask: builder.query({
+-    //   query: ({
+-    //     jobId,
+-    //     jobTaskId,
+-    //   }) => queryParams(`/jobs/${jobId}/tasks/${jobTaskId}`),
+-    // }),
+-
+-    /**
+-     * Get all tasks for a job.
+-     */
+-    getJobTasks: builder.query({
+-      query: ({
+-        jobId,
+-        take = GET_JOB_TASKS_DEFAULT_OPTIONS.take,
+-        skip = GET_JOB_TASKS_DEFAULT_OPTIONS.skip,
+-        order = GET_JOB_TASKS_DEFAULT_OPTIONS.order,
+-      }) => queryParams(`/job/${jobId}/tasks`, {
+-        order,
+-        take,
+-        skip,
++export const jobTasksApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['JobTasks'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      /**
++      * Get a job task.
++      */
++      // getJobTask: builder.query({
++      //   query: ({
++      //     jobId,
++      //     jobTaskId,
++      //   }) => queryParams(`/jobs/${jobId}/tasks/${jobTaskId}`),
++      // }),
++
++      /**
++       * Get all tasks for a job.
++       */
++      getJobTasks: builder.query({
++        query: ({
++          jobId,
++          take = GET_JOB_TASKS_DEFAULT_OPTIONS.take,
++          skip = GET_JOB_TASKS_DEFAULT_OPTIONS.skip,
++          order = GET_JOB_TASKS_DEFAULT_OPTIONS.order,
++        }) => queryParams(`/job/${jobId}/tasks`, {
++          order,
++          take,
++          skip,
++        }),
++        providesTags: ['JobTasks'],
+       }),
+-      providesTags: ['JobTasks'],
+     }),
+-
+-  }),
+-})
++  })
+ 
+ export const {
+   useGetJobTasksQuery,

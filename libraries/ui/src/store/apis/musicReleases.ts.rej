@@ -1,9 +1,19 @@
 diff a/libraries/ui/src/store/apis/musicReleases.ts b/libraries/ui/src/store/apis/musicReleases.ts	(rejected hunks)
-@@ -16,6 +16,7 @@ export type MusicReleaseType = {
-   artist: {
-     id: number,
-     name: string,
-+    musicArtistId: string,
-     [key: string]: unknown,
-   },
-   artists: Array<{
+@@ -2,7 +2,7 @@ import queryParams from '../../lib/net/queryParams'
+ 
+ import { CommonOrderParams, CommonSortParams, PaginationParams } from '../types/api'
+ import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
+-import { baseApi } from './base'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ 
+ export type ReleasesSortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
+ export type MusicReleaseType = {
+@@ -36,7 +36,7 @@ export type MusicReleaseType = {
+   [key: string]: unknown,
+ }
+ 
+-export const musicReleasesApi = baseApi
++export const musicReleasesApi = baseHomeServerApi
+   .enhanceEndpoints({
+     addTagTypes: ['list', 'MusicRelease'],
+   })

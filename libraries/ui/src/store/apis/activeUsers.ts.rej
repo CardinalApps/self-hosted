@@ -1,8 +1,46 @@
 diff a/libraries/ui/src/store/apis/activeUsers.ts b/libraries/ui/src/store/apis/activeUsers.ts	(rejected hunks)
-@@ -1,3 +1,6 @@
-+/**
-+ * @deprecated - Move to apis/users
-+ */
- import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
- 
+@@ -1,30 +1,24 @@
+ /**
+  * @deprecated - Move to apis/users
+  */
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
  import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+-import { HOME_SERVER_HOST } from '../../../env'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ 
+-export const activeUsersApi = createApi({
+-  reducerPath: 'activeUsersApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['ActiveUsers'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    getActiveUsers: builder.query({
+-      query: () => {
+-        return queryParams('/users/active')
+-      },
+-      providesTags: ['ActiveUsers'],
++export const activeUsersApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['ActiveUsers'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      getActiveUsers: builder.query({
++        query: () => {
++          return queryParams('/users/active')
++        },
++        providesTags: ['ActiveUsers'],
++      }),
+     }),
+-  }),
+-})
++  })
+ 
+ export const {
+   useGetActiveUsersQuery,

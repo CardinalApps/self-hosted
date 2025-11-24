@@ -1,10 +1,44 @@
 diff a/libraries/ui/src/store/apis/versions.ts b/libraries/ui/src/store/apis/versions.ts	(rejected hunks)
-@@ -7,7 +7,7 @@ import { HOME_SERVER_HOST } from '../../../env'
+@@ -1,27 +1,22 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
  
- export const versionsApi = createApi({
-   reducerPath: 'versionsApi',
--  refetchOnMountOrArgChange: false,
-+  refetchOnMountOrArgChange: true,
-   tagTypes: ['Versions'],
-   baseQuery: fetchBaseQuery({
-     baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-import { HOME_SERVER_HOST } from '../../../env'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ 
+-export const versionsApi = createApi({
+-  reducerPath: 'versionsApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['Versions'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    getVersions: builder.query({
+-      query: () => {
+-        return queryParams('/versions')
+-      },
+-      providesTags: ['Versions'],
++export const versionsApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['Versions'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      getVersions: builder.query({
++        query: () => {
++          return queryParams('/versions')
++        },
++        providesTags: ['Versions'],
++      }),
+     }),
+-  }),
+-})
++  })
++
+ 
+ export const {
+   useGetVersionsQuery,

@@ -1,0 +1,77 @@
+diff a/libraries/ui/src/store/apis/runs.ts b/libraries/ui/src/store/apis/runs.ts	(rejected hunks)
+@@ -1,45 +1,39 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import queryParams from '../../lib/net/queryParams'
+-import { prepareRTKQueryHeaders } from '../../lib/homeserver/prepareRTKQueryHeaders'
+ 
+-import { HOME_SERVER_HOST } from '../../../env'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ 
+-export const runsApi = createApi({
+-  reducerPath: 'runsApi',
+-  refetchOnMountOrArgChange: true,
+-  tagTypes: ['Runs'],
+-  baseQuery: fetchBaseQuery({
+-    baseUrl: `${HOME_SERVER_HOST}/api/v1`,
+-    prepareHeaders: prepareRTKQueryHeaders,
+-  }),
+-  endpoints: (builder) => ({
+-    getRuns: builder.query({
+-      query: ({ take, skip, includeEmptyRuns }) => {
+-        return queryParams('/index/runs', {
+-          includeEmptyRuns,
+-          take,
+-          skip,
+-        })
+-      },
+-      providesTags: ['Runs'],
+-    }),
+-    createRun: builder.mutation({
+-      query: (body) => ({
+-        url: '/index/run',
+-        method: 'POST',
+-        body,
++export const runsApi = baseHomeServerApi
++  .enhanceEndpoints({
++    addTagTypes: ['Runs'],
++  })
++  .injectEndpoints({
++    endpoints: (builder) => ({
++      getRuns: builder.query({
++        query: ({ take, skip, includeEmptyRuns }) => {
++          return queryParams('/index/runs', {
++            includeEmptyRuns,
++            take,
++            skip,
++          })
++        },
++        providesTags: ['Runs'],
+       }),
+-    }),
+-    updateCurrentRunState: builder.mutation({
+-      query: (body) => ({
+-        url: '/index/state',
+-        method: 'PATCH',
+-        body,
++      createRun: builder.mutation({
++        query: (body) => ({
++          url: '/index/run',
++          method: 'POST',
++          body,
++        }),
++      }),
++      updateCurrentRunState: builder.mutation({
++        query: (body) => ({
++          url: '/index/state',
++          method: 'PATCH',
++          body,
++        }),
+       }),
+     }),
+-  }),
+-})
++  })
+ 
+ export const {
+   useGetRunsQuery,

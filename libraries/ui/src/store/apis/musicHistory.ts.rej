@@ -1,29 +1,19 @@
 diff a/libraries/ui/src/store/apis/musicHistory.ts b/libraries/ui/src/store/apis/musicHistory.ts	(rejected hunks)
-@@ -1,7 +1,9 @@
- import queryParams from '../../lib/net/queryParams'
+@@ -2,7 +2,7 @@ import queryParams from '../../lib/net/queryParams'
  import { CommonSortParams, CommonOrderParams, PaginationParams } from '../types/api'
-+import { UserType } from '../../types/user'
+ import { UserType } from '../../types/user'
  import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
- import { baseApi } from './base'
-+import { MusicTrackType } from './musicTracks'
+-import { baseApi } from './base'
++import { baseHomeServerApi } from './baseHomeServerApi'
+ import { MusicTrackType } from './musicTracks'
  
  export type MusicHistorySortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
- export type MusicHistoryEntryType = {
-@@ -9,15 +11,8 @@ export type MusicHistoryEntryType = {
-   id: number,
-   progress: number,
-   playbackEntryId: string,
--  track: {
--    id: number,
--    title: string,
--    musicTrackId: string,
--  },
--  user: {
--    id: number,
--    userId: string,
--  }
-+  track: MusicTrackType,
-+  user: UserType,
+@@ -16,7 +16,7 @@ export type MusicHistoryEntryType = {
    [key: string]: unknown,
  }
  
+-export const musicHistoryApi = baseApi
++export const musicHistoryApi = baseHomeServerApi
+   .enhanceEndpoints({
+     addTagTypes: ['MusicHistoryList'],
+   })

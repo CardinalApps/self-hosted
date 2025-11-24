@@ -1,7 +1,7 @@
 import queryParams from '../../lib/net/queryParams'
 import { CommonSortParams } from '../types/api'
 import { UserType } from '../../types/user'
-import { baseApi } from './base'
+import { baseHomeServerApi } from './baseHomeServerApi'
 import { MusicTrackType } from './musicTracks'
 
 export type MusicHistorySortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
@@ -15,7 +15,7 @@ export type MusicHistoryEntryType = {
   [key: string]: unknown,
 }
 
-export const usersApi = baseApi
+export const usersApi = baseHomeServerApi
   .enhanceEndpoints({
     addTagTypes: ['Users.List'],
   })

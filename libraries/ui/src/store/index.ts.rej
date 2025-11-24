@@ -1,24 +1,52 @@
 diff a/libraries/ui/src/store/index.ts b/libraries/ui/src/store/index.ts	(rejected hunks)
-@@ -52,6 +52,7 @@ import deletePendingRTKCache from './utils/deletePendingRTKCache'
- import triggerLifecycle from './utils/triggerLifecycle'
- import { getStorageKey } from './utils/getStorageKey'
- import deleteInfiniteQueryCache from './utils/deleteInfiniteQueryCache'
-+import deleteApiCache from './utils/deleteApiCache'
+@@ -22,14 +22,7 @@ import musicSlice from './slices/music'
+ /**
+  * APIs
+  */
+-import { activeUsersApi } from './apis/activeUsers'
+-import { photoAlbumsApi } from './apis/photoAlbums'
+-import { jobsApi } from './apis/jobs'
+-import { jobTasksApi } from './apis/jobTasks'
+-import { librariesApi } from './apis/libraries'
+-import { runsApi } from './apis/runs'
+-import { versionsApi } from './apis/versions'
+-import { baseApi } from './apis/base'
++import { baseHomeServerApi } from './apis/baseHomeServerApi'
  
  /**
-  * All apps use a store of this shape.
-@@ -91,9 +92,14 @@ const createStore = () => {
-   const cachedStore = getCachedStore()
+  * Middleware
+@@ -70,14 +63,7 @@ const slices = {
+   [jobsSlice.reducerPath]: jobsSlice,
+   [layoutSlice.reducerPath]: layoutSlice,
+   [musicSlice.reducerPath]: musicSlice,
+-  [photoAlbumsApi.reducerPath]: photoAlbumsApi,
+-  [activeUsersApi.reducerPath]: activeUsersApi,
+-  [jobsApi.reducerPath]: jobsApi,
+-  [jobTasksApi.reducerPath]: jobTasksApi,
+-  [runsApi.reducerPath]: runsApi,
+-  [librariesApi.reducerPath]: librariesApi,
+-  [versionsApi.reducerPath]: versionsApi,
+-  [baseApi.reducerPath]: baseApi,
++  [baseHomeServerApi.reducerPath]: baseHomeServerApi,
+ }
  
-   merge(preloadedState, cachedStore)
-+
-+  // FIXME delete these two once all of the RTK APIs extend the base
-   deletePendingRTKCache(preloadedState)
-   deleteInfiniteQueryCache(preloadedState)
- 
-+  // This replaces the above two
-+  deleteApiCache(preloadedState)
-+
-   // Before store init lifecycle
-   triggerLifecycle(preloadedState, [
-     musicBeforeStoreInit,
+ const rootReducer = combineSlices(...Object.values(slices))
+@@ -109,17 +95,10 @@ const createStore = () => {
+     reducer: rootReducer,
+     middleware: (getDefaultMiddleware) => {
+       return getDefaultMiddleware().concat(
+-        activeUsersApi.middleware,
+-        photoAlbumsApi.middleware,
+-        jobsApi.middleware,
+-        jobTasksApi.middleware,
+-        runsApi.middleware,
+-        librariesApi.middleware,
+-        versionsApi.middleware,
+         resetMiddleware.middleware,
+         sseFactoryResetMiddleware.middleware,
+         sseLatestEventMiddleware.middleware,
+-        baseApi.middleware,
++        baseHomeServerApi.middleware,
+       )
+     },
+     preloadedState,
