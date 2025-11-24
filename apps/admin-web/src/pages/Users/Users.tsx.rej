@@ -1,53 +1,42 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -12,6 +12,8 @@ import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/users'
- import { UserType } from '@cardinalapps/ui/src/types/user'
- import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
- import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
-+import Card from '@cardinalapps/ui/src/components/layout/Card'
-+import H5 from '@cardinalapps/ui/src/components/typography/H5'
- 
- import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
- 
-@@ -27,6 +29,7 @@ function Users() {
+@@ -29,7 +29,7 @@ function Users() {
  
    const res = useGetUsersQuery({ take: 9999 })
    const data = res?.data ? res.data?.[0] : []
-+  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner')
+-  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner')
++  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner') || true
  
    const nameCol = (user: UserType) => {
      return (
-@@ -121,6 +124,34 @@ function Users() {
+@@ -47,7 +47,7 @@ function Users() {
+   const roleCol = (user: UserType) => {
+     return (
+       <Table.Col key="role">
+-        <span className="capitalize">{user.role}</span>
++        <span className="capitalize">{user?.role}</span>
+       </Table.Col>
+     )
+   }
+@@ -75,14 +75,16 @@ function Users() {
+   }
  
-   return (
-     <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
-+      <div className="user-page-cards-row">
-+        {!serverIsClaimed && (
-+          <Card
-+            icon={<Icon fa="fas fa-exclamation-triangle" />}
-+            header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
-+            padding="thin"
-+          >
-+            {i18n['users.server.unclaimed-warning.desc'][lang]}
-+          </Card>
-+        )}
-+        <Card
-+          className="user-page-capacity-card"
-+          icon={<Icon fa="fas fa-users" />}
-+          header={<H5>{i18n['users.server.capacity'][lang]}</H5>}
-+          padding="thin"
-+        >
-+          Used 0 of 2 seats
-+        </Card>
-+        <Card
-+          icon={<Icon fa="fas fa-info-circle" />}
-+          header={<H5>{i18n['users.server.info'][lang]}</H5>}
-+          padding="thin"
-+        >
-+          <Button href="https://help.cardinalapps.io/guides/cardinal-media-server/accounts" target="_blank" arrowText={true}>
-+            {i18n['users.server.info.desc'][lang]}
-+          </Button>
-+        </Card>
-+      </div>
-       <Table
-         className="server-user-list"
-         header={[
+   const lastSeenCol = (lastSeen) => {
+-    if (!lastSeen) {
+-      return null
+-    }
+     return (
+       <Table.Col key="last-seen">
+-        <span title={formatDate(lastSeen)}>
+-          {formatTimeAgo(lastSeen)}
+-        </span>
++        {lastSeen
++          ? (
++            <span title={formatDate(lastSeen)}>
++              {formatTimeAgo(lastSeen)}
++            </span>
++            )
++          : null
++        }
+       </Table.Col>
+     )
+   }
