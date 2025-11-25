@@ -1,9 +1,33 @@
 diff a/apps/admin-web/src/components/SettingsPanel/custom-pages/Advanced.jsx b/apps/admin-web/src/components/SettingsPanel/custom-pages/Advanced.jsx	(rejected hunks)
-@@ -74,6 +74,7 @@ function Advanced() {
-       className={'advancedCols'}
-       alignItems="flex-start"
-       flexWrap="medium"
-+      gap={20}
-     >
-       <Column
-         cols={6}
+@@ -100,8 +100,13 @@ function Advanced() {
+               mustEnterText={'Deindex media'}
+               confirmButtonIsDangerous={true}
+               loading={deindexingIsLoading}
+-              onConfirm={() => handleResetMediaDataClick()}
+-              onCancel={() => setShowDeindexConfirm(false)}
++              onClose={(confirmed) => {
++                if (confirmed) {
++                  handleResetMediaDataClick()
++                } else {
++                  setShowDeindexConfirm(false)
++                }
++              }}
+             />
+           }
+         </Card>
+@@ -130,8 +135,13 @@ function Advanced() {
+               mustEnterText={'Factory reset'}
+               confirmButtonIsDangerous={true}
+               loading={factoryResetIsLoading}
+-              onConfirm={() => handleFactoryResetClick()}
+-              onCancel={() => setShowFactoryResetConfirm(false)}
++              onClose={(confirmed) => {
++                if (confirmed) {
++                  handleFactoryResetClick()
++                } else {
++                  setShowFactoryResetConfirm(false)
++                }
++              }}
+             />
+           }
+         </Card>

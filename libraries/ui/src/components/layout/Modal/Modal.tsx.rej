@@ -1,35 +1,34 @@
 diff a/libraries/ui/src/components/layout/Modal/Modal.tsx b/libraries/ui/src/components/layout/Modal/Modal.tsx	(rejected hunks)
-@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
- import type { PropsWithChildren, ReactNode } from 'react'
- import { useDispatch } from 'react-redux'
- import { createPortal } from 'react-dom'
-+import { motion } from 'framer-motion'
+@@ -32,10 +32,12 @@ const Modal = ({
+   const dispatch = useDispatch()
+   const closeButtonRef = useRef(null)
  
- import Loading from '../Loading'
+-  const handleClose = () => {
++  const handleClose = (triggerCb: boolean = true) => {
+     if (canClose) {
+       dispatch(modalActions.close())
+-      onClose?.()
++      if (triggerCb) {
++        onClose?.()
++      }
+     }
+   }
  
-@@ -76,7 +77,15 @@ const Modal = ({
-       (
-         <>
-           <div className="modal-underlay" onClick={() => clickOutsideToClose ? handleClose() : null} />
--          <div className="modal-center">
-+          <motion.div
-+            className="modal-center"
-+            initial={{
-+              top: 8,
-+            }}
-+            animate={{
-+              top: 0,
-+            }}
-+          >
-             <button ref={closeButtonRef} className="modal-close" onClick={handleClose}>
+@@ -54,7 +56,7 @@ const Modal = ({
+       }, 100)
+     }
+ 
+-    return () => handleClose()
++    return () => handleClose(false)
+   }, [])
+ 
+   /**
+@@ -86,7 +88,7 @@ const Modal = ({
+               top: 0,
+             }}
+           >
+-            <button ref={closeButtonRef} className="modal-close" onClick={handleClose}>
++            <button ref={closeButtonRef} className="modal-close" onClick={() => handleClose()}>
                <i className="fas fa-times" />
              </button>
-@@ -88,7 +97,7 @@ const Modal = ({
-                 }
-               </Card>
-             </div>
--          </div>
-+          </motion.div>
-         </>
-       ),
-       document.querySelector('#modal-layer-portal'),
+             <div>

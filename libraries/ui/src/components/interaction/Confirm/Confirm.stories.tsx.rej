@@ -1,0 +1,74 @@
+diff a/libraries/ui/src/components/interaction/Confirm/Confirm.stories.tsx b/libraries/ui/src/components/interaction/Confirm/Confirm.stories.tsx	(rejected hunks)
+@@ -28,13 +28,9 @@ export const Default = () => {
+         <Confirm
+           title={'Confirm that action'}
+           message={<p>Confirmation messages can have custom content. If none is supplied, a default will be used.</p>}
+-          onConfirm={() => {
++          onClose={(confirmed) => {
+             setShowConfim(false)
+-            setConfirmed(true)
+-          }}
+-          onCancel={() => {
+-            setShowConfim(false)
+-            setConfirmed(false)
++            setConfirmed(confirmed)
+           }}
+         />
+       }
+@@ -59,13 +55,9 @@ export const Short = () => {
+         <Confirm
+           title={'Confirm'}
+           message={<p>Smol</p>}
+-          onConfirm={() => {
++          onClose={(confirmed) => {
+             setShowConfim(false)
+-            setConfirmed(true)
+-          }}
+-          onCancel={() => {
+-            setShowConfim(false)
+-            setConfirmed(false)
++            setConfirmed(confirmed)
+           }}
+         />
+       }
+@@ -78,15 +70,6 @@ export const EnterText = () => {
+   const [loading, setLoading] = useState<boolean>(false)
+   const [confirmed, setConfirmed] = useState<boolean>()
+ 
+-  const handleSubmit = () => {
+-    setLoading(true)
+-    setTimeout(() => {
+-      setShowConfirm(false)
+-      setLoading(false)
+-      setConfirmed(true)
+-    }, 5000)
+-  }
+-
+   return (
+     <div>
+       <ModalLayer />
+@@ -103,11 +86,19 @@ export const EnterText = () => {
+           mustEnterText="Important Resource"
+           loading={loading}
+           confirmButtonIsDangerous={true}
+-          onConfirm={handleSubmit}
+-          onCancel={() => {
+-            setShowConfirm(false)
+-            setConfirmed(false)
+-            setLoading(false)
++          onClose={(confirmed) => {
++            if (confirmed) {
++              setLoading(true)
++              setTimeout(() => {
++                setShowConfirm(false)
++                setLoading(false)
++                setConfirmed(true)
++              }, 3000)
++            } else {
++              setShowConfirm(false)
++              setConfirmed(false)
++              setLoading(false)
++            }
+           }}
+         />
+       }

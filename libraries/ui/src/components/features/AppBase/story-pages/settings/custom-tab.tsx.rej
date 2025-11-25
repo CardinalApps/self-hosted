@@ -1,0 +1,13 @@
+diff a/libraries/ui/src/components/features/AppBase/story-pages/settings/custom-tab.tsx b/libraries/ui/src/components/features/AppBase/story-pages/settings/custom-tab.tsx	(rejected hunks)
+@@ -17,8 +17,9 @@ function CustomSettingsTab() {
+           title="Confirm"
+           message="This is a test confirmation."
+           mustEnterText="Are you there Candy Cane?"
+-          onConfirm={() => setShowConfirm(false)}
+-          onCancel={() => setShowConfirm(false)}
++          onClose={() => {
++            setShowConfirm(false)
++          }}
+         />
+       }
+     </div>

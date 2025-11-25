@@ -1,13 +1,18 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -146,8 +146,9 @@ export class UserService {
+@@ -146,9 +146,13 @@ export class UserService {
     * Update a user.
     */
    async update(userId: string, data: Partial<User>): Promise<User | null> {
--    await this.userRepository.update({ userId }, data)
--    return await this.get(userId)
-+    const res = await this.userRepository.update({ userId }, data)
-+    const found =  await this.get(userId)
-+    return found
+-    const res = await this.userRepository.update({ userId }, data)
+-    const found =  await this.get(userId)
+-    return found
++    try {
++      await this.userRepository.update({ userId }, data)
++      return await this.get(userId)
++    } catch (error) {
++      Logger.log(error)
++      return null
++    }
    }
  
    /**

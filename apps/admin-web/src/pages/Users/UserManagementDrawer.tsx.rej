@@ -1,145 +1,133 @@
 diff a/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx b/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx	(rejected hunks)
-@@ -1,3 +1,4 @@
-+import { useEffect, useState } from 'react'
+@@ -1,4 +1,3 @@
+-import { useEffect, useState } from 'react'
  import { useSelector } from 'react-redux'
  
  import Alert from '@cardinalapps/ui/src/components/interaction/Alert'
-@@ -5,12 +6,15 @@ import Button from '@cardinalapps/ui/src/components/interaction/Button'
+@@ -6,15 +5,13 @@ import Button from '@cardinalapps/ui/src/components/interaction/Button'
  import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
  import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
  import List from '@cardinalapps/ui/src/components/interaction/List'
-+import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
+-import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
  
-+import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+-import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  import { UserType } from '@cardinalapps/ui/src/types/user'
  import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
  import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
--
-+import { useUpdateUserMutation } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
-+import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
+-import { useUpdateUserMutation } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
+-import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
++
++import EnableDisable from './EnableDisable'
  
  import i18n from './i18n.json'
  import './styles.css'
-@@ -21,13 +25,69 @@ type UserManagementDrawerProps = {
+@@ -25,69 +22,13 @@ type UserManagementDrawerProps = {
  }
  
  function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
-+  const dispatch = useAppDispatch()
+-  const dispatch = useAppDispatch()
    const { lang } = useSelector(settingsSelectors.current)
    const currentUser = useSelector(homeServerUserSelectors.current)
-+  const [updateUser, updateUserResult] = useUpdateUserMutation()
-+  const [showConfirmDisableUser, setShowConfirmDisableUser] = useState<boolean>(false)
-+  const [showConfirmEnableUser, setShowConfirmEnableUser] = useState<boolean>(false)
+-  const [updateUser, updateUserResult] = useUpdateUserMutation()
+-  const [showConfirmDisableUser, setShowConfirmDisableUser] = useState<boolean>(false)
+-  const [showConfirmEnableUser, setShowConfirmEnableUser] = useState<boolean>(false)
    const isGuestAccount = user?.designation === 'guest_account'
    const isCurrentUser = user?.userId === currentUser.userId
    const isCloudUser = user?.cardinalId
    const isServerOwner = user?.role === 'owner'
  
-+  const handleDisableUser = () => {
-+    updateUser({
-+      id: user.userId,
-+      body: {
-+        enabled: false,
-+      },
-+    })
-+  }
-+
-+  const handleEnableUser = () => {
-+    updateUser({
-+      id: user.userId,
-+      body: {
-+        enabled: true,
-+      },
-+    })
-+  }
-+
-+  useEffect(() => {
-+    if (updateUserResult.isError) {
-+      console.log(updateUserResult)
-+      dispatch(toastActions.addToQueue({
-+        type: 'danger',
-+        // @ts-expect-error
-+        title: `${updateUserResult?.error?.status} Error`,
-+        // @ts-expect-error
-+        body: updateUserResult?.error?.data?.message,
-+      }))
-+      return
-+    }
-+    if (updateUserResult.isSuccess && updateUserResult.originalArgs?.body?.enabled === true) {
-+      setShowConfirmEnableUser(false)
-+      dispatch(toastActions.addToQueue({
-+        type: 'success',
-+        title: i18n['users.updated.success'][lang],
-+        body: i18n['users.updated.enabled.success'][lang],
-+        ttl: 5000,
-+      }))
-+      return
-+    }
-+    if (updateUserResult.isSuccess && updateUserResult.originalArgs?.body?.enabled === false) {
-+      setShowConfirmDisableUser(false)
-+      dispatch(toastActions.addToQueue({
-+        type: 'success',
-+        title: i18n['users.updated.success'][lang],
-+        body: i18n['users.updated.disabled.success'][lang],
-+        ttl: 5000,
-+      }))
-+      return
-+    }
-+  }, [updateUserResult])
-+
+-  const handleDisableUser = () => {
+-    updateUser({
+-      id: user.userId,
+-      body: {
+-        enabled: false,
+-      },
+-    })
+-  }
+-
+-  const handleEnableUser = () => {
+-    updateUser({
+-      id: user.userId,
+-      body: {
+-        enabled: true,
+-      },
+-    })
+-  }
+-
+-  useEffect(() => {
+-    if (updateUserResult.isError) {
+-      console.log(updateUserResult)
+-      dispatch(toastActions.addToQueue({
+-        type: 'danger',
+-        // @ts-expect-error
+-        title: `${updateUserResult?.error?.status} Error`,
+-        // @ts-expect-error
+-        body: updateUserResult?.error?.data?.message,
+-      }))
+-      return
+-    }
+-    if (updateUserResult.isSuccess && updateUserResult.originalArgs?.body?.enabled === true) {
+-      setShowConfirmEnableUser(false)
+-      dispatch(toastActions.addToQueue({
+-        type: 'success',
+-        title: i18n['users.updated.success'][lang],
+-        body: i18n['users.updated.enabled.success'][lang],
+-        ttl: 5000,
+-      }))
+-      return
+-    }
+-    if (updateUserResult.isSuccess && updateUserResult.originalArgs?.body?.enabled === false) {
+-      setShowConfirmDisableUser(false)
+-      dispatch(toastActions.addToQueue({
+-        type: 'success',
+-        title: i18n['users.updated.success'][lang],
+-        body: i18n['users.updated.disabled.success'][lang],
+-        ttl: 5000,
+-      }))
+-      return
+-    }
+-  }, [updateUserResult])
+-
    const removeUserButton = () => {
      if (isGuestAccount) {
        return (
-@@ -93,7 +153,9 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
-             },
-             {
-               name: i18n['users.settings.info.enabled'][lang],
--              label: i18n['users.settings.info.enabled.yes'][lang],
-+              label: user?.enabled
-+                ? i18n['users.settings.info.enabled.yes'][lang]
-+                : i18n['users.settings.info.enabled.no'][lang],
-             },
-             {
-               name: i18n['users.settings.info.role'][lang],
-@@ -107,11 +169,37 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
+@@ -169,37 +110,9 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
          />
        </Drawer.Section>
        <Drawer.Section className="user-actions" title={i18n['users.settings.actions'][lang]}>
--        <Button onClick={() => alert('in development')} icon="fas fa-ban">
--          {i18n['users.settings.actions.disable'][lang]}
--        </Button>
-+        {!!user.enabled && (
-+          <Button onClick={() => setShowConfirmDisableUser(true)} icon="fas fa-ban">
-+            {i18n['users.settings.actions.disable'][lang]}
-+          </Button>
-+        )}
-+        {!user.enabled && (
-+          <Button onClick={() => setShowConfirmEnableUser(true)} icon="fas fa-door-open">
-+            {i18n['users.settings.actions.enable'][lang]}
-+          </Button>
-+        )}
+-        {!!user.enabled && (
+-          <Button onClick={() => setShowConfirmDisableUser(true)} icon="fas fa-ban">
+-            {i18n['users.settings.actions.disable'][lang]}
+-          </Button>
+-        )}
+-        {!user.enabled && (
+-          <Button onClick={() => setShowConfirmEnableUser(true)} icon="fas fa-door-open">
+-            {i18n['users.settings.actions.enable'][lang]}
+-          </Button>
+-        )}
++        <EnableDisable user={user} />
          {removeUserButton()}
        </Drawer.Section>
-+      {showConfirmDisableUser && (
-+        <Confirm
-+          title={i18n['users.settings.actions.disable.confirm.title'][lang]}
-+          message={i18n['users.settings.actions.disable.confirm.desc'][lang]}
-+          onCancel={() => setShowConfirmDisableUser(false)}
-+          onConfirm={() => handleDisableUser()}
-+          loading={updateUserResult.isLoading}
-+          confirmButtonIsDangerous={true}
-+        />
-+      )}
-+      {showConfirmEnableUser && (
-+        <Confirm
-+          title={i18n['users.settings.actions.enable.confirm.title'][lang]}
-+          message={i18n['users.settings.actions.enable.confirm.desc'][lang]}
-+          onCancel={() => setShowConfirmEnableUser(false)}
-+          onConfirm={() => handleEnableUser()}
-+          loading={updateUserResult.isLoading}
-+        />
-+      )}
+-      {showConfirmDisableUser && (
+-        <Confirm
+-          title={i18n['users.settings.actions.disable.confirm.title'][lang]}
+-          message={i18n['users.settings.actions.disable.confirm.desc'][lang]}
+-          onCancel={() => setShowConfirmDisableUser(false)}
+-          onConfirm={() => handleDisableUser()}
+-          loading={updateUserResult.isLoading}
+-          confirmButtonIsDangerous={true}
+-        />
+-      )}
+-      {showConfirmEnableUser && (
+-        <Confirm
+-          title={i18n['users.settings.actions.enable.confirm.title'][lang]}
+-          message={i18n['users.settings.actions.enable.confirm.desc'][lang]}
+-          onCancel={() => setShowConfirmEnableUser(false)}
+-          onConfirm={() => handleEnableUser()}
+-          loading={updateUserResult.isLoading}
+-        />
+-      )}
      </Drawer>
    )
  }

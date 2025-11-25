@@ -1,0 +1,81 @@
+diff a/libraries/ui/src/components/interaction/Confirm/Confirm.tsx b/libraries/ui/src/components/interaction/Confirm/Confirm.tsx	(rejected hunks)
+@@ -1,4 +1,4 @@
+-import { useState, useRef } from 'react'
++import { useState } from 'react'
+ import type { PropsWithChildren, ReactNode } from 'react'
+ import { useSelector } from 'react-redux'
+ 
+@@ -21,8 +21,7 @@ type ConfirmProps = {
+   mustEnterText?: string,
+   loading?: boolean,
+   confirmButtonIsDangerous?: boolean,
+-  onConfirm?: () => void,
+-  onCancel?: () => void,
++  onClose?: (confirmed: boolean) => void,
+ }
+ 
+ /**
+@@ -37,38 +36,24 @@ const Confirm = ({
+   mustEnterText,
+   loading = false,
+   confirmButtonIsDangerous,
+-  onConfirm = () => {},
+-  onCancel = () => {},
++  onClose = () => {},
+ }: PropsWithChildren<ConfirmProps>) => {
+-  // The Modal component has no concept of confirmation state and will trigger
+-  // its onClose both when the user cancels and confirms, so this `confirmed`
+-  // flag is used to tell the difference between an onClose from the Modal that
+-  // should trigger an onCancel here, and one that shouldn't.
+-  const confirmed = useRef(false)
+   const { lang } = useSelector(settingsSelectors.current)
+   const [enteredText, setEnteredText] = useState('')
+ 
+-  const handleConfirmClick = () => {
+-    confirmed.current = true
+-
+-    // Requires that the user enters some text
+-    if (mustEnterText && enteredText === mustEnterText) {
+-      onConfirm()
+-    }
+-    // No text confirmation required
+-    else if (!mustEnterText) {
+-      onConfirm()
++  const maybeClose = (confirmed: boolean) => {
++    if (loading) {
++      return
+     }
+-  }
+-
+-  const handleClose = () => {
+-    if (!confirmed.current && !loading) {
+-      onCancel()
++    if (mustEnterText && enteredText === mustEnterText) {
++      return onClose(confirmed)
++    } else if (!mustEnterText) {
++      return onClose(confirmed)
+     }
+   }
+ 
+   return (
+-    <Modal onClose={handleClose} canClose={!loading}>
++    <Modal onClose={() => maybeClose(false)} canClose={!loading}>
+       <div className="confirmation-dialogue">
+         <H3>{title || i18n['confirm.defaults.title'][lang]}</H3>
+         <WrittenText>
+@@ -84,13 +69,13 @@ const Confirm = ({
+           </div>
+         }
+         <div className="confirmation-dialogue-controls">
+-          <Button textual onClick={handleClose}>{i18n['confirm.button.cancel'][lang]}</Button>
++          <Button textual onClick={() => maybeClose(false)}>{i18n['confirm.button.cancel'][lang]}</Button>
+           <Button
+             textual
+             disabled={loading}
+             animation={loading ? 'loading' : undefined}
+             color={confirmButtonIsDangerous ? 'danger' : undefined}
+-            onClick={handleConfirmClick}
++            onClick={() => maybeClose(true)}
+           >
+             {i18n['confirm.button.confirm'][lang]}
+           </Button>

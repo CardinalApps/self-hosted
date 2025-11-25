@@ -1,38 +1,16 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -89,6 +89,9 @@
-   "users.settings.actions.disable": {
-     "en": "Disable this user"
-   },
-+  "users.settings.actions.enable": {
-+    "en": "Enable this user"
-+  },
-   "users.settings.actions.cloud-portal-link": {
-     "en": "Manage your Cardinal cloud account online"
-   },
-@@ -103,5 +106,26 @@
+@@ -105,7 +105,13 @@
+     "en": "The Guest Account cannot be removed."
    },
    "users.settings.actions.remove.disabled-for-owner": {
-     "en": "The Owner account can only be removed by performing a Factory Reset."
+-    "en": "The Owner account can only be removed by performing a Factory Reset."
++    "en": "The owner account can only be removed by performing a Factory Reset."
 +  },
-+  "users.settings.actions.disable.confirm.title": {
-+    "en": "Disable User"
++  "users.settings.actions.disable.disabled-for-server-owner": {
++    "en": "The owner account cannot be disabled."
 +  },
-+  "users.settings.actions.disable.confirm.desc": {
-+    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately."
-+  },
-+  "users.settings.actions.enable.confirm.title": {
-+    "en": "Enable User"
-+  },
-+  "users.settings.actions.enable.confirm.desc": {
-+    "en": "This user will be allowed to log in."
-+  },
-+  "users.updated.success": {
-+    "en": "User updated"
-+  },
-+  "users.updated.enabled.success": {
-+    "en": "User has been enabled."
-+  },
-+  "users.updated.disabled.success": {
-+    "en": "User has been disabled."
-   }
- }
++  "users.settings.actions.disable.disabled-for-own-user": {
++    "en": "You cannot disable your current user."
+   },
+   "users.settings.actions.disable.confirm.title": {
+     "en": "Disable User"

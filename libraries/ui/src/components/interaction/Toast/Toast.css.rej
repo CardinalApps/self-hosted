@@ -1,12 +1,10 @@
 diff a/libraries/ui/src/components/interaction/Toast/Toast.css b/libraries/ui/src/components/interaction/Toast/Toast.css	(rejected hunks)
-@@ -57,8 +57,8 @@
- 
-   .toast-title {
-     width: 100%;
--    font-size: 16px;
--    font-weight: 800;
-+    font-size: 15px;
-+    font-weight: 600;
-     position: relative;
-   }
- 
+@@ -121,7 +121,7 @@
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+-  z-index: 6000;
++  z-index: 100000000;
+   
+   .single-toast {
+     margin-top: 10px;

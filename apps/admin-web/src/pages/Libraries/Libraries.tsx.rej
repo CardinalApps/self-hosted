@@ -1,19 +1,17 @@
 diff a/apps/admin-web/src/pages/Libraries/Libraries.tsx b/apps/admin-web/src/pages/Libraries/Libraries.tsx	(rejected hunks)
-@@ -54,7 +54,7 @@ function Libraries() {
-    */
-   const fetchPublicUsers = () => {
-     return new Promise((resolve) => {
--      homeServerAPI('/users')
-+      homeServerAPI('/users/public')
-         .then((users) => {
-           if (Array.isArray(users)) {
-             resolve(users)
-@@ -193,8 +193,6 @@ function Libraries() {
-     }
-   }, [updateLibraryResult])
+@@ -268,8 +268,13 @@ function Libraries() {
+         <Confirm
+           title={i18n['libraries.edit.confirm-delete.title'][lang]}
+           message={<p>{i18n['libraries.edit.confirm-delete.message'][lang].replace('{{library}}', openLibrary.name)}</p>}
+-          onConfirm={() => handleDelete()}
+-          onCancel={() => setShowConfirmDelete(false)}
++          onClose={(confirmed) => {
++            if (confirmed) {
++              handleDelete()
++            } else {
++              setShowConfirmDelete(false)
++            }
++          }}
+         />
+       }
  
--  console.log(tableBody())
--
-   return (
-     <AppPage className={'libraries'} layout={PAGE_LAYOUT.files} pageTitle={i18n['title'][lang]} pageDocLink="/guides/cardinal-media-server/libraries">
-       <DirectoryTree
