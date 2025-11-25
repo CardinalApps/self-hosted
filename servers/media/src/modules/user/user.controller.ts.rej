@@ -1,23 +1,52 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -103,10 +103,21 @@ export class UserController {
-   @Get('/users')
-   @ApiTags('User')
-   @ApiOperation({ summary: 'Get all users in this server.' })
-+  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-   async getUsers(@Query() query: GetUsersDto): Promise<[Partial<User>[], number]> {
-     return await this.userService.query(query)
-   }
+@@ -8,6 +8,8 @@ import {
+   UseGuards,
+   MethodNotAllowedException,
+   Query,
++  Patch,
++  UnauthorizedException,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+@@ -23,7 +25,9 @@ import { LocalUserService } from './local-user.service'
+ import { CloudUserService } from './cloud-user.service'
+ import { User } from './user.entity'
+ import { CreateUser } from './dtos/CreateUser.dto'
++import { UpdateUserDto } from './dtos/UpdateUser.dto'
+ import { GetUserResponse } from './dtos/GetUserResponse.dto'
++import { CurrentUser } from '../../decorators/CurrentUser.decorator'
  
-+  /**
-+   * Returns a curated list of sanitized user objects meant to be shown on the login screen.
-+   */
-+  @Get('/users/public')
-+  @ApiTags('User')
-+  @ApiOperation({ summary: 'Get all users in this server.' })
-+  async getPublicUsers(): Promise<Partial<User>[]> {
-+    return await this.userService.getUsersForPublic()
-+  }
+ import { AuthGuard } from '../../guards/auth.guard'
+ import { ApiSecurityTypes } from '../../guards/types'
+@@ -162,4 +166,31 @@ export class UserController {
+ 
+     return await this.userService.createUser(createUserDto)
+   }
 +
-   /**
-    * Returns all active users for this server.
-    */
++  @Patch('/user/:id')
++  @UseGuards(AuthGuard)
++  @ApiTags('User')
++  @ApiOperation({ summary: 'Update a user.' })
++  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  async updateUser(
++    @Param('id') id,
++    @Body() updateUserDto: UpdateUserDto,
++    @CurrentUser() currentUser: User,
++  ): Promise<User> {
++    // TODO proper rbac
++    const usersThatCanUseThisEndpoint = []
++
++    // Server owner can update anyone
++    const serverOwner = await this.userService.getServerOwner()
++    usersThatCanUseThisEndpoint.push(serverOwner.userId)
++
++    // Users can update themselves
++    usersThatCanUseThisEndpoint.push(id)
++
++    if (usersThatCanUseThisEndpoint.includes(currentUser.userId)) {
++      return await this.userService.update(id, updateUserDto)
++    }
++
++    throw new UnauthorizedException()
++  }
+ }

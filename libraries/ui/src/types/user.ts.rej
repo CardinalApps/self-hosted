@@ -1,10 +1,9 @@
 diff a/libraries/ui/src/types/user.ts b/libraries/ui/src/types/user.ts	(rejected hunks)
-@@ -18,7 +18,7 @@ export type UserType = {
-   createdAt?: string,
+@@ -19,6 +19,7 @@ export type UserType = {
    deletedAt?: string,
    designation?: "guest_account",
--  role?: "user"
-+  role?: "user" | "owner",
+   role?: "user" | "owner",
++  enabled?: boolean,
    ssoToken?: string,
    updatedAt?: string,
    userId?: string,

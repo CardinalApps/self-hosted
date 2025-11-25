@@ -1,0 +1,11 @@
+diff a/servers/media/src/modules/user/user.entity.ts b/servers/media/src/modules/user/user.entity.ts	(rejected hunks)
+@@ -38,6 +38,9 @@ export class User extends BaseEntity {
+   @Column({ nullable: true })
+   cachedCloudUserAt?: Date
+ 
++  @Column({ nullable: false, default: true })
++  enabled?: boolean
++
+   @Column({ nullable: true })
+   ssoToken?: string
+ 

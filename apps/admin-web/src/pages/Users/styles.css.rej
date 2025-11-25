@@ -1,27 +1,17 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -1,5 +1,25 @@
- .users-page {
+@@ -37,14 +37,13 @@
  
-+  h3, h4 {
-+    padding-left: var(--gutter);
-+  }
-+
-+  .user-page-cards-row {
-+    display: flex;
-+    gap: var(--gutter);
-+    margin-bottom: 20px;
-+
-+    .card {
-+      min-width: 200px;
-+      max-width: 400px;
-+    }
-+  }
-+
-+  .server-info {
-+    width: 300px;
-+    margin-bottom: 20px;
-+  }
-+
-   .server-user-list {
+     .user-activation-status {
+       display: flex;
+-      gap: 5px;
++      gap: 8px;
+       align-items: center;
  
-     .user-name {
+       &.activated {
+         
+         i {
+           color: var(--success-bg);
+-          font-size: 16px;
+         }
+       }
+     }
