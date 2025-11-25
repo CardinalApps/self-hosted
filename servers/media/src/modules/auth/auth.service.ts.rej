@@ -1,0 +1,18 @@
+diff a/servers/media/src/modules/auth/auth.service.ts b/servers/media/src/modules/auth/auth.service.ts	(rejected hunks)
+@@ -9,7 +9,6 @@ import { CloudUserService } from '../user/cloud-user.service'
+ import { Designations, Roles } from '../user/types'
+ 
+ import { LoginResponse } from './dtos/LoginResponse.dto'
+-import { CardinalApp } from '../../utils/apps'
+ 
+ /**
+  * This class handles auth tasks.
+@@ -129,7 +128,7 @@ export class AuthService {
+   private async loginAsOfflineUser(localUserId: string): Promise<LoginResponse> {
+     const user = await this.userService.getUserByLocalId(localUserId)
+     const JWT = await this.createJWT(localUserId)
+-    const guestAccountIsEnabled = await this.settingsService.get(CardinalApp.ADMIN, 'enable_guest_account')
++    const guestAccountIsEnabled = await this.userService.guestAccountIsEnabled()
+ 
+     if (user.designation === Designations.GUEST_ACCOUNT && !guestAccountIsEnabled) {
+       throw new Error('Cannot log into the guest account because it has been disabled.')

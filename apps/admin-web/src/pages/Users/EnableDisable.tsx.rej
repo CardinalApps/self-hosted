@@ -1,0 +1,22 @@
+diff a/apps/admin-web/src/pages/Users/EnableDisable.tsx b/apps/admin-web/src/pages/Users/EnableDisable.tsx	(rejected hunks)
+@@ -77,12 +77,14 @@ function EnableDisableUser({ user }: EnableDisableUserProps) {
+         </Button>
+       )
+     } else {
+-      <Button
+-        onClick={onClick}
+-        icon={icon}
+-      >
+-        {label}
+-      </Button>
++      return (
++        <Button
++          onClick={onClick}
++          icon={icon}
++        >
++          {label}
++        </Button>
++      )
+     }
+   }
+ 

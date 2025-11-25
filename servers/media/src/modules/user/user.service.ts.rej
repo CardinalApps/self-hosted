@@ -1,18 +1,37 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -146,9 +146,13 @@ export class UserService {
-    * Update a user.
-    */
-   async update(userId: string, data: Partial<User>): Promise<User | null> {
--    const res = await this.userRepository.update({ userId }, data)
--    const found =  await this.get(userId)
--    return found
-+    try {
-+      await this.userRepository.update({ userId }, data)
-+      return await this.get(userId)
-+    } catch (error) {
-+      Logger.log(error)
-+      return null
-+    }
+@@ -14,7 +14,6 @@ import { User } from './user.entity'
+ import { Roles, Designations } from './types'
+ import { CreateUser } from './dtos/CreateUser.dto'
+ 
+-import { CardinalApp } from '../../utils/apps'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
+ 
+ /**
+@@ -224,6 +223,14 @@ export class UserService {
+     return await this.userRepository.findOneBy({ designation: Designations.GUEST_ACCOUNT })
    }
  
++  /**
++   * Returns whether the guest account is enabled.
++   */
++  async guestAccountIsEnabled(): Promise<boolean> {
++    const guestAccount = await this.getGuestAccount()
++    return guestAccount.enabled
++  }
++
    /**
+    * Returns all users according to the query.
+    */
+@@ -242,11 +249,9 @@ export class UserService {
+    * Returns an array of all users with all sensitive information filtered out.
+    */
+   async getUsersForPublic(): Promise<Partial<User>[]> {
+-    const guestAccountEnabled = await this.settingsService.get(CardinalApp.ADMIN, 'enable_guest_account')
+     let users
+ 
+-    // TODO make the guest account a per-app setting
+-    if (guestAccountEnabled) {
++    if (await this.guestAccountIsEnabled()) {
+       users = await this.userRepository.find()
+     } else {
+       users = await this.userRepository.find({
