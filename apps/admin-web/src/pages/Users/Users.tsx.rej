@@ -1,18 +1,101 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -6,6 +6,7 @@ import Table from '@cardinalapps/ui/src/components/interaction/Table'
+@@ -6,7 +6,7 @@ import Table from '@cardinalapps/ui/src/components/interaction/Table'
  import Icon from '@cardinalapps/ui/src/components/typography/Icon'
  import Button from '@cardinalapps/ui/src/components/interaction/Button'
  import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
-+import { Subscriptions } from '@cardinalapps/products/src'
+-import { Subscriptions } from '@cardinalapps/products/src'
++//import { Subscriptions } from '@cardinalapps/products/src'
  
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
-@@ -31,6 +32,8 @@ function Users() {
+@@ -18,6 +18,7 @@ import H5 from '@cardinalapps/ui/src/components/typography/H5'
+ 
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ 
++import ManageInvitationsDrawer from './ManageInvitationsDrawer'
+ import UserManagementDrawer from './UserManagementDrawer'
+ 
+ import i18n from './i18n.json'
+@@ -27,12 +28,13 @@ function Users() {
+   const { lang } = useSelector(settingsSelectors.current)
+   const currentUser = useSelector(homeServerUserSelectors.current)
+   const [configuringUser, setConfiguringUser] = useState<UserType>()
++  const [showManageInvitationsDrawer, setShowManageInvitationsDrawer] = useState<boolean>(false)
+ 
+   const res = useGetUsersQuery({ take: 9999 })
    const data = res?.data ? res.data?.[0] : []
    const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner')
+-
+-  console.log(Subscriptions)
++  const usedSeats = data?.filter((user: UserType) => user?.designation !== 'guest_account').length
++  const totalSeats = 3
  
-+  console.log(Subscriptions)
-+
    const nameCol = (user: UserType) => {
      return (
-       <Table.Col key="username">
+@@ -147,27 +149,48 @@ function Users() {
+           <Card
+             icon={<Icon fa="fas fa-exclamation-triangle" />}
+             header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
+-            padding="thin"
+             bottomAlignContent={true}
+           >
+             {i18n['users.server.unclaimed-warning.desc'][lang]}
+           </Card>
+         )}
+         <Card
+-          className="user-page-capacity-card"
+           icon={<Icon fa="fas fa-users" />}
+           header={<H5>{i18n['users.server.capacity'][lang]}</H5>}
+-          padding="thin"
++        >
++          {
++            i18n['users.server.capacity.seats'][lang]
++              .replace('{used}', usedSeats)
++              .replace('{total}', totalSeats)
++          }
++        </Card>
++        <Card
++          icon={<Icon fa="far fa-envelope-open" />}
++          header={<H5>{i18n['users.invite-user'][lang]}</H5>}
++          footer={(
++            <>
++              <Button
++                onClick={() => setShowManageInvitationsDrawer(true)}
++                type="button"
++              >
++                {i18n['users.invite-links.manage-button'][lang]}
++              </Button>
++            </>
++          )}
+           bottomAlignContent={true}
+         >
+-          Used 0 of 2 seats.
++          {i18n['users.new-users.invite-links.no-active-links'][lang]}
+         </Card>
+         {/* <Card
+           icon={<Icon fa="fas fa-info-circle" />}
+-          header={<H5>{i18n['users.server.info'][lang]}</H5>}
+-          padding="thin"
++          header={<H5>{i18n['users.new-users'][lang]}</H5>}
+           bottomAlignContent={true}
+         >
++          <ToggleSwitch
++            name="allow_new_members"
++            value={allowNewUsers}
++            onChange={(val) => setAllowNewUsers(val)}
++          />
+           <Button href="https://help.cardinalapps.io/guides/cardinal-media-server/accounts" target="_blank" arrowText={true}>
+             {i18n['users.server.info.desc'][lang]}
+           </Button>
+@@ -185,6 +208,11 @@ function Users() {
+         body={tableBody()}
+         emptyMessage={i18n['users.table.empty'][lang]}
+       />
++      {!!showManageInvitationsDrawer && (
++        <ManageInvitationsDrawer
++          onClose={() => setShowManageInvitationsDrawer(false)}
++        />
++      )}
+       {!!configuringUser && (
+         <UserManagementDrawer
+           user={configuringUser}

@@ -1,24 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -7,19 +7,14 @@
-   .user-page-cards-row {
-     display: flex;
-     gap: var(--gutter);
--    margin-bottom: 20px;
-+    margin-bottom: 30px;
+@@ -11,7 +11,7 @@
  
      .card {
--      min-width: 200px;
--      max-width: 400px;
-+      min-width: 230px;
-+      max-width: 300px;
+       min-width: 230px;
+-      max-width: 300px;
++      max-width: 340px;
      }
    }
  
--  .server-info {
--    width: 300px;
--    margin-bottom: 20px;
--  }
--
-   .server-user-list {
- 
-     .user-name {

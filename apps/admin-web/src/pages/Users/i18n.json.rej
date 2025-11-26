@@ -1,10 +1,39 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -9,7 +9,7 @@
-     "en": "Unclaimed Server"
-   },
+@@ -11,15 +11,33 @@
    "users.server.unclaimed-warning.desc": {
--    "en": "Log in with a Cardinal account to claim this server."
-+    "en": "Sign in with a Cardinal account to claim this server."
+     "en": "Sign in with a Cardinal account to claim this server."
    },
-   "users.server.info": {
-     "en": "Get Info"
+-  "users.server.info": {
+-    "en": "Get Info"
++  "users.new-users": {
++    "en": "New Users"
+   },
+-  "users.server.info.desc": {
+-    "en": "Get help with Cardinal accounts"
++  "users.new-users.toggle-allow": {
++    "en": "Allow new users to sign up"
++  },
++  "users.invite-user": {
++    "en": "Invite Users"
++  },
++  "users.new-users.invite-links.create": {
++    "en": "Create link"
++  },
++  "users.invite-links.manage-button": {
++    "en": "Manage"
++  },
++  "users.invite-links.manage-title": {
++    "en": "User Invitations"
++  },
++  "users.new-users.invite-links.no-active-links": {
++    "en": "No active invitations."
+   },
+   "users.server.capacity": {
+     "en": "Capacity"
+   },
++  "users.server.capacity.seats": {
++    "en": "Used {used} of {total} seats."
++  },
+   "users.table.title": {
+     "en": "All users"
+   },
