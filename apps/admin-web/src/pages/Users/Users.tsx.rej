@@ -1,60 +1,42 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useState } from 'react'
-+import { useEffect, useState } from 'react'
- import { useSelector } from 'react-redux'
+@@ -29,7 +29,7 @@ function Users() {
  
- import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
-@@ -8,7 +8,7 @@ import Button from '@cardinalapps/ui/src/components/interaction/Button'
- import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+   const res = useGetUsersQuery({ take: 9999 })
+   const data = res?.data ? res.data?.[0] : []
+-  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner') || true
++  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner')
  
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
--import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/users'
-+import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
- import { UserType } from '@cardinalapps/ui/src/types/user'
- import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
- import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
-@@ -52,12 +52,12 @@ function Users() {
-     )
-   }
- 
--  const activationStatusCol = (isActivated) => {
--    if (isActivated) {
-+  const enabledStatusCol = (user: UserType) => {
-+    if (user.enabled) {
-       return (
-         <Table.Col key="status">
-           <div className="user-activation-status activated">
--            <Icon fa="far fa-check-circle" />
-+            <Icon fa="fas fa-check-circle" />
-             <span>{i18n['users.guest.enabled'][lang]}</span>
-           </div>
-         </Table.Col>
-@@ -117,13 +117,26 @@ function Users() {
-         return [
-           nameCol(user),
-           roleCol(user),
--          activationStatusCol(true),
-+          enabledStatusCol(user),
-           lastSeenCol(user?.activityStatusUpdatedAt),
-           controlsCol(user),
-         ]
-       })
-   }
- 
-+  /**
-+   * After users are updated, refreshed the cached object of the user that is being edited.
-+   */
-+  useEffect(() => {
-+    if (configuringUser) {
-+      data.forEach((user: UserType) => {
-+        if (user.userId === configuringUser?.userId) {
-+          setConfiguringUser(user)
-+        }
-+      })
-+    }
-+  }, [data])
-+
-   return (
-     <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
-       <div className="user-page-cards-row">
+   const nameCol = (user: UserType) => {
+     return (
+@@ -145,6 +145,7 @@ function Users() {
+             icon={<Icon fa="fas fa-exclamation-triangle" />}
+             header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
+             padding="thin"
++            bottomAlignContent={true}
+           >
+             {i18n['users.server.unclaimed-warning.desc'][lang]}
+           </Card>
+@@ -154,18 +155,20 @@ function Users() {
+           icon={<Icon fa="fas fa-users" />}
+           header={<H5>{i18n['users.server.capacity'][lang]}</H5>}
+           padding="thin"
++          bottomAlignContent={true}
+         >
+-          Used 0 of 2 seats
++          Used 0 of 2 seats.
+         </Card>
+-        <Card
++        {/* <Card
+           icon={<Icon fa="fas fa-info-circle" />}
+           header={<H5>{i18n['users.server.info'][lang]}</H5>}
+           padding="thin"
++          bottomAlignContent={true}
+         >
+           <Button href="https://help.cardinalapps.io/guides/cardinal-media-server/accounts" target="_blank" arrowText={true}>
+             {i18n['users.server.info.desc'][lang]}
+           </Button>
+-        </Card>
++        </Card> */}
+       </div>
+       <Table
+         className="server-user-list"

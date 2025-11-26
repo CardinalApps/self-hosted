@@ -1,29 +1,33 @@
 diff a/libraries/ui/src/components/layout/Card/Card.tsx b/libraries/ui/src/components/layout/Card/Card.tsx	(rejected hunks)
-@@ -15,6 +15,7 @@ type CardProps = {
+@@ -1,4 +1,4 @@
+-import type { PropsWithChildren, ReactNode } from 'react'
++import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
+ import clsx from 'clsx'
+ import useWindowSize from '../../../hooks/useWindowSize'
+ 
+@@ -14,7 +14,8 @@ type CardProps = {
+   border?: 0 | 1 | 2 | 3 | 4,
    id?: string,
    className?: string,
-   style?: object,
-+  icon?: React.ReactNode,
+-  style?: object,
++  style?: CSSProperties,
++  bottomAlignContent?: boolean,
+   icon?: React.ReactNode,
    header?: ReactNode,
    footer?: ReactNode,
-   children?: ReactNode,
-@@ -29,6 +30,7 @@ const Card = ({
+@@ -30,6 +31,7 @@ const Card = ({
    id,
    className = '',
    style,
-+  icon,
++  bottomAlignContent,
+   icon,
    header,
    footer,
-   children,
-@@ -49,9 +51,10 @@ const Card = ({
+@@ -48,6 +50,7 @@ const Card = ({
+         border ? `border-${border}` : '',
+         header ? `has-header` : '',
+         footer ? `has-footer` : '',
++        bottomAlignContent ? `bottom-align-content` : '',
        )}
        style={style}
      >
--      {!!header &&
-+      {(!!header || !!icon) &&
-         <header className="card-header">
-           {header}
-+          {icon}
-         </header>
-       }
-       <div className="card-content">

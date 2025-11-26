@@ -1,10 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -93,7 +93,7 @@
-     "en": "Enable this user"
+@@ -9,7 +9,7 @@
+     "en": "Unclaimed Server"
    },
-   "users.settings.actions.cloud-portal-link": {
--    "en": "Manage your Cardinal cloud account online"
-+    "en": "Manage your Cardinal cloud account"
+   "users.server.unclaimed-warning.desc": {
+-    "en": "Log in with a Cardinal account to claim this server."
++    "en": "Sign in with a Cardinal account to claim this server."
    },
-   "users.settings.actions.remove": {
-     "en": "Remove this user"
+   "users.server.info": {
+     "en": "Get Info"
