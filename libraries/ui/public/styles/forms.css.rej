@@ -1,0 +1,8 @@
+diff a/libraries/ui/public/styles/forms.css b/libraries/ui/public/styles/forms.css	(rejected hunks)
+@@ -38,4 +38,4 @@ form {
+       border-color: var(--danger) !important;
+     }
+   }
+-}
+\ No newline at end of file
++}

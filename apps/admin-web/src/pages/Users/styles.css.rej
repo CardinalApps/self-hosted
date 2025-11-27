@@ -1,14 +1,22 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -53,3 +53,12 @@
-     gap: 8px;
+@@ -61,4 +61,20 @@
+     font-size: 12px;
+     text-align: center;
    }
- }
 +
-+.manage-invitations {
++  .create-invitiation-link {
 +
-+  .invite-user-notice {
-+    padding-top: 10px;
-+    font-size: 12px;
-+    text-align: center;
++    p {
++      margin-bottom: 20px;
++    }
 +  }
-+}
++
++  .generated-invitation-link {
++    padding-top: 20px;
++    
++    textarea {
++      height: 120px;
++      resize: none;
++    }
++  }
+ }

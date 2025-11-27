@@ -1,0 +1,12 @@
+diff a/libraries/ui/src/components/forms/Textarea/Textarea.css b/libraries/ui/src/components/forms/Textarea/Textarea.css	(rejected hunks)
+@@ -8,8 +8,8 @@
+     height: 200px;
+     padding: 15px;
+     font-weight: 400;
+-    font-size: 15px;
+-    line-height: 1.1em;
++    font-size: 13px;
++    line-height: 1.4em;
+     color: var(--text-color-1);
+     resize: both;
+     border-radius: var(--border-radius);

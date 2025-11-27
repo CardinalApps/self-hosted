@@ -1,0 +1,40 @@
+diff a/libraries/ui/src/components/forms/Textarea/Textarea.tsx b/libraries/ui/src/components/forms/Textarea/Textarea.tsx	(rejected hunks)
+@@ -1,4 +1,5 @@
+ import type { PropsWithChildren } from 'react'
++import clsx from 'clsx'
+ 
+ import './Textarea.css'
+ 
+@@ -6,6 +7,7 @@ type TextareaProps = {
+   name?: string,
+   value?: string,
+   placeholder?: string,
++  className?: string,
+   onFocus?: (e) => void,
+   onBlur?: (e) => void,
+   onChange?: (e) => void,
+@@ -18,19 +20,22 @@ const Textarea = ({
+   name,
+   value,
+   placeholder,
++  className,
+   onFocus = () => {},
+   onBlur = () => {},
+   onChange = () => {},
+   ...props
+ }: PropsWithChildren<TextareaProps>) => {
+   return (
+-    <div className="textarea">
++    <div className={clsx('textarea', className)}>
+       <textarea
+         name={name}
+         placeholder={placeholder}
++        spellCheck="false"
+         onFocus={(e) => onFocus(e.target.value)}
+         onBlur={(e) => onBlur(e.target.value)}
+-        onChange={(e) => onChange(e.target.value)} value={value}
++        onChange={(e) => onChange(e.target.value)}
++        value={value}
+         {...props}
+       />
+     </div>

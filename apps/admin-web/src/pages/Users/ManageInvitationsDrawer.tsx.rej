@@ -1,65 +1,168 @@
 diff a/apps/admin-web/src/pages/Users/ManageInvitationsDrawer.tsx b/apps/admin-web/src/pages/Users/ManageInvitationsDrawer.tsx	(rejected hunks)
-@@ -3,11 +3,14 @@ import { useSelector } from 'react-redux'
- //import Button from '@cardinalapps/ui/src/components/interaction/Button'
+@@ -1,15 +1,18 @@
++import { useEffect, useState } from 'react'
+ import { useSelector } from 'react-redux'
+ 
+-//import Button from '@cardinalapps/ui/src/components/interaction/Button'
  //import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
  import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
--//import List from '@cardinalapps/ui/src/components/interaction/List'
-+import List from '@cardinalapps/ui/src/components/interaction/List'
-+import SearchBar from '@cardinalapps/ui/src/components/interaction/SearchBar'
+ import List from '@cardinalapps/ui/src/components/interaction/List'
+ import SearchBar from '@cardinalapps/ui/src/components/interaction/SearchBar'
++import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
++import Button from '@cardinalapps/ui/src/components/interaction/Button'
++import Textarea from '@cardinalapps/ui/src/components/forms/Textarea'
  
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  //import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
  
-+import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
-+
+-import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
++import { useCreateInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
+ 
  import i18n from './i18n.json'
  
- import './styles.css'
-@@ -19,14 +22,44 @@ type ManageInvitationsDrawerProps = {
+@@ -21,48 +24,112 @@ type ManageInvitationsDrawerProps = {
+ 
  function ManageInvitationsDrawer({ onClose }: ManageInvitationsDrawerProps) {
    const { lang } = useSelector(settingsSelectors.current)
++  const [showConfirmInvite, setShowConfirmInvite] = useState<boolean>(false)
  
-+  const res = useGetInvitationsQuery({})
-+  const data = res?.data?.[0] || []
++  const [userToInvite, setUserToInvite] = useState<string>()
++  const [generatedLink, setGeneratedLink] = useState<string>()
 +
-+  const handleSearch = (value) => {
-+    console.log(value)
++  const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
+   const res = useGetInvitationsQuery({})
+   const data = res?.data?.[0] || []
+ 
+-  const handleSearch = (value) => {
+-    console.log(value)
++  const handleSearch = (val) => {
++    setShowConfirmInvite(true)
++    setUserToInvite(val)
 +  }
 +
-+  console.log(res)
++  console.log(createInvitationResult)
 +
++  const handleCreateInvitiationLink = () => {
++    setGeneratedLink('https://account.cardinalapps.io/join/jfi9nd3f')
+   }
+ 
+-  console.log(res)
++  useEffect(() => {
++    if (createInvitationResult.isSuccess) {
++      setGeneratedLink(createInvitationResult.data?.link)
++    }
++    createInvitation({})
++  }, [createInvitationResult.isSuccess])
++
++  console.log(userToInvite)
++  //console.log(res)
+ 
    return (
-     <Drawer
--      className="manage-invitations-drawer"
-+      className="manage-invitations"
-       onClose={onClose}
-       title={i18n['users.invite-links.manage-title'][lang]}
-     >
--      <Drawer.Section>
--        In development
-+      <Drawer.Section title={i18n['users.invite-links.create.title'][lang]}>
-+        <SearchBar
-+          placeholder={i18n['users.invite-links.search.placeholder'][lang]}
-+          onChange={(value) => handleSearch(value)}
-+          onSubmit={(e) => e.preventDefault()}
-+        />
-+        <p className="invite-user-notice">
-+          {i18n['users.invite-links.search.notice'][lang]}
-+        </p>
-+        {/* <UserTag showAvatar={true} size='l' user={user} /> */}
-+      </Drawer.Section>
-+      <Drawer.Section title={i18n['users.invite-links.history.title'][lang]}>
-+        {!data?.length && <p className="no-invitations">{i18n['users.invite-links.empty'][lang]}</p>}
-+        {!!data?.length && (
-+          <List
-+            items={[
-+              {
-+                name: 'Username',
-+                label: 'asd',
-+              },
-+            ]}
-+          />
-+        )}
-         {/* <UserTag showAvatar={true} size='l' user={user} /> */}
-       </Drawer.Section>
-     </Drawer>
+-    <Drawer
+-      className="manage-invitations"
+-      onClose={onClose}
+-      title={i18n['users.invite-links.manage-title'][lang]}
+-    >
+-      <Drawer.Section title={i18n['users.invite-links.create.title'][lang]}>
+-        <SearchBar
+-          placeholder={i18n['users.invite-links.search.placeholder'][lang]}
+-          onChange={(value) => handleSearch(value)}
+-          onSubmit={(e) => e.preventDefault()}
++    <>
++      <Drawer
++        className="manage-invitations"
++        onClose={onClose}
++        title={i18n['users.invite-links.manage-title'][lang]}
++      >
++        <Drawer.Tabs
++          labels={[
++            i18n['users.invite-links.tabs.by-username'][lang],
++            i18n['users.invite-links.tabs.by-link'][lang],
++          ]}
++        >
++          <Drawer.Tab index={0}>
++            <Drawer.Section>
++              <SearchBar
++                placeholder={i18n['users.invite-links.search.placeholder'][lang]}
++                onChange={(e, val) => handleSearch(val)}
++                onSubmit={(e) => e.preventDefault()}
++              />
++              <p className="invite-user-notice">
++                {i18n['users.invite-links.search.notice'][lang]}
++              </p>
++              {/* <UserTag showAvatar={true} size='l' user={user} /> */}
++            </Drawer.Section>
++          </Drawer.Tab>
++
++          <Drawer.Tab index={1}>
++            <Drawer.Section className="create-invitiation-link">
++              <p className="">{i18n['users.invite.link.create.notice'][lang]}</p>
++              <Button
++                className="create-invitation-link"
++                type="submit"
++                onClick={() => handleCreateInvitiationLink()}
++              >
++                {i18n['users.invite.link.generate'][lang]}
++              </Button>
++              {!!generatedLink && (
++                <Textarea
++                  className="generated-invitation-link"
++                  name="generated-link"
++                  value={generatedLink}
++                />
++              )}
++            </Drawer.Section>
++          </Drawer.Tab>
++
++          <Drawer.Section title={i18n['users.invite-links.history.title'][lang]}>
++            {!data?.length && <p className="no-invitations">{i18n['users.invite-links.empty'][lang]}</p>}
++            {!!data?.length && (
++              <List
++                items={[
++                  {
++                    name: 'Username',
++                    label: 'asd',
++                  },
++                ]}
++              />
++            )}
++            {/* <UserTag showAvatar={true} size='l' user={user} /> */}
++          </Drawer.Section>
++        </Drawer.Tabs>
++      </Drawer>
++      {!!showConfirmInvite && (
++        <Confirm
++          title={i18n['users.invite.confirm.title'][lang]}
++          message={i18n['users.invite.confirm.desc'][lang].replace('{name}', userToInvite)}
++          onClose={(confirmed) => {
++            if (confirmed) {
++              console.log('inviting user', userToInvite)
++            }
++            setShowConfirmInvite(false)
++          }}
+         />
+-        <p className="invite-user-notice">
+-          {i18n['users.invite-links.search.notice'][lang]}
+-        </p>
+-        {/* <UserTag showAvatar={true} size='l' user={user} /> */}
+-      </Drawer.Section>
+-      <Drawer.Section title={i18n['users.invite-links.history.title'][lang]}>
+-        {!data?.length && <p className="no-invitations">{i18n['users.invite-links.empty'][lang]}</p>}
+-        {!!data?.length && (
+-          <List
+-            items={[
+-              {
+-                name: 'Username',
+-                label: 'asd',
+-              },
+-            ]}
+-          />
+-        )}
+-        {/* <UserTag showAvatar={true} size='l' user={user} /> */}
+-      </Drawer.Section>
+-    </Drawer>
++      )}
++    </>
+   )
+ }
+ 

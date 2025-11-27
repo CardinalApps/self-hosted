@@ -1,0 +1,12 @@
+diff a/libraries/ui/src/components/forms/TextInput/TextInput.stories.tsx b/libraries/ui/src/components/forms/TextInput/TextInput.stories.tsx	(rejected hunks)
+@@ -10,7 +10,9 @@ const meta = {
+ type Story = StoryObj<typeof meta>
+ 
+ export const Default: Story = {
+-  args: {},
++  args: {
++    type: "text"
++  },
+ }
+ 
+ export default meta

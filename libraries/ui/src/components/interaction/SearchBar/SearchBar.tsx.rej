@@ -1,0 +1,19 @@
+diff a/libraries/ui/src/components/interaction/SearchBar/SearchBar.tsx b/libraries/ui/src/components/interaction/SearchBar/SearchBar.tsx	(rejected hunks)
+@@ -7,7 +7,7 @@ import './SearchBar.css'
+ type SearchBarProps = {
+   size?: 'l' | 'm',
+   placeholder?: string,
+-  onChange?: (e) => void,
++  onChange?: (e, value) => void,
+   onSubmit?: (e) => void,
+ }
+ 
+@@ -24,7 +24,7 @@ const SearchBar = ({
+ 
+   const handleChange = (e) => {
+     setQuery(e.target.value)
+-    onChange(e)
++    onChange(e, e.target.value)
+   }
+ 
+   return (

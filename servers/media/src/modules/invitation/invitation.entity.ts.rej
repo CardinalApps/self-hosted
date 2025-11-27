@@ -1,0 +1,12 @@
+diff a/servers/media/src/modules/invitation/invitation.entity.ts b/servers/media/src/modules/invitation/invitation.entity.ts	(rejected hunks)
+@@ -19,4 +19,10 @@ export class Invitation extends BaseEntity {
+ 
+   @Column()
+   invitee: string
++
++  @Column({ nullable: true })
++  link: string
++
++  @Column({ nullable: false })
++  type: 'link' | 'user'
+ }

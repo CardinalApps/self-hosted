@@ -184,4 +184,44 @@ Drawer.Section = ({ className, title, children }: PropsWithChildren<DrawerSectio
   )
 }
 
+type DrawerTabsPropsType = {
+  className?: string,
+  labels?: React.ReactNode[],
+}
+
+Drawer.Tabs = ({ className, labels = [], children }: PropsWithChildren<DrawerTabsPropsType>) => {
+  const [activeTab, setActiveTab] = useState(0)
+  return (
+    <div className={clsx('drawer-tabs', className)} data-active={activeTab}>
+      <nav className="drawer-tabs-row">
+        {labels.map((label, index) => {
+          return (
+            <button
+              key={index}
+              className={clsx('drawer-tab-button', className, activeTab === index ? 'active' : null)}
+              onClick={() => setActiveTab(index)}
+            >
+              {label}
+            </button>
+          )
+        })}
+      </nav>
+      {children}
+    </div>
+  )
+}
+
+type DrawerTabPropsType = {
+  className?: string,
+  index: number,
+}
+
+Drawer.Tab = ({ className, index, children }: PropsWithChildren<DrawerTabPropsType>) => {
+  return (
+    <section className={clsx('drawer-tab', className)} data-index={index}>
+      {children}
+    </section>
+  )
+}
+
 export default Drawer

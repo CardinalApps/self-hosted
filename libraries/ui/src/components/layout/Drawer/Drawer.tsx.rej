@@ -1,49 +1,7 @@
 diff a/libraries/ui/src/components/layout/Drawer/Drawer.tsx b/libraries/ui/src/components/layout/Drawer/Drawer.tsx	(rejected hunks)
-@@ -1,4 +1,5 @@
- import { useEffect } from 'react'
-+import clsx from 'clsx'
+@@ -1,4 +1,4 @@
+-import { useEffect } from 'react'
++import { useEffect, useState } from 'react'
+ import clsx from 'clsx'
  import type { PropsWithChildren, ReactNode } from 'react'
  import { createPortal } from 'react-dom'
- import { motion } from 'framer-motion'
-@@ -15,10 +16,11 @@ import './Drawer.css'
- 
- type DrawerProps = {
-   width?: number,
--  title?: string,
-+  title?: string | React.ReactNode,
-   subtitle?: string,
-   loading?: boolean,
-   onClose?: () => void,
-+  className?: string,
-   children?: ReactNode,
- }
- 
-@@ -28,6 +30,7 @@ const Drawer = ({
-   subtitle,
-   loading = false,
-   onClose,
-+  className,
-   children,
- }: PropsWithChildren<DrawerProps>) => {
-   const dispatch = useAppDispatch()
-@@ -63,7 +66,7 @@ const Drawer = ({
-     createPortal(
-       (
-         <motion.div
--          className="drawer-pane"
-+          className={clsx('drawer-pane', className)}
-           style={{ ...(width && { width: width }) }}
-           initial={{
-             transform: 'translateX(0%)',
-@@ -81,7 +84,10 @@ const Drawer = ({
-               {loading
-                 ? <Loading className="drawer-loading" />
-                 : <>
--                    {!!title && <H3 className="drawer-title">{title}</H3>}
-+                    {typeof title === 'string'
-+                      ? <H3 className="drawer-title">{title}</H3>
-+                      : title
-+                    }
-                     {!!subtitle && <p className="drawer-subtitle">{subtitle}</p>}
-                     {children}
-                   </>

@@ -1,29 +1,27 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -29,6 +29,27 @@
-   "users.invite-links.manage-title": {
-     "en": "User Invitations"
+@@ -44,8 +44,23 @@
+   "users.invite-links.search.notice": {
+     "en": "Only returns users whose search visibility is set to Public."
    },
-+  "users.invite-links.active": {
-+    "en": "Active until {date}"
+-  "users.invite-links.create.title": {
+-    "en": "Invite User"
++  "users.invite-links.tabs.by-username": {
++    "en": "Invite by Username"
 +  },
-+  "users.invite-links.expired": {
-+    "en": "Expired"
++  "users.invite-links.tabs.by-link": {
++    "en": "Create Invitation Link"
 +  },
-+  "users.invite-links.empty": {
-+    "en": "No invitations have been sent."
++  "users.invite.confirm.title": {
++    "en": "Invite New user"
 +  },
-+  "users.invite-links.search.placeholder": {
-+    "en": "Search for a Cardinal user"
++  "users.invite.confirm.desc": {
++    "en": "You are about to invite {name} to your server. Only invite users that you trust."
 +  },
-+  "users.invite-links.search.notice": {
-+    "en": "Only returns users whose search visibility is set to Public."
++  "users.invite.link.generate": {
++    "en": "Generate link"
 +  },
-+  "users.invite-links.create.title": {
-+    "en": "Invite User"
-+  },
-+  "users.invite-links.history.title": {
-+    "en": "History"
-+  },
-   "users.new-users.invite-links.no-active-links": {
-     "en": "No active invitations."
++  "users.invite.link.create.notice": {
++    "en": "Create a link that you can send to a friend. Your invitee will need to create a free Cardinal account, then they'll be directed to join your Media Server."
    },
+   "users.invite-links.history.title": {
+     "en": "History"

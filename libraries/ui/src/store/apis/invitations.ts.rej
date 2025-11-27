@@ -1,0 +1,11 @@
+diff a/libraries/ui/src/store/apis/invitations.ts b/libraries/ui/src/store/apis/invitations.ts	(rejected hunks)
+@@ -7,6 +7,9 @@ import { baseHomeServerApi } from './baseHomeServerApi'
+ export type InvitationType = {
+   createdAt: string,
+   createdBy: UserType,
++  type: 'link' | 'user',
++  link?: string,
++  invitee?: UserType,
+ }
+ 
+ export const invitationApi = baseHomeServerApi
