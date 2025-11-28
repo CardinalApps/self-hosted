@@ -1,24 +1,9 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -1,4 +1,6 @@
- .card {
-+  display: flex;
-+  flex-direction: column;
-   overflow-y: auto;
-   border-radius: 12px;
-   background-size: cover;
-@@ -32,6 +34,15 @@
-   &.has-header > .card-content { padding-top: 0; }
-   &.has-footer > .card-content { padding-bottom: 0; }
+@@ -53,7 +53,6 @@
+     padding: 30px 40px 30px;
+     display: flex;
+     align-items: center;
+-    justify-content: space-between;
  
-+  &.bottom-align-content {
-+
-+    > .card-content {
-+      display: flex;
-+      flex-grow: 1;
-+      align-items: flex-end;
-+    }
-+  }
-+
-   > .card-header, > .card-footer {
-     h1, h2, h3, h4, h5, h6, p, ul, ol, img, i, button {
-       margin-bottom: 0;
+     i {
+       margin-right: 10px;

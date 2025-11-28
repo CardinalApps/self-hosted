@@ -1,10 +1,27 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -145,7 +145,7 @@ function Users() {
+@@ -14,6 +14,7 @@ import { UserType } from '@cardinalapps/ui/src/types/user'
+ import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
+ import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
+ import Card from '@cardinalapps/ui/src/components/layout/Card'
++import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
+ import H5 from '@cardinalapps/ui/src/components/typography/H5'
+ 
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+@@ -144,7 +145,7 @@ function Users() {
+ 
    return (
      <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
-       <div className="user-page-cards-row">
--        {!serverIsClaimed && (
-+        {res.isSuccess && !serverIsClaimed && (
+-      <div className="user-page-cards-row">
++      <CardGrid layout="flex">
+         {res.isSuccess && !serverIsClaimed && (
            <Card
              icon={<Icon fa="fas fa-exclamation-triangle" />}
-             header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
+@@ -195,7 +196,7 @@ function Users() {
+             {i18n['users.server.info.desc'][lang]}
+           </Button>
+         </Card> */}
+-      </div>
++      </CardGrid>
+       <Table
+         className="server-user-list"
+         header={[

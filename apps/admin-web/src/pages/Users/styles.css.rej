@@ -1,18 +1,19 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -67,6 +67,16 @@
-     p {
-       margin-bottom: 20px;
-     }
-+
-+    form {
-+      display: flex;
-+      gap: 10px;
-+      align-items: flex-end;
-+
-+      .form-field {
-+        margin-bottom: 0;
-+      }
-+    }
+@@ -4,17 +4,6 @@
+     padding-left: var(--gutter);
    }
  
-   .generated-invitation-link {
+-  .user-page-cards-row {
+-    display: flex;
+-    gap: var(--gutter);
+-    margin-bottom: 30px;
+-
+-    .card {
+-      min-width: 230px;
+-      max-width: 340px;
+-    }
+-  }
+-
+   .server-user-list {
+ 
+     .user-name {

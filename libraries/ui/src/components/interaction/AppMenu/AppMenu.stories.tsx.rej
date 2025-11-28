@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/interaction/AppMenu/AppMenu.stories.tsx b/libraries/ui/src/components/interaction/AppMenu/AppMenu.stories.tsx	(rejected hunks)
+@@ -17,7 +17,7 @@ export const LeftAlign: Story = {
+ 
+ export const CenterAlign: Story = {
+   args: {
+-    align: 'left',
++    align: 'center',
+   },
+ }
+ 

@@ -1,14 +1,9 @@
 diff a/libraries/ui/src/components/interaction/Button/Button.stories.tsx b/libraries/ui/src/components/interaction/Button/Button.stories.tsx	(rejected hunks)
-@@ -52,6 +52,12 @@ export const Tag: Story = {
-     children: 'Tag button',
+@@ -13,7 +13,6 @@ type Story = StoryObj<typeof meta>
+ export const Default: Story = {
+   args: {
+     children: 'Default Button',
+-    disabled: true,
    },
  }
-+export const ArrowText: Story = {
-+  args: {
-+    arrowText: true,
-+    children: 'Text with that is a button',
-+  },
-+}
  
- export const Loading = () => {
-   const [clicked, setClicked] = useState(false)
