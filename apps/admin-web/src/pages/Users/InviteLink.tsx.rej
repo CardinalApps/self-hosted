@@ -1,0 +1,51 @@
+diff a/apps/admin-web/src/pages/Users/InviteLink.tsx b/apps/admin-web/src/pages/Users/InviteLink.tsx	(rejected hunks)
+@@ -8,9 +8,10 @@ import Textarea from '@cardinalapps/ui/src/components/forms/Textarea'
+ import DatePicker from '@cardinalapps/ui/src/components/forms/DatePicker'
+ import Form from '@cardinalapps/ui/src/components/forms/Form'
+ import FormField from '@cardinalapps/ui/src/components/forms/FormField'
++import Span from '@cardinalapps/ui/src/components/typography/Span'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+-//import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
++import { formatDate, formatTimeUntil } from '@cardinalapps/ui/src/lib/formatting/time'
+ 
+ import { useCreateInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
+ 
+@@ -35,8 +36,7 @@ function InvitationLinks() {
+ 
+   useEffect(() => {
+     if (createInvitationResult.isSuccess) {
+-      //setGeneratedLink(createInvitationResult.data?.link)
+-      setGeneratedLink('https://account.cardinalapps.io/join/f8s2easm')
++      setGeneratedLink(createInvitationResult.data?.link)
+     }
+   }, [createInvitationResult.isSuccess])
+ 
+@@ -48,12 +48,12 @@ function InvitationLinks() {
+           onSubmit={(e, values) => handleCreateInvitiationLink(e, values)}
+         >
+           <FormField label={i18n['users.invite.link.create.expiration'][lang]} labelFor="invitation-link-expiration">
+-            {/* TODO add time picker */}
+             <DatePicker
+               id="invitation-link-expiration"
+               name="expiration"
+               min={new Date().toString()}
+               required={true}
++              type="datetime-local"
+             />
+           </FormField>
+           <Button
+@@ -81,8 +81,11 @@ function InvitationLinks() {
+           <List
+             items={data?.map((invitation) => {
+               return {
+-                name: invitation?.link,
+-                controls: ['delete'],
++                name: invitation?.link?.split('/').pop(),
++                label: <Span truncate={true}>{i18n['users.invite.expires-in'][lang] + ' ' + formatTimeUntil(invitation?.expiresAt.toString())}</Span>,
++                title: i18n['users.invite.expires-at'][lang] + ' ' + formatDate(invitation?.expiresAt.toString()),
++                copyable: invitation?.link || 'missing link',
++                controls: ['copy', 'delete'],
+               }
+             })}
+           />

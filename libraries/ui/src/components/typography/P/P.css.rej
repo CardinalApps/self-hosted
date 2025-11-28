@@ -1,0 +1,14 @@
+diff a/libraries/ui/src/components/typography/P/P.css b/libraries/ui/src/components/typography/P/P.css	(rejected hunks)
+@@ -3,6 +3,12 @@
+   color: var(--text-color-1);
+   font: 400 16px var(--font-family);
+ 
++  &.truncate {
++    text-overflow: ellipsis;
++    overflow: hidden;
++    white-space: nowrap;
++  }
++
+   @media (max-width: 768px) {
+     font-size: 14px;
+   }

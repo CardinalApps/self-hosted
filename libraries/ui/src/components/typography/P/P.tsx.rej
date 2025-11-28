@@ -1,0 +1,19 @@
+diff a/libraries/ui/src/components/typography/P/P.tsx b/libraries/ui/src/components/typography/P/P.tsx	(rejected hunks)
+@@ -5,14 +5,15 @@ import './P.css'
+ 
+ type PProps = {
+   className?: string,
++  truncate?: boolean,
+ }
+ 
+ /**
+  * Paragraph tag.
+  */
+-const P = ({ className, children }: PropsWithChildren<PProps>) => {
++const P = ({ truncate = false, className, children }: PropsWithChildren<PProps>) => {
+   return (
+-    <p className={clsx('p', className)}>{children}</p>
++    <p className={clsx('p', className, truncate && 'truncate')}>{children}</p>
+   )
+ }
+ 

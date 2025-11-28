@@ -1,10 +1,61 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -84,7 +84,7 @@ const List = ({
-                   )}
-                   <span className="item-list-item-name" title={item?.title || item?.name?.toString()}>{item?.name}</span>
-                   {typeof item?.label === 'string'
--                    ? <span className="item-list-item-label" title={item?.label || item?.label?.toString()}>{item?.label}</span>
-+                    ? <span className="item-list-item-label" title={item?.title || item?.label?.toString()}>{item?.label}</span>
-                     : <span className="item-list-item-label">{item?.label || null}</span>
-                   }
+@@ -2,16 +2,19 @@ import type { ReactNode } from 'react'
+ import { useSelector } from 'react-redux'
+ import clsx from 'clsx'
+ 
++import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ import Icon from '../../typography/Icon'
+ import Avatar from '../../layout/Avatar'
+ 
+ import { settingsSelectors } from '../../../store/slices/settings'
++import { copyToClipboard } from '../../../lib/clipboard/copy'
++import { toastActions } from '../../../store/slices/toast'
+ 
+ import i18n from './i18n'
+ 
+ import './List.css'
+ 
+-export type ListItemControls = 'add' | 'remove' | 'delete'
++export type ListItemControls = 'add' | 'remove' | 'delete' | 'copy'
+ export type ListItem = {
+   name: string | ReactNode,
+   title?: string,
+@@ -24,6 +27,7 @@ export type ListItem = {
+   icon?: {
+     fa: string,
+   },
++  copyable?: string,
+   controls?: ListItemControls[],
+   pendingAdd?: boolean,
+   pendingDelete?: boolean,
+@@ -54,8 +58,22 @@ const List = ({
+   onDelete = () => {},
+   ...props
+ }: ListProps) => {
++  const dispatch = useAppDispatch()
+   const { lang } = useSelector(settingsSelectors.current)
+ 
++  const handleCopy = (copyable) => {
++    if (!copyable) {
++      return console.warn('Missing "copyable" prop on List')
++    }
++    copyToClipboard(copyable)
++    dispatch(toastActions.addToQueue({
++      type: 'success',
++      title: i18n['list.copied'][lang],
++      body: copyable,
++      ttl: 5000,
++    }))
++  }
++
+   return (
+     <div {...props} className={clsx('item-list', className)} data-name={name} data-layout={layout}>
+       {items.length
+@@ -90,6 +108,7 @@ const List = ({
                    {!!controlsToUse?.length && (
+                     <span className="item-list-item-controls">
+                       {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
++                      {!!controlsToUse.includes('copy') && <Icon fa="fas fa-copy" onClick={() => handleCopy(item?.copyable)} />}
+                       {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}
+                       {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => onDelete(item)} />}
+                     </span>

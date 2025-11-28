@@ -1,79 +1,22 @@
 diff a/servers/media/src/modules/invitation/invitation.service.ts b/servers/media/src/modules/invitation/invitation.service.ts	(rejected hunks)
-@@ -1,4 +1,5 @@
--import { Injectable } from '@nestjs/common'
-+import * as ms from 'ms'
-+import { Injectable, Logger } from '@nestjs/common'
- import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
- import { Repository, DataSource } from 'typeorm'
- 
-@@ -7,6 +8,7 @@ import { Invitation } from './invitation.entity'
- import { EventService } from '../event/event.service'
- 
- import { QueryInvitationDto } from './dtos/QueryInvitation.dto'
-+import { CreateInvitationDto } from './dtos/CreateInvitation'
- 
- @Injectable()
- export class InvitationService {
-@@ -42,10 +44,13 @@ export class InvitationService {
-    * Returns all invitations according to the query.
-    */
-   async query(queryInvitationsDto: QueryInvitationDto): Promise<[Invitation[], number]> {
--    const { take, skip, order, sort } = queryInvitationsDto
-+    const { take, skip, order, sort, type } = queryInvitationsDto
-     return await this.invitationRepository.findAndCount({
-       take,
-       skip,
-+      where: {
-+        type,
-+      },
-       relations: {
-         createdBy: true,
-       },
-@@ -56,9 +61,44 @@ export class InvitationService {
+@@ -77,15 +77,15 @@ export class InvitationService {
+     } else if (type === 'link') {
+       try {
+         //const invite = await this.createInvitiationLink(inviteeId)
++        return await this.invitationRepository.save({
++          type,
++          expiresAt: expiresAt || defaultExpiresAt,
++          link: 'https://join.cardinalconnect.com/i/lakd8s',
++        })
+       } catch (error) {
+         Logger.log(error)
+       }
+     }
+-
+-    return await this.invitationRepository.save({
+-      type,
+-      expiresAt: expiresAt || defaultExpiresAt,
+-    })
    }
  
    /**
--   * Creates a new invitation entity in the database.
-+   * Invite a user to this media server.
-    */
--  async create(createInvitationsDto): Promise<Invitation> {
--    return await this.invitationRepository.save(createInvitationsDto)
-+  async create(createInvitationsDto: CreateInvitationDto): Promise<Invitation> {
-+    const { type, expiresAt /*,inviteeId*/ } = createInvitationsDto
-+    const defaultExpiresAt = new Date(Date.now() + ms('3 days')).toString()
-+    //let invite
-+
-+    if (type === 'user') {
-+      try {
-+        //const invite = await this.sendInviteToUser(inviteeId)
-+      } catch (error) {
-+        Logger.log(error)
-+      }
-+    } else if (type === 'link') {
-+      try {
-+        //const invite = await this.createInvitiationLink(inviteeId)
-+      } catch (error) {
-+        Logger.log(error)
-+      }
-+    }
-+
-+    return await this.invitationRepository.save({
-+      type,
-+      expiresAt: expiresAt || defaultExpiresAt,
-+    })
-   }
-+
-+  /**
-+   * Send an invite directly to a new Cardinal user.
-+   */
-+  // private async sendInviteToUser(cardinalUserId: string): Promise<boolean> {
-+  //   // TODO ask cardinal cloud to send an email to the user
-+  // }
-+
-+  /**
-+   * Send an invite directly to a new Cardinal user.
-+   */
-+  // private async createInvitiationLink(): Promise<string> {
-+  //   // TODO ask cardinal cloud to create an invitation link
-+  // }
- }
