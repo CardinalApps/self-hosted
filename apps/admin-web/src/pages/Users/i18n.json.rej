@@ -1,22 +1,76 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -60,7 +60,19 @@
+@@ -18,16 +18,16 @@
+     "en": "Allow new users to sign up"
+   },
+   "users.invite-user": {
+-    "en": "Invite Users"
++    "en": "Active Invitations"
+   },
+   "users.new-users.invite-links.create": {
+     "en": "Create link"
+   },
+   "users.invite-links.manage-button": {
+-    "en": "Manage"
++    "en": "Invite User"
+   },
+   "users.invite-links.manage-title": {
+-    "en": "User Invitations"
++    "en": "Invite New User"
+   },
+   "users.invite-links.active": {
+     "en": "Active until {date}"
+@@ -35,8 +35,11 @@
+   "users.invite-links.expired": {
+     "en": "Expired"
+   },
+-  "users.invite-links.empty": {
+-    "en": "No invitations have been sent."
++  "users.invite.user.none": {
++    "en": "No user invitations have been sent."
++  },
++  "users.invite.link.none": {
++    "en": "No invitation links have been sent."
+   },
+   "users.invite-links.search.placeholder": {
+     "en": "Search for a Cardinal user"
+@@ -45,10 +48,10 @@
+     "en": "Only returns users whose search visibility is set to Public."
+   },
+   "users.invite-links.tabs.by-username": {
+-    "en": "Invite by Username"
++    "en": "Invite a Cardinal User"
+   },
+   "users.invite-links.tabs.by-link": {
+-    "en": "Create Invitation Link"
++    "en": "Invite Using a Link"
+   },
+   "users.invite.confirm.title": {
+     "en": "Invite New user"
+@@ -60,20 +63,20 @@
      "en": "Generate link"
    },
    "users.invite.link.create.notice": {
--    "en": "Create a link that you can send to a friend. Your invitee will need to create a free Cardinal account, then they'll be directed to join your Media Server."
-+    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account first."
-+  },
-+  "users.invite.link.create.expiration": {
-+    "en": "Expiration"
-+  },
-+  "users.invite.list.user": {
-+    "en": "Invite to {name}"
-+  },
-+  "users.invite.list.link": {
-+    "en": "Invite link {link}"
-+  },
-+  "users.invite.list.expiration": {
-+    "en": "Expiration"
+-    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account first."
++    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account."
    },
+   "users.invite.link.create.expiration": {
+     "en": "Expiration"
+   },
+-  "users.invite.list.user": {
+-    "en": "Invite to {name}"
+-  },
+-  "users.invite.list.link": {
+-    "en": "Invite link {link}"
+-  },
+   "users.invite.list.expiration": {
+     "en": "Expiration"
+   },
++  "users.invite.expires-in": {
++    "en": "Expires in"
++  },
++  "users.invite.expires-at": {
++    "en": "Expires at"
++  },
    "users.invite-links.history.title": {
      "en": "History"
+   },

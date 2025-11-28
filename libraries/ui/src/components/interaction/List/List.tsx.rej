@@ -1,13 +1,10 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -82,9 +82,9 @@ const List = ({
-                       <Icon {...item.icon} />
-                     </span>
+@@ -84,7 +84,7 @@ const List = ({
                    )}
--                  <span className="item-list-item-name" title={item?.title || item?.name.toString()}>{item?.name}</span>
-+                  <span className="item-list-item-name" title={item?.title || item?.name?.toString()}>{item?.name}</span>
+                   <span className="item-list-item-name" title={item?.title || item?.name?.toString()}>{item?.name}</span>
                    {typeof item?.label === 'string'
--                    ? <span className="item-list-item-label" title={item?.label || item?.label.toString()}>{item?.label}</span>
-+                    ? <span className="item-list-item-label" title={item?.label || item?.label?.toString()}>{item?.label}</span>
+-                    ? <span className="item-list-item-label" title={item?.label || item?.label?.toString()}>{item?.label}</span>
++                    ? <span className="item-list-item-label" title={item?.title || item?.label?.toString()}>{item?.label}</span>
                      : <span className="item-list-item-label">{item?.label || null}</span>
                    }
                    {!!controlsToUse?.length && (

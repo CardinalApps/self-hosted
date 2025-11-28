@@ -1,0 +1,19 @@
+diff a/servers/media/src/modules/invitation/dtos/QueryInvitation.dto.ts b/servers/media/src/modules/invitation/dtos/QueryInvitation.dto.ts	(rejected hunks)
+@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer'
+ import { IsString, IsOptional, IsIn } from 'class-validator'
+ 
+ import { Pagination } from '../../../dtos/pagination.dto'
++import { InvitationType } from '../invitation.entity'
+ 
+ enum AllowedMusicTracksOrderBy {
+   'createdAt' = 'createdAt',
+@@ -15,4 +16,8 @@ class InvitationPagination extends Pagination {
+   sort?: AllowedMusicTracksOrderBy = AllowedMusicTracksOrderBy.createdAt
+ }
+ 
+-export class QueryInvitationDto extends InvitationPagination {}
++export class QueryInvitationDto extends InvitationPagination {
++  @Transform(({ value }) => String(value))
++  @IsString()
++  type?: InvitationType
++}

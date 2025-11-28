@@ -1,9 +1,12 @@
 diff a/libraries/ui/src/types/user.ts b/libraries/ui/src/types/user.ts	(rejected hunks)
-@@ -19,6 +19,7 @@ export type UserType = {
-   deletedAt?: string,
-   designation?: "guest_account",
-   role?: "user" | "owner",
-+  enabled?: boolean,
-   ssoToken?: string,
-   updatedAt?: string,
-   userId?: string,
+@@ -1,8 +1,8 @@
+ import { AvatarProps } from "../components/layout/Avatar/Avatar"
+ 
+ export type UserType = {
+-  activityStatus: string,
+-  activityStatusUpdatedAt: string,
++  activityStatus?: string,
++  activityStatusUpdatedAt?: string,
+   cachedCloudUser?: {
+     userId?: string,
+     avatar?: AvatarProps,

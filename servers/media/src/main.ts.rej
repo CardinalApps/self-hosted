@@ -3,8 +3,8 @@ diff a/servers/media/src/main.ts b/servers/media/src/main.ts	(rejected hunks)
      Logger.log(`│ Cinema app......................${(ip+':'+PORT+'/cinema').padEnd(31)}│`, 'Welcome')
      Logger.log(`│ API specification...............${(ip+':'+PORT+'/api/docs').padEnd(31)}│`, 'Welcome')
      Logger.log('│ Manage your Cardinal account....account.cardinalapps.io        │', 'Welcome')
--    Logger.log('│ Get help using the apps.........help.cardinalapps.io           │', 'Welcome')
-+    Logger.log('│ Get help using your apps.........help.cardinalapps.io          │', 'Welcome')
+-    Logger.log('│ Get help using your apps.........help.cardinalapps.io          │', 'Welcome')
++    Logger.log('│ Get help using your apps........help.cardinalapps.io           │', 'Welcome')
      Logger.log('╰────────────────────────────────────────────────────────────────╯', 'Welcome')
    }
  

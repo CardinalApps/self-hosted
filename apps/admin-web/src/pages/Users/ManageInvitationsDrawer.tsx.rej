@@ -1,100 +1,174 @@
 diff a/apps/admin-web/src/pages/Users/ManageInvitationsDrawer.tsx b/apps/admin-web/src/pages/Users/ManageInvitationsDrawer.tsx	(rejected hunks)
-@@ -8,6 +8,9 @@ import SearchBar from '@cardinalapps/ui/src/components/interaction/SearchBar'
- import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
- import Button from '@cardinalapps/ui/src/components/interaction/Button'
- import Textarea from '@cardinalapps/ui/src/components/forms/Textarea'
-+import DatePicker from '@cardinalapps/ui/src/components/forms/DatePicker'
-+import Form from '@cardinalapps/ui/src/components/forms/Form'
-+import FormField from '@cardinalapps/ui/src/components/forms/FormField'
+@@ -1,21 +1,11 @@
+-import { useEffect, useState } from 'react'
+ import { useSelector } from 'react-redux'
  
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- //import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
-@@ -38,22 +41,20 @@ function ManageInvitationsDrawer({ onClose }: ManageInvitationsDrawerProps) {
-     setUserToInvite(val)
-   }
+-//import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+ import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
+-import List from '@cardinalapps/ui/src/components/interaction/List'
+-import SearchBar from '@cardinalapps/ui/src/components/interaction/SearchBar'
+-import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
+-import Button from '@cardinalapps/ui/src/components/interaction/Button'
+-import Textarea from '@cardinalapps/ui/src/components/forms/Textarea'
+-import DatePicker from '@cardinalapps/ui/src/components/forms/DatePicker'
+-import Form from '@cardinalapps/ui/src/components/forms/Form'
+-import FormField from '@cardinalapps/ui/src/components/forms/FormField'
  
--  console.log(createInvitationResult)
+-import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+-//import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
++import UserInvitations from './InviteUser'
++import InvitationLinks from './InviteLink'
+ 
+-import { useCreateInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
++import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ 
+ import i18n from './i18n.json'
+ 
+@@ -27,128 +17,28 @@ type ManageInvitationsDrawerProps = {
+ 
+ function ManageInvitationsDrawer({ onClose }: ManageInvitationsDrawerProps) {
+   const { lang } = useSelector(settingsSelectors.current)
+-  const [showConfirmInvite, setShowConfirmInvite] = useState<boolean>(false)
 -
--  const handleCreateInvitiationLink = () => {
--    setGeneratedLink('https://account.cardinalapps.io/join/jfi9nd3f')
-+  const handleCreateInvitiationLink = (e, values) => {
-+    createInvitation({
-+      type: 'link',
-+      expiresAt: new Date(values?.expiration),
-+    })
-   }
- 
-   useEffect(() => {
-     if (createInvitationResult.isSuccess) {
--      setGeneratedLink(createInvitationResult.data?.link)
-+      //setGeneratedLink(createInvitationResult.data?.link)
-+      setGeneratedLink('https://account.cardinalapps.io/join/f8s2easm')
-     }
--    createInvitation({})
-   }, [createInvitationResult.isSuccess])
- 
--  console.log(userToInvite)
--  //console.log(res)
+-  const [userToInvite, setUserToInvite] = useState<string>()
+-  const [generatedLink, setGeneratedLink] = useState<string>()
 -
+-  const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
+-  const res = useGetInvitationsQuery({})
+-  const data = res?.data?.[0] || []
+-
+-  const handleSearch = (val) => {
+-    setShowConfirmInvite(true)
+-    setUserToInvite(val)
+-  }
+-
+-  const handleCreateInvitiationLink = (e, values) => {
+-    createInvitation({
+-      type: 'link',
+-      expiresAt: new Date(values?.expiration),
+-    })
+-  }
+-
+-  useEffect(() => {
+-    if (createInvitationResult.isSuccess) {
+-      //setGeneratedLink(createInvitationResult.data?.link)
+-      setGeneratedLink('https://account.cardinalapps.io/join/f8s2easm')
+-    }
+-  }, [createInvitationResult.isSuccess])
+ 
    return (
-     <>
-       <Drawer
-@@ -83,14 +84,30 @@ function ManageInvitationsDrawer({ onClose }: ManageInvitationsDrawerProps) {
+-    <>
+-      <Drawer
+-        className="manage-invitations"
+-        onClose={onClose}
+-        title={i18n['users.invite-links.manage-title'][lang]}
++    <Drawer
++      className="manage-invitations"
++      onClose={onClose}
++      title={i18n['users.invite-links.manage-title'][lang]}
++    >
++      <Drawer.Tabs
++        labels={[
++          i18n['users.invite-links.tabs.by-username'][lang],
++          i18n['users.invite-links.tabs.by-link'][lang],
++        ]}
+       >
+-        <Drawer.Tabs
+-          labels={[
+-            i18n['users.invite-links.tabs.by-username'][lang],
+-            i18n['users.invite-links.tabs.by-link'][lang],
+-          ]}
+-        >
+-          <Drawer.Tab index={0}>
+-            <Drawer.Section>
+-              <SearchBar
+-                placeholder={i18n['users.invite-links.search.placeholder'][lang]}
+-                onChange={(e, val) => handleSearch(val)}
+-                onSubmit={(e) => e.preventDefault()}
+-              />
+-              <p className="invite-user-notice">
+-                {i18n['users.invite-links.search.notice'][lang]}
+-              </p>
+-              {/* <UserTag showAvatar={true} size='l' user={user} /> */}
+-            </Drawer.Section>
+-          </Drawer.Tab>
+-
+-          <Drawer.Tab index={1}>
+-            <Drawer.Section className="create-invitiation-link">
+-              <p>{i18n['users.invite.link.create.notice'][lang]}</p>
+-              <Form
+-                onSubmit={(e, values) => handleCreateInvitiationLink(e, values)}
+-              >
+-                <FormField label={i18n['users.invite.link.create.expiration'][lang]} labelFor="invitation-link-expiration">
+-                  {/* TODO add time picker */}
+-                  <DatePicker
+-                    id="invitation-link-expiration"
+-                    name="expiration"
+-                    min={new Date().toString()}
+-                    required={true}
+-                  />
+-                </FormField>
+-                <Button
+-                  className="create-invitation-link"
+-                  type="submit"
+-                  animation={createInvitationResult.originalArgs?.type === 'link' && createInvitationResult.isLoading
+-                    ? 'loading'
+-                    : null
+-                  }
+-                >
+-                  {i18n['users.invite.link.generate'][lang]}
+-                </Button>
+-              </Form>
+-              {!!generatedLink && (
+-                <Textarea
+-                  className="generated-invitation-link"
+-                  name="generated-link"
+-                  value={generatedLink}
+-                />
+-              )}
+-            </Drawer.Section>
+-          </Drawer.Tab>
+-
+-          <Drawer.Section title={i18n['users.invite-links.history.title'][lang]}>
+-            {!data?.length && <p className="no-invitations">{i18n['users.invite-links.empty'][lang]}</p>}
+-            {!!data?.length && (
+-              <List
+-                items={data?.map((invitation) => {
+-                  return {
+-                    name: invitation?.type === 'link'
+-                      ? i18n['users.invite.list.link'][lang].replace('{link}', invitation?.link)
+-                      : i18n['users.invite.list.user'][lang].replace('{name}', invitation?.invitee),
+-                    controls: ['delete'],
+-                  }
+-                })}
+-              />
+-            )}
+-            {/* <UserTag showAvatar={true} size='l' user={user} /> */}
+-          </Drawer.Section>
+-        </Drawer.Tabs>
+-      </Drawer>
+-      {!!showConfirmInvite && (
+-        <Confirm
+-          title={i18n['users.invite.confirm.title'][lang]}
+-          message={i18n['users.invite.confirm.desc'][lang].replace('{name}', userToInvite)}
+-          onClose={(confirmed) => {
+-            if (confirmed) {
+-              console.log('inviting user', userToInvite)
+-            }
+-            setShowConfirmInvite(false)
+-          }}
+-        />
+-      )}
+-    </>
++        <Drawer.Tab index={0}>
++          <UserInvitations />
++        </Drawer.Tab>
++
++        <Drawer.Tab index={1}>
++          <InvitationLinks />
++        </Drawer.Tab>
++      </Drawer.Tabs>
++    </Drawer>
+   )
+ }
  
-           <Drawer.Tab index={1}>
-             <Drawer.Section className="create-invitiation-link">
--              <p className="">{i18n['users.invite.link.create.notice'][lang]}</p>
--              <Button
--                className="create-invitation-link"
--                type="submit"
--                onClick={() => handleCreateInvitiationLink()}
-+              <p>{i18n['users.invite.link.create.notice'][lang]}</p>
-+              <Form
-+                onSubmit={(e, values) => handleCreateInvitiationLink(e, values)}
-               >
--                {i18n['users.invite.link.generate'][lang]}
--              </Button>
-+                <FormField label={i18n['users.invite.link.create.expiration'][lang]} labelFor="invitation-link-expiration">
-+                  {/* TODO add time picker */}
-+                  <DatePicker
-+                    id="invitation-link-expiration"
-+                    name="expiration"
-+                    min={new Date().toString()}
-+                    required={true}
-+                  />
-+                </FormField>
-+                <Button
-+                  className="create-invitation-link"
-+                  type="submit"
-+                  animation={createInvitationResult.originalArgs?.type === 'link' && createInvitationResult.isLoading
-+                    ? 'loading'
-+                    : null
-+                  }
-+                >
-+                  {i18n['users.invite.link.generate'][lang]}
-+                </Button>
-+              </Form>
-               {!!generatedLink && (
-                 <Textarea
-                   className="generated-invitation-link"
-@@ -105,12 +122,14 @@ function ManageInvitationsDrawer({ onClose }: ManageInvitationsDrawerProps) {
-             {!data?.length && <p className="no-invitations">{i18n['users.invite-links.empty'][lang]}</p>}
-             {!!data?.length && (
-               <List
--                items={[
--                  {
--                    name: 'Username',
--                    label: 'asd',
--                  },
--                ]}
-+                items={data?.map((invitation) => {
-+                  return {
-+                    name: invitation?.type === 'link'
-+                      ? i18n['users.invite.list.link'][lang].replace('{link}', invitation?.link)
-+                      : i18n['users.invite.list.user'][lang].replace('{name}', invitation?.invitee),
-+                    controls: ['delete'],
-+                  }
-+                })}
-               />
-             )}
-             {/* <UserTag showAvatar={true} size='l' user={user} /> */}

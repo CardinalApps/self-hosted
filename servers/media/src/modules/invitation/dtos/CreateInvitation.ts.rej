@@ -1,14 +1,19 @@
 diff a/servers/media/src/modules/invitation/dtos/CreateInvitation.ts b/servers/media/src/modules/invitation/dtos/CreateInvitation.ts	(rejected hunks)
-@@ -1,6 +1,10 @@
- import { IsString } from 'class-validator'
-+import { InvitationType } from '../invitation.entity'
+@@ -1,4 +1,4 @@
+-import { IsString } from 'class-validator'
++import { IsOptional, IsString } from 'class-validator'
+ import { InvitationType } from '../invitation.entity'
  
--export class CreateInvitationsDto {
-+export class CreateInvitationDto {
+ export class CreateInvitationDto {
+@@ -6,5 +6,10 @@ export class CreateInvitationDto {
+   type: InvitationType
+ 
    @IsString()
--  name: string
-+  type: InvitationType
+-  expiresAt: string
++  @IsOptional()
++  expiresAt?: string
 +
 +  @IsString()
-+  expiresAt: string
++  @IsOptional()
++  inviteeId?: string
  }
