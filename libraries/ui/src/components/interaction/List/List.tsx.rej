@@ -1,45 +1,67 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -31,6 +31,9 @@ export type ListItem = {
-   controls?: ListItemControls[],
-   pendingAdd?: boolean,
-   pendingDelete?: boolean,
+@@ -42,6 +42,9 @@ type ListProps = {
+   items: ListItem[],
+   controls?: unknown[],
+   layout?: 'default' | 'compact'
 +  onAdd?: (item: ListItem) => void,
 +  onRemove?: (item: ListItem) => void,
 +  onDelete?: (item: ListItem) => void,
  }
  
- type ListProps = {
-@@ -39,9 +42,6 @@ type ListProps = {
-   items: ListItem[],
-   controls?: unknown[],
-   layout?: 'default' | 'compact'
--  onAdd?: (item: ListItem) => void,
--  onRemove?: (item: ListItem) => void,
--  onDelete?: (item: ListItem) => void,
- }
- 
  /**
-@@ -53,9 +53,6 @@ const List = ({
+@@ -53,11 +56,41 @@ const List = ({
    items = [],
    controls = [],
    layout = 'default',
--  onAdd = () => {},
--  onRemove = () => {},
--  onDelete = () => {},
++  onAdd,
++  onRemove,
++  onDelete,
    ...props
  }: ListProps) => {
    const dispatch = useAppDispatch()
-@@ -107,10 +104,10 @@ const List = ({
+   const { lang } = useSelector(settingsSelectors.current)
+ 
++  const handleOnAdd = (item) => {
++    if (typeof onAdd === 'function') {
++      onAdd(item)
++    }
++    if (typeof item?.onAdd === 'function') {
++      item.onAdd(item)
++    }
++  }
++
++  const handleOnRemove = (item) => {
++    if (typeof onRemove === 'function') {
++      onRemove(item)
++    }
++    if (typeof item?.onRemove === 'function') {
++      item.onRemove(item)
++    }
++  }
++
++  const handleOnDelete = (item) => {
++    if (typeof onDelete === 'function') {
++      onDelete(item)
++    }
++    if (typeof item?.onDelete === 'function') {
++      item.onDelete(item)
++    }
++  }
++
+   const handleCopy = (copyable) => {
+     if (!copyable) {
+       return console.warn('Missing "copyable" prop on List')
+@@ -104,10 +137,10 @@ const List = ({
                    }
                    {!!controlsToUse?.length && (
                      <span className="item-list-item-controls">
--                      {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => onAdd(item)} />}
-+                      {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => item?.onAdd?.(item)} />}
+-                      {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => item?.onAdd?.(item)} />}
++                      {!!controlsToUse.includes('add') && <Icon fa="fas fa-plus" onClick={() => handleOnAdd(item)} />}
                        {!!controlsToUse.includes('copy') && <Icon fa="fas fa-copy" onClick={() => handleCopy(item?.copyable)} />}
--                      {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => onRemove(item)} />}
--                      {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => onDelete(item)} />}
-+                      {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => item?.onRemove(item)} />}
-+                      {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => item?.onDelete(item)} />}
+-                      {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => item?.onRemove(item)} />}
+-                      {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => item?.onDelete(item)} />}
++                      {!!controlsToUse.includes('remove') && <Icon fa="fas fa-minus" onClick={() => handleOnRemove(item)} />}
++                      {!!controlsToUse.includes('delete') && <Icon fa="fas fa-trash-alt" onClick={() => handleOnDelete(item)} />}
                      </span>
                    )}
                  </li>
