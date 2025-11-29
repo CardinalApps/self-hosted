@@ -1,33 +1,24 @@
 diff a/libraries/ui/src/store/apis/invitations.ts b/libraries/ui/src/store/apis/invitations.ts	(rejected hunks)
-@@ -4,10 +4,12 @@ import { UserType } from '../../types/user'
- import { CommonOrderParams, PaginationParams } from '../types/api'
- import { baseHomeServerApi } from './baseHomeServerApi'
- 
-+type InvitationTypeType = 'link' | 'user'
+@@ -53,10 +53,22 @@ export const invitationApi = baseHomeServerApi
+         }),
+         invalidatesTags: ['Invitation.List'],
+       }),
 +
- export type InvitationType = {
-   createdAt: string,
-   createdBy: UserType,
--  type: 'link' | 'user',
-+  type: InvitationTypeType,
-   link?: string,
-   invitee?: UserType,
-   expiresAt: Date,
-@@ -25,14 +27,16 @@ export const invitationApi = baseHomeServerApi
-         PaginationParams & {
-           order?: CommonOrderParams,
-           orderBy?: 'createdAt',
-+          type?: InvitationTypeType,
-         }
-       >({
--        query: ({ take, skip, order, orderBy }) => {
-+        query: ({ take, skip, order, orderBy, type }) => {
-           return queryParams('/invitations', {
-             ...(take && { take }),
-             ...(skip && { skip }),
-             ...(order && { order }),
-             ...(orderBy && { orderBy }),
-+            ...(type && { type }),
-           })
-         },
-         providesTags: ['Invitation.List'],
++      deleteInvitation: builder.mutation<
++        boolean,
++        string
++      >({
++        query: (id) => ({
++          url: `invitations/${id}`,
++          method: 'DELETE',
++        }),
++        invalidatesTags: ['Invitation.List'],
++      }),
+     }),
+   })
+ 
+ export const {
+   useGetInvitationsQuery,
+   useCreateInvitationMutation,
++  useDeleteInvitationMutation,
+ } = invitationApi

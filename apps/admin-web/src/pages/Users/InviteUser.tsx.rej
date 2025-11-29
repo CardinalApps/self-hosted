@@ -1,0 +1,96 @@
+diff a/apps/admin-web/src/pages/Users/InviteUser.tsx b/apps/admin-web/src/pages/Users/InviteUser.tsx	(rejected hunks)
+@@ -8,20 +8,26 @@ import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ 
+-import { useCreateInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
+-import { formatDate, formatTimeUntil } from '@cardinalapps/ui/src/lib/formatting/time'
++import { InvitationType, useCreateInvitationMutation, useDeleteInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
++import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
++import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
++import { DrawIntitationTabType } from './ManageInvitationsDrawer'
+ 
+ import i18n from './i18n.json'
+ 
+ import './styles.css'
++import Span from '@cardinalapps/ui/src/components/typography/Span'
+ 
+-function UserInvitations() {
++function UserInvitations({ getExpiration }: DrawIntitationTabType) {
++  const dispatch = useAppDispatch()
+   const { lang } = useSelector(settingsSelectors.current)
+   const [showConfirmInvite, setShowConfirmInvite] = useState<boolean>(false)
++  const [confirmingDelete, setConfirmingDelete] = useState<InvitationType>()
+ 
+   const [userToInvite, setUserToInvite] = useState<string>()
+ 
+   const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
++  const [deleteInvitation, deleteInvitationResult] = useDeleteInvitationMutation()
+   const res = useGetInvitationsQuery({ type: 'user' })
+   const data = res?.data?.[0] || []
+ 
+@@ -33,9 +39,39 @@ function UserInvitations() {
+   useEffect(() => {
+     if (createInvitationResult.isSuccess) {
+       setShowConfirmInvite(false)
++      dispatch(toastActions.addToQueue({
++        type: 'success',
++        ttl: 5000,
++        title: i18n['users.invite.sent-invite-to-user'][lang],
++      }))
+     }
+   }, [createInvitationResult.isSuccess])
+ 
++  /**
++   * Handle delete success.
++   */
++  useEffect(() => {
++    if (deleteInvitationResult.isSuccess) {
++      setConfirmingDelete(null)
++    }
++  }, [deleteInvitationResult.isSuccess])
++
++  /**
++   * Handle delete error.
++   */
++  useEffect(() => {
++    if (deleteInvitationResult.isError) {
++      dispatch(toastActions.addToQueue({
++        type: 'danger',
++        title: 'status' in deleteInvitationResult.error ? deleteInvitationResult.error.status.toString() : 'Error',
++        body: 'data' in deleteInvitationResult.error
++            // @ts-expect-error
++            ? deleteInvitationResult.error.data?.message
++            : 'Error',
++      }))
++    }
++  }, [deleteInvitationResult.isError])
++
+   return (
+     <>
+       <Drawer.Section>
+@@ -44,6 +80,7 @@ function UserInvitations() {
+           onChange={(e, val) => handleSearch(val)}
+           onSubmit={(e) => e.preventDefault()}
+         />
++        {/* TODO add search */}
+         <p className="invite-user-notice">
+           {i18n['users.invite-links.search.notice'][lang]}
+         </p>
+@@ -55,10 +92,14 @@ function UserInvitations() {
+           <List
+             items={data?.map((invitation) => {
+               return {
++                // TODO show cardinal public name
+                 name: invitation?.invitationId.split('-')[0],
+-                label: i18n['users.invite.expires-in'][lang] + ' ' + formatTimeUntil(invitation?.expiresAt.toString()),
+-                title: i18n['users.invite.expires-at'][lang] + ' ' + formatDate(invitation?.expiresAt.toString()),
++                label: <Span truncate={true}>{getExpiration(invitation?.expiresAt)}</Span>,
++                title: getExpiration(invitation?.expiresAt, true),
+                 controls: ['delete'],
++                onDelete: () => {
++                  setConfirmingDelete(invitation)
++                },
+               }
+             })}
+           />

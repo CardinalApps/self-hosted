@@ -1,22 +1,61 @@
 diff a/servers/media/src/modules/invitation/invitation.service.ts b/servers/media/src/modules/invitation/invitation.service.ts	(rejected hunks)
-@@ -77,15 +77,15 @@ export class InvitationService {
-     } else if (type === 'link') {
+@@ -6,6 +6,7 @@ import { Repository, DataSource } from 'typeorm'
+ import { Invitation } from './invitation.entity'
+ 
+ import { EventService } from '../event/event.service'
++import { User } from '../user/user.entity'
+ 
+ import { QueryInvitationDto } from './dtos/QueryInvitation.dto'
+ import { CreateInvitationDto } from './dtos/CreateInvitation'
+@@ -24,7 +25,7 @@ export class InvitationService {
+    * Gets a single invitation
+    */
+   async get(id: number | string): Promise<Invitation | null> {
+-    const where = typeof id === 'number' ? { id: id } : { musicTrackId: id }
++    const where: Partial<Invitation> = typeof id === 'number' ? { id: id } : { invitationId: id }
+ 
+     const invite = await this.invitationRepository.find({
+       where,
+@@ -60,10 +61,21 @@ export class InvitationService {
+     })
+   }
+ 
++  /**
++   * Delete an invitation.
++   */
++  async delete(id: string | number): Promise<boolean> {
++    const where: Partial<Invitation> = typeof id === 'number' ? { id: id } : { invitationId: id }
++
++    const invite = await this.invitationRepository.delete(where)
++
++    return !!invite.affected
++  }
++
+   /**
+    * Invite a user to this media server.
+    */
+-  async create(createInvitationsDto: CreateInvitationDto): Promise<Invitation> {
++  async create(createInvitationsDto: CreateInvitationDto, user: User): Promise<Invitation> {
+     const { type, expiresAt /*,inviteeId*/ } = createInvitationsDto
+     const defaultExpiresAt = new Date(Date.now() + ms('3 days')).toString()
+     //let invite
+@@ -71,6 +83,11 @@ export class InvitationService {
+     if (type === 'user') {
        try {
-         //const invite = await this.createInvitiationLink(inviteeId)
+         //const invite = await this.sendInviteToUser(inviteeId)
 +        return await this.invitationRepository.save({
 +          type,
 +          expiresAt: expiresAt || defaultExpiresAt,
-+          link: 'https://join.cardinalconnect.com/i/lakd8s',
++          createdBy: user,
 +        })
        } catch (error) {
          Logger.log(error)
        }
-     }
--
--    return await this.invitationRepository.save({
--      type,
--      expiresAt: expiresAt || defaultExpiresAt,
--    })
-   }
- 
-   /**
+@@ -81,6 +98,7 @@ export class InvitationService {
+           type,
+           expiresAt: expiresAt || defaultExpiresAt,
+           link: 'https://join.cardinalconnect.com/i/lakd8s',
++          createdBy: user,
+         })
+       } catch (error) {
+         Logger.log(error)

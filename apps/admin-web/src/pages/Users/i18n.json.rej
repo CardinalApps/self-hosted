@@ -1,76 +1,43 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -18,16 +18,16 @@
-     "en": "Allow new users to sign up"
-   },
-   "users.invite-user": {
--    "en": "Invite Users"
-+    "en": "Active Invitations"
-   },
-   "users.new-users.invite-links.create": {
-     "en": "Create link"
-   },
-   "users.invite-links.manage-button": {
--    "en": "Manage"
-+    "en": "Invite User"
-   },
-   "users.invite-links.manage-title": {
--    "en": "User Invitations"
-+    "en": "Invite New User"
-   },
-   "users.invite-links.active": {
-     "en": "Active until {date}"
-@@ -35,8 +35,11 @@
-   "users.invite-links.expired": {
+@@ -36,10 +36,10 @@
      "en": "Expired"
    },
--  "users.invite-links.empty": {
--    "en": "No invitations have been sent."
-+  "users.invite.user.none": {
-+    "en": "No user invitations have been sent."
-+  },
-+  "users.invite.link.none": {
-+    "en": "No invitation links have been sent."
+   "users.invite.user.none": {
+-    "en": "No user invitations have been sent."
++    "en": "No user invitations."
+   },
+   "users.invite.link.none": {
+-    "en": "No invitation links have been sent."
++    "en": "No invitation links."
    },
    "users.invite-links.search.placeholder": {
      "en": "Search for a Cardinal user"
-@@ -45,10 +48,10 @@
-     "en": "Only returns users whose search visibility is set to Public."
+@@ -74,6 +74,9 @@
+   "users.invite.expires-in": {
+     "en": "Expires in"
    },
-   "users.invite-links.tabs.by-username": {
--    "en": "Invite by Username"
-+    "en": "Invite a Cardinal User"
-   },
-   "users.invite-links.tabs.by-link": {
--    "en": "Create Invitation Link"
-+    "en": "Invite Using a Link"
-   },
-   "users.invite.confirm.title": {
-     "en": "Invite New user"
-@@ -60,20 +63,20 @@
-     "en": "Generate link"
-   },
-   "users.invite.link.create.notice": {
--    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account first."
-+    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account."
-   },
-   "users.invite.link.create.expiration": {
-     "en": "Expiration"
-   },
--  "users.invite.list.user": {
--    "en": "Invite to {name}"
--  },
--  "users.invite.list.link": {
--    "en": "Invite link {link}"
--  },
-   "users.invite.list.expiration": {
-     "en": "Expiration"
-   },
-+  "users.invite.expires-in": {
-+    "en": "Expires in"
++  "users.invite.expired": {
++    "en": "Expired"
 +  },
-+  "users.invite.expires-at": {
-+    "en": "Expires at"
+   "users.invite.expires-at": {
+     "en": "Expires at"
+   },
+@@ -83,6 +86,18 @@
+   "users.new-users.invite-links.no-active-links": {
+     "en": "No active invitations."
+   },
++  "users.invite.confirm-delete.title": {
++    "en": "Confirm Delete"
 +  },
-   "users.invite-links.history.title": {
-     "en": "History"
++  "users.invite.confirm-delete.desc": {
++    "en": "Users will no longer be able to join using this link, and it cannot be restored."
++  },
++  "users.invite.confirm-delete-for-user.desc": {
++    "en": "The invitation email that was sent to {username} cannot be unsent, but the link within it will no longer work. You will not be able to reactivate it."
++  },
++  "users.invite.sent-invite-to-user": {
++    "en": "Invitation sent."
++  },
+   "users.server.capacity": {
+     "en": "Capacity"
    },

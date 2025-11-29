@@ -1,22 +1,61 @@
 diff a/servers/media/src/modules/invitation/invitation.controller.ts b/servers/media/src/modules/invitation/invitation.controller.ts	(rejected hunks)
-@@ -24,7 +24,7 @@ import { GetInvitationDto } from './dtos/GetInvitation.dto'
+@@ -7,6 +7,8 @@ import {
+   Param,
+   Post,
+   Body,
++  ForbiddenException,
++  Delete,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+@@ -20,11 +22,14 @@ import { ApiSecurityTypes } from '../../guards/types'
+ import { Invitation } from './invitation.entity'
+ import { InvitationService } from './invitation.service'
+ 
++import { CurrentUser } from '../../decorators/CurrentUser.decorator'
+ import { GetInvitationDto } from './dtos/GetInvitation.dto'
  import { QueryInvitationDto } from './dtos/QueryInvitation.dto'
  
  import { EventService } from '../event/event.service'
--import { CreateInvitationsDto } from './dtos/CreateInvitation'
-+import { CreateInvitationDto } from './dtos/CreateInvitation'
+ import { CreateInvitationDto } from './dtos/CreateInvitation'
++import { DeleteInvitationDto } from './dtos/DeleteInvitationDto'
++import { User } from '../user/user.entity'
  
  @Controller('/invitations')
  export class InvitationController {
-@@ -71,8 +71,8 @@ export class InvitationController {
+@@ -71,8 +76,33 @@ export class InvitationController {
    @ApiTags('Invitations')
    @ApiOperation({ summary: 'Create a new invitation.' })
    @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
--  async createInvitation(@Body() createInvitationsDto: CreateInvitationsDto): Promise<Invitation> {
--    const job = await this.invitationService.create(createInvitationsDto)
--    return job
-+  async createInvitation(@Body() createInvitationsDto: CreateInvitationDto): Promise<Invitation> {
-+    const invitation = await this.invitationService.create(createInvitationsDto)
+-  async createInvitation(@Body() createInvitationsDto: CreateInvitationDto): Promise<Invitation> {
+-    const invitation = await this.invitationService.create(createInvitationsDto)
++  async createInvitation(
++    @Body() createInvitationsDto: CreateInvitationDto,
++    @CurrentUser() user: User,
++  ): Promise<Invitation> {
++    const invitation = await this.invitationService.create(createInvitationsDto, user)
 +    return invitation
++  }
++
++  /**
++   * Delete an invitation.
++   */
++  @Delete(':id')
++  @UseGuards(AuthGuard)
++  @ApiTags('Invitations')
++  @ApiOperation({ summary: 'Delete a new invitation.' })
++  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  async deleteInvitation(
++    @Param() { id }: DeleteInvitationDto,
++    @CurrentUser() user: User,
++  ): Promise<boolean> {
++    const invitiation = await this.invitationService.get(id)
++
++    if (invitiation.createdBy?.userId !== user?.userId) {
++      throw new ForbiddenException()
++    }
++
++    const invitation = await this.invitationService.delete(id)
+     return invitation
    }
  }

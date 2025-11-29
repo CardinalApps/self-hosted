@@ -142,6 +142,21 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
           }}
         />
       )}
+      {!!confirmingDelete && (
+        <Confirm
+          title={i18n['users.invite.confirm-delete.title'][lang]}
+          message={i18n['users.invite.confirm-delete-for-user.desc'][lang]}
+          loading={deleteInvitationResult.isLoading}
+          confirmButtonIsDangerous={true}
+          onClose={(confirmed) => {
+            if (confirmed) {
+              deleteInvitation(confirmingDelete?.invitationId)
+            } else {
+              setConfirmingDelete(null)
+            }
+          }}
+        />
+      )}
     </>
   )
 }
