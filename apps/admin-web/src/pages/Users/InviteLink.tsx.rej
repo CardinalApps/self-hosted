@@ -1,146 +1,17 @@
 diff a/apps/admin-web/src/pages/Users/InviteLink.tsx b/apps/admin-web/src/pages/Users/InviteLink.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
+@@ -1,5 +1,6 @@
  import { useEffect, useState } from 'react'
  import { useSelector } from 'react-redux'
++import ms from 'ms'
  
-+import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
  import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
- import List from '@cardinalapps/ui/src/components/interaction/List'
- import Button from '@cardinalapps/ui/src/components/interaction/Button'
-@@ -9,37 +10,93 @@ import DatePicker from '@cardinalapps/ui/src/components/forms/DatePicker'
- import Form from '@cardinalapps/ui/src/components/forms/Form'
- import FormField from '@cardinalapps/ui/src/components/forms/FormField'
- import Span from '@cardinalapps/ui/src/components/typography/Span'
-+import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
- 
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
--import { formatDate, formatTimeUntil } from '@cardinalapps/ui/src/lib/formatting/time'
-+import { DrawIntitationTabType } from './ManageInvitationsDrawer'
- 
--import { useCreateInvitationMutation, useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
-+import {
-+  InvitationType,
-+  useCreateInvitationMutation,
-+  useGetInvitationsQuery,
-+  useDeleteInvitationMutation,
-+} from '@cardinalapps/ui/src/store/apis/invitations'
-+import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
- 
- import i18n from './i18n.json'
- 
- import './styles.css'
- 
--function InvitationLinks() {
-+function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
-+  const dispatch = useAppDispatch()
-   const { lang } = useSelector(settingsSelectors.current)
-   const [generatedLink, setGeneratedLink] = useState<string>()
-+  const [confirmingDelete, setConfirmingDelete] = useState<InvitationType>()
- 
-   const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
-+  const [deleteInvitation, deleteInvitationResult] = useDeleteInvitationMutation()
-   const res = useGetInvitationsQuery({ type: 'link' })
-   const data = res?.data?.[0] || []
- 
-   const handleCreateInvitiationLink = (e, values) => {
--    createInvitation({
--      type: 'link',
--      expiresAt: new Date(values?.expiration),
--    })
-+    if (!generatedLink) {
-+      createInvitation({
-+        type: 'link',
-+        expiresAt: new Date(values?.expiration),
-+      })
-+    }
-   }
- 
-+  /**
-+   * Handle create success.
-+   */
-   useEffect(() => {
-     if (createInvitationResult.isSuccess) {
-       setGeneratedLink(createInvitationResult.data?.link)
-     }
-   }, [createInvitationResult.isSuccess])
- 
-+  /**
-+   * Handle create error.
-+   */
-+  useEffect(() => {
-+    if (createInvitationResult.isError) {
-+      dispatch(toastActions.addToQueue({
-+        type: 'danger',
-+        title: 'status' in deleteInvitationResult.error ? deleteInvitationResult.error.status.toString() : 'Error',
-+        body: 'data' in deleteInvitationResult.error
-+            // @ts-expect-error
-+            ? deleteInvitationResult.error.data?.message
-+            : 'Error',
-+      }))
-+    }
-+  }, [createInvitationResult.isError])
-+
-+  /**
-+   * Handle delete success.
-+   */
-+  useEffect(() => {
-+    if (deleteInvitationResult.isSuccess) {
-+      setConfirmingDelete(null)
-+    }
-+  }, [deleteInvitationResult.isSuccess])
-+
-+  /**
-+   * Handle delete error.
-+   */
-+  useEffect(() => {
-+    if (deleteInvitationResult.isError) {
-+      dispatch(toastActions.addToQueue({
-+        type: 'danger',
-+        title: 'status' in deleteInvitationResult.error ? deleteInvitationResult.error.status.toString() : 'Error',
-+        body: 'data' in deleteInvitationResult.error
-+            // @ts-expect-error
-+            ? deleteInvitationResult.error.data?.message
-+            : 'Error',
-+      }))
-+    }
-+  }, [deleteInvitationResult.isError])
-+
-   return (
-     <>
-       <Drawer.Section className="create-invitiation-link">
-@@ -82,15 +139,33 @@ function InvitationLinks() {
-             items={data?.map((invitation) => {
-               return {
-                 name: invitation?.link?.split('/').pop(),
--                label: <Span truncate={true}>{i18n['users.invite.expires-in'][lang] + ' ' + formatTimeUntil(invitation?.expiresAt.toString())}</Span>,
--                title: i18n['users.invite.expires-at'][lang] + ' ' + formatDate(invitation?.expiresAt.toString()),
-+                label: <Span truncate={true}>{getExpiration(invitation?.expiresAt)}</Span>,
-+                title: getExpiration(invitation?.expiresAt, true),
-                 copyable: invitation?.link || 'missing link',
-                 controls: ['copy', 'delete'],
-+                onDelete: () => {
-+                  setConfirmingDelete(invitation)
-+                },
-               }
-             })}
-           />
-         )}
-       </Drawer.Section>
-+      {!!confirmingDelete && (
-+        <Confirm
-+          title={i18n['users.invite.confirm-delete.title'][lang]}
-+          message={i18n['users.invite.confirm-delete.desc'][lang]}
-+          loading={deleteInvitationResult.isLoading}
-+          confirmButtonIsDangerous={true}
-+          onClose={(confirmed) => {
-+            if (confirmed) {
-+              deleteInvitation(confirmingDelete?.invitationId)
-+            } else {
-+              setConfirmingDelete(null)
-+            }
-+          }}
-+        />
-+      )}
-     </>
-   )
- }
+@@ -108,7 +109,7 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
+             <DatePicker
+               id="invitation-link-expiration"
+               name="expiration"
+-              min={new Date().toString()}
++              min={new Date(Date.now() + ms('1 day')).toString()}
+               required={true}
+               type="datetime-local"
+             />

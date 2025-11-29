@@ -1,10 +1,71 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -166,7 +166,7 @@ function Users() {
-           }
+@@ -31,12 +32,15 @@ function Users() {
+   const [configuringUser, setConfiguringUser] = useState<UserType>()
+   const [showManageInvitationsDrawer, setShowManageInvitationsDrawer] = useState<boolean>(false)
+ 
+-  const res = useGetUsersQuery({ take: 9999 })
+-  const data = res?.data ? res.data?.[0] : []
+-  const serverIsClaimed = data?.find((user: UserType) => user?.role === 'owner')
+-  const usedSeats = data?.filter((user: UserType) => user?.designation !== 'guest_account').length
++  const usersRes = useGetUsersQuery({ take: 9999 })
++  const users = usersRes?.data ? usersRes.data?.[0] : []
++  const serverIsClaimed = users?.find((user: UserType) => user?.role === 'owner')
++  const usedSeats = users?.filter((user: UserType) => user?.designation !== 'guest_account').length
+   const totalSeats = 3
+ 
++  const activeInvitationsRes = useGetInvitationsQuery({ isExpired: false })
++  const activeIntiations = activeInvitationsRes?.data?.[0] || []
++
+   const nameCol = (user: UserType) => {
+     return (
+       <Table.Col key="username">
+@@ -106,12 +110,12 @@ function Users() {
+   }
+ 
+   const tableBody = () => {
+-    if (!data.length) {
++    if (!users.length) {
+       return []
+     }
+ 
+-    const allUsersExceptGuest = data.filter((user: UserType) => user.designation !== 'guest_account')
+-    const guestAccount = data.find((user: UserType) => user.designation === 'guest_account')
++    const allUsersExceptGuest = users.filter((user: UserType) => user.designation !== 'guest_account')
++    const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
+ 
+     const ordered = [
+       ...allUsersExceptGuest,
+@@ -135,18 +139,18 @@ function Users() {
+    */
+   useEffect(() => {
+     if (configuringUser) {
+-      data.forEach((user: UserType) => {
++      users.forEach((user: UserType) => {
+         if (user.userId === configuringUser?.userId) {
+           setConfiguringUser(user)
+         }
+       })
+     }
+-  }, [data])
++  }, [users])
+ 
+   return (
+     <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
+       <CardGrid layout="flex">
+-        {res.isSuccess && !serverIsClaimed && (
++        {usersRes.isSuccess && !serverIsClaimed && (
+           <Card
+             icon={<Icon fa="fas fa-exclamation-triangle" />}
+             header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
+@@ -180,7 +184,10 @@ function Users() {
+           )}
+           bottomAlignContent={true}
+         >
+-          {i18n['users.new-users.invite-links.no-active-links'][lang]}
++          {activeIntiations.length
++            ? i18n['users.invite.some-active-links'][lang].replace('{num}', activeIntiations.length)
++            : i18n['users.invite.no-active-links'][lang]
++          }
          </Card>
-         <Card
--          icon={<Icon fa="far fa-envelope-open" />}
-+          icon={<Icon fa="fas fa-envelope" />}
-           header={<H5>{i18n['users.invite-user'][lang]}</H5>}
-           footer={(
-             <>
+         {/* <Card
+           icon={<Icon fa="fas fa-info-circle" />}

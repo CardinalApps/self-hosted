@@ -1,24 +1,20 @@
 diff a/libraries/ui/src/store/apis/invitations.ts b/libraries/ui/src/store/apis/invitations.ts	(rejected hunks)
-@@ -53,10 +53,22 @@ export const invitationApi = baseHomeServerApi
-         }),
-         invalidatesTags: ['Invitation.List'],
-       }),
-+
-+      deleteInvitation: builder.mutation<
-+        boolean,
-+        string
-+      >({
-+        query: (id) => ({
-+          url: `invitations/${id}`,
-+          method: 'DELETE',
-+        }),
-+        invalidatesTags: ['Invitation.List'],
-+      }),
-     }),
-   })
- 
- export const {
-   useGetInvitationsQuery,
-   useCreateInvitationMutation,
-+  useDeleteInvitationMutation,
- } = invitationApi
+@@ -28,15 +28,17 @@ export const invitationApi = baseHomeServerApi
+           order?: CommonOrderParams,
+           orderBy?: 'createdAt',
+           type?: InvitationTypeType,
++          isExpired?: boolean,
+         }
+       >({
+-        query: ({ take, skip, order, orderBy, type }) => {
++        query: ({ take, skip, order, orderBy, type, isExpired }) => {
+           return queryParams('/invitations', {
+             ...(take && { take }),
+             ...(skip && { skip }),
+             ...(order && { order }),
+             ...(orderBy && { orderBy }),
+             ...(type && { type }),
++            ...(typeof isExpired !== 'undefined' && { isExpired }),
+           })
+         },
+         providesTags: ['Invitation.List'],

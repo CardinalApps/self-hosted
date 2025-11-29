@@ -30,6 +30,7 @@ import CreateUserDrawer from './CreateUserDrawer'
 
 import i18n from './i18n.json'
 import './styles.css'
+import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
 
 function Users() {
   const { lang } = useSelector(settingsSelectors.current)

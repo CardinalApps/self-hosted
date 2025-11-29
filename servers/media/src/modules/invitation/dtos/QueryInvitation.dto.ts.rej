@@ -1,19 +1,27 @@
 diff a/servers/media/src/modules/invitation/dtos/QueryInvitation.dto.ts b/servers/media/src/modules/invitation/dtos/QueryInvitation.dto.ts	(rejected hunks)
-@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer'
- import { IsString, IsOptional, IsIn } from 'class-validator'
+@@ -1,8 +1,9 @@
+ import { Transform } from 'class-transformer'
+-import { IsString, IsOptional, IsIn } from 'class-validator'
++import { IsString, IsOptional, IsIn, IsBoolean } from 'class-validator'
  
  import { Pagination } from '../../../dtos/pagination.dto'
-+import { InvitationType } from '../invitation.entity'
+ import { InvitationType } from '../invitation.entity'
++import { toBoolean, toString } from '../../../utils/transformers'
  
  enum AllowedMusicTracksOrderBy {
    'createdAt' = 'createdAt',
-@@ -15,4 +16,8 @@ class InvitationPagination extends Pagination {
-   sort?: AllowedMusicTracksOrderBy = AllowedMusicTracksOrderBy.createdAt
+@@ -17,7 +18,13 @@ class InvitationPagination extends Pagination {
  }
  
--export class QueryInvitationDto extends InvitationPagination {}
-+export class QueryInvitationDto extends InvitationPagination {
-+  @Transform(({ value }) => String(value))
-+  @IsString()
-+  type?: InvitationType
-+}
+ export class QueryInvitationDto extends InvitationPagination {
+-  @Transform(({ value }) => String(value))
++  @Transform(toString)
++  @IsOptional()
+   @IsString()
+   type?: InvitationType
++
++  @Transform(toBoolean)
++  @IsOptional()
++  @IsBoolean()
++  isExpired?: boolean
+ }
