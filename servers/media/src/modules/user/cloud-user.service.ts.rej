@@ -1,0 +1,10 @@
+diff a/servers/media/src/modules/user/cloud-user.service.ts b/servers/media/src/modules/user/cloud-user.service.ts	(rejected hunks)
+@@ -71,7 +71,7 @@ export class CloudUserService {
+       throw new Error('This user cannot be used.')
+     }
+     if (!userObj?.confirmedEmail) {
+-      throw new Error("The account's email address must be confirmed before it can be used with a Media Server.")
++      throw new Error("This account's email address must be confirmed before it can log into a server.")
+     }
+   }
+ 

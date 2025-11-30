@@ -1,47 +1,17 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -52,10 +52,6 @@ export class UserService {
-    * will be validated.
-    */
-   async createUser(createUserDto: CreateUser): Promise<User | null> {
--    if (createUserDto?.cardinalJWT && await this.getServerOwner()) {
--      throw new Error('Cannot create more than 1 online local account')
--    }
--
-     let cardinalCloudUser
+@@ -56,13 +56,8 @@ export class UserService {
  
      // Fetch the user from the auth servers for this JWT and validate it
-@@ -311,4 +323,34 @@ export class UserService {
-       cachedCloudUserAt: userObject.cachedCloudUserAt,
+     if (createUserDto?.cardinalJWT) {
+-      try {
+-        cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserDto.cardinalJWT)
+-        this.cloudUserService.throwIfInvalidCardinalAccount(cardinalCloudUser)
+-      } catch (error) {
+-        Logger.error(error)
+-        throw new Error('Could not create a new user with this Cardinal account.')
+-      }
++      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserDto.cardinalJWT)
++      this.cloudUserService.throwIfInvalidCardinalAccount(cardinalCloudUser)
      }
-   }
-+
-+
-+  /**
-+   * TODO move seats to a new service
-+   */
-+
-+
-+  /**
-+   * Returns an array of all users that are using a seat.
-+   */
-+  async getSeatedUsers(): Promise<User[]> {
-+    const seatedUsers = await this.userRepository.find({
-+      where: {
-+        cardinalId: Not(IsNull()),
-+      },
-+    })
-+    return seatedUsers
-+  }
-+
-+  /**
-+   * Returns the number of users that are using seats.
-+   */
-+  async countSeatedUsers(): Promise<number> {
-+    const seatedUsers = await this.userRepository.count({
-+      where: {
-+        cardinalId: Not(IsNull()),
-+      },
-+    })
-+    return seatedUsers
-+  }
- }
+ 
+     let createdUser = null
