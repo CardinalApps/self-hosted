@@ -1,17 +1,27 @@
 diff a/servers/media/src/modules/auth/auth.module.ts b/servers/media/src/modules/auth/auth.module.ts	(rejected hunks)
-@@ -7,11 +7,13 @@ import { UserModule } from '../user/user.module'
- import { AuthService } from './auth.service'
+@@ -8,6 +8,9 @@ import { AuthService } from './auth.service'
  import { AuthController } from './auth.controller'
  
--import { envVar } from '../../utils/env'
-+import { getSigningSecret } from '../../utils/jwt'
+ import { getSigningSecret } from '../../utils/jwt'
++import { TokenService } from './token.service'
++import { CardinalSSOStrategy } from './strategies/cardinal-sso.service'
++import { LocalAuthStrategy } from './strategies/local.service'
  
  @Module({
    imports: [
--    JwtModule.register({ secret: envVar('SIGNING_SECRET', '340f94ad046a7539058f25c7f46036b4b9bd840313ab4496b4da194df0cb6bb5408a23998b5fa9843cf424e9f514662c5a4d5b19fedb6efd49b286bcaf67b2a0') as string }),
-+    JwtModule.register({
-+      secret: getSigningSecret(),
-+    }),
-     SettingsModule,
-     UserModule,
+@@ -19,9 +22,15 @@ import { getSigningSecret } from '../../utils/jwt'
    ],
+   exports: [
+     AuthService,
++    TokenService,
++    LocalAuthStrategy,
++    CardinalSSOStrategy,
+   ],
+   providers: [
+     AuthService,
++    TokenService,
++    LocalAuthStrategy,
++    CardinalSSOStrategy,
+   ],
+   controllers: [AuthController],
+ })

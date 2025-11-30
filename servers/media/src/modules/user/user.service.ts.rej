@@ -1,37 +1,47 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -14,7 +14,6 @@ import { User } from './user.entity'
- import { Roles, Designations } from './types'
- import { CreateUser } from './dtos/CreateUser.dto'
+@@ -52,10 +52,6 @@ export class UserService {
+    * will be validated.
+    */
+   async createUser(createUserDto: CreateUser): Promise<User | null> {
+-    if (createUserDto?.cardinalJWT && await this.getServerOwner()) {
+-      throw new Error('Cannot create more than 1 online local account')
+-    }
+-
+     let cardinalCloudUser
  
--import { CardinalApp } from '../../utils/apps'
- import { GetUsersDto } from './dtos/GetUsers.dto'
- 
- /**
-@@ -224,6 +223,14 @@ export class UserService {
-     return await this.userRepository.findOneBy({ designation: Designations.GUEST_ACCOUNT })
+     // Fetch the user from the auth servers for this JWT and validate it
+@@ -311,4 +323,34 @@ export class UserService {
+       cachedCloudUserAt: userObject.cachedCloudUserAt,
+     }
    }
- 
++
++
 +  /**
-+   * Returns whether the guest account is enabled.
++   * TODO move seats to a new service
 +   */
-+  async guestAccountIsEnabled(): Promise<boolean> {
-+    const guestAccount = await this.getGuestAccount()
-+    return guestAccount.enabled
++
++
++  /**
++   * Returns an array of all users that are using a seat.
++   */
++  async getSeatedUsers(): Promise<User[]> {
++    const seatedUsers = await this.userRepository.find({
++      where: {
++        cardinalId: Not(IsNull()),
++      },
++    })
++    return seatedUsers
 +  }
 +
-   /**
-    * Returns all users according to the query.
-    */
-@@ -242,11 +249,9 @@ export class UserService {
-    * Returns an array of all users with all sensitive information filtered out.
-    */
-   async getUsersForPublic(): Promise<Partial<User>[]> {
--    const guestAccountEnabled = await this.settingsService.get(CardinalApp.ADMIN, 'enable_guest_account')
-     let users
- 
--    // TODO make the guest account a per-app setting
--    if (guestAccountEnabled) {
-+    if (await this.guestAccountIsEnabled()) {
-       users = await this.userRepository.find()
-     } else {
-       users = await this.userRepository.find({
++  /**
++   * Returns the number of users that are using seats.
++   */
++  async countSeatedUsers(): Promise<number> {
++    const seatedUsers = await this.userRepository.count({
++      where: {
++        cardinalId: Not(IsNull()),
++      },
++    })
++    return seatedUsers
++  }
+ }

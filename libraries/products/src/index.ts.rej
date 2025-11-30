@@ -1,0 +1,9 @@
+diff a/libraries/products/src/index.ts b/libraries/products/src/index.ts	(rejected hunks)
+@@ -1,4 +1,3 @@
+-export const Subscriptions = {
+-  name: "free",
+-  price: 0,
+-} as const
++import Subscriptions from './subscriptions'
++
++export { Subscriptions }

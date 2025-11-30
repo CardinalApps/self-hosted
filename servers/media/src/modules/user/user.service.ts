@@ -207,6 +207,22 @@ export class UserService {
   }
 
   /**
+   * Creates a server owner account.
+   */
+  async createServerOwner(cardinalSSOJWT): Promise<User | null> {
+    if (await this.getServerOwner()) {
+      throw new Error('Cannot create multiple server owners')
+    }
+
+    const newOwnerAccount = await this.createUser({
+      role: Roles.OWNER,
+      cardinalJWT: cardinalSSOJWT,
+    })
+
+    return newOwnerAccount
+  }
+
+  /**
    * Returns the local user account associated with the Cardinal account that
    * has claimed this Media Server.
    */

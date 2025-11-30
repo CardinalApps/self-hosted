@@ -1,0 +1,32 @@
+diff a/servers/media/src/middleware/AttachLocalUser.middleware.ts b/servers/media/src/middleware/AttachLocalUser.middleware.ts	(rejected hunks)
+@@ -1,10 +1,10 @@
+ import { Injectable, NestMiddleware, Logger, GoneException } from '@nestjs/common'
+ import { NextFunction } from 'express'
+ 
+-import { AuthService } from '../modules/auth/auth.service'
+ import { UserService } from '../modules/user/user.service'
+ 
+ import { getJWTFromHeaders } from '../utils/jwt'
++import { TokenService } from 'src/modules/auth/token.service'
+ 
+ /**
+  * This middleware reads the JWT in the Authorization header and verifies the
+@@ -18,8 +18,8 @@ import { getJWTFromHeaders } from '../utils/jwt'
+ @Injectable()
+ export class AttachLocalUserToRequest implements NestMiddleware {
+   constructor(
+-    private readonly authService: AuthService,
+     private readonly userService: UserService,
++    private readonly tokenService: TokenService,
+   ) {}
+ 
+   async use(request, response, next: NextFunction): Promise<void> {
+@@ -30,7 +30,7 @@ export class AttachLocalUserToRequest implements NestMiddleware {
+       return next()
+     }
+ 
+-    const tokenIsValid = this.authService.verifyJWT(localUserJWT)
++    const tokenIsValid = this.tokenService.verifyJWT(localUserJWT)
+ 
+     // The token will become invalid when the server secret is changed
+     if (!tokenIsValid) {
