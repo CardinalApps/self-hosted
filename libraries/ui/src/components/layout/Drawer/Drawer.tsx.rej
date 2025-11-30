@@ -1,7 +1,9 @@
 diff a/libraries/ui/src/components/layout/Drawer/Drawer.tsx b/libraries/ui/src/components/layout/Drawer/Drawer.tsx	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { useEffect } from 'react'
-+import { useEffect, useState } from 'react'
- import clsx from 'clsx'
- import type { PropsWithChildren, ReactNode } from 'react'
- import { createPortal } from 'react-dom'
+@@ -55,6 +55,7 @@ const Drawer = ({
+   useEffect(() => {
+     const onEsc = (e) => {
+       if (e?.key === 'Escape') {
++        e.stopImmediatePropagation()
+         handleClose()
+       }
+     }
