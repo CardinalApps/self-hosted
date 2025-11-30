@@ -1,17 +1,51 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -56,13 +56,8 @@ export class UserService {
- 
-     // Fetch the user from the auth servers for this JWT and validate it
-     if (createUserDto?.cardinalJWT) {
--      try {
--        cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserDto.cardinalJWT)
--        this.cloudUserService.throwIfInvalidCardinalAccount(cardinalCloudUser)
--      } catch (error) {
--        Logger.error(error)
--        throw new Error('Could not create a new user with this Cardinal account.')
--      }
-+      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserDto.cardinalJWT)
-+      this.cloudUserService.throwIfInvalidCardinalAccount(cardinalCloudUser)
+@@ -37,14 +37,6 @@ export class UserService {
+       await this.createGuestAccount()
+       Logger.log('Created guest account', 'User')
      }
+-
+-    // Check for legacy shared offline account
+-    // Probably safe to remove this after a few releases or a few months
+-    const legacyAccount = await this.userRepository.findOneBy({ designation: 'shared_offline_account' })
+-    if (legacyAccount) {
+-      await this.userRepository.delete({ designation: 'shared_offline_account' })
+-      Logger.log('Migrated to guest account', 'User')
+-    }
+   }
  
-     let createdUser = null
+   /**
+@@ -318,34 +310,4 @@ export class UserService {
+       cachedCloudUserAt: userObject.cachedCloudUserAt,
+     }
+   }
+-
+-
+-  /**
+-   * TODO move seats to a new service
+-   */
+-
+-
+-  /**
+-   * Returns an array of all users that are using a seat.
+-   */
+-  async getSeatedUsers(): Promise<User[]> {
+-    const seatedUsers = await this.userRepository.find({
+-      where: {
+-        cardinalId: Not(IsNull()),
+-      },
+-    })
+-    return seatedUsers
+-  }
+-
+-  /**
+-   * Returns the number of users that are using seats.
+-   */
+-  async countSeatedUsers(): Promise<number> {
+-    const seatedUsers = await this.userRepository.count({
+-      where: {
+-        cardinalId: Not(IsNull()),
+-      },
+-    })
+-    return seatedUsers
+-  }
+ }

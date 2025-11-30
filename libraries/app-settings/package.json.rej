@@ -1,16 +1,15 @@
 diff a/libraries/app-settings/package.json b/libraries/app-settings/package.json	(rejected hunks)
-@@ -5,12 +5,12 @@
-   "version": "0.1.25",
-   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+@@ -7,10 +7,11 @@
    "private": true,
--  "type": "commonjs",
-+  "type": "module",
+   "type": "module",
    "scripts": {
-     "dev": "tsc --watch",
+-    "dev": "tsc --watch",
++    "dev": "pnpm copy-dist-packagejson && tsc --watch",
      "lint": "eslint src",
      "typecheck": "tsc --noEmit",
--    "build": "tsc",
-+    "build": "tsc && cp package.cjs.json dist/cjs/package.json",
+-    "build": "tsc && cp package.cjs.json dist/cjs/package.json",
++    "build": "tsc && copy-dist-packagejson",
++    "copy-dist-packagejson": "mkdir dist && mkdir dist/cjs && cp package.cjs.json dist/cjs/package.json",
      "test": "jest"
    },
    "devDependencies": {

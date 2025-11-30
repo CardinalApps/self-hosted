@@ -1,11 +1,29 @@
 diff a/servers/media/src/modules/user/user.entity.ts b/servers/media/src/modules/user/user.entity.ts	(rejected hunks)
-@@ -38,6 +38,9 @@ export class User extends BaseEntity {
+@@ -5,6 +5,8 @@ import {
+   JoinColumn,
+ } from 'typeorm'
+ 
++import { SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
++
+ import { BaseEntity } from '../../entities/base.entity'
+ import { Grant } from '../rbac/grant.entity'
+ 
+@@ -33,7 +35,9 @@ export class User extends BaseEntity {
+       to: (val) => JSON.stringify(val),
+     },
+   })
+-  cachedCloudUser?: object
++  cachedCloudUser?: {
++    subscription: SubscriptionTier
++  }
+ 
    @Column({ nullable: true })
    cachedCloudUserAt?: Date
+@@ -47,7 +51,6 @@ export class User extends BaseEntity {
+   @Column()
+   role: string
  
-+  @Column({ nullable: false, default: true })
-+  enabled?: boolean
-+
+-  // Some accounts have a designated purpose
    @Column({ nullable: true })
-   ssoToken?: string
+   designation?: string
  

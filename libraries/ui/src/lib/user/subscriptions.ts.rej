@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/lib/user/subscriptions.ts b/libraries/ui/src/lib/user/subscriptions.ts	(rejected hunks)
+@@ -2,6 +2,8 @@
+  * Keep the backend copy of this definition in sync. It is at:
+  *
+  * /server-auth/src/constants/subscriptions.js
++ * 
++ * @deprecated use @cardinalapps/products package instead
+  */
+ const SUBSCRIPTIONS = {
+   FREE: 'free',

@@ -1,0 +1,59 @@
+diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
+@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
+ 
+ import { UserService } from '../../user/user.service'
+ import { CloudUserService } from '../../user/cloud-user.service'
++import { SeatsService } from 'src/modules/user/seats.service'
+ 
+ import { LoginResponse } from '../dtos/LoginResponse.dto'
+ import { TokenService } from '../token.service'
+@@ -16,6 +17,7 @@ const MAX_SEATS = 3
+ export class CardinalSSOStrategy {
+   constructor(
+     private readonly userService: UserService,
++    private readonly seatsService: SeatsService,
+     private readonly cloudUserService: CloudUserService,
+     private readonly tokenService: TokenService,
+   ) {}
+@@ -33,7 +35,7 @@ export class CardinalSSOStrategy {
+     }
+ 
+     /**
+-     * Situation 1: Happy path, the SSO JWT matches an existing user. Login is successful.
++     * Decision 1: Happy path, the SSO JWT matches an existing user. Login is successful.
+      */
+     const localUser = await this.userService.getUserByCardinalJWT(cardinalSSOToken)
+     if (localUser) {
+@@ -44,20 +46,20 @@ export class CardinalSSOStrategy {
+     }
+ 
+     /**
+-     * Situation 2: 
++     * Decision 2: 
+      * 
+      *    - The SSO JWT didn't match a user.
+      * 
+      * Check if there are any seated users. If there are none, handle the first
+      * login.
+      */
+-    const numSeatedUsers = await this.userService.countSeatedUsers()
++    const numSeatedUsers = await this.seatsService.countSeatedUsers()
+     if (numSeatedUsers === 0) {
+       return await this.handleFirstCardinalUserLogin(cardinalSSOToken)
+     }
+ 
+     /**
+-     * Situation 3:
++     * Decision 3:
+      * 
+      *    - The SSO JWT didn't match a user.
+      *    - We have >=1 seated users in the database.
+@@ -71,7 +73,7 @@ export class CardinalSSOStrategy {
+     }
+ 
+     /**
+-     * Situation 4:
++     * Decision 4:
+      * 
+      *    - The SSO JWT didn't match a user.
+      *    - We have >=1 seated users in the database.

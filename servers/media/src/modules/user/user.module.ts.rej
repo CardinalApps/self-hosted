@@ -1,0 +1,37 @@
+diff a/servers/media/src/modules/user/user.module.ts b/servers/media/src/modules/user/user.module.ts	(rejected hunks)
+@@ -1,22 +1,26 @@
+-import { Module } from '@nestjs/common'
++import { forwardRef, Module } from '@nestjs/common'
+ import { TypeOrmModule } from '@nestjs/typeorm'
+ 
+ import { UserService } from './user.service'
++import { SeatsService } from './seats.service'
+ import { LocalUserService } from './local-user.service'
+ import { CloudUserService } from './cloud-user.service'
+ import { UserController } from './user.controller'
+ import { User } from './user.entity'
+ import { Grant } from '../rbac/grant.entity'
+ import { SettingsModule } from '../settings/settings.module'
++import { LicensingModule } from '../licensing/licensing.module'
+ 
+ @Module({
+   imports: [
+     TypeOrmModule.forFeature([User, Grant]),
+     SettingsModule,
++    forwardRef(() => LicensingModule),
+   ],
+   exports: [
+     TypeOrmModule,
+     UserService,
++    SeatsService,
+     LocalUserService,
+     CloudUserService,
+   ],
+@@ -24,6 +28,7 @@ import { SettingsModule } from '../settings/settings.module'
+     UserService,
+     LocalUserService,
+     CloudUserService,
++    SeatsService,
+   ],
+   controllers: [UserController],
+ })

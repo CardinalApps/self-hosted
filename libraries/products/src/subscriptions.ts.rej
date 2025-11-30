@@ -1,0 +1,51 @@
+diff a/libraries/products/src/subscriptions.ts b/libraries/products/src/subscriptions.ts	(rejected hunks)
+@@ -1,9 +1,42 @@
+-export const Subscriptions = {
+-  slug: "free",
+-  name: {
+-    en: 'Free',
++export enum SubscriptionTiers {
++  FREE = 'free',
++  EARLY_ADOPTER = 'early_adopter',
++}
++
++type localizedStrings = {
++  [lang: string]: string,
++}
++
++/**
++ * A single subscription as advertised on https://cardinalapps.io/pricing
++ */
++export type SubscriptionTier = {
++  name: localizedStrings,
++  slug: string,
++  provides: {
++    seats: number,
++  },
++}
++
++export const SUBSCRIPTIONS = {
++  free: {
++    name: {
++      en: "Free",
++    },
++    slug: "free",
++    provides: {
++      seats: 2,
++    },
++  },
++  early_adopter: {
++    name: {
++      en: "Free",
++    },
++    slug: "free",
++    provides: {
++      seats: 10,
++    },
+   },
+-  seats: 3,
+-} as const
++} as Record<SubscriptionTiers, SubscriptionTier>
+ 
+-export default Subscriptions
++export default SUBSCRIPTIONS
