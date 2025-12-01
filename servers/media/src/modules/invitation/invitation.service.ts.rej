@@ -1,33 +1,10 @@
 diff a/servers/media/src/modules/invitation/invitation.service.ts b/servers/media/src/modules/invitation/invitation.service.ts	(rejected hunks)
-@@ -1,9 +1,9 @@
- import * as ms from 'ms'
- import { Injectable, Logger } from '@nestjs/common'
+@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
  import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
--import { Repository, DataSource } from 'typeorm'
-+import { Repository, DataSource, MoreThan } from 'typeorm'
+ import { Repository, DataSource, MoreThan } from 'typeorm'
  
--import { Invitation } from './invitation.entity'
-+import { Invitation, InvitationType } from './invitation.entity'
+-import { Invitation, InvitationType } from './invitation.entity'
++import { Invitation } from './invitation.entity'
  
  import { EventService } from '../event/event.service'
  import { User } from '../user/user.entity'
-@@ -45,12 +45,17 @@ export class InvitationService {
-    * Returns all invitations according to the query.
-    */
-   async query(queryInvitationsDto: QueryInvitationDto): Promise<[Invitation[], number]> {
--    const { take, skip, order, sort, type } = queryInvitationsDto
-+    const { take, skip, order, sort, type, isExpired } = queryInvitationsDto
-+    const expiresAt = typeof isExpired !== 'undefined'
-+      ? MoreThan(new Date())
-+      : null
-+
-     return await this.invitationRepository.findAndCount({
-       take,
-       skip,
-       where: {
--        type,
-+        ...(type ? { type } : {}),
-+        ...(expiresAt ? { expiresAt: expiresAt } : {}),
-       },
-       relations: {
-         createdBy: true,
