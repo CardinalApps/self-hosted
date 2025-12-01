@@ -286,6 +286,27 @@ export class UserService {
   }
 
   /**
+   * Returns the subscription license of the server owner. Defaults to Free if
+   * there is no owner.
+   */
+  async getServerOwnerSubscription(): Promise<SubscriptionTier> {
+    const owner = await this.getServerOwner()
+
+    if (!owner) {
+      return SUBSCRIPTIONS['free']
+    }
+
+    const ownerSubscriptionSlug = owner?.cachedCloudUser?.subscription
+    const subscription = getSubscription(ownerSubscriptionSlug)
+
+    if (subscription) {
+      return subscription
+    } else {
+      throw new Error('Could not determine license')
+    }
+  }
+
+  /**
    * Returns the local user that is associated with the given local ID.
    */
   async getUserByLocalId(userId: string): Promise<User | null> {

@@ -1,45 +1,28 @@
 diff a/libraries/products/src/subscriptions.ts b/libraries/products/src/subscriptions.ts	(rejected hunks)
-@@ -1,4 +1,4 @@
--export enum SubscriptionTiers {
-+export enum SubscriptionTierSlug {
-   FREE = 'free',
-   EARLY_ADOPTER = 'early_adopter',
- }
-@@ -18,6 +18,9 @@ export type SubscriptionTier = {
-   },
- }
+@@ -20,6 +20,8 @@ export type SubscriptionTier = {
  
-+/**
-+ * All subscriptions with their final values.
-+ */
+ /**
+  * All subscriptions with their final values.
++ * 
++ * Use underscores for slugs.
+  */
  export const SUBSCRIPTIONS = {
    free: {
-     name: {
-@@ -25,7 +28,7 @@ export const SUBSCRIPTIONS = {
+@@ -28,14 +30,14 @@ export const SUBSCRIPTIONS = {
      },
      slug: "free",
      provides: {
--      seats: 2,
-+      seats: 5,
+-      seats: 5,
++      seats: 3,
      },
    },
    early_adopter: {
-@@ -37,6 +40,17 @@ export const SUBSCRIPTIONS = {
+     name: {
+-      en: "Free",
++      en: "Early Adopter",
+     },
+-    slug: "free",
++    slug: "early_adopter",
+     provides: {
        seats: 10,
      },
-   },
--} as Record<SubscriptionTiers, SubscriptionTier>
-+} as Record<SubscriptionTierSlug, SubscriptionTier>
-+
-+/**
-+ * Primary API for getting a subscription.
-+ */
-+export const getSubscription = (slug: string): SubscriptionTier | null => {
-+  if (slug in SUBSCRIPTIONS) {
-+    return SUBSCRIPTIONS[slug as SubscriptionTierSlug]
-+  } else {
-+    return null
-+  }
-+}
- 
- export default SUBSCRIPTIONS

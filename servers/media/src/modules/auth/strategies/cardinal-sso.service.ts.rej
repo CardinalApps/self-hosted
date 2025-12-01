@@ -1,42 +1,9 @@
 diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
-@@ -2,14 +2,13 @@ import { Injectable, Logger } from '@nestjs/common'
- 
+@@ -3,7 +3,6 @@ import { Injectable, Logger } from '@nestjs/common'
  import { UserService } from '../../user/user.service'
  import { CloudUserService } from '../../user/cloud-user.service'
--import { SeatsService } from 'src/modules/user/seats.service'
-+import { SeatsService } from '../../user/seats.service'
-+import { LicensingService } from '../../licensing/licensing.service'
+ import { SeatsService } from '../../user/seats.service'
+-import { LicensingService } from '../../licensing/licensing.service'
  
  import { LoginResponse } from '../dtos/LoginResponse.dto'
  import { TokenService } from '../token.service'
- import { Roles } from '../../user/types'
- 
--const MAX_SEATS = 3
--
- /**
-  * Logs a user into a Cardinal cloud account.
-  */
-@@ -39,9 +39,6 @@ export class CardinalSSOStrategy {
-      */
-     const localUser = await this.userService.getUserByCardinalJWT(cardinalSSOToken)
-     if (localUser) {
--      // if (localUser.cardinalId !== cloudUser?.userId) {
--      //   throw new Error('Cannot log into online account - invalid SSO token')
--      // }
-       return await this.loginSuccess(localUser, cardinalSSOToken)
-     }
- 
-@@ -65,11 +62,9 @@ export class CardinalSSOStrategy {
-      *    - We have >=1 seated users in the database.
-      * 
-      * Check if a seat is available, and do not proceed if server is full.
--     * 
--     * TODO use MAX_SEATS from product library
-      */
--    if (numSeatedUsers >= MAX_SEATS) {
--      throw new Error('User login rejected, no seats available.')
-+    if (!await this.seatsService.hasAvailableSeats()) {
-+      throw new Error('User login denied, no seats available.')
-     }
- 
-     /**

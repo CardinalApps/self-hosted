@@ -1,40 +1,17 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -18,13 +18,14 @@ import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
- import H5 from '@cardinalapps/ui/src/components/typography/H5'
+@@ -116,10 +116,14 @@ function Users() {
+       return []
+     }
  
- import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
-+import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
-+import { useGetLicensingSeatsQuery } from '@cardinalapps/ui/src/store/apis/licensing'
+-    const allUsersExceptGuest = users.filter((user: UserType) => user.designation !== 'guest_account')
++    const allUsersExceptGuest = users
++      .filter((user: UserType) => user.designation !== 'guest_account')
++      .filter((user: UserType) => user.role !== 'owner')
+     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
++    const ownerAccount = users.find((user: UserType) => user.role === 'owner')
  
- import ManageInvitationsDrawer from './ManageInvitationsDrawer'
- import UserManagementDrawer from './UserManagementDrawer'
- 
- import i18n from './i18n.json'
- import './styles.css'
--import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
- 
- function Users() {
-   const { lang } = useSelector(settingsSelectors.current)
-@@ -35,8 +36,9 @@ function Users() {
-   const usersRes = useGetUsersQuery({ take: 9999 })
-   const users = usersRes?.data ? usersRes.data?.[0] : []
-   const serverIsClaimed = users?.find((user: UserType) => user?.role === 'owner')
--  const usedSeats = users?.filter((user: UserType) => user?.designation !== 'guest_account').length
--  const totalSeats = 3
-+
-+  const licensingSeatsRes = useGetLicensingSeatsQuery({})
-+  const licensingSeats = licensingSeatsRes?.data
- 
-   const activeInvitationsRes = useGetInvitationsQuery({ isExpired: false })
-   const activeIntiations = activeInvitationsRes?.data?.[0] || []
-@@ -165,8 +167,8 @@ function Users() {
-         >
-           {
-             i18n['users.server.capacity.seats'][lang]
--              .replace('{used}', usedSeats)
--              .replace('{total}', totalSeats)
-+              .replace('{used}', licensingSeats?.used || '')
-+              .replace('{total}', licensingSeats?.total || '')
-           }
-         </Card>
-         <Card
+     const ordered = [
++      ownerAccount,
+       ...allUsersExceptGuest,
+       guestAccount,
+     ]

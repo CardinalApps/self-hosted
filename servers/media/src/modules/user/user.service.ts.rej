@@ -1,51 +1,28 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -37,14 +37,6 @@ export class UserService {
-       await this.createGuestAccount()
-       Logger.log('Created guest account', 'User')
-     }
+@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
+ import { IsNull, Not, Repository } from 'typeorm'
+ import * as ms from 'ms'
+ 
++import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
++
+ import { v4 as uuid } from 'uuid'
+ 
+ import { getJWTPayload, CloudUserJWTPayload, LocalUserJWTPayload } from '../../utils/jwt'
+@@ -13,8 +15,8 @@ import { CloudUserService } from './cloud-user.service'
+ import { User } from './user.entity'
+ import { Roles, Designations } from './types'
+ import { CreateUser } from './dtos/CreateUser.dto'
 -
--    // Check for legacy shared offline account
--    // Probably safe to remove this after a few releases or a few months
--    const legacyAccount = await this.userRepository.findOneBy({ designation: 'shared_offline_account' })
--    if (legacyAccount) {
--      await this.userRepository.delete({ designation: 'shared_offline_account' })
--      Logger.log('Migrated to guest account', 'User')
--    }
-   }
+ import { GetUsersDto } from './dtos/GetUsers.dto'
++import { SeatsService } from './seats.service'
+ 
+ /**
+  * This class harmonizes the features of offline and online accounts.
+@@ -27,6 +29,7 @@ export class UserService {
+     private readonly localUserService: LocalUserService,
+     private readonly cloudUserService: CloudUserService,
+     private readonly settingsService: SettingsService,
++    private readonly seatsService: SeatsService,
+   ) {}
  
    /**
-@@ -318,34 +310,4 @@ export class UserService {
-       cachedCloudUserAt: userObject.cachedCloudUserAt,
-     }
-   }
--
--
--  /**
--   * TODO move seats to a new service
--   */
--
--
--  /**
--   * Returns an array of all users that are using a seat.
--   */
--  async getSeatedUsers(): Promise<User[]> {
--    const seatedUsers = await this.userRepository.find({
--      where: {
--        cardinalId: Not(IsNull()),
--      },
--    })
--    return seatedUsers
--  }
--
--  /**
--   * Returns the number of users that are using seats.
--   */
--  async countSeatedUsers(): Promise<number> {
--    const seatedUsers = await this.userRepository.count({
--      where: {
--        cardinalId: Not(IsNull()),
--      },
--    })
--    return seatedUsers
--  }
- }

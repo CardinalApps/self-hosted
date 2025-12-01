@@ -1,26 +1,50 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -167,6 +167,9 @@ export class UserController {
-     return await this.userService.createUser(createUserDto)
-   }
+@@ -10,6 +10,8 @@ import {
+   Query,
+   Patch,
+   UnauthorizedException,
++  ForbiddenException,
++  InternalServerErrorException,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+@@ -33,6 +35,7 @@ import { AuthGuard } from '../../guards/auth.guard'
+ import { ApiSecurityTypes } from '../../guards/types'
+ import { getJWTFromHeaders } from '../../utils/jwt'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
++import { SeatsService } from './seats.service'
  
-+  /**
-+   * FIXME this endpoint needs proper RBAC
-+   */
-   @Patch('/user/:id')
-   @UseGuards(AuthGuard)
-   @ApiTags('User')
-@@ -177,9 +180,13 @@ export class UserController {
-     @Body() updateUserDto: UpdateUserDto,
-     @CurrentUser() currentUser: User,
-   ): Promise<User> {
--    // TODO proper rbac
-     const usersThatCanUseThisEndpoint = []
+ @Controller()
+ export class UserController {
+@@ -40,6 +43,7 @@ export class UserController {
+     private readonly userService: UserService,
+     private readonly localUserService: LocalUserService,
+     private readonly cloudUserService: CloudUserService,
++    private readonly seatsService: SeatsService,
+   ) {}
  
-+    // Special case: prevent disabling your own user
-+    if (id === currentUser.userId && updateUserDto.enabled === false) {
-+      throw new UnauthorizedException('You cannot disable your current user.')
-+    }
+   /**
+@@ -194,8 +198,22 @@ export class UserController {
+     // Users can update themselves
+     usersThatCanUseThisEndpoint.push(id)
+ 
++    // User is allow to perform this update
+     if (usersThatCanUseThisEndpoint.includes(currentUser.userId)) {
+-      return await this.userService.update(id, updateUserDto)
++      const userPriorToUpdate = await this.userService.get(id)
 +
-     // Server owner can update anyone
-     const serverOwner = await this.userService.getServerOwner()
-     usersThatCanUseThisEndpoint.push(serverOwner.userId)
++      // If trying to enable a user, check if there is a seat available
++      if (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false) {
++        if (!await this.seatsService.hasAvailableSeats()) {
++          throw new ForbiddenException('Cannot enable this user because there are no seats available.')
++        }
++      }
++
++      try {
++        return await this.userService.update(id, updateUserDto)
++      } catch (error) {
++        throw new InternalServerErrorException(error.message)
++      }
+     }
+ 
+     throw new UnauthorizedException()

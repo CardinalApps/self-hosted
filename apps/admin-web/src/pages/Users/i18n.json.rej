@@ -1,13 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -86,7 +86,10 @@
-   "users.invite.no-active-links": {
-     "en": "No active invitations."
+@@ -207,7 +207,7 @@
+     "en": "Disable User"
    },
--  "users.invite.some-active-links": {
-+  "users.invite.some-active-links.singular": {
-+    "en": "1 active invitation."
-+  },
-+  "users.invite.some-active-links.plural": {
-     "en": "{num} active invitations."
+   "users.settings.actions.disable.confirm.desc": {
+-    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately."
++    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. A seat will also become available."
    },
-   "users.invite.confirm-delete.title": {
+   "users.settings.actions.enable.confirm.title": {
+     "en": "Enable User"

@@ -1,17 +1,17 @@
 diff a/servers/media/src/modules/app/app.module.ts b/servers/media/src/modules/app/app.module.ts	(rejected hunks)
-@@ -28,6 +28,7 @@ import { RBACModule } from '../rbac/rbac.module'
+@@ -28,7 +28,6 @@ import { RBACModule } from '../rbac/rbac.module'
  import { LibraryModule } from '../library/library.module'
  import { MusicHistoryModule } from '../music-history/music-history.module'
  import { InvitationModule } from '../invitation/invitation.module'
-+import { LicensingModule } from '../licensing/licensing.module'
+-import { LicensingModule } from '../licensing/licensing.module'
  
  import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
  import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
-@@ -120,6 +121,7 @@ const resolvePostgresHost = () => {
+@@ -121,7 +120,6 @@ const resolvePostgresHost = () => {
      LibraryModule,
      MusicHistoryModule,
      InvitationModule,
-+    LicensingModule,
+-    LicensingModule,
      // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
      ServeStaticModule.forRoot({
        rootPath: join(__dirname, '..', '..', '..', 'public'),

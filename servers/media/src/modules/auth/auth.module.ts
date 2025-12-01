@@ -11,7 +11,6 @@ import { getSigningSecret } from '../../utils/jwt'
 import { TokenService } from './token.service'
 import { CardinalSSOStrategy } from './strategies/cardinal-sso.service'
 import { LocalAuthStrategy } from './strategies/local.service'
-import { LicensingModule } from '../licensing/licensing.module'
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { LicensingModule } from '../licensing/licensing.module'
     }),
     SettingsModule,
     UserModule,
-    LicensingModule,
   ],
   exports: [
     AuthService,

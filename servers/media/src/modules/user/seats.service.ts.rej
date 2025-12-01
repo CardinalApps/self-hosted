@@ -1,0 +1,37 @@
+diff a/servers/media/src/modules/user/seats.service.ts b/servers/media/src/modules/user/seats.service.ts	(rejected hunks)
+@@ -1,10 +1,9 @@
+-import { Injectable } from '@nestjs/common'
++import { forwardRef, Inject, Injectable } from '@nestjs/common'
+ import { InjectRepository } from '@nestjs/typeorm'
+ import { IsNull, Not, Repository } from 'typeorm'
+ 
+ import { User } from './user.entity'
+ import { UserService } from './user.service'
+-import { LicensingService } from '../licensing/licensing.service'
+ 
+ /**
+  * This service handles all things related to managing user seats.
+@@ -18,9 +17,9 @@ import { LicensingService } from '../licensing/licensing.service'
+ export class SeatsService {
+   constructor(
+     @InjectRepository(User)
+-    private userRepository: Repository<User>,
+-    private userService: UserService,
+-    private licensingService: LicensingService,
++    private readonly userRepository: Repository<User>,
++    @Inject(forwardRef(() => UserService))
++    private readonly userService: UserService,
+   ) {}
+ 
+   /**
+@@ -55,8 +54,8 @@ export class SeatsService {
+    */
+   async hasAvailableSeats(): Promise<boolean> {
+     const numSeated = await this.countSeatedUsers()
+-    const serverLicense = await this.licensingService.getServerLicense()
++    const ownerSubscription = await this.userService.getServerOwnerSubscription()
+ 
+-    return numSeated < serverLicense.provides.seats
++    return numSeated < ownerSubscription.provides.seats
+   }
+ }

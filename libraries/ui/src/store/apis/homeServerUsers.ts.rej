@@ -1,0 +1,19 @@
+diff a/libraries/ui/src/store/apis/homeServerUsers.ts b/libraries/ui/src/store/apis/homeServerUsers.ts	(rejected hunks)
+@@ -17,7 +17,7 @@ export type MusicHistoryEntryType = {
+ 
+ export const usersApi = baseHomeServerApi
+   .enhanceEndpoints({
+-    addTagTypes: ['Users.List'],
++    addTagTypes: ['Users.List', 'Licensing.Seats'],
+   })
+   .injectEndpoints({
+     endpoints: (builder) => ({
+@@ -40,7 +40,7 @@ export const usersApi = baseHomeServerApi
+           method: 'PATCH',
+           body,
+         }),
+-        invalidatesTags: ['Users.List'],
++        invalidatesTags: ['Users.List', 'Licensing.Seats'],
+       }),
+     }),
+   })
