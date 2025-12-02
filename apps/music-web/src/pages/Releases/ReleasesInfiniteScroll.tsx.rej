@@ -1,24 +1,18 @@
 diff a/apps/music-web/src/pages/Releases/ReleasesInfiniteScroll.tsx b/apps/music-web/src/pages/Releases/ReleasesInfiniteScroll.tsx	(rejected hunks)
-@@ -12,8 +12,6 @@ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
+@@ -11,6 +11,7 @@ import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScr
+ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
  import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
  import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
++import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
  
--import { HOME_SERVER_HOST } from '../../env'
--
  const ITEM_WIDTH = 220
  const ITEM_HEIGHT = 275
- 
-@@ -57,12 +55,11 @@ function ReleasesInfiniteScroll({
-   )
- 
-   const getItem = (musicRelease: MusicReleaseType) => {
--    const artwork = musicRelease?.thumbnails?.find?.((t) => t.size === 'small_nocrop')?.relativeSrc
+@@ -58,7 +59,7 @@ function ReleasesInfiniteScroll({
      return (
        <MusicRelease
          key={`item-${musicRelease?.musicReleaseId}`}
-         tracks={musicRelease?.tracks || []}
--        artwork={artwork ? `${HOME_SERVER_HOST}${artwork}` : undefined}
-+        releaseId={musicRelease?.id}
+-        tracks={musicRelease?.tracks || []}
++        tracks={musicRelease?.tracks as MusicTrackType[] || []}
+         releaseId={musicRelease?.id}
          releaseTitle={musicRelease?.title}
          artistName={musicRelease?.artist?.name}
-         //releaseYear={musicRelease.year}
