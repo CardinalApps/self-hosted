@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/components/typography/H4/H4.tsx b/libraries/ui/src/components/typography/H4/H4.tsx	(rejected hunks)
+@@ -6,6 +6,7 @@ import './H4.css'
+ type H1Props = {
+   title?: string,
+   className?: string,
++  id?: string,
+ }
+ 
+ /**
+@@ -13,7 +14,13 @@ type H1Props = {
+  */
+ const H4 = (props: PropsWithChildren<H1Props>) => {
+   return (
+-    <h4 className={clsx('h4', props.className)} title={props.title}>{props.children}</h4>
++    <h4
++      id={props?.id}
++      className={clsx('h4', props.className)}
++      title={props.title}
++    >
++        {props.children}
++      </h4>
+   )
+ }
+ 
