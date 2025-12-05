@@ -1,10 +1,9 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -65,7 +65,7 @@ function Users() {
-   }
- 
-   const enabledStatusCol = (user: UserType) => {
--    if (user.enabled) {
-+    if (user?.enabled) {
-       return (
-         <Table.Col key="status">
-           <div className="user-activation-status activated">
+@@ -160,7 +160,6 @@ function Users() {
+           <Card
+             icon={<Icon fa="fas fa-exclamation-triangle" />}
+             header={<H5>{i18n['users.server.unclaimed-warning'][lang]}</H5>}
+-            bottomAlignContent={true}
+           >
+             {i18n['users.server.unclaimed-warning.desc'][lang]}
+           </Card>
