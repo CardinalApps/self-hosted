@@ -1,9 +1,47 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -129,6 +129,7 @@ function Users() {
-     ]
+@@ -154,9 +154,16 @@ function Users() {
+     }
+   }, [users])
  
-     return ordered
-+      .filter((user) => !!user)
-       .map((user: UserType) => {
-         return [
-           nameCol(user),
++  console.log(licensingSeats)
++
+   return (
+     <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
+       <CardGrid layout="flex">
++        {
++        /*
++         * "Server is unclaimed" warning card. 
++         */
++        }
+         {usersRes.isSuccess && !serverIsClaimed && (
+           <Card
+             icon={<Icon fa="fas fa-exclamation-triangle" />}
+@@ -165,16 +172,26 @@ function Users() {
+             {i18n['users.server.unclaimed-warning.desc'][lang]}
+           </Card>
+         )}
++        {
++        /*
++         * Number of used seats card. 
++         */
++        }
+         <Card
+           icon={<Icon fa="fas fa-users" />}
+           header={<H5>{i18n['users.server.capacity'][lang]}</H5>}
+         >
+           {
+             i18n['users.server.capacity.seats'][lang]
+-              .replace('{used}', licensingSeats?.used || '')
+-              .replace('{total}', licensingSeats?.total || '')
++              .replace('{used}', !isNaN(licensingSeats?.used) ? licensingSeats.used : 'Unknown')
++              .replace('{total}', licensingSeats?.total || 'Unknown')
+           }
+         </Card>
++        {
++        /*
++         * User invitations card. 
++         */
++        }
+         <Card
+           icon={<Icon fa="fas fa-envelope" />}
+           header={<H5>{i18n['users.invite-user'][lang]}</H5>}
