@@ -1,74 +1,13 @@
 diff a/apps/admin-web/src/pages/Users/InviteUser.tsx b/apps/admin-web/src/pages/Users/InviteUser.tsx	(rejected hunks)
-@@ -5,6 +5,8 @@ import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
- import List from '@cardinalapps/ui/src/components/interaction/List'
- import SearchBar from '@cardinalapps/ui/src/components/interaction/SearchBar'
- import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
-+import Span from '@cardinalapps/ui/src/components/typography/Span'
-+import Form from '@cardinalapps/ui/src/components/forms/Form'
+@@ -25,9 +25,9 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
+   const [showConfirmInvite, setShowConfirmInvite] = useState<boolean>(false)
+   const [confirmingDelete, setConfirmingDelete] = useState<InvitationType>()
  
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+-  const [userToInvite, setUserToInvite] = useState<string>()
++  const [, setUserToInvite] = useState<string>()
  
-@@ -16,7 +18,6 @@ import { DrawIntitationTabType } from './ManageInvitationsDrawer'
- import i18n from './i18n.json'
- 
- import './styles.css'
--import Span from '@cardinalapps/ui/src/components/typography/Span'
- 
- function UserInvitations({ getExpiration }: DrawIntitationTabType) {
-   const dispatch = useAppDispatch()
-@@ -32,8 +33,10 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
+-  const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
++  const [, createInvitationResult] = useCreateInvitationMutation({})
+   const [deleteInvitation, deleteInvitationResult] = useDeleteInvitationMutation()
+   const res = useGetInvitationsQuery({ type: 'user' })
    const data = res?.data?.[0] || []
- 
-   const handleSearch = (val) => {
--    setShowConfirmInvite(true)
--    setUserToInvite(val)
-+    if (val?.query) {
-+      setShowConfirmInvite(true)
-+      setUserToInvite(val.query)
-+    }
-   }
- 
-   useEffect(() => {
-@@ -75,11 +78,11 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
-   return (
-     <>
-       <Drawer.Section>
--        <SearchBar
--          placeholder={i18n['users.invite-links.search.placeholder'][lang]}
--          onChange={(e, val) => handleSearch(val)}
--          onSubmit={(e) => e.preventDefault()}
--        />
-+        <Form onSubmit={(e, val) => handleSearch(val)}>
-+          <SearchBar
-+            placeholder={i18n['users.invite-links.search.placeholder'][lang]}
-+          />
-+        </Form>
-         {/* TODO add search */}
-         <p className="invite-user-notice">
-           {i18n['users.invite-links.search.notice'][lang]}
-@@ -108,16 +111,18 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
-       {!!showConfirmInvite && (
-         <Confirm
-           title={i18n['users.invite.confirm.title'][lang]}
--          message={i18n['users.invite.confirm.desc'][lang].replace('{name}', userToInvite)}
-+          //message={i18n['users.invite.confirm.desc'][lang].replace('{name}', userToInvite)}
-+          message={'This feature is coming soon.'}
-           loading={createInvitationResult.isLoading}
-           onClose={(confirmed) => {
-+            setShowConfirmInvite(false)
-             if (confirmed) {
--              createInvitation({
--                type: 'user',
--                invitee: {
--                  userId: 'someuser123',
--                },
--              })
-+              // createInvitation({
-+              //   type: 'user',
-+              //   invitee: {
-+              //     userId: 'someuser123',
-+              //   },
-+              // })
-             }
-           }}
-         />

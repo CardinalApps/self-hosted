@@ -1,17 +1,65 @@
 diff a/apps/admin-web/src/pages/Users/InviteLink.tsx b/apps/admin-web/src/pages/Users/InviteLink.tsx	(rejected hunks)
-@@ -1,5 +1,6 @@
- import { useEffect, useState } from 'react'
- import { useSelector } from 'react-redux'
-+import ms from 'ms'
- 
- import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+@@ -6,7 +6,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
  import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
-@@ -108,7 +109,7 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
-             <DatePicker
-               id="invitation-link-expiration"
-               name="expiration"
--              min={new Date().toString()}
-+              min={new Date(Date.now() + ms('1 day')).toString()}
-               required={true}
-               type="datetime-local"
-             />
+ import List from '@cardinalapps/ui/src/components/interaction/List'
+ import Button from '@cardinalapps/ui/src/components/interaction/Button'
+-import Textarea from '@cardinalapps/ui/src/components/forms/Textarea'
++import TextInput from '@cardinalapps/ui/src/components/forms/TextInput'
+ import DatePicker from '@cardinalapps/ui/src/components/forms/DatePicker'
+ import Form from '@cardinalapps/ui/src/components/forms/Form'
+ import FormField from '@cardinalapps/ui/src/components/forms/FormField'
+@@ -33,19 +33,22 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
+   const { lang } = useSelector(settingsSelectors.current)
+   const [generatedLink, setGeneratedLink] = useState<string>()
+   const [confirmingDelete, setConfirmingDelete] = useState<InvitationType>()
++  const [showComingSoon, setshowComingSoon] = useState<boolean>(false)
+ 
+-  const [createInvitation, createInvitationResult] = useCreateInvitationMutation({})
++  const [, createInvitationResult] = useCreateInvitationMutation({})
+   const [deleteInvitation, deleteInvitationResult] = useDeleteInvitationMutation()
+   const res = useGetInvitationsQuery({ type: 'link' })
+   const data = res?.data?.[0] || []
+ 
+   const handleCreateInvitiationLink = (e, values) => {
+-    if (!generatedLink) {
+-      createInvitation({
+-        type: 'link',
+-        expiresAt: new Date(values?.expiration),
+-      })
+-    }
++    console.log(values)
++    setshowComingSoon(true)
++    // if (!generatedLink) {
++    //   createInvitation({
++    //     type: 'link',
++    //     expiresAt: new Date(values?.expiration),
++    //   })
++    // }
+   }
+ 
+   /**
+@@ -126,7 +129,7 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
+           </Button>
+         </Form>
+         {!!generatedLink && (
+-          <Textarea
++          <TextInput
+             className="generated-invitation-link"
+             name="generated-link"
+             value={generatedLink}
+@@ -152,6 +155,15 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
+           />
+         )}
+       </Drawer.Section>
++      {!!showComingSoon && (
++        <Confirm
++          title={'Generate Link'}
++          message={'This feature is coming soon.'}
++          onClose={() => {
++            setshowComingSoon(false)
++          }}
++        />
++      )}
+       {!!confirmingDelete && (
+         <Confirm
+           title={i18n['users.invite.confirm-delete.title'][lang]}

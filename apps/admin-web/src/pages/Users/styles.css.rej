@@ -1,19 +1,13 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -4,17 +4,6 @@
-     padding-left: var(--gutter);
+@@ -71,9 +71,8 @@
+   .generated-invitation-link {
+     padding-top: 20px;
+     
+-    textarea {
+-      height: 120px;
+-      resize: none;
++    input {
++      width: 100%;
+     }
    }
- 
--  .user-page-cards-row {
--    display: flex;
--    gap: var(--gutter);
--    margin-bottom: 30px;
--
--    .card {
--      min-width: 230px;
--      max-width: 340px;
--    }
--  }
--
-   .server-user-list {
- 
-     .user-name {
+ }
