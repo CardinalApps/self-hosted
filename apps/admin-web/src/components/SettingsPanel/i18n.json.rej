@@ -1,56 +1,32 @@
 diff a/apps/admin-web/src/components/SettingsPanel/i18n.json b/apps/admin-web/src/components/SettingsPanel/i18n.json	(rejected hunks)
-@@ -47,54 +47,6 @@
+@@ -8,6 +8,9 @@
+   "data.media-reset.desc": {
+     "en": "Deindex your media files."
+   },
++  "updates.tab.name": {
++    "en": "Updates"
++  },
+   "reporting.tab.name": {
+     "en": "Reporting"
+   },
+@@ -46,20 +49,5 @@
+   },
    "data.media-reset.success-toast.title": {
      "en": "Media successfully dexindexed."
-   },
--  "apps.tab.name": {
--    "en": "Apps"
 -  },
--  "apps.self-hosted-apps": {
--    "en": "Self-hosted apps"
+-  "manually-check-for-updates.update.links": {
+-    "en": "<a href='https://cardinalapps.io/release-notes/cardinal-media-server/{version}' target='_blank'>Release notes</a> / <a href='https://help.cardinalapps.io/guides/cardinal-media-server/update' target='_blank'>How to update</a>"
 -  },
--  "apps.versions.app.admin": {
--    "en": "Cardinal Media Server"
+-  "manually-check-for-updates.none": {
+-    "en": "You using the latest release."
 -  },
--  "apps.versions.app.cardinal_music": {
--    "en": "Cardinal Music"
+-  "manually-check-for-updates.error": {
+-    "en": "Error when checking for updates."
 -  },
--  "apps.versions.app.cardinal_photos": {
--    "en": "Cardinal Photos"
+-  "manually-check-for-updates.development-mode": {
+-    "en": "The development release channel does not support checking for updates."
 -  },
--  "apps.versions.app.cardinal_cinema": {
--    "en": "Cardinal Cinema"
--  },
--  "apps.versions.nodejs": {
--    "en": "Node.js"
--  },
--  "apps.versions.openssl": {
--    "en": "OpenSSL"
--  },
--  "apps.versions.database": {
--    "en": "Database"
--  },
--  "apps.versions.web-app-prefix": {
--    "en": "v"
--  },
--  "apps.versions.home-server-version-prefix": {
--    "en": "Server v"
--  },
--  "apps.versions.home-server-admin-version-prefix": {
--    "en": "Admin v"
--  },
--  "apps.error": {
--    "en": "Error loading apps"
--  },
--  "manually-check-for-updates.title": {
--    "en": "Updates"
--  },
--  "manually-check-for-updates.button": {
--    "en": "Check for updates now"
--  },
--  "manually-check-for-updates.available": {
--    "en": "Update available: <strong>{version}</strong>"
--  },
-   "manually-check-for-updates.update.links": {
-     "en": "<a href='https://cardinalapps.io/release-notes/cardinal-media-server/{version}' target='_blank'>Release notes</a> / <a href='https://help.cardinalapps.io/guides/cardinal-media-server/update' target='_blank'>How to update</a>"
-   },
+-  "manually-check-for-updates.release-channel": {
+-    "en": "You are on the <code>{channel}</code> release channel. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/release-channels' target='_blank'>More information.</a>"
+   }
+ }

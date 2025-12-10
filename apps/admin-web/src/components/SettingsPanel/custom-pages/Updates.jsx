@@ -10,21 +10,21 @@ import i18n from '../i18n.json'
 /**
  * Custom settings pages for the Media Server.
  */
-function Information() {
+function Updates() {
   const dispatch = useDispatch()
   const { lang, auto_check_for_updates } = useSelector(settingsSelectors.current)
   const autoCheckForUpdatesField = autoCheckForUpdatesFieldFactory('admin', lang)
 
   return (
     <>
-      <Field label={i18n['manually-check-for-updates.title'][lang]}>
+      <Field label={i18n['updates.tab.name'][lang]}>
         {autoCheckForUpdatesField.render({
           value: auto_check_for_updates,
           onChange: (v) => dispatch(setSetting({
             settings: {
               auto_check_for_updates: v,
             },
-            app: 'dashboard',
+            app: 'admin',
           })),
         })}
       </Field>
@@ -32,4 +32,4 @@ function Information() {
   )
 }
 
-export default Information
+export default Updates

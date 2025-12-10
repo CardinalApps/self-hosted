@@ -1,21 +1,9 @@
 diff a/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx b/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx	(rejected hunks)
-@@ -6,7 +6,6 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+@@ -6,6 +6,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  
  import Advanced from './custom-pages/Advanced'
  import Reporting from './custom-pages/Reporting'
--import Apps from './custom-pages/Apps'
++import Updates from './custom-pages/Updates'
  
  import i18n from './i18n.json'
  
-@@ -24,11 +23,6 @@ function HomeServerSettingsPanel() {
-       onClose={() => window.history.back()}
-       lang="en"
-       customTabs={[
--        {
--          tabName: i18n['apps.tab.name'][lang],
--          tabIcon: 'fas fa-th',
--          tabContent: <Apps />,
--        },
-         {
-           tabName: i18n['reporting.tab.name'][lang],
-           tabIcon: 'fas fa-bullhorn',
