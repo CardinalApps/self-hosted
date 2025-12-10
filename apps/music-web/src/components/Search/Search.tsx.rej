@@ -1,0 +1,23 @@
+diff a/apps/music-web/src/components/Search/Search.tsx b/apps/music-web/src/components/Search/Search.tsx	(rejected hunks)
+@@ -9,17 +9,16 @@ function Search() {
+     console.log(e.target.value)
+   }
+ 
+-  const handleSubmit = (e) => {
+-    e.preventDefault()
+-    console.log(e)
+-  }
++  // const handleSubmit = (e) => {
++  //   e.preventDefault()
++  //   console.log(e)
++  // }
+ 
+   return (
+     <div className="search">
+       <SearchBar
+         placeholder={i18n['placeholder']['en']}
+         onChange={handleChange}
+-        onSubmit={handleSubmit}
+       />
+     </div>
+   )
