@@ -1,32 +1,10 @@
 diff a/apps/admin-web/src/components/SettingsPanel/i18n.json b/apps/admin-web/src/components/SettingsPanel/i18n.json	(rejected hunks)
-@@ -8,6 +8,9 @@
-   "data.media-reset.desc": {
-     "en": "Deindex your media files."
+@@ -12,7 +12,7 @@
+     "en": "Updates"
    },
-+  "updates.tab.name": {
-+    "en": "Updates"
-+  },
    "reporting.tab.name": {
-     "en": "Reporting"
+-    "en": "Reporting"
++    "en": "Telemetry"
    },
-@@ -46,20 +49,5 @@
-   },
-   "data.media-reset.success-toast.title": {
-     "en": "Media successfully dexindexed."
--  },
--  "manually-check-for-updates.update.links": {
--    "en": "<a href='https://cardinalapps.io/release-notes/cardinal-media-server/{version}' target='_blank'>Release notes</a> / <a href='https://help.cardinalapps.io/guides/cardinal-media-server/update' target='_blank'>How to update</a>"
--  },
--  "manually-check-for-updates.none": {
--    "en": "You using the latest release."
--  },
--  "manually-check-for-updates.error": {
--    "en": "Error when checking for updates."
--  },
--  "manually-check-for-updates.development-mode": {
--    "en": "The development release channel does not support checking for updates."
--  },
--  "manually-check-for-updates.release-channel": {
--    "en": "You are on the <code>{channel}</code> release channel. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/release-channels' target='_blank'>More information.</a>"
-   }
- }
+   "telemetry.history.title": {
+     "en": "History"

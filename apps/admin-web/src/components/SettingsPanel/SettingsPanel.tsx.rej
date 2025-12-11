@@ -1,9 +1,9 @@
 diff a/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx b/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx	(rejected hunks)
-@@ -6,6 +6,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+@@ -6,7 +6,6 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  
  import Advanced from './custom-pages/Advanced'
  import Reporting from './custom-pages/Reporting'
-+import Updates from './custom-pages/Updates'
+-import Updates from './custom-pages/Updates'
  
  import i18n from './i18n.json'
  

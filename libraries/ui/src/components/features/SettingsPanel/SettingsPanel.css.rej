@@ -1,23 +1,12 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css	(rejected hunks)
-@@ -8,6 +8,21 @@
-   background-color: var(--bg-2);
-   z-index: 10000;
+@@ -176,8 +176,8 @@
+     display: flex;
  
-+  .build-tag {
-+    padding: 5px 0 0 23px;
-+
-+    p {
-+      font-size: 10px;
-+      font-weight: 300;
-+      font-family: monospace;
-+      color: var(--text-color-4);
-+
-+      strong {
-+        font-weight: 600;
-+      }
-+    }
-+  }
-+
-   .panel {
-     max-width: 1100px;
-     height: 100%;
+     &.for-toggle-switch {
+-      padding-top: 0;
+-      padding-left: 65px;
++      padding-top: 4px;
++      padding-left: 56px;
+     }
+ 
+     i {

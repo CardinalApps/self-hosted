@@ -23,11 +23,6 @@ function HomeServerSettingsPanel() {
       lang="en"
       customTabs={[
         {
-          tabName: i18n['updates.tab.name'][lang],
-          tabIcon: 'fas fa-download',
-          tabContent: <Updates />,
-        },
-        {
           tabName: i18n['reporting.tab.name'][lang],
           tabIcon: 'fas fa-bullhorn',
           tabContent: <Reporting />,

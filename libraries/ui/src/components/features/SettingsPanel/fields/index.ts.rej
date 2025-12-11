@@ -1,16 +1,18 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/index.ts b/libraries/ui/src/components/features/SettingsPanel/fields/index.ts	(rejected hunks)
-@@ -144,14 +144,6 @@ export const getFields = (app, lang) => {
+@@ -16,7 +16,7 @@ export const getFields = (app, lang) => {
+   const defaults = {
+     general: [
+       //commonFields.lang,
+-      commonFields.startPage,
++      //commonFields.startPage,
+       commonFields.enableCustomContextMenu,
+       commonFields.developerMode,
+     ],
+@@ -142,6 +142,7 @@ export const getFields = (app, lang) => {
+             adminServerFields.serverName,
+             ...defaults.general,
              adminServerFields.openAppsInNewTab,
++            adminServerFields.autoCheckForUpdates,
            ],
          },
--        // Access settings tab
--        {
--          tabName: i18n['settings.tab-name-access'][lang],
--          tabIcon: 'fas fa-users',
--          fields: [
--            adminServerFields.enableGuestAccount,
--          ],
--        },
          // Theme settings tab
-         {
-           tabName: i18n['settings.tab-name-theme'][lang],

@@ -1,11 +1,10 @@
 diff a/libraries/app-settings/src/i18n.ts b/libraries/app-settings/src/i18n.ts	(rejected hunks)
-@@ -149,9 +149,6 @@ export default {
-   "settings.guest-account.enable-label": {
-     "en": "Enable guest account",
-   },
--  "settings.guest-account.desc": {
--    "en": "The guest account can only be disabled if you've claimed this server with a Cardinal account.",
--  },
-   "settings.telemetry.label": {
+@@ -153,7 +153,7 @@ export default {
      "en": "Enable telemetry",
    },
+   "settings.telemetry.desc": {
+-    "en": "Applies to the Media Server and the Music, Photos, and Cinema apps. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more.</a>",
++    "en": "This setting applies to all apps. All data is anonymized. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more.</a>",
+   },
+   "settings.open-apps-in-new-tab.label": {
+     "en": "Open apps in a new tab",
