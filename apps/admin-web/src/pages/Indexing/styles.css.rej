@@ -1,200 +1,132 @@
 diff a/apps/admin-web/src/pages/Indexing/styles.css b/apps/admin-web/src/pages/Indexing/styles.css	(rejected hunks)
-@@ -353,33 +353,7 @@
+@@ -5,12 +5,6 @@
    }
  }
  
--.runHistory {
--  padding-bottom: 80px;
+-.wrapper {
+-  max-width: 1100px;
+-  width: 100%;
+-  margin: 0 auto;
+-}
 -
--  .wrapper {
--    max-width: 600px;
--    margin: 0 auto;
--  }
--
--  .runsTitleBar {
--    margin-bottom: 20px;
--    display: flex;
--    align-items: center;
--    justify-content: space-between;
--
--    .title {
--      margin-bottom: 0;
--      width: auto;
+ .indexing {
+   display: flex;
+   gap: var(--gutter);
+@@ -46,7 +63,6 @@
+     .importerButton {
+       margin-bottom: 20px;
+       display: flex;
+-      flex: 0 0 160px;
+       justify-content: center;
+ 
+       .buttonCol {
+@@ -126,10 +142,6 @@
+       }
+     }
+ 
+-    .progressBar {
+-      width: 100%;
 -    }
 -
--    @media (max-width: 768px) {
--      flex-wrap: wrap;
+     .info {
+       width: 100%;
+       padding: 10px 14px;
+@@ -168,7 +180,8 @@
+           padding: 4px 0;
+           display: inline-flex;
+           align-items: center;
+-          font-weight: 700;
++          font-weight: 500;
++          font-size: 14px;
+           flex-grow: 1;
+         }
+       }
+@@ -199,75 +212,11 @@
+       }
+     }
+   }
+-
+-  .card {
+-    flex: 1 0 calc(50% - (var(--gutter) / 2));
+-
+-    header {
+-      padding: 0 25px 20px;
+-      display: flex;
+-      justify-content: space-between;
+-      align-items: center;
 -
 -      .title {
--        margin-bottom: 10px;
+-        margin-bottom: 0;
+-      }
+-
+-      i {
+-        font-size: 18px;
 -      }
 -    }
 -  }
-+.indexing-history {
-   
-   .output {
-     width: 100%;
-@@ -389,133 +363,61 @@
-     background-color: var(--bg-2);
-   }
- 
--  .noRunsMessage {
--    font-size: 15px;
--    font-weight: 500;
 -
--    i {
--      margin-right: 8px;
--      font-size: 20px;
--    }
--  }
+-  .list {
 -
-   .loadMore {
-     padding: 30px 0;
-     display: flex;
-     justify-content: center;
-   }
--}
- 
--.runItem {
--  width: 100%;
--  margin-bottom: var(--gutter);
--
--  @media (max-width: 768px) {
--    padding: 0;
--  }
--
--  header {
--    padding-bottom: 10px;
--    margin-bottom: 15px;
-+  .list-name {
-     display: flex;
--    justify-content: space-between;
-     align-items: center;
--    align-content: center;
--    border-bottom: 1px solid var(--border-color-1);
-+    gap: 10px;
-+  }
- 
--    .date {
--      font-weight: 700;
--      font-size: 16px;
-+  .counts {
-+    display: flex;
-+    gap: 10px;
-+    
-+    button {
-+      margin: 5px 0;
-     }
-+  }
- 
--    .status {
--      font-weight: 600;
+-    li {
+-      margin-bottom: 10px;
 -      font-size: 15px;
--      position: relative;
--      top: -3px;
--      white-space: nowrap;
--
--      .good {
--
--        i {
--          color: var(--success);
--        }
--      }
--
--      .warn {
--
--        i {
--          color: var(--warning);
--        }
--      }
--
--      .bad {
-+  .status {
-+    font-weight: 400;
-+    font-size: 13px;
-+    white-space: nowrap;
- 
--        i {
--          color: var(--danger);
--        }
--      }
-+    .good {
- 
-       i {
--        font-size: 15px;
--        position: relative;
--        top: 1px;
--      }
--
--      span {
--        margin-right: 8px;
-+        color: var(--success);
-       }
-     }
--  }
--
--  .indexedFileCounts {
--    padding: 10px 0 0;
--    display: flex;
--    flex-wrap: wrap;
--    justify-content: center;
--    gap: 10px;
- 
--    button.indexedFileCount {
--      cursor: pointer;
--
--      &:hover {
--        background-color: var(--bg-4);
--      }
-+    .warn {
- 
--      .modalCta {
--        font-size: 12px;
--        font-weight: 800;
--        text-transform: uppercase;
-+      i {
-+        color: var(--warning);
-       }
-     }
- 
--    .indexedFileCount {
--      width: calc(50% - 5px);
--      padding: 15px 20px;
+-      padding: 20px 30px;
+-      border-radius: 20px;
 -      display: flex;
--      align-items: center;
 -      justify-content: space-between;
--      border-radius: 8px;
--      border: none;
--      background-color: var(--bg-3);
+-      align-items: center;
+-      background: var(--bg-3);
 -
 -      @media (max-width: 768px) {
--        width: 100%;
+-        padding: 15px 20px;
 -      }
-+    .bad {
- 
-       i {
+-
+-      &:last-of-type {
+-        margin-bottom: 0;
+-      }
+-
+-      i {
 -        margin-right: 15px;
--        width: 20px;
--        color: var(--accent-color);
--        font-size: 17px;
-+        color: var(--danger);
-       }
-+    }
- 
--      span {
--        font-size: 15px;
--        font-weight: 600;
--        font-family: var(--font-family);
--        color: var(--text-color-1);
+-        font-size: 19px;
+-        opacity: 0.8;
+-        position: relative;
+-        top: -1px;
 -      }
-+    i {
-+      font-size: 15px;
-+      position: relative;
-+      top: 1px;
-+    }
-+
-+    span {
-+      margin: 8px;
-     }
-   }
+-
+-      strong {
+-        width: 100px;
+-        display: inline-flex;
+-        align-items: center;
+-        white-space: nowrap;
+-      }
+-
+-      span {
+-        width: calc(100% - 100px);
+-        text-overflow: ellipsis;
+-        white-space: nowrap;
+-        overflow: hidden;
+-        text-align: right;
+-      }
+-    }
+-  }
  }
+ 
+ .importButton {
+-  width: 160px;
+-  height: 160px;
++  width: 120px;
++  height: 120px;
+   position: relative;
+   border-radius: 100%;
+   overflow: hidden;
+@@ -335,8 +284,8 @@
+ }
+ 
+ .spinny {
+-  width: 164px;
+-  height: 164px;
++  width: 124px;
++  height: 124px;
+   position: absolute;
+   top: -2px;
+   left: -2px;

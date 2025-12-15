@@ -27,6 +27,29 @@
     }
   }
 
+  .progressBar {
+    width: 100%;
+
+    p {
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    font-size: 11px;
+    gap: 10px;
+    justify-content: flex-end;
+
+    i {
+      font-size: 14px;
+      position: relative;
+      top: 2px;
+    }
+  }
+
   .importerCard {
     display: flex;
     flex: 1 0 100% !important;

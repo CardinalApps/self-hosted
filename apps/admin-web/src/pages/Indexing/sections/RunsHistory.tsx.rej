@@ -1,225 +1,43 @@
 diff a/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx b/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx	(rejected hunks)
-@@ -1,27 +1,30 @@
- import { useState, useEffect, ReactNode } from 'react'
- import { useSelector } from 'react-redux'
--import clsx from 'clsx'
- 
--import H4 from '@cardinalapps/ui/src/components/typography/H4'
- import Button from '@cardinalapps/ui/src/components/interaction/Button'
- import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
--import Card from '@cardinalapps/ui/src/components/layout/Card'
- import Modal from '@cardinalapps/ui/src/components/layout/Modal'
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
-+import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
-+import H5 from '@cardinalapps/ui/src/components/typography/H5'
-+import List from '@cardinalapps/ui/src/components/interaction/List'
-+import { ListItem } from '@cardinalapps/ui/src/components/interaction/List/List'
- 
- import { useGetRunsQuery } from '@cardinalapps/ui/src/store/apis/runs'
- import { indexingSelectors } from '@cardinalapps/ui/src/store/slices/indexing'
- 
--import { formatDate } from '../../../utils/date'
-+import { formatTimeAgo, formatDate } from '@cardinalapps/ui/src/lib/formatting/time'
+@@ -17,8 +17,6 @@ import { formatTimeAgo, formatDate } from '@cardinalapps/ui/src/lib/formatting/t
  
  import i18n from '../i18n.json'
-+
- import '../styles.css'
  
+-import '../styles.css'
+-
  function RunsHistory() {
    const itemsPerPage = 10
    const { lang } = useSelector(settingsSelectors.current)
-   const serverState = useSelector(indexingSelectors.serverState)
--  const [take, setTake] = useState(3)
-+  const initialTake = 5
-+  const [take, setTake] = useState(initialTake)
-   const [includeEmptyRuns, setIncludeEmptyRuns] = useState(false)
-   const [importedFilesModalContent, setImportedFilesModalContent] = useState<ReactNode>()
-   const { data, isLoading, refetch } = useGetRunsQuery({ take, skip: 0, includeEmptyRuns })
-@@ -35,35 +38,26 @@ function RunsHistory() {
-     }
-   }
- 
--  const countButtonOrSpan = (icon, fileList = []) => {
-+  const countButton = (icon, fileList = []) => {
-     if (fileList?.length) {
-       const list = fileList.map((path) => <li key={path}>{path}</li>)
-       return (
--        <button
--          className={clsx('indexedFileCount')}
-+        <Button
-           onClick={() => setImportedFilesModalContent(<ol className={'fileList'}>{list}</ol>)}
-         >
-           <span>
-             <i className={icon} />
-             <span>{indexedCountString(fileList.length)}</span>
-           </span>
--          <span className={'modalCta'}>{i18n['run.file-count.view-list'][lang]}</span>
--        </button>
-+        </Button>
-       )
-     } else {
--      return (
--        <span className={clsx('indexedFileCount')}>
--          <span>
--            <i className={icon} />
--            <span>{indexedCountString(fileList?.length)}</span>
--          </span>
--        </span>
--      )
-+      return null
-     }
-   }
- 
-   const handleLoadMore = () => {
--    if (take === 3) {
-+    if (take === initialTake) {
-       setTake(itemsPerPage)
-     } else {
-       setTake(take + itemsPerPage)
-@@ -76,11 +70,60 @@ function RunsHistory() {
-     }
-   }, [serverState])
- 
-+  const listItems = (): ListItem[] => {
-+    if (!pagedRuns?.length) {
-+      return []
-+    }
-+    return pagedRuns.map((run) => {
-+      return {
-+        title: formatDate(run?.createdAt),
-+        name: (
-+          <div className="list-name">
-+            <div className="status">
-+              {run?.status === 'completed' &&
-+                <div className={'good'}>
-+                  <i className="fas fa-check" title={i18n['run.status.success'][lang]} />
-+                </div>
-+              }
-+              {run?.status === 'stopped_by_user' &&
-+                <div className={'warn'}>
-+                  <i className="fas fa-stop-circle" title={i18n['run.status.stopped-by-user'][lang]} />
-+                </div>
-+              }
-+              {run?.status === 'not_started' &&
-+                <div className={'bad'}>
-+                  <i className="fas fa-times" title={i18n['run.status.not-started'][lang]} />
-+                </div>
-+              }
-+            </div>
-+            {formatTimeAgo(run?.createdAt)}
-+          </div>
-+        ),
-+        label: (
-+          <>
-+            <div className="counts">
-+              {countButton("fas fa-music", run?.musicIndexed)}
-+              {countButton("fas fa-images", run?.photosIndexed)}
-+              {countButton("fas fa-film", run?.moviesIndexed)}
-+              {countButton("fas fa-tv", run?.tvIndexed)}
-+            </div>
-+          </>
-+        ),
-+      } as ListItem
-+    })
-+  }
-+
-   return (
--    <section className={'runHistory'}>
+@@ -145,20 +143,18 @@ function RunsHistory() {
+           {importedFilesModalContent}
+         </Modal>
+       }
 -      <div className={'wrapper'}>
--        <div className={'runsTitleBar'}>
--          <H4 className={'title'}>{i18n['run.history.title'][lang]}</H4>
-+    <CardGrid.Card
-+      className="indexing-history"
-+      size="xl"
-+      header={
-+        <>
-+          <H5>{i18n['run.history.title'][lang]}</H5>
-+        </>
-+      }
-+      footer={
-+        <>
-           <ToggleSwitch
-             label={i18n['run.history.show-empty-runs'][lang]}
-             labelAlign="left"
-@@ -89,51 +132,22 @@ function RunsHistory() {
-             value2={true}
-             onChange={(value) => setIncludeEmptyRuns(value)}
-           />
--        </div>
--        {!!importedFilesModalContent &&
--          <Modal width={1200} onClose={() => setImportedFilesModalContent(null)}>
--            {importedFilesModalContent}
--          </Modal>
+-        {pagedRuns?.length
+-          ? <div className={'runsArchive'}>
+-              {pagedRuns.length < totalRuns &&
+-                <div className={'loadMore'}>
+-                  <Button onClick={handleLoadMore} animation={isLoading ? 'loading' : undefined}>
+-                    {i18n['run.history.load-more'][lang]}
+-                  </Button>
+-                </div>
+-              }
+-            </div>
+-          : null
 -        }
-+        </>
+-      </div>
++      {pagedRuns?.length
++        ? <div className={'runsArchive'}>
++            {pagedRuns.length < totalRuns &&
++              <div className={'loadMore'}>
++                <Button onClick={handleLoadMore} animation={isLoading ? 'loading' : undefined}>
++                  {i18n['run.history.load-more'][lang]}
++                </Button>
++              </div>
++            }
++          </div>
++        : null
 +      }
-+    >
-+      <List
-+        className="server-info-list"
-+        layout="compact"
-+        items={listItems()}
-+      />
-+      {!!importedFilesModalContent &&
-+        <Modal width={1200} onClose={() => setImportedFilesModalContent(null)}>
-+          {importedFilesModalContent}
-+        </Modal>
-+      }
-+      <div className={'wrapper'}>
-         {pagedRuns?.length
-           ? <div className={'runsArchive'}>
--              {pagedRuns.map((run) => {
--                return (
--                  <Card className={clsx('runItem')} key={run?.runId} border={3} shadow={null}>
--                    <header>
--                      <p className={'date'}>
--                        {i18n['run.status.date'][lang].replace('{date}', formatDate(run?.createdAt))}
--                      </p>
--                      <div className={'status'}>
--                        {run?.status === 'completed' &&
--                          <div className={'good'}>
--                            <span>{i18n['run.status.success'][lang]}</span>
--                            <i className="fas fa-check" />
--                          </div>
--                        }
--                        {run?.status === 'stopped_by_user' &&
--                          <div className={'warn'}>
--                            <span>{i18n['run.status.stopped-by-user'][lang]}</span>
--                            <i className="fas fa-stop-circle" />
--                          </div>
--                        }
--                        {run?.status === 'not_started' &&
--                          <div className={'bad'}>
--                            <span>{i18n['run.status.not-started'][lang]}</span>
--                            <i className="fas fa-times" />
--                          </div>
--                        }
--                      </div>
--                    </header>
--                    <div className={'indexedFileCounts'}>
--                      {countButtonOrSpan("fas fa-music", run?.musicIndexed)}
--                      {countButtonOrSpan("fas fa-images", run?.photosIndexed)}
--                      {countButtonOrSpan("fas fa-film", run?.moviesIndexed)}
--                      {countButtonOrSpan("fas fa-tv", run?.tvIndexed)}
--                    </div>
--                  </Card>
--                )
--              })}
-               {pagedRuns.length < totalRuns &&
-                 <div className={'loadMore'}>
-                   <Button onClick={handleLoadMore} animation={isLoading ? 'loading' : undefined}>
-@@ -142,13 +156,10 @@ function RunsHistory() {
-                 </div>
-               }
-             </div>
--          : <p className={'noRunsMessage'}>
--              <i className="far fa-hand-point-right" />
--              {i18n['run.history.no-entries'][lang]}
--            </p>
-+          : null
-         }
-       </div>
--    </section>
-+    </CardGrid.Card>
+     </CardGrid.Card>
    )
  }
- 

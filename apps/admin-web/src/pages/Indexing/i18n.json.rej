@@ -1,33 +1,58 @@
 diff a/apps/admin-web/src/pages/Indexing/i18n.json b/apps/admin-web/src/pages/Indexing/i18n.json	(rejected hunks)
-@@ -123,28 +123,19 @@
-     "en": "No files found"
+@@ -12,13 +12,13 @@
+     "en": "Stop the current indexing run"
    },
-   "run.history.title": {
--    "en": "Indexing history"
-+    "en": "History"
+   "status.title.begin": {
+-    "en": "Begin indexing"
++    "en": "Start Indexing"
    },
-   "run.history.show-empty-runs": {
-     "en": "Include empty runs"
+   "status.title.pause": {
+-    "en": "Pause indexing"
++    "en": "Pause Indexing"
    },
--  "run.history.no-entries": {
--    "en": "After your first run, you'll see a history of everything you've indexed."
--  },
-   "run.history.load-more": {
--    "en": "Previous runs"
--  },
--  "run.status.date": {
--    "en": "Run initiated on {date}"
-+    "en": "Load More"
+   "status.title.resume": {
+-    "en": "Resume indexing"
++    "en": "Resume Indexing"
    },
-   "run.file-count.0": {
-     "en": "No change"
+   "status.current-status": {
+     "en": "Status"
+@@ -44,6 +44,12 @@
+   "status.elapsed.time": {
+     "en": "{time}"
    },
-   "run.file-count.added": {
--    "en": "+{num} files"
--  },
--  "run.file-count.view-list": {
--    "en": "View all"
-+    "en": "+{num}"
++  "status.overall-progress.title": {
++    "en": "This Run"
++  },
++  "status.media-progress.title": {
++    "en": "Progress"
++  },
+   "status.progress.music": {
+     "en": "Music"
    },
-   "run.status.success": {
-     "en": "Completed"
+@@ -69,7 +75,7 @@
+     "en": "TV"
+   },
+   "counts.title": {
+-    "en": "Indexed files"
++    "en": "Files"
+   },
+   "counts.songs": {
+     "en": "Music"
+@@ -87,7 +93,7 @@
+     "en": "Folders"
+   },
+   "dirs.tooltip-docker": {
+-    "en": "Your media folders are set in your docker-compose.yaml file."
++    "en": "Folders are set in your docker-compose.yaml file."
+   },
+   "dirs.music": {
+     "en": "Music"
+@@ -150,7 +156,7 @@
+     "en": "Stopped"
+   },
+   "run.status.not-started": {
+-    "en": "Not started"
++    "en": "-"
+   },
+   "run.total-files-found": {
+     "en": "Files Found"

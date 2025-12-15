@@ -1,42 +1,40 @@
 diff a/apps/admin-web/src/pages/Indexing/Indexing.tsx b/apps/admin-web/src/pages/Indexing/Indexing.tsx	(rejected hunks)
-@@ -1,7 +1,6 @@
- import { useSelector } from 'react-redux'
- 
+@@ -3,25 +3,29 @@ import { useSelector } from 'react-redux'
  import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
--import H1 from '@cardinalapps/ui/src/components/typography/H1'
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  
- import Importer from './sections/Importer'
-@@ -11,23 +10,20 @@ import RunsHistory from './sections/RunsHistory'
+-import Importer from './sections/Importer'
+-import FileCounts from './sections/FileCounts'
+-import MediaFolders from './sections/MediaFolders'
++import NewRun from './sections/NewRun'
++import OverallProgress from './sections/OverallProgress'
++import MediaProgress from './sections/MediaProgress'
++import Files from './sections/Files'
++import Folders from './sections/Folders'
+ import RunsHistory from './sections/RunsHistory'
++import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
++import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout'
  
  import i18n from './i18n.json'
  import './styles.css'
-+import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout'
-+import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
+-import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout'
+-import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
  
  function Indexing() {
    const { lang } = useSelector(settingsSelectors.current)
  
    return (
--    <AppPage>
--      <div className={'media'}>
--        <div className={'wrapper'}>
--          <H1>{i18n['title'][lang]}</H1>
--          <section className={'indexing'}>
--            <Importer />
--            <FileCounts />
--            <MediaFolders />
--          </section>
--          <RunsHistory />
--        </div>
--      </div>
-+    <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title'][lang]}>
-+      <CardGrid rowHeight='l'>
-+        <Importer />
-+        {/* <FileCounts />
-+        <MediaFolders /> */}
-+        <RunsHistory />
-+      </CardGrid>
+     <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title'][lang]}>
+-      <CardGrid rowHeight='l'>
+-        <Importer />
+-        {/* <FileCounts />
+-        <MediaFolders /> */}
++      <CardGrid rowHeight='l' className='indexing'>
++        <NewRun />
++        <OverallProgress />
++        <MediaProgress />
++        <Files />
++        <Folders />
+         <RunsHistory />
+       </CardGrid>
      </AppPage>
-   )
- }
