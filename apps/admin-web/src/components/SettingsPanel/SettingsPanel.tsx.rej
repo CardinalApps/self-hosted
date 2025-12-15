@@ -1,18 +1,9 @@
 diff a/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx b/apps/admin-web/src/components/SettingsPanel/SettingsPanel.tsx	(rejected hunks)
-@@ -28,11 +28,11 @@ function HomeServerSettingsPanel() {
-           tabIcon: 'fas fa-bullhorn',
-           tabContent: <Reporting />,
-         },
--        {
--          tabName: i18n['advanced.tab.name'][lang],
--          tabIcon: 'fas fa-microscope',
--          tabContent: <Advanced />,
--        },
-+        // {
-+        //   tabName: i18n['advanced.tab.name'][lang],
-+        //   tabIcon: 'fas fa-microscope',
-+        //   tabContent: <Advanced />,
-+        // },
-       ]}
-     />
-   )
+@@ -4,7 +4,6 @@ import SettingsPanel from '@cardinalapps/ui/src/components/features/SettingsPane
+ import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ 
+-import Advanced from './custom-pages/Advanced'
+ import Reporting from './custom-pages/Reporting'
+ 
+ import i18n from './i18n.json'
