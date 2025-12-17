@@ -1,10 +1,26 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -207,7 +207,7 @@
-     "en": "Disable User"
+@@ -41,6 +41,15 @@
+   "users.invite.link.none": {
+     "en": "No invitation links."
    },
-   "users.settings.actions.disable.confirm.desc": {
--    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. A seat will also become available."
-+    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. The user's seat will become available for another user to use."
++  "users.invite.link.code": {
++    "en": "Code"
++  },
++  "users.invite.link.cloud-link": {
++    "en": "Link"
++  },
++  "users.invite.link.created-at-by": {
++    "en": "Created {ago}"
++  },
+   "users.invite-links.search.placeholder": {
+     "en": "Search for a Cardinal user"
    },
-   "users.settings.actions.enable.confirm.title": {
-     "en": "Enable User"
+@@ -63,7 +72,7 @@
+     "en": "Generate link"
+   },
+   "users.invite.link.create.notice": {
+-    "en": "Create a link that your friends can use to join your Media Server. Invitees will need to create a free Cardinal account."
++    "en": "Create a link that people can use to join your Media Server with their Cardinal Account."
+   },
+   "users.invite.link.create.expiration": {
+     "en": "Expiration"

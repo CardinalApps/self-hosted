@@ -1,9 +1,13 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -31,6 +31,7 @@ export type ListItem = {
-   controls?: ListItemControls[],
-   pendingAdd?: boolean,
-   pendingDelete?: boolean,
-+  onView?: (item: ListItem) => void,
-   onAdd?: (item: ListItem) => void,
-   onRemove?: (item: ListItem) => void,
-   onDelete?: (item: ListItem) => void,
+@@ -142,9 +142,9 @@ const List = ({
+                       <Icon {...item.icon} />
+                     </span>
+                   )}
+-                  <span className="item-list-item-name" title={item?.title || item?.name?.toString()}>{item?.name}</span>
++                  <span className="item-list-item-name" title={item?.title}>{item?.name}</span>
+                   {typeof item?.label === 'string'
+-                    ? <span className="item-list-item-label" title={item?.title || item?.label?.toString()}>{item?.label}</span>
++                    ? <span className="item-list-item-label" title={item?.title}>{item?.label}</span>
+                     : <span className="item-list-item-label">{item?.label || null}</span>
+                   }
+                   {!!controlsToUse?.length && (

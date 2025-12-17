@@ -1,10 +1,63 @@
 diff a/servers/media/src/modules/invitation/invitation.service.ts b/servers/media/src/modules/invitation/invitation.service.ts	(rejected hunks)
-@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
+@@ -1,7 +1,9 @@
+ import * as ms from 'ms'
++import { v4 as uuid } from 'uuid'
+ import { Injectable, Logger } from '@nestjs/common'
  import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
  import { Repository, DataSource, MoreThan } from 'typeorm'
++import { generateSlug } from 'random-word-slugs'
  
--import { Invitation, InvitationType } from './invitation.entity'
-+import { Invitation } from './invitation.entity'
+ import { Invitation } from './invitation.entity'
  
- import { EventService } from '../event/event.service'
- import { User } from '../user/user.entity'
+@@ -81,11 +83,12 @@ export class InvitationService {
+    * Invite a user to this media server.
+    */
+   async create(createInvitationsDto: CreateInvitationDto, user: User): Promise<Invitation> {
+-    const { type, expiresAt /*,inviteeId*/ } = createInvitationsDto
++    const { type, expiresAt, inviteeId } = createInvitationsDto
+     const defaultExpiresAt = new Date(Date.now() + ms('3 days')).toString()
+     //let invite
+ 
+     if (type === 'user') {
++      // TODO
+       try {
+         //const invite = await this.sendInviteToUser(inviteeId)
+         return await this.invitationRepository.save({
+@@ -98,11 +101,12 @@ export class InvitationService {
+       }
+     } else if (type === 'link') {
+       try {
+-        //const invite = await this.createInvitiationLink(inviteeId)
++        const { cloudLink } = await this.createInvitiationLink(inviteeId)
+         return await this.invitationRepository.save({
+           type,
+           expiresAt: expiresAt || defaultExpiresAt,
+-          link: 'https://join.cardinalconnect.com/i/lakd8s',
++          cloudLink,
++          userFriendlyCode: generateSlug(),
+           createdBy: user,
+         })
+       } catch (error) {
+@@ -119,9 +123,18 @@ export class InvitationService {
+   // }
+ 
+   /**
+-   * Send an invite directly to a new Cardinal user.
++   * Create a link that users can use to join the server.
+    */
+-  // private async createInvitiationLink(): Promise<string> {
+-  //   // TODO ask cardinal cloud to create an invitation link
+-  // }
++  private async createInvitiationLink(inviteeId): Promise<{
++    cloudLink: string,
++    inviteeId,
++  }> {
++    // TODO ask cardinal cloud to create an invitation link
++    const mockCardinalCloudResponse = {
++      cloudLink: `https://join.cardinalapps.io/i/${uuid()}-${uuid()}`,
++      inviteeId,
++    }
++
++    return mockCardinalCloudResponse
++  }
+ }

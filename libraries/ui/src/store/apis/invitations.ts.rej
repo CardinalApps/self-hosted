@@ -1,20 +1,11 @@
 diff a/libraries/ui/src/store/apis/invitations.ts b/libraries/ui/src/store/apis/invitations.ts	(rejected hunks)
-@@ -28,15 +28,17 @@ export const invitationApi = baseHomeServerApi
-           order?: CommonOrderParams,
-           orderBy?: 'createdAt',
-           type?: InvitationTypeType,
-+          isExpired?: boolean,
-         }
-       >({
--        query: ({ take, skip, order, orderBy, type }) => {
-+        query: ({ take, skip, order, orderBy, type, isExpired }) => {
-           return queryParams('/invitations', {
-             ...(take && { take }),
-             ...(skip && { skip }),
-             ...(order && { order }),
-             ...(orderBy && { orderBy }),
-             ...(type && { type }),
-+            ...(typeof isExpired !== 'undefined' && { isExpired }),
-           })
-         },
-         providesTags: ['Invitation.List'],
+@@ -10,7 +10,8 @@ export type InvitationType = {
+   createdAt: string,
+   createdBy: UserType,
+   type: InvitationTypeType,
+-  link?: string,
++  cloudLink?: string,
++  userFriendlyCode?: string,
+   invitee?: UserType,
+   expiresAt: Date,
+   invitationId: string,

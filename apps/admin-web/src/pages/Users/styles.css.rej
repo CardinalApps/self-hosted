@@ -1,13 +1,33 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -71,9 +71,8 @@
-   .generated-invitation-link {
-     padding-top: 20px;
-     
--    textarea {
--      height: 120px;
--      resize: none;
-+    input {
-+      width: 100%;
+@@ -75,4 +75,31 @@
+       width: 100%;
      }
    }
++
++  .invite-link-info {
++    display: flex;
++    flex-direction: column;
++    gap: 6px;
++
++    p {
++      margin-bottom: 0;
++      font-weight: 400;
++      font-size: 13px;
++    }
++
++    strong {
++      
++      &:after {
++        content: ': ';
++      }
++    }
++
++    a {
++      color: var(--accent-color);
++
++      &:hover {
++        text-decoration: underline;
++      }
++    }
++  }
  }
