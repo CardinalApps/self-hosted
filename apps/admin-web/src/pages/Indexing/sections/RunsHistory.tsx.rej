@@ -1,38 +1,11 @@
 diff a/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx b/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx	(rejected hunks)
-@@ -104,28 +104,14 @@ function RunsHistory() {
-     return pagedRuns.map((run) => {
-       return {
-         title: formatDate(run?.createdAt),
--        name: (
--          <div className="list-name">
--            <div className="status">
--              {run?.status === 'completed' &&
--                <div className={'good'}>
--                  <i className="fas fa-check" title={i18n['run.status.success'][lang]} />
--                </div>
--              }
--              {run?.status === 'stopped_by_user' &&
--                <div className={'warn'}>
--                  <i className="fas fa-stop-circle" title={i18n['run.status.stopped-by-user'][lang]} />
--                </div>
--              }
--              {run?.status === 'not_started' &&
--                <div className={'bad'}>
--                  <i className="fas fa-times" title={i18n['run.status.not-started'][lang]} />
--                </div>
--              }
--            </div>
--            {formatTimeAgo(run?.createdAt)}
--          </div>
--        ),
-+        icon: run?.status === 'completed'
-+          ? { fa: 'fas fa-check', className: 'success-color' }
-+          : run?.status === 'stopped_by_user'
-+            ? { fa: 'fas fa-stop-circle', className: 'warning-color' }
-+            : run?.status === 'not_started'
-+              ? { fa: 'fas fa-times', className: 'success-color' }
-+              : null,
-+        name: formatTimeAgo(run?.createdAt),
-         label: (
-           <>
-             <div className="counts">
+@@ -119,6 +119,9 @@ function RunsHistory() {
+               {countButton("fas fa-images", run?.photosIndexed)}
+               {countButton("fas fa-film", run?.moviesIndexed)}
+               {countButton("fas fa-tv", run?.tvIndexed)}
++              {!run?.musicIndexed?.length && !run?.photosIndexed?.length && !run?.moviesIndexed?.length && !run?.tvIndexed?.length && (
++                i18n['run.history.no-change'][lang]
++              )}
+             </div>
+           </>
+         ),

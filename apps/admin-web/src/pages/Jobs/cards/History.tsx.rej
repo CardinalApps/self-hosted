@@ -1,0 +1,10 @@
+diff a/apps/admin-web/src/pages/Jobs/cards/History.tsx b/apps/admin-web/src/pages/Jobs/cards/History.tsx	(rejected hunks)
+@@ -132,7 +132,7 @@ function History() {
+ 
+   return (
+     <CardGrid.Card
+-      size="xl"
++      size="l"
+       className={'jobReports'}
+       header={<H5 className={'title'}>{i18n['job-reports.title'][lang]}</H5>}
+     >
