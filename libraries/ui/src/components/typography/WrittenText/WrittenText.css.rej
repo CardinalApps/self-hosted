@@ -1,9 +1,10 @@
 diff a/libraries/ui/src/components/typography/WrittenText/WrittenText.css b/libraries/ui/src/components/typography/WrittenText/WrittenText.css	(rejected hunks)
-@@ -1,6 +1,6 @@
- .written-text {
+@@ -48,7 +48,7 @@
+     font-family: var(--font-family);
+     font-weight: 400;
+     font-size: 16px;
+-    line-height: 1.4em;
++    line-height: 1.5em;
  
--  *:last-child {
-+  >*:last-child {
-     margin-bottom: 0;
-   }
- 
+     /* &:first-of-type {
+       margin-bottom: 20px;
