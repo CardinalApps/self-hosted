@@ -1,10 +1,42 @@
 diff a/libraries/ui/src/components/forms/ToggleSwitch/ToggleSwitch.tsx b/libraries/ui/src/components/forms/ToggleSwitch/ToggleSwitch.tsx	(rejected hunks)
-@@ -38,7 +38,7 @@ const ToggleSwitch = ({
+@@ -1,6 +1,8 @@
+ import type { PropsWithChildren } from 'react'
+ import clsx from 'clsx'
+ 
++import i18n from './i18n'
++
+ import './ToggleSwitch.css'
+ 
+ type ToggleSwitchProps = {
+@@ -32,14 +34,22 @@ const ToggleSwitch = ({
+   value = false,
+   onChange = () => {},
+   labelAlign = 'right',
+-  //showActiveLabel = false,
++  showActiveLabel = false,
+   disabled = false,
+   children,
  }: PropsWithChildren<ToggleSwitchProps>) => {
++  const getActiveLabel = () => {
++    if (value) {
++      return i18n['toggle-switch.enabled']['en']
++    } else {
++      return i18n['toggle-switch.disabled']['en']
++    }
++  }
    return (
      <div className={clsx('toggle-switch-box', layout)}>
--      {title && <p className="title" dangerouslySetInnerHTML={{ __html: title }} />}
-+      {title && <p className="toggle-switch-box-title" dangerouslySetInnerHTML={{ __html: title }} />}
+       {title && <p className="toggle-switch-box-title" dangerouslySetInnerHTML={{ __html: title }} />}
        {children}
++      {labelAlign === 'left' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
        {labelAlign === 'left' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
        <div className={`toggle-switch-box-inner`}>
+         {description && <div className="description" dangerouslySetInnerHTML={{ __html: description }} />}
+@@ -60,6 +70,7 @@ const ToggleSwitch = ({
+           {!!disabled && <i className="lock fas fa-lock" />}
+         </label>
+       </div>
++      {labelAlign === 'right' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
+       {labelAlign === 'right' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
+     </div>
+   )

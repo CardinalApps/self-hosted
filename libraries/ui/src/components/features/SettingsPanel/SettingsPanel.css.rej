@@ -1,12 +1,90 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css	(rejected hunks)
-@@ -176,8 +176,8 @@
-     display: flex;
+@@ -86,35 +86,52 @@
+     }
+   }
  
-     &.for-toggle-switch {
--      padding-top: 0;
--      padding-left: 65px;
-+      padding-top: 4px;
-+      padding-left: 56px;
+-  .field, .custom-field {
++  .field {
+     margin-bottom: 40px;
+ 
+-    &.type-toggle {
++    &.type-toggle,
++    &.type-number {
++      min-height: 20px;
+       margin-bottom: 15px;
++      padding: 15px 20px;
+       display: flex;
+       align-items: center;
+-      flex-wrap: wrap;
++      flex-wrap: nowrap;
++      border-radius: 10px;
++      background-color: var(--bg-2);
++
++      .toggle-switch {
++        background-color: var(--bg-4);
++      }
++    }
++
++    &.type-number {
++
++      p {
++        margin-bottom: 0;
++      }
++
++      .settings-input {
++        width: 100%;
++        display: flex;
++        align-items: center;
++        gap: 10px;
++        justify-content: space-between;
++      }
      }
  
+     &:last-of-type {
+       margin-bottom: 0;
+     }
+ 
+-    .field-label {
+-      margin-bottom: 10px;
+-      color: var(--text-color-2);
+-      font-size: 16px;
+-      font-weight: 700;
++    .field-meta {
++      flex-grow: 1;
+     }
+ 
+-    .custom-field-desc {
+-      margin-bottom: 10px;
+-      font-size: 14px;
++    .field-label {
+       color: var(--text-color-2);
+-
+-      p {
+-        margin-bottom: 10px;
+-      }
++      font-size: 15px;
++      font-weight: 400;
+     }
+ 
+     .custom-select {
+@@ -168,18 +185,12 @@
+ 
+   .settings-field-desc {
+     width: 100%;
+-    padding-top: 10px;
+-    margin-bottom: 5px;
++    padding-top: 2px;
+     font-size: 13px;
+     font-weight: 400;
+-    color: var(--text-color-2);
++    color: var(--text-color-3);
+     display: flex;
+ 
+-    &.for-toggle-switch {
+-      padding-top: 4px;
+-      padding-left: 56px;
+-    }
+-
      i {
+       margin-right: 5px;
+       position: relative;

@@ -1,0 +1,46 @@
+diff a/libraries/ui/src/components/features/SettingsPanel/Field.tsx b/libraries/ui/src/components/features/SettingsPanel/Field.tsx	(rejected hunks)
+@@ -1,28 +1,35 @@
+-import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
++import type { CSSProperties, PropsWithChildren } from 'react'
+ import clsx from 'clsx'
+ 
++import { SettingsObject } from '@cardinalapps/app-settings/src/types'
++
++import Desc from './layout/Desc'
++
+ type FieldProps = {
+-  label?: string,
+-  desc?: ReactNode,
+   className?: string,
+   style?: CSSProperties,
++  field: SettingsObject,
+ }
+ 
+ /**
+  * Custom settings pages for the Media Server.
+  */
+ function Field({
+-  label,
+-  desc,
+   className,
+   style,
+   children,
++  field,
+ }: PropsWithChildren<FieldProps>) {
++  const { label, description } = field
+   return (
+-    <div className={clsx('custom-field', className)} style={style}>
+-      {!!label && <p className={"field-label"}>{label}</p>}
+-      {!!desc && <div className={"custom-field-desc"}>{desc}</div>}
+-      {children}
++    <div className={clsx('field', className, `type-${field.type}`)} style={style}>
++      <div className="field-meta">
++        {!!label && <p className="field-label">{label}</p>}
++        {!!description && <Desc>{description}</Desc>}
++      </div>
++      <div className="field-input">
++        {children}
++      </div>
+     </div>
+   )
+ }

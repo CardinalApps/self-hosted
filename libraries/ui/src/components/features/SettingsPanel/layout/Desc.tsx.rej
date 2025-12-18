@@ -1,0 +1,23 @@
+diff a/libraries/ui/src/components/features/SettingsPanel/layout/Desc.tsx b/libraries/ui/src/components/features/SettingsPanel/layout/Desc.tsx	(rejected hunks)
+@@ -2,17 +2,17 @@ import type { ReactNode } from 'react'
+ import clsx from 'clsx'
+ 
+ type DescProps = {
+-  type?: 'toggle-switch' | 'textinput',
++  showIcon?: boolean,
+   children?: ReactNode,
+ }
+ 
+ const Desc = ({
+-  type,
++  showIcon = false,
+   children,
+ }: DescProps) => {
+   return (
+-    <div className={clsx('settings-field-desc', type ? `for-${type}` : undefined)}>
+-      <i className="fas fa-info-circle" />
++    <div className={clsx('settings-field-desc')}>
++      {!!showIcon && <i className="fas fa-info-circle" />}
+       <div className="settings-field-desc-text" dangerouslySetInnerHTML={{ __html: children }} />
+     </div>
+   )

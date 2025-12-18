@@ -1,0 +1,56 @@
+diff a/apps/admin-web/src/components/SettingsPanel/custom-pages/Reporting.jsx b/apps/admin-web/src/components/SettingsPanel/custom-pages/Reporting.jsx	(rejected hunks)
+@@ -1,11 +1,8 @@
+ import { useSelector, useDispatch } from 'react-redux'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+-//import H4 from '@cardinalapps/ui/src/components/typography/H4'
+-import Field from '@cardinalapps/ui/src/components/features/SettingsPanel/Field'
+ import telemetryField from '@cardinalapps/ui/src/components/features/SettingsPanel/fields/admin/telemetry'
+ import setSetting from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
+-//import Table from '@cardinalapps/ui/src/components/interaction/Table'
+ 
+ /**
+  * Custom settings page for the Media Server.
+@@ -17,33 +14,15 @@ function Telemetry() {
+ 
+   return (
+     <div className={'reporting'}>
+-      <Field>
+-        {telemetryFieldFactory.render({
+-          value: telemetry,
+-          onChange: (v) => dispatch(setSetting({
+-            settings: {
+-              telemetry: v,
+-            },
+-            app: null,
+-          })),
+-        })}
+-      </Field>
+-
+-      {/* <H4>{i18n['telemetry.history.title'][lang]}</H4>
+-      <Field
+-        desc={<div dangerouslySetInnerHTML={{ __html: i18n['telemetry.history.desc'][lang] }} />}
+-      >
+-        <Table
+-          headerRowClassName={styles.headerRow}
+-          bodyRowClassName={styles.bodyRow}
+-          header={[
+-            { props: { children: i18n['telemetry.history.header.date'][lang] } },
+-          ]}
+-          body={[
+-            [{ props: { children: 'test', className: styles.noData } }],
+-          ]}
+-        />
+-      </Field> */}
++      {telemetryFieldFactory.render({
++        value: telemetry,
++        onChange: (v) => dispatch(setSetting({
++          settings: {
++            telemetry: v,
++          },
++          app: null,
++        })),
++      })}
+     </div>
+   )
+ }

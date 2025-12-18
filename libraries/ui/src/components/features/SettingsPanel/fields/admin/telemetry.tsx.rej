@@ -1,0 +1,30 @@
+diff a/libraries/ui/src/components/features/SettingsPanel/fields/admin/telemetry.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/admin/telemetry.tsx	(rejected hunks)
+@@ -2,7 +2,7 @@ import { getSetting } from '@cardinalapps/app-settings/src'
+ 
+ import ToggleSwitch from '../../../../forms/ToggleSwitch'
+ 
+-import Desc from '../../layout/Desc'
++import Field from '../../Field'
+ 
+ const telemetry = (app, lang) => {
+   const fieldFactory = getSetting('telemetry')
+@@ -12,15 +12,15 @@ const telemetry = (app, lang) => {
+     ...field,
+     render: ({ value, onChange }) => {
+       return (
+-        <>
++        <Field field={field}>
+           <ToggleSwitch
+             name={field.slug}
+             value={value}
+-            label={field.label}
+             onChange={onChange}
++            showActiveLabel={true}
++            labelAlign="left"
+           />
+-          {!!field?.description && <Desc type="toggle-switch">{field.description}</Desc>}
+-        </>
++        </Field>
+       )
+     },
+   })
