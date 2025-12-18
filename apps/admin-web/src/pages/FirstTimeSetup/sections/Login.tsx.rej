@@ -1,0 +1,19 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx	(rejected hunks)
+@@ -10,7 +10,7 @@ import LoginWithCardinal from '../../../components/LoginWithCardinal'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import authAPI from '@cardinalapps/ui/src/lib/auth/authAPI'
+-import { HomeServerUser } from '@cardinalapps/ui/src/store/slices/homeServerUser'
++import { UserType } from '@cardinalapps/ui/src/types/user'
+ 
+ import i18n from '../i18n.json'
+ 
+@@ -45,7 +45,7 @@ function Login({
+       JWT: JWT,
+     })
+       .then((user) => {
+-        setUserObjectOfFutureOwner(user as HomeServerUser)
++        setUserObjectOfFutureOwner(user as UserType)
+         setSsoJWTOfFutureOwner(JWT)
+       })
+       .catch((error) => {
