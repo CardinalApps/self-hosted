@@ -1,27 +1,23 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -109,6 +109,7 @@ export class UserController {
-    * Returns all users in this server.
-    */
-   @Get('/users')
-+  @UseGuards(AuthGuard)
-   @ApiTags('User')
-   @ApiOperation({ summary: 'Get all users in this server.' })
-   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-@@ -116,6 +117,17 @@ export class UserController {
-     return await this.userService.query(query)
-   }
+@@ -36,6 +36,7 @@ import { ApiSecurityTypes } from '../../guards/types'
+ import { getJWTFromHeaders } from '../../utils/jwt'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
+ import { SeatsService } from './seats.service'
++import { Designations } from './types'
  
-+  /**
-+   * Returns the server owner, if there is one.
-+   */
-+  @Get('/users/owner')
-+  @UseGuards(AuthGuard)
-+  @ApiTags('User')
-+  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-+  async getOwner(): Promise<Partial<User> | null> {
-+    return await this.userService.getServerOwner()
-+  }
-+
-   /**
-    * Returns a curated list of sanitized user objects meant to be shown on the login screen.
-    */
+ @Controller()
+ export class UserController {
+@@ -214,8 +215,11 @@ export class UserController {
+     if (usersThatCanUseThisEndpoint.includes(currentUser.userId)) {
+       const userPriorToUpdate = await this.userService.get(id)
+ 
+-      // If trying to enable a user, check if there is a seat available
+-      if (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false) {
++      // If trying to enable a user (but not the Guest Account), check if there is a seat available
++      if (
++        (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false)
++        && userPriorToUpdate.designation !== Designations.GUEST_ACCOUNT
++      ) {
+         if (!await this.seatsService.hasAvailableSeats()) {
+           throw new ForbiddenException('Cannot enable this user because there are no seats available.')
+         }

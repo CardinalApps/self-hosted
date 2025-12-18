@@ -1,14 +1,35 @@
 diff a/libraries/ui/src/store/slices/homeServerUser/index.ts b/libraries/ui/src/store/slices/homeServerUser/index.ts	(rejected hunks)
-@@ -9,10 +9,12 @@ import { globalActions } from '../../constants/actions'
- import { STORE_KEY } from './constants'
- import { CloudUser } from '../cloudUser'
+@@ -7,22 +7,13 @@ import homeServerLogout from './thunks/logout'
+ import { globalActions } from '../../constants/actions'
  
-+// FIXME should this use UserType?
- export type HomeServerUser = {
-   designation?: string,
-   cachedCloudUser?: CloudUser,
-   userId?: string,
-+  cardinalId?: string,
-   [key: string]: unknown,
+ import { STORE_KEY } from './constants'
+-import { CloudUser } from '../cloudUser'
+-
+-// FIXME should this use UserType?
+-export type HomeServerUser = {
+-  designation?: string,
+-  cachedCloudUser?: CloudUser,
+-  userId?: string,
+-  cardinalId?: string,
+-  [key: string]: unknown,
+-}
++import { UserType } from '../../../types/user'
+ 
+ type HomeServerUserSliceState = {
+   loading: boolean,
+   loggedInAt: number | null,
+   loginRedirectCompletedFor: number | null,
+-  current: HomeServerUser,
++  current: UserType,
  }
  
+ const initialState: HomeServerUserSliceState = {
+@@ -39,7 +30,7 @@ const homeServerUserSlice = createSlice({
+   name: STORE_KEY,
+   initialState,
+   reducers: {
+-    setCurrent: (state, action: PayloadAction<HomeServerUser>) => {
++    setCurrent: (state, action: PayloadAction<UserType>) => {
+       return {
+         ...state,
+         current: action.payload,

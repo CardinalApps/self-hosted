@@ -1,44 +1,151 @@
 diff a/libraries/ui/src/components/features/LoginScreen/LoginScreen.tsx b/libraries/ui/src/components/features/LoginScreen/LoginScreen.tsx	(rejected hunks)
-@@ -19,7 +19,7 @@ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
+@@ -10,21 +10,23 @@ import H2 from '../../typography/H2'
+ import H5 from '../../typography/H5'
+ import Button from '../../interaction/Button'
+ import BrandLogo from '../../layout/BrandLogo'
+-import Avatar from '../../layout/Avatar'
+ import Card from '../../layout/Card'
++import UserTag from '../../interaction/UserTag'
++import { BrandLogoIcon } from '../../layout/BrandLogo/BrandLogo'
+ 
++import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ import { appSelectors } from '../../../store/slices/app'
+-import { cloudUserSelectors } from '../../../store/slices/cloudUser'
++//import { cloudUserSelectors } from '../../../store/slices/cloudUser'
+ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
  import { settingsSelectors } from '../../../store/slices/settings'
  //import set from '../../../store/slices/settings/thunks/set'
++import logout from '../../../store/slices/homeServerUser/thunks/logout'
  
--import { AppBasePaths } from '../../../lib/env/cardinal'
-+import { AppBasePaths, CardinalApp } from '../../../lib/env/cardinal'
+ import { AppBasePaths, CardinalApp } from '../../../lib/env/cardinal'
  
  import i18n from './i18n'
  
-@@ -27,6 +27,7 @@ import './LoginScreen.css'
- import { BrandLogoIcon } from '../../layout/BrandLogo/BrandLogo'
+ import './LoginScreen.css'
+-import { BrandLogoIcon } from '../../layout/BrandLogo/BrandLogo'
  
  type LoginScreenProps = {
-+  overrideApp?: CardinalApp,
-   allowGuestAccount?: boolean,
-   onLoginWithAnonymousAccountClick: () => void,
-   cardinalSSOLoginButton: ReactNode,
-@@ -39,13 +40,15 @@ type LoginScreenProps = {
-  */
- const LoginScreen = ({
-   //ownerAccount,
-+  overrideApp,
-   cardinalSSOLoginButton,
-   allowGuestAccount = true,
+   overrideApp?: CardinalApp,
+@@ -46,13 +48,13 @@ const LoginScreen = ({
    onLoginWithAnonymousAccountClick,
    onContinueAsCurrentUserClick,
  }: PropsWithChildren<LoginScreenProps>) => {
-   //const dispatch = useDispatch()
--  const app = useSelector(appSelectors.app)
-+  let app = useSelector(appSelectors.app)
-+  if (overrideApp) app = overrideApp
+-  //const dispatch = useDispatch()
++  const dispatch = useAppDispatch()
+   let app = useSelector(appSelectors.app)
+   if (overrideApp) app = overrideApp
    const kioskMode = useSelector(appSelectors.kioskMode)
    //const cloudUserLoggedIn = useSelector(cloudUserSelectors.loggedIn)
    const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
-@@ -111,7 +114,7 @@ const LoginScreen = ({
+-  const currentCloudUser = useSelector(cloudUserSelectors.current)
++  //const currentCloudUser = useSelector(cloudUserSelectors.current)
+   const currentUser = useSelector(homeServerUserSelectors.current)
+   const { lang } = useSelector(settingsSelectors.current)
+   const [showCurrentUser, setShowCurrentUser] = useState(false)
+@@ -70,8 +72,9 @@ const LoginScreen = ({
+       case 'cinema':
+         return `${base}/images/popcorn.jpg`
+       case 'admin':
++        return `${base}/images/satellite-dish.jpg`
+       default:
+-        return `${base}/images/sky.jpg`
++        return `${base}/images/2.jpg`
+     }
+   }
+ 
+@@ -114,7 +117,7 @@ const LoginScreen = ({
          initial={{ opacity: 0 }}
          animate={{ opacity: 1, transition: { duration: 0.4 } }}
        >
--        <Card className="accounts" shadow={1}>
-+        <Card className="accounts" shadow={2} border={3}>
+-        <Card className="accounts" shadow={2} border={3}>
++        <Card className="login-card" shadow={2} border={3} bg={1}>
            <header>
              <div className="logo">
                <BrandLogo
+@@ -129,37 +132,37 @@ const LoginScreen = ({
+           <div className="account-list">
+             {/* Current user */}
+             {!!showCurrentUser &&
+-              <section className="account-type current-session">
+-                <H5 className="type-title">{i18n['current-session.title'][lang]}</H5>
+-                <Card className={`account current-account`} bg={2} border={3} padding="thin">
+-                  <div className="avatar-box">
+-                    {currentUser?.designation === 'guest_account'
+-                      ? <Avatar type="guest" size="m" />
+-                      : <Avatar {...currentUser?.cachedCloudUser?.avatar} size="m" />
+-                    }
+-                  </div>
+-                  <p className="name">
+-                    {currentUser?.designation === 'guest_account'
+-                      ? i18n['guest-account.name'][lang]
+-                      : currentCloudUser?.publicName || i18n['sso-account.fallback-name'][lang]
+-                    }
+-                  </p>
++            <div>
++              <H5 className="type-title">{i18n['current-session.title'][lang]}</H5>
++              <section>
++                <Card className={`account current-account`} bg={1} border={3} padding="thin">
++                  <UserTag user={currentUser} size="s" />
+                   <div className="btn">
+                     <Button onClick={handleContinueAsCurrentUserClick}>{i18n['current-session.continue'][lang]}</Button>
+                   </div>
+                 </Card>
+               </section>
++            </div>
+             }
+-            {/* Log in with SSO */}
+-            <section className="account-type login-button">
+-              <H5 className="type-title">{i18n['login.title'][lang]}</H5>
+-              {cardinalSSOLoginButton}
+-            </section>
++            <div>
++              {/* Log in with SSO */}
++              {homeServerUserLoggedIn
++                ? <H5 className="type-title">{i18n['login.title.new-session'][lang]}</H5>
++                : <H5 className="type-title">{i18n['login.title.first-session'][lang]}</H5>
++              }
++              <section className="button-group">
++                {cardinalSSOLoginButton}
++                {!!allowGuestAccount && currentUser?.designation !== 'guest_account' &&
++                  <Button onClick={handleGuestAccountClick} disabled={!allowGuestAccount}>
++                    {i18n['guest-account.use'][lang]}
++                  </Button>
++                }
++              </section>
++            </div>
+             {/* Log in with a local account */}
+-            {!!allowGuestAccount && currentUser?.designation !== 'guest_account' &&
++            {/* {!!allowGuestAccount && currentUser?.designation !== 'guest_account' &&
+               <section className="account-type login-button">
+                 <div className="list">
+-                  {/* Guest account */}
+                   <div className="btn">
+                     <Button onClick={handleGuestAccountClick} disabled={!allowGuestAccount}>
+                       {i18n['guest-account.use'][lang]}
+@@ -167,9 +170,14 @@ const LoginScreen = ({
+                   </div>
+                 </div>
+               </section>
+-            }
++            } */}
+           </div>
+           <footer>
++            {homeServerUserLoggedIn && (
++              <div className="log-out">
++                <Button plain onClick={() => dispatch(logout())}>{i18n['footer.log-out'][lang]}</Button>
++              </div>
++            )}
+             <div className="help">
+               <div className="login-screen-help-link">
+                 <a href="https://help.cardinalapps.io/guides/cardinal-media-server/accounts" target="_blank">{i18n['footer.help'][lang]}</a>
+@@ -181,6 +189,10 @@ const LoginScreen = ({
+                 </div>
+               } */}
+             </div>
++            <div className="login-screen-help-link">
++              <a href="https://cardinalapps.io/contact" target="_blank">{i18n['footer.report'][lang]}</a>
++              <i className="fas fa-external-link-alt" />
++            </div>
+           </footer>
+         </Card>
+       </motion.div>

@@ -1,0 +1,146 @@
+diff a/libraries/ui/src/components/features/LoginScreen/LoginScreen.css b/libraries/ui/src/components/features/LoginScreen/LoginScreen.css	(rejected hunks)
+@@ -11,7 +11,7 @@
+   overflow-y: auto;
+   flex-wrap: wrap;
+   z-index: 5000;
+-  background-position: center center;
++  background-position: bottom right;
+   background-size: cover;
+ 
+   .bg-cover {
+@@ -32,7 +32,7 @@
+     max-width: 410px;
+ 
+     header {
+-      padding: 0 0 20px;
++      padding: 0 0 10px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+@@ -71,7 +71,7 @@
+     transform: scaleX(-1);
+   }
+ 
+-  .accounts {
++  .login-card {
+     display: flex;
+     justify-content: center;
+     align-items: flex-start;
+@@ -91,18 +91,40 @@
+       text-transform: uppercase;
+     }
+ 
++    .button-group {
++      display: flex;
++      flex-direction: column;
++      gap: 8px;
++
++      button, a {
++        width: 100%;
++        min-height: 50px;
++        padding: 8px 10px;
++        margin-bottom: 10px;
++        justify-content: center;
++        background-color: var(--bg-2);
++
++        &:last-of-type {
++          margin-bottom: 0;
++        }
++
++        &:hover {
++          background-color: var(--bg-4);
++        }
++      }
++    }
++
+     .account-list {
+       padding: 10px 0;
+       display: flex;
+       justify-content: center;
+       flex-direction: column;
+-      gap: 14px;
++      gap: 18px;
+     }
+ 
+     .account {
+       width: 100%;
+       display: flex;
+-      overflow-y: visible;
+       justify-content: center;
+ 
+       &.disabled {
+@@ -162,21 +184,10 @@
+         font-weight: 900;
+       }
+     }
++  }
+ 
+-    .login-button {
+-      
+-      button, a {
+-        width: 100%;
+-        min-height: 50px;
+-        padding: 8px 10px;
+-        justify-content: center;
+-        background-color: var(--bg-2);
+-
+-        &:hover {
+-          background-color: var(--bg-4);
+-        }
+-      }
+-    }
++  .server-owner-disclaimer {
++    margin: 0 5px;
+   }
+   
+   footer {
+@@ -188,27 +199,27 @@
+     > div {
+       padding: 0 10px;
+     }
+-  }
+ 
+-  .login-screen-help-link {
+-    display: flex;
+-    align-items: center;
++    a, button {
++      color: var(--text-color-1) !important;
++      font-size: 13px !important;
++      font-weight: 400 !important;
++
++      &:hover {
++        text-decoration: underline;
++      }
++    }
+ 
+     i {
+       font-size: 8px;
+       margin-left: 5px;
+       color: var(--text-color-1);
+     }
++  }
+ 
+-    a {
+-      color: var(--text-color-1);
+-      font-size: 13px;
+-      font-weight: 400;
+-
+-      &:hover {
+-        text-decoration: underline;
+-      }
+-    }
++  .login-screen-help-link {
++    display: flex;
++    align-items: center;
+   }
+ 
+   @media (max-width: 768px) {
+@@ -225,4 +236,8 @@
+       justify-content: center;
+     }
+   }
++
++  .current-user {
++
++  }
+ }

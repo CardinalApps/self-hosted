@@ -1,0 +1,44 @@
+diff a/libraries/ui/src/components/features/LoginScreen/i18n.ts b/libraries/ui/src/components/features/LoginScreen/i18n.ts	(rejected hunks)
+@@ -5,17 +5,20 @@ const i18n: StringList = {
+     "en": "Guest",
+   },
+   "guest-account.use": {
+-    "en": "Sign in as guest",
++    "en": "Sign in as Guest",
+   },
+   "current-session.title": {
+-    "en": "Current User",
++    "en": "Signed in as",
+   },
+   "current-session.continue": {
+     "en": "Continue",
+   },
+-  "login.title": {
++  "login.title.first-session": {
+     "en": "Sign in",
+   },
++  "login.title.new-session": {
++    "en": "Switch Account",
++  },
+   "sso-account.disabled": {
+     "en": "Disabled",
+   },
+@@ -28,11 +31,17 @@ const i18n: StringList = {
+   "footer.help": {
+     "en": "Help",
+   },
++  "footer.log-out": {
++    "en": "Log out",
++  },
++  "footer.report": {
++    "en": "Report Server",
++  },
+   "app.log-in": {
+     "en": "Log into",
+   },
+   "app.admin": {
+-    "en": "Cardinal Media Server",
++    "en": "Cardinal Admin",
+   },
+   "app.music": {
+     "en": "Cardinal Music",

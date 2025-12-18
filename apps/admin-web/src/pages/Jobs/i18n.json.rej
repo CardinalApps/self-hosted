@@ -1,31 +1,10 @@
 diff a/apps/admin-web/src/pages/Jobs/i18n.json b/apps/admin-web/src/pages/Jobs/i18n.json	(rejected hunks)
-@@ -6,7 +6,7 @@
-     "en": "ago"
+@@ -21,7 +21,7 @@
+     "en": "No active jobs."
    },
-   "active-jobs.title": {
--    "en": "Current Jobs"
-+    "en": "Job Queue"
-   },
-   "job-reports.title": {
-     "en": "History"
-@@ -18,7 +18,10 @@
-     "en": "How jobs work"
-   },
-   "active-jobs.no-active-jobs": {
--    "en": "<p>No active jobs.<br />Your Media Server will automatically run jobs when they're needed, and you can also run them manually.</p>"
-+    "en": "No active jobs."
-+  },
-+  "active-jobs.active-jobs-automatic-notice": {
-+    "en": "Jobs will automatically run when they are needed."
+   "active-jobs.active-jobs-automatic-notice": {
+-    "en": "Jobs will automatically run when they are needed."
++    "en": "Jobs run automatically when needed."
    },
    "job.photo_thumbnails.name": {
      "en": "Photo thumbnails"
-@@ -160,5 +163,8 @@
-   },
-   "job.details.tasks.no-tasks-needed": {
-     "en": "The job ran successfully and did not need to create any tasks."
-+  },
-+  "job.history.load-more": {
-+    "en": "Load More"
-   }
- }

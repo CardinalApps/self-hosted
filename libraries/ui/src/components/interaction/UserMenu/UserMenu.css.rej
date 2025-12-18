@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/interaction/UserMenu/UserMenu.css b/libraries/ui/src/components/interaction/UserMenu/UserMenu.css	(rejected hunks)
+@@ -405,7 +405,7 @@
+ 
+       span {
+         font-size: 12px;
+-        font-weight: 600;
++        font-weight: 400;
+         color: var(--text-color-3);
+ 
+         &:after {

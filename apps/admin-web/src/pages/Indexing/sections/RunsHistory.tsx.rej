@@ -1,11 +1,10 @@
 diff a/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx b/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx	(rejected hunks)
-@@ -119,6 +119,9 @@ function RunsHistory() {
-               {countButton("fas fa-images", run?.photosIndexed)}
-               {countButton("fas fa-film", run?.moviesIndexed)}
-               {countButton("fas fa-tv", run?.tvIndexed)}
-+              {!run?.musicIndexed?.length && !run?.photosIndexed?.length && !run?.moviesIndexed?.length && !run?.tvIndexed?.length && (
-+                i18n['run.history.no-change'][lang]
-+              )}
-             </div>
-           </>
-         ),
+@@ -132,7 +132,7 @@ function RunsHistory() {
+   return (
+     <CardGrid.Card
+       className="indexing-history"
+-      size="xl"
++      size="l"
+       header={
+         <>
+           <H5>{i18n['run.history.title'][lang]}</H5>
