@@ -1,0 +1,32 @@
+diff a/libraries/ui/src/components/features/SettingsPanel/fields/photos/peopleInPhotosEnabled.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/photos/peopleInPhotosEnabled.tsx	(rejected hunks)
+@@ -2,8 +2,6 @@ import { getSetting } from '@cardinalapps/app-settings/src'
+ 
+ import ToggleSwitch from '../../../../forms/ToggleSwitch'
+ 
+-import Desc from '../../layout/Desc'
+-
+ const peopleInPhotosEnabled = (app, lang) => {
+   const fieldFactory = getSetting('enable_people_in_photos')
+   const field = fieldFactory(app, lang)
+@@ -12,15 +10,12 @@ const peopleInPhotosEnabled = (app, lang) => {
+     ...field,
+     render: ({ value, onChange }) => {
+       return (
+-        <>
+-          <ToggleSwitch
+-            name={field.slug}
+-            value={value}
+-            label={field.label}
+-            onChange={onChange}
+-          />
+-          {!!field?.description && <Desc type="toggle-switch">{field.description}</Desc>}
+-        </>
++        <ToggleSwitch
++          value={value}
++          onChange={onChange}
++          showActiveLabel={true}
++          labelAlign='left'
++        />
+       )
+     },
+   })
