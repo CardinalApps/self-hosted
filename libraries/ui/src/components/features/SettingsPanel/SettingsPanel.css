@@ -149,6 +149,15 @@
       }
     }
 
+    &.type-text {
+      width: 100%;
+      margin-bottom: 30px;
+
+      .settings-field-desc {
+        margin-bottom: 4px;
+      }
+    }
+
     &.type-number {
 
       p {

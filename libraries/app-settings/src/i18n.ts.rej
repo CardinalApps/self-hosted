@@ -1,10 +1,10 @@
 diff a/libraries/app-settings/src/i18n.ts b/libraries/app-settings/src/i18n.ts	(rejected hunks)
-@@ -156,7 +156,7 @@ export default {
-     "en": "This setting applies to all apps. All data is anonymized. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more.</a>",
+@@ -33,7 +33,7 @@ export default {
+     "en": "Server name",
    },
-   "settings.open-apps-in-new-tab.label": {
--    "en": "Open apps in a new tab",
-+    "en": "Open apps in new tab",
+   "settings.server-name.desc": {
+-    "en": "Your Media Server's name is shared with the people that you invite, and with other devices on the local network.",
++    "en": "Your server's name will be shared with people that you invite.",
    },
-   "settings.max-concurrent-audio-streams.label": {
-     "en": "Maximum number of concurrent audio streams",
+   "settings.custom-css.notice": {
+     "en": "Notice",

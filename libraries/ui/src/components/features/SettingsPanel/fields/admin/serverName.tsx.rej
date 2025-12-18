@@ -1,0 +1,15 @@
+diff a/libraries/ui/src/components/features/SettingsPanel/fields/admin/serverName.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/admin/serverName.tsx	(rejected hunks)
+@@ -20,13 +20,11 @@ const serverName = (app, lang) => {
+     render: ({ value, onChange }) => {
+       return (
+         <>
+-          <p className="field-label">{fieldObj.label}</p>
+           <TextInput
+             name={fieldObj.slug}
+             value={value}
+             onChange={(val) => handleServerNameOnChange(val, onChange)}
+           />
+-          <Desc>{fieldObj.description}</Desc>
+         </>
+       )
+     },
