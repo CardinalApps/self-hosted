@@ -1,41 +1,15 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentAudioStreams.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentAudioStreams.tsx	(rejected hunks)
-@@ -1,11 +1,39 @@
-+import { useEffect } from 'react'
- import { getSetting } from '@cardinalapps/app-settings/src'
+@@ -4,11 +4,13 @@ import { getSetting } from '@cardinalapps/app-settings/src'
+ import { useAppDispatch } from '../../../../../hooks/useAppDispatch'
+ import { useAppSelector } from '../../../../../hooks/useAppSelector'
+ import { settingsActions, settingsSelectors } from '../../../../../store/slices/settings'
++import { musicActions, musicSelectors } from '../../../../../store/slices/music'
  
-+import { useAppDispatch } from '../../../../../hooks/useAppDispatch'
-+import { useAppSelector } from '../../../../../hooks/useAppSelector'
-+import { settingsActions, settingsSelectors } from '../../../../../store/slices/settings'
-+
  import NumberInput from '../../../../forms/NumberInput'
  
  const maxConcurrentAudioStreams = (app, lang) => {
-+  const dispatch = useAppDispatch()
-+
-+  const maxConcurrentPlayingFactory = getSetting('max_concurrent_playing_audio_streams')
-+  const maxConcurrentPlaying = maxConcurrentPlayingFactory(app, lang)
-+
-   const fieldFactory = getSetting('max_concurrent_audio_streams')
-   const fieldObj = fieldFactory(app, lang)
+   const dispatch = useAppDispatch()
++  const players = useAppSelector(musicSelectors.players)
  
-+  const {
-+    [maxConcurrentPlaying.slug]: maxPlayingPlayersSetting,
-+    [fieldObj.slug]: maxPlayersSetting,
-+  } = useAppSelector(settingsSelectors.current)
-+
-+  /**
-+   * The maximum number of concurrently playing players cannot exceed the
-+   * maximum number of players.
-+   */
-+  useEffect(() => {
-+    if (maxPlayersSetting < maxPlayingPlayersSetting) {
-+      dispatch(settingsActions.set({
-+        key: maxConcurrentPlaying.slug,
-+        value: maxPlayersSetting,
-+      }))
-+    }
-+  }, [maxPlayersSetting])
-+
-   return Object.freeze({
-     ...fieldObj,
-     render: ({ value, onChange }) => {
+   const maxConcurrentPlayingFactory = getSetting('max_concurrent_playing_audio_streams')
+   const maxConcurrentPlaying = maxConcurrentPlayingFactory(app, lang)

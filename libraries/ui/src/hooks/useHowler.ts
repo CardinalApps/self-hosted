@@ -167,14 +167,4 @@ export default function useHowler() {
       }
     })
   }, [pausedIds])
-
-  /**
-   * Stop Howls in real time when the user lowers the max number of concurrent
-   * streams.
-   * 
-   * TODO
-   */
-  useEffect(() => {
-    //console.log('max concurrent streams', maxConcurrentAudioStreams)
-  }, [maxConcurrentAudioStreams])
 }

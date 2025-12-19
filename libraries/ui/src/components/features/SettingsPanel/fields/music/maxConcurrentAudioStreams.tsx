@@ -50,6 +50,20 @@ const maxConcurrentAudioStreams = (app, lang) => {
     }
   }, [maxPlayersSetting])
 
+  /**
+   * Stop players in real time as the user lowers the number.
+   */
+  useEffect(() => {
+    const inOrderOfOldest = Object.values(players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
+
+    if (maxPlayersSetting as number < inOrderOfOldest.length) {
+      const numToTrim = inOrderOfOldest.length - (maxPlayersSetting as number)
+      for (let i = 0; i < numToTrim; i++) {
+        dispatch(musicActions.stop(inOrderOfOldest[i].id))
+      }
+    }
+  }, [maxPlayersSetting])
+
   return Object.freeze({
     ...fieldObj,
     render: ({ value, onChange }) => {
