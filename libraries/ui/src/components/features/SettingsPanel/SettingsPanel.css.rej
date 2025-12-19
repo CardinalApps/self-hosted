@@ -1,14 +1,31 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css	(rejected hunks)
-@@ -87,10 +87,11 @@
+@@ -87,11 +87,11 @@
    }
  
    .field {
--    margin-bottom: 40px;
-+    margin-bottom: 60px;
+-    margin-bottom: 60px;
++    width: 100%;
++    margin-bottom: 30px;
  
      &.type-toggle,
      &.type-number {
-+      width: 100%;
+-      width: 100%;
        min-height: 20px;
        margin-bottom: 15px;
        padding: 15px 20px;
+@@ -139,6 +139,7 @@
+     }
+ 
+     .field-label {
++      margin-bottom: 5px;
+       color: var(--text-color-2);
+       font-size: 15px;
+       font-weight: 400;
+@@ -195,7 +196,6 @@
+ 
+   .settings-field-desc {
+     width: 100%;
+-    padding-top: 2px;
+     font-size: 13px;
+     font-weight: 400;
+     color: var(--text-color-3);

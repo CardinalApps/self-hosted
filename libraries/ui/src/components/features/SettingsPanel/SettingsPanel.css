@@ -149,11 +149,11 @@
       }
     }
 
-    &.type-text {
-      width: 100%;
-      margin-bottom: 30px;
+    &.type-text,
+    &.type-number {
 
       .settings-field-desc {
+        margin-top: -6px;
         margin-bottom: 4px;
       }
     }
