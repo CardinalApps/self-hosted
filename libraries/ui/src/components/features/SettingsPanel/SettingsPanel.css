@@ -221,6 +221,30 @@
     }
   }
 
+  .settings-field-desc {
+    width: 100%;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-color-3);
+    display: flex;
+
+    i {
+      margin-right: 5px;
+      position: relative;
+      font-size: 15px;
+      top: 3px;
+      color: var(--text-color-4);
+    }
+
+    a {
+      color: var(--accent-color);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   .swatches {
     display: flex;
 

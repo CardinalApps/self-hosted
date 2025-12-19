@@ -1,10 +1,69 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/index.ts b/libraries/ui/src/components/features/SettingsPanel/fields/index.ts	(rejected hunks)
-@@ -50,7 +50,7 @@ export const getFields = (app, lang) => {
-           tabName: i18n['settings.tab-name-music-playback'][lang],
-           tabIcon: 'fas fa-headphones-alt',
+@@ -27,6 +27,29 @@ export const getFields = (app, lang) => {
+   }
+ 
+   switch (app) {
++    case 'admin':
++      return [
++        // General settings tab
++        {
++          tabName: i18n['settings.tab-name-general'][lang],
++          tabIcon: 'fas fa-home',
++          fields: [
++            adminServerFields.serverName,
++            ...defaults.general,
++            adminServerFields.openAppsInNewTab,
++            adminServerFields.autoCheckForUpdates,
++          ],
++        },
++        // Theme settings tab
++        {
++          tabName: i18n['settings.tab-name-theme'][lang],
++          tabIcon: 'fas fa-palette',
++          fields: [
++            ...defaults.theme,
++          ],
++        },
++      ]
++
+     case 'music':
+       return [
+         // General settings tab
+@@ -52,6 +75,7 @@ export const getFields = (app, lang) => {
            fields: [
--            musicFields.notifications,
-+            // musicFields.notifications,
+             // musicFields.notifications,
              musicFields.maxConcurrentAudioStreams,
++            musicFields.maxConcurrentPlayingAudioStreams,
            ],
          },
+       ]
+@@ -132,29 +156,6 @@ export const getFields = (app, lang) => {
+         },
+       ]
+ 
+-    case 'admin':
+-      return [
+-        // General settings tab
+-        {
+-          tabName: i18n['settings.tab-name-general'][lang],
+-          tabIcon: 'fas fa-home',
+-          fields: [
+-            adminServerFields.serverName,
+-            ...defaults.general,
+-            adminServerFields.openAppsInNewTab,
+-            adminServerFields.autoCheckForUpdates,
+-          ],
+-        },
+-        // Theme settings tab
+-        {
+-          tabName: i18n['settings.tab-name-theme'][lang],
+-          tabIcon: 'fas fa-palette',
+-          fields: [
+-            ...defaults.theme,
+-          ],
+-        },
+-      ]
+-
+     // Used by kiosk
+     default:
+       return [

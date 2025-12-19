@@ -1,10 +1,12 @@
 diff a/libraries/app-settings/src/i18n.ts b/libraries/app-settings/src/i18n.ts	(rejected hunks)
-@@ -33,7 +33,7 @@ export default {
-     "en": "Server name",
+@@ -159,6 +159,9 @@ export default {
+     "en": "Open apps in new tab",
    },
-   "settings.server-name.desc": {
--    "en": "Your Media Server's name is shared with the people that you invite, and with other devices on the local network.",
-+    "en": "Your server's name will be shared with people that you invite.",
+   "settings.max-concurrent-audio-streams.label": {
+-    "en": "Maximum number of concurrent audio streams",
++    "en": "Maximum number of concurrent audio players",
++  },
++  "settings.max-concurrent-playing-audio-streams.label": {
++    "en": "Maximum number of concurrently playing audio players",
    },
-   "settings.custom-css.notice": {
-     "en": "Notice",
+ }
