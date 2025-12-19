@@ -1,48 +1,21 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css	(rejected hunks)
-@@ -104,10 +104,13 @@
-       .toggle-switch {
-         background-color: var(--bg-4);
+@@ -92,7 +92,7 @@
+ 
+     &.type-toggle,
+     &.type-number {
+-      min-height: 20px;
++      min-height: 68px;
+       margin-bottom: 15px;
+       padding: 15px 20px;
+       display: flex;
+@@ -131,6 +131,10 @@
+         gap: 10px;
+         justify-content: space-between;
        }
-+      
-+      .field-label {
-+        margin-bottom: 0;
++
++      input {
++        background-color: var(--bg-4);
 +      }
      }
  
--    &.type-text,
--    &.type-number {
-+    &.type-text {
- 
-       .settings-field-desc {
-         margin-top: -6px;
-@@ -194,30 +221,6 @@
-     }
-   }
- 
--  .settings-field-desc {
--    width: 100%;
--    font-size: 13px;
--    font-weight: 400;
--    color: var(--text-color-3);
--    display: flex;
--
--    i {
--      margin-right: 5px;
--      position: relative;
--      font-size: 15px;
--      top: 3px;
--      color: var(--text-color-4);
--    }
--
--    a {
--      color: var(--accent-color);
--
--      &:hover {
--        text-decoration: underline;
--      }
--    }
--  }
--
-   .close {
-     padding: 0;
-     position: absolute;
+     &:last-of-type {
