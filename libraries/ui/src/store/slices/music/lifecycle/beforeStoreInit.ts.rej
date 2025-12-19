@@ -1,0 +1,15 @@
+diff a/libraries/ui/src/store/slices/music/lifecycle/beforeStoreInit.ts b/libraries/ui/src/store/slices/music/lifecycle/beforeStoreInit.ts	(rejected hunks)
+@@ -2,10 +2,10 @@ import { PLAYBACK_STATE } from '../constants'
+ import { RootState } from '../../..'
+ 
+ export default function beforeStoreInit(state: RootState) {
+-  // Pause all music
+-  Object.values(state.music.players).forEach((player) => {
++  // Pause all audio
++  Object.values(state.audio.players).forEach((player) => {
+     if (player.state === PLAYBACK_STATE.PLAYING) {
+-      state.music.players[player.id].state = PLAYBACK_STATE.PAUSED
++      state.audio.players[player.id].state = PLAYBACK_STATE.PAUSED
+     }
+   })
+ }

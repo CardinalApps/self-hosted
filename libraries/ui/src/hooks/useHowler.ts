@@ -4,7 +4,7 @@ import { Howl } from 'howler'
 
 import { getSetting } from '@cardinalapps/app-settings/src'
 import { SupportedLang } from '@cardinalapps/app-settings/src/types'
-import { musicSelectors, musicActions, Player } from '../store/slices/music'
+import { audioSelectors, audioActions, Player } from '../store/slices/music'
 import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../store/slices/music/constants'
 import { authorizedFetchHeaders, JWT_TYPE } from '../lib/auth/jwt'
 import { settingsSelectors } from '../store/slices/settings'
@@ -54,12 +54,12 @@ export const saveMusicHistory = (playerId, trackId) => {
  */
 export default function useHowler() {
   const dispatch = useDispatch()
-  const players = useSelector(musicSelectors.players)
-  const playerIds = useSelector(musicSelectors.playerIds)
-  const playing = useSelector(musicSelectors.playing)
-  const playingIds = useSelector(musicSelectors.playingIds)
-  const paused = useSelector(musicSelectors.paused)
-  const pausedIds = useSelector(musicSelectors.pausedIds)
+  const players = useSelector(audioSelectors.players)
+  const playerIds = useSelector(audioSelectors.playerIds)
+  const playing = useSelector(audioSelectors.playing)
+  const playingIds = useSelector(audioSelectors.playingIds)
+  const paused = useSelector(audioSelectors.paused)
+  const pausedIds = useSelector(audioSelectors.pausedIds)
   const { lang, max_concurrent_audio_streams } = useSelector(settingsSelectors.current)
   const { defaultValue: defaultMaxConcurrentAudioStreams } = useMemo(() => getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang), [])
   const maxConcurrentAudioStreams = Number(max_concurrent_audio_streams || defaultMaxConcurrentAudioStreams)
@@ -87,13 +87,13 @@ export default function useHowler() {
       // Howl may be destroyed before load is complete
       if (howl) {
         howl.seek(player.currentSeconds)
-        dispatch(musicActions.loaded({ playerId: player.id, maxConcurrentPlayingPlayers: maxConcurrentAudioStreams }))
+        dispatch(audioActions.loaded({ playerId: player.id, maxConcurrentPlayingPlayers: maxConcurrentAudioStreams }))
       }
     })
 
     howl.on('end', () => {
       saveMusicHistory(player.id, player.trackId)
-      dispatch(musicActions.stop(player.id))
+      dispatch(audioActions.stop(player.id))
     })
 
     howl.on('stop', () => {

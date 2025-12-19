@@ -1,44 +1,24 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentPlayingAudioStreams.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentPlayingAudioStreams.tsx	(rejected hunks)
-@@ -1,18 +1,41 @@
-+import { useEffect } from 'react'
- import { getSetting } from '@cardinalapps/app-settings/src'
- 
- import NumberInput from '../../../../forms/NumberInput'
- 
-+import { useAppDispatch } from '../../../../../hooks/useAppDispatch'
+@@ -6,11 +6,11 @@ import NumberInput from '../../../../forms/NumberInput'
+ import { useAppDispatch } from '../../../../../hooks/useAppDispatch'
  import { useAppSelector } from '../../../../../hooks/useAppSelector'
  import { settingsSelectors } from '../../../../../store/slices/settings'
-+import { musicActions, musicSelectors } from '../../../../../store/slices/music'
+-import { musicActions, musicSelectors } from '../../../../../store/slices/music'
++import { audioActions, audioSelectors } from '../../../../../store/slices/music'
  
  const maxConcurrentPlayingAudioStreams = (app, lang) => {
-+  const dispatch = useAppDispatch()
-+  const players = useAppSelector(musicSelectors.players)
-+
+   const dispatch = useAppDispatch()
+-  const players = useAppSelector(musicSelectors.players)
++  const players = useAppSelector(audioSelectors.players)
+ 
    const maxPlayersFactory = getSetting('max_concurrent_audio_streams')
    const maxPlayers = maxPlayersFactory(app, lang)
- 
-   const fieldFactory = getSetting('max_concurrent_playing_audio_streams')
-   const fieldObj = fieldFactory(app, lang)
- 
--  const { [maxPlayers.slug]: maxPlayersSetting } = useAppSelector(settingsSelectors.current)
-+  const {
-+    [maxPlayers.slug]: maxPlayersSetting,
-+    [fieldObj.slug]: maxPlayingPlayersSetting,
-+  } = useAppSelector(settingsSelectors.current)
-+
-+  /**
-+   * Stop players in real time as the user lowers the number.
-+   */
-+  useEffect(() => {
-+    const inOrderOfOldest = Object.values(players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
-+
-+    if (maxPlayingPlayersSetting as number < inOrderOfOldest.length) {
-+      const numToPause = inOrderOfOldest.length - (maxPlayingPlayersSetting as number)
-+      for (let i = 0; i < numToPause; i++) {
-+        dispatch(musicActions.pause(inOrderOfOldest[i].id))
-+      }
-+    }
-+  }, [maxPlayingPlayersSetting])
- 
-   return Object.freeze({
-     ...fieldObj,
+@@ -32,7 +32,7 @@ const maxConcurrentPlayingAudioStreams = (app, lang) => {
+     if (maxPlayingPlayersSetting as number < inOrderOfOldest.length) {
+       const numToPause = inOrderOfOldest.length - (maxPlayingPlayersSetting as number)
+       for (let i = 0; i < numToPause; i++) {
+-        dispatch(musicActions.pause(inOrderOfOldest[i].id))
++        dispatch(audioActions.pause(inOrderOfOldest[i].id))
+       }
+     }
+   }, [maxPlayingPlayersSetting])

@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
-import { musicSelectors, Player } from '../../../store/slices/music'
+import { audioSelectors, Player } from '../../../store/slices/music'
 
 import AudioPlayer from './AudioPlayer'
 
@@ -23,10 +23,10 @@ import './AudioPlayer.css'
  */
 const GlobalAudioPlayer = () => {
   const { lang } = useSelector(settingsSelectors.current)
-  const players = useSelector(musicSelectors.players)
-  const playerIds = useSelector(musicSelectors.playerIds)
-  const playing = useSelector(musicSelectors.playing)
-  const playingIds = useSelector(musicSelectors.playingIds)
+  const players = useSelector(audioSelectors.players)
+  const playerIds = useSelector(audioSelectors.playerIds)
+  const playing = useSelector(audioSelectors.playing)
+  const playingIds = useSelector(audioSelectors.playingIds)
   const [visiblePlayer, setVisiblePlayer] = useState<string | undefined>()
 
   const changePlayer = (change) => {

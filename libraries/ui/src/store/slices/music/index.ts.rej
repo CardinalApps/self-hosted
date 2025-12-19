@@ -1,9 +1,21 @@
 diff a/libraries/ui/src/store/slices/music/index.ts b/libraries/ui/src/store/slices/music/index.ts	(rejected hunks)
-@@ -86,7 +86,6 @@ const musicSlice = createSlice({
-         return { ...initialState }
-       })
-       .addCase(playMusic.fulfilled, (state, { payload }) => {
--        console.log('playMusic.fulfilled', payload)
-         const { create, remove, resume, pause } = payload
+@@ -30,7 +30,7 @@ type PlayerLoaded = {
+   playerId?: string,
+ }
  
-         // Add new players
+-const musicSlice = createSlice({
++const audioSlice = createSlice({
+   name: STORE_KEY,
+   initialState,
+   reducers: {
+@@ -159,7 +159,7 @@ const selectLoading = createSelector((state) => state.players, (players) => {
+     .filter((player: Player) => player.state === PLAYBACK_STATE.LOADING)
+ })
+ 
+-export const musicSelectors = musicSlice.selectors
+-export const musicActions = musicSlice.actions
++export const audioSelectors = audioSlice.selectors
++export const audioActions = audioSlice.actions
+ 
+-export default musicSlice
++export default audioSlice

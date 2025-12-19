@@ -1,48 +1,32 @@
 diff a/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.tsx b/libraries/ui/src/components/interaction/MusicPlaybackButton/MusicPlaybackButton.tsx	(rejected hunks)
-@@ -1,13 +1,15 @@
- import type { PropsWithChildren } from 'react'
--import { useDispatch, useSelector } from 'react-redux'
-+import { useSelector } from 'react-redux'
- import clsx from 'clsx'
- 
-+import { useAppDispatch } from '../../../hooks/useAppDispatch'
- import Icon from '../../typography/Icon'
- import MusicAnimation from '../../layout/MusicAnimation'
+@@ -8,7 +8,7 @@ import MusicAnimation from '../../layout/MusicAnimation'
  import Loading from '../../layout/Loading'
  
  import { settingsSelectors } from '../../../store/slices/settings'
- import { musicSelectors, musicActions, Player } from '../../../store/slices/music'
-+import playMusic from '../../../store/slices/music/thunks/play'
+-import { musicSelectors, musicActions, Player } from '../../../store/slices/music'
++import { audioSelectors, audioActions, Player } from '../../../store/slices/music'
+ import playMusic from '../../../store/slices/music/thunks/play'
  
  import i18n from './i18n'
- 
-@@ -16,9 +18,9 @@ import './MusicPlaybackButton.css'
- export type PlayButtonSizeType = 'm' | 's'
- 
- type MusicPlaybackButtonProps = {
--  musicTrackIds: number[],
-+  musicTrackIds: string[],
-   musicTrackTitle?: string,
--  musicTrackIdToPlay: number,
-+  musicTrackIdToPlay: string,
-   solid?: boolean,
-   size?: PlayButtonSizeType,
- }
-@@ -40,7 +42,7 @@ const MusicPlaybackButton = ({
-   solid,
-   size = 's',
+@@ -44,9 +44,9 @@ const MusicPlaybackButton = ({
  }: PropsWithChildren<MusicPlaybackButtonProps>) => {
--  const dispatch = useDispatch()
-+  const dispatch = useAppDispatch()
+   const dispatch = useAppDispatch()
    const { lang } = useSelector(settingsSelectors.current)
-   const playing = useSelector(musicSelectors.playing)
-   const loading = useSelector(musicSelectors.loading)
-@@ -50,7 +52,7 @@ const MusicPlaybackButton = ({
+-  const playing = useSelector(musicSelectors.playing)
+-  const loading = useSelector(musicSelectors.loading)
+-  const paused = useSelector(musicSelectors.paused)
++  const playing = useSelector(audioSelectors.playing)
++  const loading = useSelector(audioSelectors.loading)
++  const paused = useSelector(audioSelectors.paused)
+   const isPlaying = playing.some((player: Player) => musicTrackIds.includes(player.trackId))
+   const isLoading = loading.find((player: Player) => musicTrackIds.includes(player.trackId))
    const isPaused = paused.find((player: Player) => musicTrackIds.includes(player.trackId))
- 
-   const handlePlayClick = () => {
--    dispatch(musicActions.play({ trackId: musicTrackIdToPlay }))
-+    dispatch(playMusic({ trackId: musicTrackIdToPlay }))
-   }
- 
+@@ -58,7 +58,7 @@ const MusicPlaybackButton = ({
    const handlePauseClick = () => {
+     playing.forEach((player: Player) => {
+       if (musicTrackIds.includes(player.trackId)) {
+-        dispatch(musicActions.pause(player.id))
++        dispatch(audioActions.pause(player.id))
+       }
+     })
+   }

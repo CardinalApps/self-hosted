@@ -59,7 +59,7 @@ const maxConcurrentAudioStreams = (app, lang) => {
     if (maxPlayersSetting as number < inOrderOfOldest.length) {
       const numToTrim = inOrderOfOldest.length - (maxPlayersSetting as number)
       for (let i = 0; i < numToTrim; i++) {
-        dispatch(musicActions.stop(inOrderOfOldest[i].id))
+        dispatch(audioActions.stop(inOrderOfOldest[i].id))
       }
     }
   }, [maxPlayersSetting])

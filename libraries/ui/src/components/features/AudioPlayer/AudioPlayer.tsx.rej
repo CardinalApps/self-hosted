@@ -1,42 +1,33 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx	(rejected hunks)
-@@ -26,6 +26,7 @@ export type CachedSeekPositionType = {
- }
+@@ -8,7 +8,7 @@ import Icon from '../../typography/Icon'
+ import Loading from '../../layout/Loading'
+ import Scrubber from '../../interaction/Scrubber'
  
- type AudioPlayerProps = {
-+  className?: string,
-   playerId: string,
-   size: 'mini' | 'wide',
- }
-@@ -34,6 +35,7 @@ type AudioPlayerProps = {
-  * One AudioPlayer controls the playback of one audio stream.
-  */
- const AudioPlayer = ({
-+  className,
-   playerId,
-   size,
- }: PropsWithChildren<AudioPlayerProps>) => {
-@@ -53,6 +55,7 @@ const AudioPlayer = ({
-   } = useGetMusicTrackQuery({ id: player.trackId })
-   const track = musicTrackResponse
-   const coverSrc = useReleaseCover(track?.release?.id)
-+  const [fadeIn, setFadeIn] = useState(false)
+-import { musicSelectors, musicActions } from '../../../store/slices/music'
++import { audioSelectors, audioActions } from '../../../store/slices/music'
+ import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../../store/slices/music/constants'
+ import playMusic from '../../../store/slices/music/thunks/play'
  
-   const handlePlayClick = (id) => {
-     dispatch(playMusic({ trackId: id }))
-@@ -101,8 +104,15 @@ const AudioPlayer = ({
-     }
-   }, [playerId, howl])
+@@ -43,7 +43,7 @@ const AudioPlayer = ({
+   const dispatch = useAppDispatch()
+   //const { max_concurrent_audio_streams } = useSelector(settingsSelectors.current)
+   const playbackTimeInterval = useRef(null)
+-  const players = useAppSelector(musicSelectors.players)
++  const players = useAppSelector(audioSelectors.players)
+   const player = players?.[playerId]
+   const isPlaying = player.state === PLAYBACK_STATE.PLAYING
+   const isPaused = player.state === PLAYBACK_STATE.PAUSED
+@@ -62,11 +62,11 @@ const AudioPlayer = ({
+   }
  
-+  useEffect(() => {
-+    const timeout = setTimeout(() => {
-+      setFadeIn(true)
-+    }, 100)
-+    return () => clearTimeout(timeout)
-+  }, [])
-+
-   return (
--    <div className="audio-player" data-size={size} key={playerId}>
-+    <div className={clsx("audio-player", className, !!fadeIn && 'fade-in')} data-size={size} data-state={player.state} key={playerId}>
-       <div className="metadata no-collapse">
-         <p
-           className="audio-player-track-title"
+   const handlePauseClick = () => {
+-    dispatch(musicActions.pause(player.id))
++    dispatch(audioActions.pause(player.id))
+   }
+ 
+   const handleStopClick = () => {
+-    dispatch(musicActions.stop(player.id))
++    dispatch(audioActions.stop(player.id))
+   }
+ 
+   const getCachedSeekPositions = () => {

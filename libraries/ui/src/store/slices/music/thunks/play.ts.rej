@@ -1,17 +1,42 @@
 diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
-@@ -53,7 +53,6 @@ const playMusic = createAsyncThunk<
-   const { trackId, playerId } = args
-   const state = thunkAPI.getState()
-   const lang = state.settings?.current?.lang
--  const maxConcurrentPlayingPlayers = 1
+@@ -74,7 +74,7 @@ const playMusic = createAsyncThunk<
+   }
+   // Look for a player with the given track ID
+   else if (!playerId && trackId) {
+-    const player = Object.values(state.music.players).find((player) => player.trackId === trackId)
++    const player = Object.values(state.audio.players).find((player) => player.trackId === trackId)
+     if (player) {
+       resolvedPlayerId = player.id
+     }
+@@ -90,7 +90,7 @@ const playMusic = createAsyncThunk<
+   }
  
-   const workToDo: PlayReturn = {
-     create: [],
-@@ -117,6 +116,7 @@ const playMusic = createAsyncThunk<
+   // If the player exists and is paused, resume it
+-  if (resolvedPlayerId && state.music.players?.[resolvedPlayerId] && state.music.players?.[resolvedPlayerId].state === PLAYBACK_STATE.PAUSED) {
++  if (resolvedPlayerId && state.audio.players?.[resolvedPlayerId] && state.audio.players?.[resolvedPlayerId].state === PLAYBACK_STATE.PAUSED) {
+     workToDo.resume?.push({
+       playerId: resolvedPlayerId,
+       now: Date.now(),
+@@ -98,11 +98,11 @@ const playMusic = createAsyncThunk<
+   }
+ 
+   // If we are at the max concurrent players, save the playback history of the oldest ones before they are removed
+-  const numPlayers = Object.values(state.music.players).length + workToDo.create.length
++  const numPlayers = Object.values(state.audio.players).length + workToDo.create.length
+   const maxConcurrentPlayers = Number(state.settings.current[getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang).slug])
+ 
+   if (numPlayers > maxConcurrentPlayers) {
+-    const inOrderOfOldest = Object.values(state.music.players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
++    const inOrderOfOldest = Object.values(state.audio.players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
+     const numToStop = numPlayers - maxConcurrentPlayers
+     for (let i = 0; i < numToStop; i++) {
+       const idToStop = inOrderOfOldest[i].id
+@@ -111,7 +111,7 @@ const playMusic = createAsyncThunk<
+   }
+ 
+   // If we are at the max concurrent *playing* players, pause the oldest ones
+-  const oldestOtherPlayersPlayingOrLoading = Object.values(state.music.players)
++  const oldestOtherPlayersPlayingOrLoading = Object.values(state.audio.players)
+     .map((player) => player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING ? { ...player } : null)
      .filter((player) => !!player)
      .sort((a, b) => a?.currentPlaybackStartedAt <= b?.currentPlaybackStartedAt ? -1 : 1)
- 
-+  const maxConcurrentPlayingPlayers = Number(state.settings.current[getSetting('max_concurrent_playing_audio_streams')('music', lang as SupportedLang).slug])
-   const numOtherPlayersAllowed = maxConcurrentPlayingPlayers - 1
- 
-   if (oldestOtherPlayersPlayingOrLoading.length > numOtherPlayersAllowed) {

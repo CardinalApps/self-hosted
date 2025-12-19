@@ -1,15 +1,17 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentAudioStreams.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/music/maxConcurrentAudioStreams.tsx	(rejected hunks)
-@@ -4,11 +4,13 @@ import { getSetting } from '@cardinalapps/app-settings/src'
+@@ -4,13 +4,13 @@ import { getSetting } from '@cardinalapps/app-settings/src'
  import { useAppDispatch } from '../../../../../hooks/useAppDispatch'
  import { useAppSelector } from '../../../../../hooks/useAppSelector'
  import { settingsActions, settingsSelectors } from '../../../../../store/slices/settings'
-+import { musicActions, musicSelectors } from '../../../../../store/slices/music'
+-import { musicActions, musicSelectors } from '../../../../../store/slices/music'
++import { audioActions, audioSelectors } from '../../../../../store/slices/music'
  
  import NumberInput from '../../../../forms/NumberInput'
  
  const maxConcurrentAudioStreams = (app, lang) => {
    const dispatch = useAppDispatch()
-+  const players = useAppSelector(musicSelectors.players)
+-  const players = useAppSelector(musicSelectors.players)
++  const players = useAppSelector(audioSelectors.players)
  
    const maxConcurrentPlayingFactory = getSetting('max_concurrent_playing_audio_streams')
    const maxConcurrentPlaying = maxConcurrentPlayingFactory(app, lang)

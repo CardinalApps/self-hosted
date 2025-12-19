@@ -1,17 +1,19 @@
 diff a/libraries/ui/src/store/index.ts b/libraries/ui/src/store/index.ts	(rejected hunks)
-@@ -30,6 +30,7 @@ import { baseHomeServerApi } from './apis/baseHomeServerApi'
- import resetMiddleware from './middleware/reset'
- import sseFactoryResetMiddleware from './middleware/sseFactoryReset'
- import sseLatestEventMiddleware from './slices/homeServer/middleware/sseLatestEvent'
-+import logHTTPError from './middleware/logHTTPError'
+@@ -17,7 +17,7 @@ import drawerSlice from './slices/drawer'
+ import indexingSlice from './slices/indexing'
+ import jobsSlice from './slices/jobs'
+ import layoutSlice from './slices/layout'
+-import musicSlice from './slices/music'
++import audioSlice from './slices/music'
  
  /**
-  * Lifecycle
-@@ -98,6 +99,7 @@ const createStore = () => {
-         resetMiddleware.middleware,
-         sseFactoryResetMiddleware.middleware,
-         sseLatestEventMiddleware.middleware,
-+        logHTTPError.middleware,
-         baseHomeServerApi.middleware,
-       )
-     },
+  * APIs
+@@ -63,7 +63,7 @@ const slices = {
+   [indexingSlice.reducerPath]: indexingSlice,
+   [jobsSlice.reducerPath]: jobsSlice,
+   [layoutSlice.reducerPath]: layoutSlice,
+-  [musicSlice.reducerPath]: musicSlice,
++  [audioSlice.reducerPath]: audioSlice,
+   [baseHomeServerApi.reducerPath]: baseHomeServerApi,
+ }
+ 
