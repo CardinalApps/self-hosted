@@ -1,0 +1,107 @@
+diff a/apps/admin-web/src/pages/Roles/styles.css b/apps/admin-web/src/pages/Roles/styles.css	(rejected hunks)
+@@ -1,105 +0,0 @@
+-.users-page {
+-
+-  h3, h4 {
+-    padding-left: var(--gutter);
+-  }
+-
+-  .server-user-list {
+-
+-    .user-name {
+-      display: flex;
+-      align-items: center;
+-      gap: 10px;
+-    }
+-
+-    .current-user-badge {
+-      
+-      i {
+-        font-size: 16px;
+-      }
+-    }
+-
+-    .user-activation-status {
+-      display: flex;
+-      gap: 8px;
+-      align-items: center;
+-
+-      &.activated {
+-        
+-        i {
+-          color: var(--success-bg);
+-        }
+-      }
+-    }
+-  }
+-}
+-
+-.manage-user-drawer {
+-
+-  .user-actions {
+-    display: grid;
+-    grid-template-columns: 50% 50%;
+-    gap: 8px;
+-  }
+-}
+-
+-.manage-invitations {
+-
+-  .invite-user-notice {
+-    padding-top: 10px;
+-    font-size: 12px;
+-    text-align: center;
+-  }
+-
+-  .create-invitiation-link {
+-
+-    p {
+-      margin-bottom: 20px;
+-    }
+-
+-    form {
+-      display: flex;
+-      gap: 10px;
+-      align-items: flex-end;
+-
+-      .form-field {
+-        margin-bottom: 0;
+-      }
+-    }
+-  }
+-
+-  .generated-invitation-link {
+-    padding-top: 20px;
+-    
+-    input {
+-      width: 100%;
+-    }
+-  }
+-
+-  .invite-link-info {
+-    display: flex;
+-    flex-direction: column;
+-    gap: 6px;
+-
+-    p {
+-      margin-bottom: 0;
+-      font-weight: 400;
+-      font-size: 13px;
+-    }
+-
+-    strong {
+-      
+-      &:after {
+-        content: ': ';
+-      }
+-    }
+-
+-    a {
+-      color: var(--accent-color);
+-
+-      &:hover {
+-        text-decoration: underline;
+-      }
+-    }
+-  }
+-}

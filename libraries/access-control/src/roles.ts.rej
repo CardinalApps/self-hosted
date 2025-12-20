@@ -1,0 +1,29 @@
+diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
+@@ -1,5 +1,23 @@
+-export const ROLES_LIST = [
+-  `owner`,
+-] as const
++export type Role = {
++  editable: boolean,
+ 
+-export type Roles = typeof ROLES_LIST[number]
++  // Use null for unlimited
++  maxUsers: number | null
++}
++
++export const Roles: Record<string, Role> = {
++  owner: {
++    editable: false,
++    maxUsers: 1,
++  },
++  newcomer: {
++    editable: false,
++    maxUsers: null,
++  },
++} as const
++
++export type AllRoleSlugs = keyof typeof Roles
++
++export const getRole = (role: AllRoleSlugs): Role | undefined => {
++  return Roles?.[role]
++}

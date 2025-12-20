@@ -1,0 +1,27 @@
+diff a/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx b/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx	(rejected hunks)
+@@ -1,6 +1,6 @@
+ import { useState } from 'react'
+ 
+-import { ACi18n, CAPABILITIES_LIST, ROLES_LIST } from '@cardinalapps/access-control/src/'
++import { ACi18n, Capabilities, Roles } from '@cardinalapps/access-control/src/'
+ 
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ 
+@@ -35,7 +35,7 @@ function CapabilitiesList({
+   }
+ 
+   const listItems = () => {
+-    return CAPABILITIES_LIST.map((cap) => {
++    return Object.keys(Capabilities).map((cap) => {
+       return {
+         name: cap,
+         controls: ['view'],
+@@ -56,7 +56,7 @@ function CapabilitiesList({
+             name="role"
+             size='s'
+             multi={false}
+-            options={ROLES_LIST.map((role) => {
++            options={Object.keys(Roles).map((role) => {
+               return {
+                 label: ACi18n[`role.${role}.name`]?.[lang],
+                 value: role,

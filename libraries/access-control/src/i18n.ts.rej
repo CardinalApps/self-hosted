@@ -1,0 +1,33 @@
+diff a/libraries/access-control/src/i18n.ts b/libraries/access-control/src/i18n.ts	(rejected hunks)
+@@ -2,9 +2,31 @@ export type Languages = 'en'
+ export type StringList = Record<string, Record<Languages, string>>
+ 
+ export const ACi18n: StringList = {
++  /**
++   * Owner
++   */
+   "role.owner.name": {
+     "en": "Owner",
+   },
++  "role.owner.description": {
++    "en": `
++      <p>The Owner role is the most powerful role, with unrestricted capabilities. It is assigned to the first Cardinal Account that logs into the server, and can only be removed by performing a factory reset. It is the only role that is limited to a single user.</p>
++      <p>The role is designed for the individual that is hosting Cardinal Media Server, and provides complete administrative control.</p>
++    `,
++  },
++
++  /**
++   * Newcomer
++   */
++  "role.newcomer.name": {
++    "en": "Newcomer",
++  },
++  "role.newcomer.description": {
++    "en": `
++      <p>The Newcomer role is the default role assigned to all users when they first join your server. It grants users only the basic Capabilities needed to log into your Media Server, and to manage their account.</p>
++      <p>Newcomers cannot access media or use most of server's features until they are assigned additional roles.</p>
++    `,
++  },
+ }
+ 
+ export default ACi18n

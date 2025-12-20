@@ -1,0 +1,20 @@
+diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
+@@ -1,7 +1,14 @@
+ import { Resources } from "./resources"
+ 
+-export const CAPABILITIES_LIST = [
+-  `${Resources.MUSIC_TRACKS}.List`,
+-] as const
++// todo this
++export type Capability = object
+ 
+-export type Capabilities = typeof CAPABILITIES_LIST[number]
++export const Capabilities: Record<string, Capability> = {
++  [`${Resources.MUSIC_TRACKS}.List`]: {},
++}
++
++export type AllCapabilitySlugs = keyof typeof Capabilities
++
++export const getCapability = (capability: AllCapabilitySlugs): Capability | undefined => {
++  return Capabilities?.[capability]
++}

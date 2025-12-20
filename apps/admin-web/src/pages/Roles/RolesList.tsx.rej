@@ -1,0 +1,99 @@
+diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
+@@ -1,5 +1,5 @@
+ import { useState } from 'react'
+-import { ROLES_LIST, ACi18n } from '@cardinalapps/access-control/src'
++import { ACi18n, AllRoleSlugs, getRole, Role, Roles } from '@cardinalapps/access-control/src'
+ 
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ 
+@@ -8,10 +8,16 @@ import List from '@cardinalapps/ui/src/components/interaction/List'
+ import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
+ import { ListItem } from '@cardinalapps/ui/src/components/interaction/List/List'
+ import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
++import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
++import WrittenText from '@cardinalapps/ui/src/components/typography/WrittenText'
++import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
++import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
++import { UserType } from '@cardinalapps/ui/src/types/user'
+ 
+ import i18n from './i18n.json'
++import AddRemove from '@cardinalapps/ui/src/components/forms/AddRemove'
+ 
+ type CapabilitiesListProps = {
+   globallySelectedRole: string,
+@@ -25,15 +31,30 @@ function RolesList({
+   setGloballySelectedRole,
+ }: CapabilitiesListProps) {
+   const { lang } = useAppSelector(settingsSelectors.current)
+-  const [details, setDetails] = useState<string>()
++  const [drawerRoleSlug, setDrawerRoleSlug] = useState<AllRoleSlugs>()
++  const drawerRole: Role = getRole(drawerRoleSlug)
+ 
+-  const listItems = () => {
+-    return ROLES_LIST.map((role) => {
++  const usersRes = useGetUsersQuery({ take: 9999 })
++  const users = usersRes?.data ? usersRes.data?.[0] : []
++
++  const usersWithRole = (role) => users.filter((user: UserType) => user.role === role)
++
++  const rolesList = () => {
++    return Object.keys(Roles).map((role) => {
++      const numUsersWithRole = usersWithRole(role).length
+       return {
+         name: ACi18n[`role.${role}.name`]?.[lang],
+-        label: '1 User',
++        label: pluralize(numUsersWithRole, i18n['roles.num-users.singular'][lang], i18n['roles.num-users.plural'][lang]).replace('{num}', numUsersWithRole),
+         controls: ['view'],
+-        onView: () => setDetails(role),
++        onView: () => setDrawerRoleSlug(role),
++      } as ListItem
++    })
++  }
++
++  const roleUsersUneditableList = (roleSlug: AllRoleSlugs) => {
++    return usersWithRole(roleSlug).map((user: UserType) => {
++      return {
++        name: <UserTag user={user} size="xs" />,
+       } as ListItem
+     })
+   }
+@@ -46,14 +67,32 @@ function RolesList({
+     >
+       <List
+         layout="compact"
+-        items={listItems()}
++        items={rolesList()}
+       />
+-      {!!details &&
++      {!!drawerRoleSlug &&
+         <Drawer
+-          title={i18n['roles.drawer.title'][lang]}
+-          onClose={() => setDetails(undefined)}
++          className="role-drawer"
++          title={ACi18n[`role.${drawerRoleSlug}.name`][lang]}
++          subtitle={i18n['roles.drawer.subtitle'][lang]}
++          onClose={() => setDrawerRoleSlug(undefined)}
+         >
+-          {details}
++          <Drawer.Section>
++            <WrittenText className="role-description">
++              {ACi18n[`role.${drawerRoleSlug}.description`][lang]}
++            </WrittenText>
++          </Drawer.Section>
++          <Drawer.Section title={i18n['roles.drawer.user-list-title'][lang]}>
++            {drawerRole.editable
++              ? (
++                <AddRemove />
++              )
++              : (
++                <List
++                  items={roleUsersUneditableList(drawerRoleSlug)}
++                />
++              )
++            }
++          </Drawer.Section>
+         </Drawer>
+       }
+     </CardGrid.Card>

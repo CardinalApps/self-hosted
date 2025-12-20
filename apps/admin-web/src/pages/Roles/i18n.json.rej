@@ -1,0 +1,22 @@
+diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
+@@ -5,9 +5,19 @@
+   "roles-list.title": {
+     "en": "Roles"
+   },
+-  "roles.drawer.title": {
++  "roles.drawer.subtitle": {
+     "en": "Role"
+   },
++  "roles.num-users.singular": {
++    "en": "{num} User"
++  },
++  "roles.num-users.plural": {
++    "en": "{num} Users"
++  },
++  "roles.drawer.user-list-title": {
++    "en": "Users with this role"
++  },
++
+   "caps-list.title": {
+     "en": "Capabilities"
+   },

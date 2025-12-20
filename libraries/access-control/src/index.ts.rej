@@ -1,97 +1,14 @@
 diff a/libraries/access-control/src/index.ts b/libraries/access-control/src/index.ts	(rejected hunks)
-@@ -1,89 +1,9 @@
--/**
-- * All possible roles. Roles are used to bundle capabilities.
-- */
--export enum Role {
--  OWNER = 'owner',
--  CONSUMER = 'consumer',
--  GUEST = 'guest',
--}
-+export type { Capabilities } from './capabilities'
-+export { CAPABILITIES_LIST } from './capabilities'
+@@ -1,8 +1,8 @@
+-export type { Capabilities } from './capabilities'
+-export { CAPABILITIES_LIST } from './capabilities'
++export type { AllCapabilitySlugs, Capability } from './capabilities'
++export { Capabilities, getCapability } from './capabilities'
  
--/**
-- * Capabilities are booleans that restrict access to things.
-- */
--export type CapabilityValue = boolean
-+export type { Roles } from './roles'
-+export { ROLES_LIST } from './roles'
+-export type { Roles } from './roles'
+-export { ROLES_LIST } from './roles'
++export type { AllRoleSlugs, Role } from './roles'
++export { Roles, getRole } from './roles'
  
--/**
-- * All possible capabilities.
-- */
--export enum Capability {
--  // music
--  LOG_INTO_MUSIC_APP = 'log_into_music_app',
--  LIST_MUSIC_TRACKS = 'list_music_tracks',
--  PLAY_MUSIC = 'play_music',
-+export { Resources } from './resources'
+ export { Resources } from './resources'
  
--  // photos
--  LOG_INTO_PHOTOS_APP = 'log_into_photos_app',
--
--  // cinema
--  LOG_INTO_CINEMA_APP = 'log_into_cinema_app',
--
--  // admin
--  LOG_INTO_ADMIN_APP = 'log_into_admin_app',
--}
--
--/**
-- * Arrays of capabilities are assigned to users.
-- */
--export type CapabilitiesAssignment = Capability[]
--
--const DefaultGuestCapabilities: CapabilitiesAssignment = [
--  Capability.LIST_MUSIC_TRACKS,
--  Capability.PLAY_MUSIC,
--]
--
--const DefaultConsumerCapabilities: CapabilitiesAssignment = [
--  ...DefaultGuestCapabilities,
--] as const
--
--const DefaultOwnerCapabilities: CapabilitiesAssignment = [
--  ...DefaultConsumerCapabilities,
--] as const
--
--export const DefaultCapabilities = {
--  [Role.GUEST]: DefaultGuestCapabilities,
--  [Role.CONSUMER]: DefaultConsumerCapabilities,
--  [Role.OWNER]: DefaultOwnerCapabilities,
--} as const
--
--export interface UserDuck {
--  role?: string
--  capabilities?: CapabilitiesAssignment
--}
--
--/**
-- * This access control class is used to check what a single user can do.
-- */
--export class AC {
--  // either the role or a caps list is needed
--  constructor(user: UserDuck) {
--    if (!user.role && !user?.capabilities?.length) {
--      this.capabilities = []
--    } else {
--      this.user = user
--
--      // use given caps, or load default caps for the role
--      if (user?.capabilities?.length) {
--        this.capabilities = user.capabilities
--      } else if (Object.values(Role).includes(user.role as Role)) {
--        this.capabilities = DefaultCapabilities[user.role as Role]
--      }
--    }
--  }
--
--  user: UserDuck
--  capabilities: CapabilitiesAssignment
--
--  can(cap: Capability) {
--    return this.capabilities.includes(cap)
--  }
--}
-+export { ACi18n } from './i18n'
