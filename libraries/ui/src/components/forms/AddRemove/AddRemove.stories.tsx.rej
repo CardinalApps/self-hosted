@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/forms/AddRemove/AddRemove.stories.tsx b/libraries/ui/src/components/forms/AddRemove/AddRemove.stories.tsx	(rejected hunks)
+@@ -58,7 +58,7 @@ export const Default = () => {
+             initialAvailableItems={availableUsers}
+             selectedTitle={'Remove users'}
+             availableTitle={'Available users'}
+-            //onChange={(items) => console.log('list change', items)}
++            onChange={(items) => console.log('list change', items)}
+           />
+         </FormField>
+       </Form>

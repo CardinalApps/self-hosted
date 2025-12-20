@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/forms/AddRemove/AddRemove.css b/libraries/ui/src/components/forms/AddRemove/AddRemove.css	(rejected hunks)
+@@ -12,7 +12,7 @@
+ 
+   .add-remove-title {
+     margin-bottom: 10px;
+-    font-weight: 800;
++    font-weight: 500;
+     font-size: 14px;
+     color: var(--text-color-1);
+   }

@@ -1,22 +1,27 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -5,9 +5,19 @@
-   "roles-list.title": {
-     "en": "Roles"
-   },
--  "roles.drawer.title": {
-+  "roles.drawer.subtitle": {
+@@ -9,13 +9,22 @@
      "en": "Role"
    },
-+  "roles.num-users.singular": {
-+    "en": "{num} User"
-+  },
-+  "roles.num-users.plural": {
-+    "en": "{num} Users"
-+  },
-+  "roles.drawer.user-list-title": {
-+    "en": "Users with this role"
-+  },
-+
-   "caps-list.title": {
-     "en": "Capabilities"
+   "roles.num-users.singular": {
+-    "en": "{num} User"
++    "en": "{num} Assignment"
    },
+   "roles.num-users.plural": {
+-    "en": "{num} Users"
++    "en": "{num} Assignments"
+   },
+   "roles.drawer.user-list-title": {
+-    "en": "Users with this role"
++    "en": "Role Assignments"
++  },
++  "roles.drawer.user-list.assigned": {
++    "en": "Users Assigned this Role"
++  },
++  "roles.drawer.user-list.available": {
++    "en": "Available Users"
++  },
++  "roles.drawer.user-list.save": {
++    "en": "Update Assignments"
+   },
+ 
+   "caps-list.title": {

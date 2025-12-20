@@ -1,24 +1,25 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,18 +1,19 @@
+@@ -1,17 +1,20 @@
  export type Role = {
-   editable: boolean,
--
--  // Use null for unlimited
--  maxUsers: number | null
-+  maxUsers: number | null, // Use null for unlimited
-+  slug: string,
+-  editable: boolean,
++  assignable: boolean,
++  unassignable: boolean,
+   maxUsers: number | null, // Use null for unlimited
+   slug: string,
  }
  
  export const Roles: Record<string, Role> = {
    owner: {
-     editable: false,
+-    editable: false,
++    assignable: false,
++    unassignable: false,
      maxUsers: 1,
-+    slug: 'owner',
+     slug: 'owner',
    },
    newcomer: {
-     editable: false,
+-    editable: false,
++    assignable: true,
++    unassignable: true,
      maxUsers: null,
-+    slug: 'newcomer',
+     slug: 'newcomer',
    },
- } as const
- 
