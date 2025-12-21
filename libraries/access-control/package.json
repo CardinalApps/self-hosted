@@ -10,7 +10,8 @@
     "dev": "tsc --watch",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "build": "tsc && cp package.cjs.json dist/cjs/package.json"
+    "build": "tsc && cp package.cjs.json dist/cjs/package.json",
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.9",

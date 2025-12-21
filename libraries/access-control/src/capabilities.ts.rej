@@ -1,60 +1,151 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -1,14 +1,48 @@
--import { Resources } from "./resources"
-+// import { Resources } from "./resources"
+@@ -1,14 +1,32 @@
+-// import { Resources } from "./resources"
+-
+-// type CapabilityFormat<T extends string> = `${T}.${string}`
+-
+-// type CapabilityWithFeature = CapabilityFormat<
+-//     Resources.USERS
+-//   | Resources.MUSIC_TRACKS
+-//   | Resources.MUSIC_RELEASES
+-//   | Resources.MUSIC_ARTISTS
+-// >
++/**
++ * Master list of all components.
++ * 
++ * In the context of Access Control, "component" is used as a generic term for
++ * anything that can have its access restricted. High level concepts like
++ * Resources, Features, Applications, and Services are all categorized as
++ * components within the Access Control layer.
++ */
++export type Components =
++    'Users'
++  | 'AdminApp'
++  | 'MusicApp'
++  | 'MusicTracks'
++  | 'MusicReleases'
++  | 'MusicArtists'
++  | 'PhotosApp'
++  | 'CinemaApp'
  
--// todo this
--export type Capability = object
-+// type CapabilityFormat<T extends string> = `${T}.${string}`
++/**
++ * Master list of all capabilities.
++ * 
++ * A capability is a single string that combines a Component and an Action,
++ * separating them with a dot.
++ * 
++ *    {Component}.{Action}
++ * 
++ * The Component must be defined in the Components type, and the Action can be
++ * any arbitrary string except an asterisk (*).
++ */
+ export const Capabilities = [
+   /**
+    * Users
+@@ -45,4 +63,106 @@ export const Capabilities = [
+   'CinemaApp.Login',
+ ] as const
  
--export const Capabilities: Record<string, Capability> = {
--  [`${Resources.MUSIC_TRACKS}.List`]: {},
--}
-+// type CapabilityWithFeature = CapabilityFormat<
-+//     Resources.USERS
-+//   | Resources.MUSIC_TRACKS
-+//   | Resources.MUSIC_RELEASES
-+//   | Resources.MUSIC_ARTISTS
-+// >
- 
--export type AllCapabilitySlugs = keyof typeof Capabilities
-+export const Capabilities = [
-+  /**
-+   * Users
-+   */
-+  'Users.List',
- 
--export const getCapability = (capability: AllCapabilitySlugs): Capability | undefined => {
--  return Capabilities?.[capability]
--}
-+  /**
-+   * Admin
-+   */
-+  'AdminApp.Login',
++/**
++ * A type that includes all capabilities.
++ */
+ export type CapabilitityString = typeof Capabilities[number]
 +
-+  /**
-+   * Music
-+   */
-+  'MusicApp.Login',
++/**
++ * Capability Assignments are stored as an array of capability strings. The
++ * strings can be exact matching capabilities, or can use of a wildcard for
++ * selecting broader ranges of capabilities.
++ * 
++ *    `*.*` - Matches all components and all actions, granting all current and
++ *    future capabilities. Reserved for Owner account.
++ * 
++ *    `MusicApp.*` - Matches all actions in the MusicApp component, granting all
++ *    current and future MusicApp capabilities.
++ * 
++ *    `*.Login` - Matches only Login actions on all current and future
++ *    components.
++ */
++export type CapabilityAssignment =
++  CapabilitityString
++  | '*.*'
++  | `${Components}.*`
++  | `*.${string}`
 +
-+  'MusicTracks.Read',
-+  'MusicTracks.List',
++export type CapabilityAssignments = CapabilityAssignment[]
 +
-+  'MusicReleases.Read',
-+  'MusicReleases.List',
++/**
++ * Validate the syntax of an capability assignment.
++ */
++const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean => {
++  if (typeof assignment !== 'string') {
++    return false
++  }
 +
-+  'MusicArtists.Read',
-+  'MusicArtists.List',
++  if (!assignment.includes('.')) {
++    return false
++  }
 +
-+  /**
-+   * Photos
-+   */
-+  'PhotosApp.Login',
++  const parts = assignment.split('.')
 +
-+  /**
-+   * Cinema
-+   */
-+  'CinemaApp.Login',
-+] as const
++  if (parts.length !== 2) {
++    return false
++  }
 +
-+export type CapabilitityString = typeof Capabilities[number]
++  return true
++}
++
++/**
++ * Validate the syntax of an array of capability assignments.
++ */
++const validateCapabilitiesSyntax = (capabilityList: CapabilitityString[]): boolean => {
++  let allAreValid = true
++
++  for (const capability of capabilityList) {
++    if (!validateCapabilitySyntax(capability)) {
++      allAreValid = false
++    }
++  }
++
++  return allAreValid
++}
++
++/**
++ * Checks whether the capability assignment exists in the list of capabilities.
++ */
++export function hasCapability(assignment: CapabilityAssignment, capabilityList: CapabilitityString[]) {
++  if (!validateCapabilitySyntax(assignment)) {
++    return false
++  }
++
++  if (!validateCapabilitiesSyntax(capabilityList)) {
++    return false
++  }
++
++  const [assignmentComponent, assignmentAction] = assignment.split('.')
++
++  for (const capabilityToCheckAgainst of capabilityList) {
++    const [componentToCheckAgainst, actionToCheckAgainst] = capabilityToCheckAgainst.split('.')
++    let componetIsValid = false
++    let actionIsValid = false
++
++    if (
++      assignmentComponent === componentToCheckAgainst
++      || assignmentComponent === '*'
++    ) {
++      componetIsValid = true
++    }
++
++    if (
++      assignmentAction === actionToCheckAgainst
++      || assignmentAction === '*'
++    ) {
++      actionIsValid = true
++    }
++
++    if (componetIsValid && actionIsValid) {
++      return true
++    }
++  }
++
++  return false
++}

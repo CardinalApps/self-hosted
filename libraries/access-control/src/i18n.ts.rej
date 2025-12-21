@@ -1,23 +1,10 @@
 diff a/libraries/access-control/src/i18n.ts b/libraries/access-control/src/i18n.ts	(rejected hunks)
-@@ -10,8 +10,8 @@ export const ACi18n: StringList = {
-   },
-   "role.owner.description": {
-     "en": `
--      <p>The Owner role is the most powerful role, with unrestricted capabilities. It is assigned to the first Cardinal Account that logs into the server, and can only be removed by performing a factory reset. It is the only role that is limited to a single user.</p>
--      <p>The role is designed for the individual that is hosting Cardinal Media Server, and provides complete administrative control.</p>
-+      <p>The Owner role is the most powerful role, with unrestricted capabilities. It is assigned to the first Cardinal Account that logs into the server, and can only be removed by performing a factory reset.</p>
-+      <p>The Owner role also links the Media Server to Cardinal's Cloud, allowing the Media Server to use the features included in the owner's subscription.</p>
-     `,
-   },
- 
-@@ -23,8 +23,8 @@ export const ACi18n: StringList = {
-   },
+@@ -24,7 +24,7 @@ export const ACi18n: StringList = {
    "role.newcomer.description": {
      "en": `
--      <p>The Newcomer role is the default role assigned to all users when they first join your server. It grants users only the basic Capabilities needed to manage their account.</p>
--      <p>Newcomers cannot access media or use most of server's features until they are assigned additional roles.</p>
-+      <p>The Newcomer role is the default role assigned to all users when they first join your server. It lets users log into the apps, but does not allow them to access any media.</p>
-+      <p>The role exists to act as a waiting room for new users, allowing server administrators to start each new user from a position of least privilege.</p>
+       <p>The Newcomer role is the default role assigned to all users when they first join your server. It lets users log into the apps, but does not allow them to access any media.</p>
+-      <p>The role exists to act as a waiting room for new users, allowing server administrators to start each new user from a position of least privilege.</p>
++      <p>The role exists as a waiting room for new users, allowing server administrators to start each new user from a position of least privilege.</p>
      `,
    },
  }

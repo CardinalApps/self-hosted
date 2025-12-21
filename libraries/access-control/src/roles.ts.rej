@@ -1,34 +1,53 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,8 +1,11 @@
-+import { CapabilitityString } from "./capabilities"
-+
+@@ -1,28 +1,35 @@
+-import { CapabilitityString } from "./capabilities"
++import { CapabilityAssignments } from "./capabilities"
+ 
++/**
++ * Roles are groups of capabilities. Users can be assigned multiple different
++ * roles.
++ */
  export type Role = {
    assignable: boolean,
    unassignable: boolean,
    maxUsers: number | null, // Use null for unlimited
-   slug: string,
-+  capabilities: CapabilitityString[],
+-  slug: string,
+-  capabilities: CapabilitityString[],
++  name: string,
++  capabilities: CapabilityAssignments,
  }
  
++/**
++ * Master list of all roles and their capabilities.
++ */
  export const Roles: Record<string, Role> = {
-@@ -11,12 +14,20 @@ export const Roles: Record<string, Role> = {
+   owner: {
+     assignable: false,
      unassignable: false,
      maxUsers: 1,
-     slug: 'owner',
-+    capabilities: [
-+      'AdminApp.Login',
-+    ],
+-    slug: 'owner',
++    name: 'owner',
+     capabilities: [
+-      'AdminApp.Login',
++      '*.*',
+     ],
    },
    newcomer: {
      assignable: true,
      unassignable: true,
      maxUsers: null,
-     slug: 'newcomer',
-+    capabilities: [
-+      'MusicApp.Login',
-+      'PhotosApp.Login',
-+      'CinemaApp.Login',
-+    ],
+-    slug: 'newcomer',
++    name: 'newcomer',
+     capabilities: [
+       'MusicApp.Login',
+       'PhotosApp.Login',
+@@ -31,6 +38,9 @@ export const Roles: Record<string, Role> = {
    },
  } as const
  
++/**
++ * A type with all role slugs.
++ */
+ export type AllRoleSlugs = keyof typeof Roles
+ 
+ export const getRole = (role: AllRoleSlugs): Role | undefined => {

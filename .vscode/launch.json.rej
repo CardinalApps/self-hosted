@@ -1,14 +1,14 @@
 diff a/.vscode/launch.json b/.vscode/launch.json	(rejected hunks)
-@@ -19,6 +19,12 @@
+@@ -25,12 +25,5 @@
        "request": "launch",
        "type": "node-terminal"
      },
-+    {
-+      "name": "Status App",
-+      "command": "cd ./apps/status-web && pnpm dev",
-+      "request": "launch",
-+      "type": "node-terminal"
-+    },
-     {
-       "name": "Current File (std out)",
-       "type": "node",
+-    {
+-      "name": "Current File (std out)",
+-      "type": "node",
+-      "request": "launch",
+-      "program": "${file}",
+-      "outputCapture": "std"
+-    }
+   ]
+ }
