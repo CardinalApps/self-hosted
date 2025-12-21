@@ -1,28 +1,9 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -6,14 +6,14 @@
-   background-size: cover;
+@@ -82,6 +82,7 @@
+     width: 100%;
+     padding: 20px 20px 20px 40px;
+     display: flex;
++    font-size: 13px;
+     justify-content: flex-end;
  
-   &.padding-thick { padding: 20px; }
--  &.padding-thick > .card-header { padding: 30px 40px 30px; }
-+  &.padding-thick > .card-header { padding: 10px 40px; min-height: 90px; }
-   &.padding-thick > .card-content { padding: 30px 40px; }
-   &.padding-thick > .card-footer { padding: 30px 20px 20px; }
- 
--  &.padding-regular > .card-header { padding: 30px 40px 30px; }
-+  &.padding-regular > .card-header { padding: 30px 40px; min-height: 90px; }
-   &.padding-regular > .card-content { padding: 30px 40px; }
- 
--  &.padding-thin > .card-header { padding: 24px; }
-+  &.padding-thin > .card-header { padding: 10px 24px; min-height: 78px; }
-   &.padding-thin > .card-content { padding: 24px; }
- 
-   &.padding-none > .card-content { padding: 0 !important; }
-@@ -56,7 +56,7 @@
-     align-items: center;
-     justify-content: space-between;
- 
--    > i {
-+    .card-icon {
-       margin-right: 10px;
-       font-size: 19px;
-       position: relative;
+     button {

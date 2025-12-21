@@ -1,20 +1,60 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -1,7 +1,14 @@
- import { Resources } from "./resources"
+@@ -1,14 +1,48 @@
+-import { Resources } from "./resources"
++// import { Resources } from "./resources"
  
--export const CAPABILITIES_LIST = [
--  `${Resources.MUSIC_TRACKS}.List`,
--] as const
-+// todo this
-+export type Capability = object
+-// todo this
+-export type Capability = object
++// type CapabilityFormat<T extends string> = `${T}.${string}`
  
--export type Capabilities = typeof CAPABILITIES_LIST[number]
-+export const Capabilities: Record<string, Capability> = {
-+  [`${Resources.MUSIC_TRACKS}.List`]: {},
-+}
+-export const Capabilities: Record<string, Capability> = {
+-  [`${Resources.MUSIC_TRACKS}.List`]: {},
+-}
++// type CapabilityWithFeature = CapabilityFormat<
++//     Resources.USERS
++//   | Resources.MUSIC_TRACKS
++//   | Resources.MUSIC_RELEASES
++//   | Resources.MUSIC_ARTISTS
++// >
+ 
+-export type AllCapabilitySlugs = keyof typeof Capabilities
++export const Capabilities = [
++  /**
++   * Users
++   */
++  'Users.List',
+ 
+-export const getCapability = (capability: AllCapabilitySlugs): Capability | undefined => {
+-  return Capabilities?.[capability]
+-}
++  /**
++   * Admin
++   */
++  'AdminApp.Login',
 +
-+export type AllCapabilitySlugs = keyof typeof Capabilities
++  /**
++   * Music
++   */
++  'MusicApp.Login',
 +
-+export const getCapability = (capability: AllCapabilitySlugs): Capability | undefined => {
-+  return Capabilities?.[capability]
-+}
++  'MusicTracks.Read',
++  'MusicTracks.List',
++
++  'MusicReleases.Read',
++  'MusicReleases.List',
++
++  'MusicArtists.Read',
++  'MusicArtists.List',
++
++  /**
++   * Photos
++   */
++  'PhotosApp.Login',
++
++  /**
++   * Cinema
++   */
++  'CinemaApp.Login',
++] as const
++
++export type CapabilitityString = typeof Capabilities[number]

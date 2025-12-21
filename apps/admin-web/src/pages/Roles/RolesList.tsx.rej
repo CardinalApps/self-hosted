@@ -1,107 +1,69 @@
 diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
-@@ -11,13 +11,16 @@ import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
- import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
- import WrittenText from '@cardinalapps/ui/src/components/typography/WrittenText'
- import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
-+import AddRemove from '@cardinalapps/ui/src/components/forms/AddRemove'
-+import Form from '@cardinalapps/ui/src/components/forms/Form'
-+import FormField from '@cardinalapps/ui/src/components/forms/FormField'
-+import Button from '@cardinalapps/ui/src/components/interaction/Button'
- 
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
- import { UserType } from '@cardinalapps/ui/src/types/user'
+@@ -22,17 +22,7 @@ import { UserType } from '@cardinalapps/ui/src/types/user'
  
  import i18n from './i18n.json'
--import AddRemove from '@cardinalapps/ui/src/components/forms/AddRemove'
  
- type CapabilitiesListProps = {
-   globallySelectedRole: string,
-@@ -39,6 +42,16 @@ function RolesList({
- 
-   const usersWithRole = (role) => users.filter((user: UserType) => user.role === role)
- 
-+  const usersWithoutRole = (role) => users.filter((user: UserType) => {
-+    if (user.role === 'owner') {
-+      return false
-+    }
-+    if (user.designation === 'guest_account') {
-+      return false
-+    }
-+    return user.role !== role
-+  })
-+
-   const rolesList = () => {
-     return Object.keys(Roles).map((role) => {
-       const numUsersWithRole = usersWithRole(role).length
-@@ -59,6 +72,19 @@ function RolesList({
+-type CapabilitiesListProps = {
+-  globallySelectedRole: string,
+-  setGloballySelectedRole: (string) => void
+-}
+-
+-function RolesList({
+-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+-  globallySelectedRole,
+-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+-  setGloballySelectedRole,
+-}: CapabilitiesListProps) {
++function RolesList() {
+   const { lang } = useAppSelector(settingsSelectors.current)
+   const [drawerRoleSlug, setDrawerRoleSlug] = useState<AllRoleSlugs>()
+   const drawerRole: Role = getRole(drawerRoleSlug)
+@@ -67,7 +57,7 @@ function RolesList({
+   const roleUsersUneditableList = (roleSlug: AllRoleSlugs) => {
+     return usersWithRole(roleSlug).map((user: UserType) => {
+       return {
+-        name: <UserTag user={user} size="xs" />,
++        name: <UserTag user={user} size="s" />,
+       } as ListItem
      })
    }
- 
-+  // TODO this needs to use new role assignment system
-+  const handleUpdateRoleAssignments = (e, formData) => {
-+    console.log(formData)
-+    //const assignments = formData['role-assignments']
-+    // if (newSelectedUsers) {
-+    //   setAvailableUsers([...availableUsers]
-+    //     .filter((available) => !newSelectedUsers.find((newSelected) => newSelected?.value === available?.value))
-+    //     .concat([...selectedUsers].filter((maybeDeleted) => !newSelectedUsers.find((newSelected) => newSelected?.value === maybeDeleted?.value))),
-+    //   )
-+    //   setSelectedUsers([...newSelectedUsers])
-+    // }
-+  }
-+
-   return (
-     <CardGrid.Card
-       size="m"
-@@ -82,9 +108,48 @@ function RolesList({
+@@ -107,6 +97,31 @@ function RolesList({
+               {ACi18n[`role.${drawerRoleSlug}.description`][lang]}
              </WrittenText>
            </Drawer.Section>
++          <Drawer.Section>
++            <List
++              layout='compact'
++              items={[
++                {
++                  name: i18n['roles.drawer.max-assignments'][lang],
++                  label: Roles[drawerRoleSlug].maxUsers !== null
++                    ? Roles[drawerRoleSlug].maxUsers
++                    : i18n['roles.drawer.max-assignments.unlimited'][lang],
++                },
++                {
++                  name: i18n['roles.drawer.can-be-assigned'][lang],
++                  label: Roles[drawerRoleSlug].assignable
++                    ? i18n['roles.drawer.can-be-assigned.true'][lang]
++                    : i18n['roles.drawer.can-be-assigned.false'][lang],
++                },
++                {
++                  name: i18n['roles.drawer.can-be-revoked'][lang],
++                  label: Roles[drawerRoleSlug].unassignable
++                    ? i18n['roles.drawer.can-be-assigned.true'][lang]
++                    : i18n['roles.drawer.can-be-assigned.false'][lang],
++                },
++              ]}
++            />
++          </Drawer.Section>
            <Drawer.Section title={i18n['roles.drawer.user-list-title'][lang]}>
--            {drawerRole.editable
-+            {drawerRole.assignable && drawerRole.unassignable
+             {drawerRole.assignable && drawerRole.unassignable
                ? (
--                <AddRemove />
-+                <Form
-+                  onSubmit={handleUpdateRoleAssignments}
-+                  controls={
-+                    <Button type="submit">
-+                      {i18n['roles.drawer.user-list.save'][lang]}
-+                    </Button>
-+                  }
-+                >
-+                  <FormField>
-+                    <AddRemove
-+                      name="role-assignments"
-+                      selectedTitle={i18n['roles.drawer.user-list.assigned'][lang]}
-+                      availableTitle={i18n['roles.drawer.user-list.available'][lang]}
-+                      initialSelectedItems={
-+                        usersWithRole(drawerRoleSlug)
-+                          .map((user) => ({
-+                            name: user?.cachedCloudUser?.publicName || 'Cardinal User',
-+                            value: user.userId,
-+                            avatar: user?.designation === 'guest_account'
-+                              ? { type: 'guest' }
-+                              : user?.cachedCloudUser?.avatar
-+                                ? { ...user?.cachedCloudUser?.avatar }
-+                                : undefined,
-+                          }))
-+                      }
-+                      initialAvailableItems={
-+                        usersWithoutRole(drawerRoleSlug)
-+                          .map((user) => ({
-+                            name: user?.cachedCloudUser?.publicName || 'Cardinal User',
-+                            value: user.userId,
-+                            avatar: user?.designation === 'guest_account'
-+                            ? { type: 'guest' }
-+                            : user?.cachedCloudUser?.avatar
-+                              ? { ...user?.cachedCloudUser?.avatar }
-+                              : undefined,
-+                          }))
-+                      }
-+                    />
-+                  </FormField>
-+                </Form>
-               )
-               : (
-                 <List
+@@ -121,7 +136,6 @@ function RolesList({
+                   <FormField>
+                     <AddRemove
+                       name="role-assignments"
+-                      selectedTitle={i18n['roles.drawer.user-list.assigned'][lang]}
+                       availableTitle={i18n['roles.drawer.user-list.available'][lang]}
+                       initialSelectedItems={
+                         usersWithRole(drawerRoleSlug)

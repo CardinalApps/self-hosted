@@ -1,27 +1,46 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -9,13 +9,22 @@
-     "en": "Role"
-   },
-   "roles.num-users.singular": {
--    "en": "{num} User"
-+    "en": "{num} Assignment"
-   },
+@@ -14,11 +14,26 @@
    "roles.num-users.plural": {
--    "en": "{num} Users"
-+    "en": "{num} Assignments"
+     "en": "{num} Assignments"
    },
-   "roles.drawer.user-list-title": {
--    "en": "Users with this role"
-+    "en": "Role Assignments"
+-  "roles.drawer.user-list-title": {
+-    "en": "Role Assignments"
++  "roles.drawer.max-assignments": {
++    "en": "Maximum Assignments"
 +  },
-+  "roles.drawer.user-list.assigned": {
-+    "en": "Users Assigned this Role"
++  "roles.drawer.max-assignments.unlimited": {
++    "en": "Unlimited"
 +  },
-+  "roles.drawer.user-list.available": {
-+    "en": "Available Users"
++  "roles.drawer.can-be-assigned": {
++    "en": "Assignable"
 +  },
-+  "roles.drawer.user-list.save": {
-+    "en": "Update Assignments"
++  "roles.drawer.can-be-revoked": {
++    "en": "Revocable"
++  },
++  "roles.drawer.can-be-assigned.true": {
++    "en": "Yes"
    },
- 
+-  "roles.drawer.user-list.assigned": {
+-    "en": "Users Assigned this Role"
++  "roles.drawer.can-be-assigned.false": {
++    "en": "No"
++  },
++  "roles.drawer.user-list-title": {
++    "en": "Assignments"
+   },
+   "roles.drawer.user-list.available": {
+     "en": "Available Users"
+@@ -30,7 +45,13 @@
    "caps-list.title": {
+     "en": "Capabilities"
+   },
++  "caps-list.role-filter": {
++    "en": "Fitler by role"
++  },
+   "caps.drawer.title": {
+     "en": "Capability"
++  },
++  "caps-list.filtered-count": {
++    "en": "Showing {num} of {total}"
+   }
+ }

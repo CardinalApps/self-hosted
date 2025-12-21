@@ -1,0 +1,16 @@
+diff a/apps/admin-web/src/pages/Roles/Roles.tsx b/apps/admin-web/src/pages/Roles/Roles.tsx	(rejected hunks)
+@@ -15,12 +15,12 @@ import './styles.css'
+ 
+ function Roles() {
+   const { lang } = useSelector(settingsSelectors.current)
+-  const [globallySelectedRole, setGloballySelectedRole] = useState()
++  const [globallySelectedRole, setGloballySelectedRole] = useState<string>()
+ 
+   return (
+     <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title'][lang]}>
+       <CardGrid rowHeight='l'>
+-        <RolesList globallySelectedRole={globallySelectedRole} setGloballySelectedRole={setGloballySelectedRole} />
++        <RolesList />
+         <CapabilitiesList globallySelectedRole={globallySelectedRole} setGloballySelectedRole={setGloballySelectedRole} />
+       </CardGrid>
+     </AppPage>

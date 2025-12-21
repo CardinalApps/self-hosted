@@ -1,14 +1,9 @@
 diff a/libraries/access-control/src/index.ts b/libraries/access-control/src/index.ts	(rejected hunks)
-@@ -1,8 +1,8 @@
--export type { Capabilities } from './capabilities'
--export { CAPABILITIES_LIST } from './capabilities'
-+export type { AllCapabilitySlugs, Capability } from './capabilities'
-+export { Capabilities, getCapability } from './capabilities'
+@@ -1,5 +1,5 @@
+-export type { AllCapabilitySlugs, Capability } from './capabilities'
+-export { Capabilities, getCapability } from './capabilities'
++export type { CapabilityFormat as Capability } from './capabilities'
++export { Capabilities } from './capabilities'
  
--export type { Roles } from './roles'
--export { ROLES_LIST } from './roles'
-+export type { AllRoleSlugs, Role } from './roles'
-+export { Roles, getRole } from './roles'
- 
- export { Resources } from './resources'
- 
+ export type { AllRoleSlugs, Role } from './roles'
+ export { Roles, getRole } from './roles'

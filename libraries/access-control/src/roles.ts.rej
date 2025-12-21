@@ -1,25 +1,34 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,17 +1,20 @@
+@@ -1,8 +1,11 @@
++import { CapabilitityString } from "./capabilities"
++
  export type Role = {
--  editable: boolean,
-+  assignable: boolean,
-+  unassignable: boolean,
+   assignable: boolean,
+   unassignable: boolean,
    maxUsers: number | null, // Use null for unlimited
    slug: string,
++  capabilities: CapabilitityString[],
  }
  
  export const Roles: Record<string, Role> = {
-   owner: {
--    editable: false,
-+    assignable: false,
-+    unassignable: false,
+@@ -11,12 +14,20 @@ export const Roles: Record<string, Role> = {
+     unassignable: false,
      maxUsers: 1,
      slug: 'owner',
++    capabilities: [
++      'AdminApp.Login',
++    ],
    },
    newcomer: {
--    editable: false,
-+    assignable: true,
-+    unassignable: true,
+     assignable: true,
+     unassignable: true,
      maxUsers: null,
      slug: 'newcomer',
++    capabilities: [
++      'MusicApp.Login',
++      'PhotosApp.Login',
++      'CinemaApp.Login',
++    ],
    },
+ } as const
+ 
