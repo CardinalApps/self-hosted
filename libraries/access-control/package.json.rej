@@ -1,0 +1,10 @@
+diff a/libraries/access-control/package.json b/libraries/access-control/package.json	(rejected hunks)
+@@ -2,7 +2,7 @@
+   "name": "@cardinalapps/access-control",
+   "description": "Access control layer for Cardinal apps.",
+   "license": "CC BY-NC-ND 4.0",
+-  "version": "0.1.0",
++  "version": "0.1.1",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "private": true,
+   "type": "module",
