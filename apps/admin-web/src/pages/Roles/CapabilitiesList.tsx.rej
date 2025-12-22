@@ -1,110 +1,17 @@
 diff a/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx b/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx	(rejected hunks)
-@@ -1,10 +1,8 @@
--import { useState } from 'react'
--
--import { ACi18n, Capabilities, Roles } from '@cardinalapps/access-control/src/'
-+import { useEffect, useState } from 'react'
-+import { ACi18n, Capabilities, Roles } from '@cardinalapps/access-control/src'
+@@ -1,5 +1,5 @@
+ import { useEffect, useState } from 'react'
+-import { ACi18n, Capabilities, Roles } from '@cardinalapps/access-control/src'
++import { ACi18n, Capabilities, Roles, hasCapability } from '@cardinalapps/access-control/src'
  
  import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
  
--import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
- import H5 from '@cardinalapps/ui/src/components/typography/H5'
- import List from '@cardinalapps/ui/src/components/interaction/List'
- import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
-@@ -22,61 +20,69 @@ type CapabilitiesListProps = {
- }
- 
- function CapabilitiesList({
--  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   globallySelectedRole,
--  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   setGloballySelectedRole,
- }: CapabilitiesListProps) {
-   const { lang } = useAppSelector(settingsSelectors.current)
--  const [details, setDetails] = useState<string>()
-+  const [filteredItems, setFilteredItems] = useState([])
- 
--  const handleRoleChange = (e, c) => {
--    console.log(e, c)
-+  const handleRoleChange = (role) => {
-+    setGloballySelectedRole(role)
-   }
- 
--  const listItems = () => {
--    return Object.keys(Capabilities).map((cap) => {
--      return {
--        name: cap,
--        controls: ['view'],
--        value: cap,
--        onView: () => setDetails(cap),
--      } as ListItem
--    })
--  }
-+  useEffect(() => {
-+    const filtered = Capabilities
-+      .filter((cap) => {
-+        if (globallySelectedRole) {
-+          return Roles?.[globallySelectedRole]?.capabilities.includes(cap)
-+        } else {
-+          return cap
-+        }
-+      })
-+      .sort()
-+      .map((cap) => {
-+        return {
-+          name: <code>{cap}</code>,
-+          value: cap,
-+        } as ListItem
-+      })
-+
-+    setFilteredItems(filtered)
-+  }, [globallySelectedRole])
- 
-   return (
-     <CardGrid.Card
-       size="m"
-       className={'capabilities-list'}
-       header={<H5 className={'title'}>{i18n['caps-list.title'][lang]}</H5>}
-+      footer={
-+        i18n['caps-list.filtered-count'][lang]
-+          .replace('{num}', filteredItems.length)
-+          .replace('{total}', Capabilities.length)
-+      }
-       headerRight={(
--        <Form onSubmit={handleRoleChange}>
-+        <Form>
-           <Select
-             name="role"
-             size='s'
-             multi={false}
-+            selectPlaceholder={i18n['caps-list.role-filter'][lang]}
-+            value={globallySelectedRole}
-             options={Object.keys(Roles).map((role) => {
-               return {
-                 label: ACi18n[`role.${role}.name`]?.[lang],
-                 value: role,
-               }
--            })} />
-+            })}
-+            onChange={(selected) => handleRoleChange(selected)}
-+          />
-         </Form>
-       )}
-     >
-       <List
-         layout="compact"
--        items={listItems()}
-+        items={filteredItems}
-       />
--      {!!details &&
--        <Drawer
--          title={i18n['caps.drawer.title'][lang]}
--          onClose={() => setDetails(undefined)}
--        >
--          {details}
--        </Drawer>
--      }
-     </CardGrid.Card>
-   )
- }
+@@ -34,7 +34,7 @@ function CapabilitiesList({
+     const filtered = Capabilities
+       .filter((cap) => {
+         if (globallySelectedRole) {
+-          return Roles?.[globallySelectedRole]?.capabilities.includes(cap)
++          return hasCapability(cap, Roles?.[globallySelectedRole]?.capabilities)
+         } else {
+           return cap
+         }
