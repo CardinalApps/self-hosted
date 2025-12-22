@@ -1,92 +1,46 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
-@@ -1,32 +1,74 @@
--import { Injectable } from '@nestjs/common'
-+import { Injectable, Logger } from '@nestjs/common'
+@@ -1,4 +1,4 @@
+-import { Injectable, Logger } from '@nestjs/common'
++import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
  import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
  import { DataSource, Repository } from 'typeorm'
--import { AccessControl } from 'accesscontrol'
-+import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
- 
--import { Grant } from './grant.entity'
--
--import { Roles } from '../user/types'
--
--import { RBACResources } from './enums'
-+import { RoleAssignment } from './role-assignment.entity'
-+import { User } from '../user/user.entity'
- 
- @Injectable()
- export class RBACService {
-   constructor(
-     @InjectDataSource()
-     private dataSource: DataSource,
--    @InjectRepository(Grant)
--    private grantRepository: Repository<Grant>,
-+    @InjectRepository(RoleAssignment)
-+    private roleAssignmentRepository: Repository<RoleAssignment>,
-   ) {}
- 
--  #ac: AccessControl | null = null
-+  /**
-+   * Gets all assignments for a single user.
-+   */
-+  async getRoleAssignments(user: User): Promise<RoleAssignment[]> {
-+    let found = null
-+
-+    try {
-+      found = await this.roleAssignmentRepository.findBy({ user })
-+    } catch (error) {
-+      Logger.error(error, 'RBAC')
-+    }
-+
-+    if (!found.value) {
-+      return []
-+    }
-+
-+    return found.value
-+  }
-+
-+  /**
-+   * Checks if a user has been assigned a role.
-+   */
-+  async hasRole(user: User, role: RoleNames): Promise<RoleAssignment | undefined> {
-+    const assignedRoles = await this.getRoleAssignments(user)
-+    return assignedRoles.find((assignment) => assignment.role === role)
-+  }
+ import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
+@@ -43,7 +43,7 @@ export class RBACService {
+   }
  
    /**
--   * When Nest starts up.
-+   * Assigns a role. If the user already has the role, this quietly returns
-+   * success.
+-   * Assigns a role. If the user already has the role, this quietly returns
++   * Assigns roles. If the user already has the role, this quietly returns
+    * success.
     */
--  async onModuleInit(): Promise<void> {
--    this.#ac = new AccessControl()
--    this.#ac
--      .grant(Roles.OWNER)
--      .createAny(RBACResources.AUTHENTICATION, ['*'])
-+  async assignRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
-+    const assignments = []
+   async assignRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
+@@ -71,4 +71,29 @@ export class RBACService {
+ 
+     return assignments
+   }
++
++  /**
++   * Revokes roles. If the user does not have the role, this quietly continues.
++   * Returns an array of the deleted assignments.
++   */
++  async revokeRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
++    const toRevoke: RoleAssignment[] = []
 +
 +    for (const role of roles) {
 +      const assignment = await this.hasRole(user, role)
 +
 +      if (assignment) {
-+        assignments.push(assignment)
-+        return
-+      }
-+
-+      try {
-+        const newAssignment = await this.roleAssignmentRepository.save({
-+          user,
-+          role: role,
-+        })
-+        assignments.push(newAssignment)
-+      } catch (error) {
-+        Logger.error(`Failed to assign role ${role}`)
-+        Logger.error(error)
++        toRevoke.push(assignment)
 +      }
 +    }
 +
-+    return assignments
-   }
++    try {
++      const deleted = await this.roleAssignmentRepository.remove(toRevoke)
++      return deleted
++    } catch (error) {
++      Logger.error(error)
++    }
++
++    throw new InternalServerErrorException()
++  }
  }

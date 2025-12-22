@@ -1,0 +1,61 @@
+diff a/servers/media/src/modules/rbac/rbac.controller.ts b/servers/media/src/modules/rbac/rbac.controller.ts	(rejected hunks)
+@@ -5,6 +5,8 @@ import {
+   InternalServerErrorException,
+   UseGuards,
+   Post,
++  Delete,
++  Param,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+@@ -18,7 +20,9 @@ import { ApiSecurityTypes } from '../../guards/types'
+ import { RBACService } from './rbac.service'
+ import { CurrentUser } from '../../decorators/CurrentUser.decorator'
+ import { RoleAssignment } from './role-assignment.entity'
+-import { AssignRoles } from './dtos/AssignRoles.dto'
++import { AssignRolesDto } from './dtos/AssignRoles.dto'
++import { RevokeRolesDto } from './dtos/RevokeRoles.dto'
++import { User } from '../user/user.entity'
+ 
+ @Controller()
+ @ApiTags('Role Assignments')
+@@ -40,7 +44,7 @@ export class RBACController {
+   }
+ 
+   /**
+-   * Assigns a role by creating a role assignment. If the user already has the
++   * Assigns roles by creating a role assignments. If the user already has the
+    * role, the existing assignment will silently returned instead of creating a
+    * new one.
+    */
+@@ -49,8 +53,8 @@ export class RBACController {
+   @ApiOperation({ summary: 'Assign one or more roles.' })
+   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async assignRoles(
+-    @Body() { roles }: AssignRoles,
+-    @CurrentUser() user,
++    @Body() { roles }: AssignRolesDto,
++    @CurrentUser() user: User,
+   ): Promise<RoleAssignment[]> {
+     const assignments = await this.rbacService.assignRoles(user, roles)
+ 
+@@ -60,4 +64,19 @@ export class RBACController {
+ 
+     return assignments
+   }
++
++  /**
++   * Revokes roles by deleting the assignment.
++   */
++  @Delete('/role-assignments/:role')
++  @ApiOperation({ summary: 'Revoke roles.' })
++  @UseGuards(AuthGuard)
++  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  async revokeRoles(
++    @Param() { roles }: RevokeRolesDto,
++    @CurrentUser() user: User,
++  ): Promise<RoleAssignment[]> {
++    const deleted = await this.rbacService.revokeRoles(user, roles)
++    return deleted
++  }
+ }
