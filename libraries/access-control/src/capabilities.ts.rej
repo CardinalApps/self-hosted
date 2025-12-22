@@ -1,151 +1,71 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -1,14 +1,32 @@
--// import { Resources } from "./resources"
--
--// type CapabilityFormat<T extends string> = `${T}.${string}`
--
--// type CapabilityWithFeature = CapabilityFormat<
--//     Resources.USERS
--//   | Resources.MUSIC_TRACKS
--//   | Resources.MUSIC_RELEASES
--//   | Resources.MUSIC_ARTISTS
--// >
-+/**
-+ * Master list of all components.
-+ * 
-+ * In the context of Access Control, "component" is used as a generic term for
-+ * anything that can have its access restricted. High level concepts like
-+ * Resources, Features, Applications, and Services are all categorized as
-+ * components within the Access Control layer.
-+ */
-+export type Components =
-+    'Users'
-+  | 'AdminApp'
-+  | 'MusicApp'
-+  | 'MusicTracks'
-+  | 'MusicReleases'
-+  | 'MusicArtists'
-+  | 'PhotosApp'
-+  | 'CinemaApp'
+@@ -66,7 +66,7 @@ export const Capabilities = [
+ /**
+  * A type that includes all capabilities.
+  */
+-export type CapabilitityString = typeof Capabilities[number]
++export type CapabilityString = typeof Capabilities[number]
  
-+/**
-+ * Master list of all capabilities.
-+ * 
-+ * A capability is a single string that combines a Component and an Action,
-+ * separating them with a dot.
-+ * 
-+ *    {Component}.{Action}
-+ * 
-+ * The Component must be defined in the Components type, and the Action can be
-+ * any arbitrary string except an asterisk (*).
-+ */
- export const Capabilities = [
-   /**
-    * Users
-@@ -45,4 +63,106 @@ export const Capabilities = [
-   'CinemaApp.Login',
- ] as const
+ /**
+  * Capability Assignments are stored as an array of capability strings. The
+@@ -83,7 +83,7 @@ export type CapabilitityString = typeof Capabilities[number]
+  *    components.
+  */
+ export type CapabilityAssignment =
+-  CapabilitityString
++  CapabilityString
+   | '*.*'
+   | `${Components}.*`
+   | `*.${string}`
+@@ -114,7 +114,7 @@ const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean =>
+ /**
+  * Validate the syntax of an array of capability assignments.
+  */
+-const validateCapabilitiesSyntax = (capabilityList: CapabilitityString[]): boolean => {
++const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments): boolean => {
+   let allAreValid = true
  
-+/**
-+ * A type that includes all capabilities.
-+ */
- export type CapabilitityString = typeof Capabilities[number]
-+
-+/**
-+ * Capability Assignments are stored as an array of capability strings. The
-+ * strings can be exact matching capabilities, or can use of a wildcard for
-+ * selecting broader ranges of capabilities.
-+ * 
-+ *    `*.*` - Matches all components and all actions, granting all current and
-+ *    future capabilities. Reserved for Owner account.
-+ * 
-+ *    `MusicApp.*` - Matches all actions in the MusicApp component, granting all
-+ *    current and future MusicApp capabilities.
-+ * 
-+ *    `*.Login` - Matches only Login actions on all current and future
-+ *    components.
-+ */
-+export type CapabilityAssignment =
-+  CapabilitityString
-+  | '*.*'
-+  | `${Components}.*`
-+  | `*.${string}`
-+
-+export type CapabilityAssignments = CapabilityAssignment[]
-+
-+/**
-+ * Validate the syntax of an capability assignment.
-+ */
-+const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean => {
-+  if (typeof assignment !== 'string') {
-+    return false
-+  }
-+
-+  if (!assignment.includes('.')) {
-+    return false
-+  }
-+
-+  const parts = assignment.split('.')
-+
-+  if (parts.length !== 2) {
-+    return false
-+  }
-+
-+  return true
-+}
-+
-+/**
-+ * Validate the syntax of an array of capability assignments.
-+ */
-+const validateCapabilitiesSyntax = (capabilityList: CapabilitityString[]): boolean => {
-+  let allAreValid = true
-+
-+  for (const capability of capabilityList) {
-+    if (!validateCapabilitySyntax(capability)) {
-+      allAreValid = false
-+    }
-+  }
-+
-+  return allAreValid
-+}
-+
-+/**
-+ * Checks whether the capability assignment exists in the list of capabilities.
-+ */
-+export function hasCapability(assignment: CapabilityAssignment, capabilityList: CapabilitityString[]) {
-+  if (!validateCapabilitySyntax(assignment)) {
-+    return false
-+  }
-+
-+  if (!validateCapabilitiesSyntax(capabilityList)) {
-+    return false
-+  }
-+
-+  const [assignmentComponent, assignmentAction] = assignment.split('.')
-+
-+  for (const capabilityToCheckAgainst of capabilityList) {
-+    const [componentToCheckAgainst, actionToCheckAgainst] = capabilityToCheckAgainst.split('.')
-+    let componetIsValid = false
-+    let actionIsValid = false
-+
-+    if (
-+      assignmentComponent === componentToCheckAgainst
-+      || assignmentComponent === '*'
-+    ) {
-+      componetIsValid = true
-+    }
-+
-+    if (
-+      assignmentAction === actionToCheckAgainst
-+      || assignmentAction === '*'
-+    ) {
-+      actionIsValid = true
-+    }
-+
-+    if (componetIsValid && actionIsValid) {
-+      return true
-+    }
-+  }
-+
-+  return false
-+}
+   for (const capability of capabilityList) {
+@@ -129,31 +129,34 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilitityString[]): boole
+ /**
+  * Checks whether the capability assignment exists in the list of capabilities.
+  */
+-export function hasCapability(assignment: CapabilityAssignment, capabilityList: CapabilitityString[]) {
+-  if (!validateCapabilitySyntax(assignment)) {
++export function hasCapability(
++  requiredCapability: CapabilityString,
++  assignments: CapabilityAssignments,
++) {
++  if (!validateCapabilitySyntax(requiredCapability)) {
+     return false
+   }
+ 
+-  if (!validateCapabilitiesSyntax(capabilityList)) {
++  if (!validateCapabilitiesSyntax(assignments)) {
+     return false
+   }
+ 
+-  const [assignmentComponent, assignmentAction] = assignment.split('.')
++  const [requiredComponent, requiredAction] = requiredCapability.split('.')
+ 
+-  for (const capabilityToCheckAgainst of capabilityList) {
+-    const [componentToCheckAgainst, actionToCheckAgainst] = capabilityToCheckAgainst.split('.')
++  for (const assignment of assignments) {
++    const [assignmentComponent, assignmentAction] = assignment.split('.')
+     let componetIsValid = false
+     let actionIsValid = false
+ 
+     if (
+-      assignmentComponent === componentToCheckAgainst
++      requiredComponent === assignmentComponent
+       || assignmentComponent === '*'
+     ) {
+       componetIsValid = true
+     }
+ 
+     if (
+-      assignmentAction === actionToCheckAgainst
++      requiredAction === assignmentAction
+       || assignmentAction === '*'
+     ) {
+       actionIsValid = true
