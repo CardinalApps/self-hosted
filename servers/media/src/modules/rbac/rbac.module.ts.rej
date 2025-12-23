@@ -1,16 +1,19 @@
 diff a/servers/media/src/modules/rbac/rbac.module.ts b/servers/media/src/modules/rbac/rbac.module.ts	(rejected hunks)
-@@ -6,8 +6,13 @@ import { RoleAssignment } from './role-assignment.entity'
- import { User } from '../user/user.entity'
+@@ -7,14 +7,15 @@ import { User } from '../user/user.entity'
  import { RBACController } from './rbac.controller'
  
-+import { UserModule } from '../user/user.module'
-+
+ import { UserModule } from '../user/user.module'
++import { RBACStartupService } from './rbac-startup.service'
+ 
  @Module({
--  imports: [TypeOrmModule.forFeature([RoleAssignment, User])],
-+  imports: [
-+    TypeOrmModule.forFeature([RoleAssignment, User]),
-+    UserModule,
-+  ],
-   exports: [TypeOrmModule, RBACService],
-   providers: [RBACService],
+   imports: [
+     TypeOrmModule.forFeature([RoleAssignment, User]),
+     UserModule,
+   ],
+-  exports: [TypeOrmModule, RBACService],
+-  providers: [RBACService],
++  exports: [TypeOrmModule, RBACService, RBACStartupService],
++  providers: [RBACService, RBACStartupService],
    controllers: [RBACController],
+ })
+ export class RBACModule {}

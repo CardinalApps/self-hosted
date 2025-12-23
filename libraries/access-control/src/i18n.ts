@@ -84,6 +84,18 @@ export const ACi18n: StringList = {
   },
 
   /**
+   * Administrator
+   */
+  "role.administrator.name": {
+    "en": "Administrator",
+  },
+  "role.administrator.description": {
+    "en": `
+      <p>The Admin role.</p>
+    `,
+  },
+
+  /**
    * Newcomer
    */
   "role.newcomer.name": {

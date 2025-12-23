@@ -1,26 +1,17 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,8 +1,8 @@
- import { CapabilityAssignments } from "./capabilities"
- 
- /**
-- * Roles are groups of capabilities. Users can be assigned multiple different
-- * roles.
-+ * Roles are sets of capabilities. Users can be assigned multiple different
-+ * roles to form a superset of capabilities.
-  */
- export type Role = {
-   assignable: boolean,
-@@ -41,8 +41,11 @@ export const Roles: Record<string, Role> = {
- /**
-  * A type with all role slugs.
-  */
--export type AllRoleSlugs = keyof typeof Roles
-+export type RoleNames = keyof typeof Roles
- 
--export const getRole = (role: AllRoleSlugs): Role | undefined => {
-+/**
-+ * Returns a single role.
-+ */
-+export const getRole = (role: RoleNames): Role | undefined => {
-   return Roles?.[role]
- }
+@@ -25,6 +25,15 @@ export const Roles: Record<string, Role> = {
+       '*.*',
+     ],
+   },
++  administrator: {
++    assignable: true,
++    unassignable: true,
++    maxUsers: null,
++    name: 'administrator',
++    capabilities: [
++      '*.*',
++    ],
++  },
+   newcomer: {
+     assignable: true,
+     unassignable: true,
