@@ -1,18 +1,16 @@
 diff a/servers/media/src/modules/rbac/rbac.module.ts b/servers/media/src/modules/rbac/rbac.module.ts	(rejected hunks)
-@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common'
- import { TypeOrmModule } from '@nestjs/typeorm'
- 
- import { RBACService } from './rbac.service'
--import { Grant } from './grant.entity'
-+import { RoleAssignment } from './role-assignment.entity'
+@@ -6,8 +6,13 @@ import { RoleAssignment } from './role-assignment.entity'
  import { User } from '../user/user.entity'
-+import { RBACController } from './rbac.controller'
+ import { RBACController } from './rbac.controller'
  
++import { UserModule } from '../user/user.module'
++
  @Module({
--  imports: [TypeOrmModule.forFeature([Grant, User])],
-+  imports: [TypeOrmModule.forFeature([RoleAssignment, User])],
+-  imports: [TypeOrmModule.forFeature([RoleAssignment, User])],
++  imports: [
++    TypeOrmModule.forFeature([RoleAssignment, User]),
++    UserModule,
++  ],
    exports: [TypeOrmModule, RBACService],
    providers: [RBACService],
-+  controllers: [RBACController],
- })
- export class RBACModule {}
+   controllers: [RBACController],

@@ -1,12 +1,12 @@
-diff a/servers/media/src/modules/rbac/dtos/AssignRoles.dto.ts b/servers/media/src/modules/rbac/dtos/AssignRoles.dto.ts	(rejected hunks)
+diff a/servers/media/src/modules/rbac/dtos/RevokeRoles.dto.ts b/servers/media/src/modules/rbac/dtos/RevokeRoles.dto.ts	(rejected hunks)
 @@ -1,12 +1,11 @@
- import { ArrayNotEmpty, IsArray } from 'class-validator'
+ import { IsArray, ArrayNotEmpty } from 'class-validator'
  import { Transform } from 'class-transformer'
 -import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
  
  import { toArrayOfStrings } from '../../../utils/transformers'
  
- export class AssignRolesDto {
+ export class RevokeRolesDto {
    @Transform(toArrayOfStrings)
    @IsArray()
 -  @ArrayNotEmpty({ each: true })

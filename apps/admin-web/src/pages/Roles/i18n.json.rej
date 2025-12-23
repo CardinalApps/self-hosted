@@ -1,46 +1,49 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -14,11 +14,26 @@
+@@ -9,13 +9,13 @@
+     "en": "Role"
+   },
+   "roles.num-users.singular": {
+-    "en": "{num} Assignment"
++    "en": "{num} User"
+   },
    "roles.num-users.plural": {
-     "en": "{num} Assignments"
+-    "en": "{num} Assignments"
++    "en": "{num} Users"
    },
--  "roles.drawer.user-list-title": {
--    "en": "Role Assignments"
-+  "roles.drawer.max-assignments": {
-+    "en": "Maximum Assignments"
-+  },
-+  "roles.drawer.max-assignments.unlimited": {
-+    "en": "Unlimited"
-+  },
-+  "roles.drawer.can-be-assigned": {
-+    "en": "Assignable"
-+  },
-+  "roles.drawer.can-be-revoked": {
-+    "en": "Revocable"
-+  },
-+  "roles.drawer.can-be-assigned.true": {
-+    "en": "Yes"
+   "roles.drawer.max-assignments": {
+-    "en": "Maximum Assignments"
++    "en": "Maximum Users"
    },
--  "roles.drawer.user-list.assigned": {
--    "en": "Users Assigned this Role"
-+  "roles.drawer.can-be-assigned.false": {
-+    "en": "No"
-+  },
-+  "roles.drawer.user-list-title": {
-+    "en": "Assignments"
+   "roles.drawer.max-assignments.unlimited": {
+     "en": "Unlimited"
+@@ -33,15 +33,26 @@
+     "en": "No"
+   },
+   "roles.drawer.user-list-title": {
+-    "en": "Assignments"
++    "en": "Users with this role"
    },
    "roles.drawer.user-list.available": {
-     "en": "Available Users"
-@@ -30,7 +45,13 @@
+-    "en": "Available Users"
++    "en": "Assign Role"
+   },
+   "roles.drawer.user-list.save": {
+-    "en": "Update Assignments"
++    "en": "Update Users"
++  },
++  "roles.drawer.assign.success.singular": {
++    "en": "Role has been assigned to {num} user."
++  },
++  "roles.drawer.assign.success.plural": {
++    "en": "Role has been assigned to {num} users."
++  },
++  "roles.drawer.revoke.success.singular": {
++    "en": "Role has been unassigned from {num} user."
++  },
++  "roles.drawer.revoke.success.plural": {
++    "en": "Role has been unassigned from {num} users."
+   },
+-
    "caps-list.title": {
      "en": "Capabilities"
    },
-+  "caps-list.role-filter": {
-+    "en": "Fitler by role"
-+  },
-   "caps.drawer.title": {
-     "en": "Capability"
-+  },
-+  "caps-list.filtered-count": {
-+    "en": "Showing {num} of {total}"
-   }
- }

@@ -1,46 +1,129 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
 @@ -1,4 +1,4 @@
--import { Injectable, Logger } from '@nestjs/common'
-+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
+-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
++import { Injectable, Logger } from '@nestjs/common'
  import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
  import { DataSource, Repository } from 'typeorm'
  import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
-@@ -43,7 +43,7 @@ export class RBACService {
+@@ -18,27 +18,50 @@ export class RBACService {
+   /**
+    * Gets all assignments for a single user.
+    */
+-  async getRoleAssignments(user: User): Promise<RoleAssignment[]> {
++  async getAndCountRoleAssignments(): Promise<RoleAssignment[]> {
+     let found = null
+ 
+     try {
+-      found = await this.roleAssignmentRepository.findBy({ user })
++      found = await this.roleAssignmentRepository.findAndCount({
++        relations: {
++          user: true,
++        },
++      })
+     } catch (error) {
+       Logger.error(error, 'RBAC')
+-    }
++  }
++
++    return found
++  }
+ 
+-    if (!found.value) {
++  /**
++   * Gets all assignments for a single user.
++   */
++  async getUserRoleAssignments(user: User): Promise<RoleAssignment[]> {
++    try {
++      const found = await this.roleAssignmentRepository.find({
++        where: {
++          user: {
++            id: user.id,
++          },
++        },
++        relations: {
++          user: true,
++        },
++      })
++      return found
++    } catch (error) {
++      Logger.error(error, 'RBAC')
+       return []
+     }
+-
+-    return found.value
    }
  
    /**
--   * Assigns a role. If the user already has the role, this quietly returns
-+   * Assigns roles. If the user already has the role, this quietly returns
+-   * Checks if a user has been assigned a role.
++   * Checks if a user has been assigned a role, and if so, returns that role
++   * assignment, otherwise undefined.
+    */
+   async hasRole(user: User, role: RoleNames): Promise<RoleAssignment | undefined> {
+-    const assignedRoles = await this.getRoleAssignments(user)
++    const assignedRoles = await this.getUserRoleAssignments(user)
+     return assignedRoles.find((assignment) => assignment.role === role)
+   }
+ 
+@@ -46,12 +69,13 @@ export class RBACService {
+    * Assigns roles. If the user already has the role, this quietly returns
     * success.
     */
-   async assignRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
-@@ -71,4 +71,29 @@ export class RBACService {
+-  async assignRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
++  async assignRole(role: RoleNames, users: User[]): Promise<RoleAssignment[]> {
+     const assignments = []
  
-     return assignments
+-    for (const role of roles) {
++    for (const user of users) {
+       const assignment = await this.hasRole(user, role)
+ 
++      // Quietly use the existing assignment
+       if (assignment) {
+         assignments.push(assignment)
+         return
+@@ -64,7 +88,7 @@ export class RBACService {
+         })
+         assignments.push(newAssignment)
+       } catch (error) {
+-        Logger.error(`Failed to assign role ${role}`)
++        Logger.error(`Failed to assign role ${role} to user ${user.userId}`)
+         Logger.error(error)
+       }
+     }
+@@ -76,24 +100,25 @@ export class RBACService {
+    * Revokes roles. If the user does not have the role, this quietly continues.
+    * Returns an array of the deleted assignments.
+    */
+-  async revokeRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
+-    const toRevoke: RoleAssignment[] = []
++  async revokeRole(role: RoleNames, users: User[]): Promise<RoleAssignment[]> {
++    const revoked: RoleAssignment[] = []
+ 
+-    for (const role of roles) {
++    for (const user of users) {
+       const assignment = await this.hasRole(user, role)
+ 
+       if (assignment) {
+-        toRevoke.push(assignment)
++        try {
++          const deleted = await this.roleAssignmentRepository.remove(assignment)
++          if (deleted) {
++            revoked.push(deleted)
++          }
++        } catch (error) {
++          Logger.error(`Failed to revoke role ${role}`)
++          Logger.error(error)
++        }
+       }
+     }
+ 
+-    try {
+-      const deleted = await this.roleAssignmentRepository.remove(toRevoke)
+-      return deleted
+-    } catch (error) {
+-      Logger.error(error)
+-    }
+-
+-    throw new InternalServerErrorException()
++    return revoked
    }
-+
-+  /**
-+   * Revokes roles. If the user does not have the role, this quietly continues.
-+   * Returns an array of the deleted assignments.
-+   */
-+  async revokeRoles(user: User, roles: RoleNames[] = []): Promise<RoleAssignment[]> {
-+    const toRevoke: RoleAssignment[] = []
-+
-+    for (const role of roles) {
-+      const assignment = await this.hasRole(user, role)
-+
-+      if (assignment) {
-+        toRevoke.push(assignment)
-+      }
-+    }
-+
-+    try {
-+      const deleted = await this.roleAssignmentRepository.remove(toRevoke)
-+      return deleted
-+    } catch (error) {
-+      Logger.error(error)
-+    }
-+
-+    throw new InternalServerErrorException()
-+  }
  }
