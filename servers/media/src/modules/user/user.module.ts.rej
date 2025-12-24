@@ -1,17 +1,27 @@
 diff a/servers/media/src/modules/user/user.module.ts b/servers/media/src/modules/user/user.module.ts	(rejected hunks)
-@@ -7,13 +7,13 @@ import { LocalUserService } from './local-user.service'
- import { CloudUserService } from './cloud-user.service'
+@@ -1,6 +1,9 @@
+-import { Module } from '@nestjs/common'
++import { forwardRef, Module } from '@nestjs/common'
+ import { TypeOrmModule } from '@nestjs/typeorm'
+ 
++import { RBACModule } from '../rbac/rbac.module'
++import { SettingsModule } from '../settings/settings.module'
++
+ import { UserService } from './user.service'
+ import { SeatsService } from './seats.service'
+ import { LocalUserService } from './local-user.service'
+@@ -8,13 +11,13 @@ import { CloudUserService } from './cloud-user.service'
  import { UserController } from './user.controller'
  import { User } from './user.entity'
--import { Grant } from '../rbac/grant.entity'
-+import { RoleAssignment } from '../rbac/role-assignment.entity'
- import { SettingsModule } from '../settings/settings.module'
+ import { RoleAssignment } from '../rbac/role-assignment.entity'
+-import { SettingsModule } from '../settings/settings.module'
  import { LicensingController } from './licensing.controller'
  
  @Module({
    imports: [
--    TypeOrmModule.forFeature([User, Grant]),
-+    TypeOrmModule.forFeature([User, RoleAssignment]),
+     TypeOrmModule.forFeature([User, RoleAssignment]),
      SettingsModule,
++    forwardRef(() => RBACModule),
    ],
    exports: [
+     TypeOrmModule,

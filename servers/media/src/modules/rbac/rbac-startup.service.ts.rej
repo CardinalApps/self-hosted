@@ -1,34 +1,28 @@
 diff a/servers/media/src/modules/rbac/rbac-startup.service.ts b/servers/media/src/modules/rbac/rbac-startup.service.ts	(rejected hunks)
-@@ -7,13 +7,12 @@
+@@ -1,7 +1,7 @@
+ /**
+- * @file This file exists because at the time of writing it, the database used
+- * synchronize:true. This can be removed once the system has moved to database
+- * migrations.
++ * @file This migration-as-a-file exists because at the time of writing it, the
++ * database used synchronize:true. This can be removed once the system has moved
++ * to database migrations.
+  */
+ 
  import { Injectable, Logger } from '@nestjs/common'
- import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+@@ -9,7 +9,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
  import { DataSource, Repository } from 'typeorm'
--//import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
  
  import { RoleAssignment } from './role-assignment.entity'
- import { UserService } from '../user/user.service'
+-import { UserService } from '../user/user.service'
  import { User } from '../user/user.entity'
  import { RBACService } from './rbac.service'
--import { getRole } from '@cardinalapps/access-control/dist/cjs'
-+import { RoleName } from '@cardinalapps/access-control/dist/cjs'
+ import { RoleName } from '@cardinalapps/access-control/dist/cjs'
+@@ -23,7 +22,6 @@ export class RBACStartupService {
+     private roleAssignmentRepository: Repository<RoleAssignment>,
+     @InjectRepository(User)
+     private userRepository: Repository<User>,
+-    private readonly userService: UserService,
+     private readonly rbacService: RBACService,
+   ) {}
  
- @Injectable()
- export class RBACStartupService {
-@@ -46,7 +45,7 @@ export class RBACStartupService {
-     })
- 
-     if (legacyOwnerRole) {
--      const ownerRoleAssignment = await this.rbacService.hasRole(legacyOwnerRole, getRole('owner').name)
-+      const ownerRoleAssignment = await this.rbacService.hasRole(legacyOwnerRole, RoleName.OWNER)
- 
-       // If the legacy owner doesn't have the new owner role, create it and
-       // remove the legacy role
-@@ -97,7 +96,7 @@ export class RBACStartupService {
- 
-     if (usersWithLegacyUserRole.length) {
-       for (const user of usersWithLegacyUserRole) {
--        const newcomerRoleAssignment = await this.rbacService.hasRole(user, getRole('newcomer').name)
-+        const newcomerRoleAssignment = await this.rbacService.hasRole(user, RoleName.NEWCOMER)
- 
-         // If the user doesn't have the newcomer role, create it and remove the
-         // legacy role

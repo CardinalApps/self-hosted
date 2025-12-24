@@ -1,12 +1,43 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
-@@ -106,6 +106,10 @@ export class RBACService {
-     for (const user of users) {
-       const assignment = await this.hasRole(user, role)
+@@ -1,6 +1,6 @@
+ import { Injectable, Logger } from '@nestjs/common'
+ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+-import { DataSource, Repository } from 'typeorm'
++import { DataSource, QueryRunner, Repository } from 'typeorm'
+ import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
  
-+      if (assignment.role === 'owner') {
-+        throw new Error('Cannot unassign Owner role.')
-+      }
+ import { RoleAssignment } from './role-assignment.entity'
+@@ -69,7 +69,7 @@ export class RBACService {
+    * Assigns roles. If the user already has the role, this quietly returns
+    * success.
+    */
+-  async assignRole(role: RoleNames, users: User[]): Promise<RoleAssignment[]> {
++  async assignRole(role: RoleNames, users: User[], queryRunner?: QueryRunner): Promise<RoleAssignment[]> {
+     const assignments = []
+ 
+     for (const user of users) {
+@@ -82,10 +82,20 @@ export class RBACService {
+       }
+ 
+       try {
+-        const newAssignment = await this.roleAssignmentRepository.save({
+-          user,
+-          role: role,
+-        })
++        let newAssignment
 +
-       if (assignment) {
-         try {
-           const deleted = await this.roleAssignmentRepository.remove(assignment)
++        if (queryRunner) {
++          newAssignment = await queryRunner.manager.save(RoleAssignment, {
++            user,
++            role,
++          })
++        } else {
++          newAssignment = await this.roleAssignmentRepository.save({
++            user,
++            role,
++          })
++        }
++
+         assignments.push(newAssignment)
+       } catch (error) {
+         Logger.error(`Failed to assign role ${role} to user ${user.userId}`)

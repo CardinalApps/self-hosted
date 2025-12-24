@@ -207,7 +207,7 @@ export class UserService {
   }
 
   /**
-   * Creates a server owner account.
+   * Creates the server owner account.
    */
   async createServerOwner(cardinalSSOJWT): Promise<User | null> {
     if (await this.getServerOwner()) {

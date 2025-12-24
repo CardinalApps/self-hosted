@@ -1,28 +1,68 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
- import { IsNull, Not, Repository } from 'typeorm'
+@@ -1,6 +1,6 @@
+ import { Injectable, Logger } from '@nestjs/common'
+-import { InjectRepository } from '@nestjs/typeorm'
+-import { IsNull, Not, Repository } from 'typeorm'
++import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
++import { DataSource, IsNull, Not, Repository } from 'typeorm'
  import * as ms from 'ms'
  
-+import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
-+
- import { v4 as uuid } from 'uuid'
- 
- import { getJWTPayload, CloudUserJWTPayload, LocalUserJWTPayload } from '../../utils/jwt'
-@@ -13,8 +15,8 @@ import { CloudUserService } from './cloud-user.service'
- import { User } from './user.entity'
- import { Roles, Designations } from './types'
+ import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
+@@ -17,6 +17,7 @@ import { Roles, Designations } from './types'
  import { CreateUser } from './dtos/CreateUser.dto'
--
  import { GetUsersDto } from './dtos/GetUsers.dto'
-+import { SeatsService } from './seats.service'
+ import { SeatsService } from './seats.service'
++import { RBACService } from '../rbac/rbac.service'
  
  /**
   * This class harmonizes the features of offline and online accounts.
-@@ -27,6 +29,7 @@ export class UserService {
+@@ -24,12 +25,15 @@ import { SeatsService } from './seats.service'
+ @Injectable()
+ export class UserService {
+   constructor(
++    @InjectDataSource()
++    private dataSource: DataSource,
+     @InjectRepository(User)
+     private userRepository: Repository<User>,
      private readonly localUserService: LocalUserService,
      private readonly cloudUserService: CloudUserService,
      private readonly settingsService: SettingsService,
-+    private readonly seatsService: SeatsService,
+     private readonly seatsService: SeatsService,
++    private readonly rbacService: RBACService,
    ) {}
+ 
+   /**
+@@ -79,13 +83,27 @@ export class UserService {
+    * Creates the guest account.
+    */
+   async createGuestAccount(): Promise<User> {
+-    const createdUser = await this.userRepository.save({
+-      userId: uuid(),
+-      role: Roles.USER,
+-      designation: Designations.GUEST_ACCOUNT,
+-    })
++    const queryRunner = this.dataSource.createQueryRunner()
++    await queryRunner.connect()
++    await queryRunner.startTransaction()
+ 
+-    return createdUser
++    try {
++      const guestAccount = await queryRunner.manager.save(User, {
++        userId: uuid(),
++        designation: Designations.GUEST_ACCOUNT,
++      })
++
++      await this.rbacService.assignRole('administrator', [guestAccount], queryRunner)
++
++      await queryRunner.commitTransaction()
++
++      return guestAccount
++    } catch (error) {
++      await queryRunner.rollbackTransaction()
++      Logger.error(error)
++    } finally {
++      await queryRunner.release()
++    }
+   }
  
    /**
