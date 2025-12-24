@@ -1,9 +1,9 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -82,6 +82,7 @@
-     width: 100%;
-     padding: 20px 20px 20px 40px;
-     display: flex;
-+    font-size: 13px;
-     justify-content: flex-end;
+@@ -92,7 +92,6 @@
+     .note {
+       display: flex;
+       align-items: flex-start;
+-      font-size: 11px;
+       gap: 10px;
+       justify-content: flex-end;
  
-     button {
