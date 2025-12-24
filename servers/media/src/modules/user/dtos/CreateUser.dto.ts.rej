@@ -1,9 +1,13 @@
 diff a/servers/media/src/modules/user/dtos/CreateUser.dto.ts b/servers/media/src/modules/user/dtos/CreateUser.dto.ts	(rejected hunks)
-@@ -4,7 +4,4 @@ export class CreateUser {
+@@ -1,7 +1,11 @@
++import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
+ import { IsOptional, IsString } from 'class-validator'
+ 
+ export class CreateUser {
    @IsOptional()
    @IsString()
    cardinalJWT?: string
--
--  @IsString()
--  role: string
++
++  @IsString()
++  role?: RoleNames
  }

@@ -2,129 +2,132 @@ diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/module
 @@ -1,6 +1,6 @@
  import { Injectable, Logger } from '@nestjs/common'
  import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
--import { DataSource, IsNull, Not, Repository } from 'typeorm'
-+import { DataSource, IsNull, Not, QueryRunner, Repository } from 'typeorm'
+-import { DataSource, IsNull, Not, QueryRunner, Repository } from 'typeorm'
++import { DataSource, IsNull, Not, Repository } from 'typeorm'
  import * as ms from 'ms'
  
  import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
-@@ -13,12 +13,19 @@ import { SettingsService } from '../settings/settings.service'
- import { LocalUserService } from './local-user.service'
- import { CloudUserService } from './cloud-user.service'
- import { User } from './user.entity'
--import { Roles, Designations } from './types'
-+import { Designations } from './types'
- import { CreateUser } from './dtos/CreateUser.dto'
- import { GetUsersDto } from './dtos/GetUsers.dto'
+@@ -19,11 +19,12 @@ import { GetUsersDto } from './dtos/GetUsers.dto'
  import { SeatsService } from './seats.service'
  import { RBACService } from '../rbac/rbac.service'
  
-+/**
-+ * Only the backend should set these args.
-+ */
-+export type SecureArgs = {
-+  designation?: Designations
-+}
-+
+-/**
+- * Only the backend should set these args.
+- */
+-export type SecureArgs = {
+-  designation?: Designations
++type CreateUserArgs = {
++  dto?: CreateUser,
++  // Only the backend should set secure args
++  secure?: {
++    designation?: Designations,
++  },
+ }
+ 
  /**
-  * This class harmonizes the features of offline and online accounts.
-  */
-@@ -50,27 +57,33 @@ export class UserService {
+@@ -57,73 +58,69 @@ export class UserService {
     * Creates a new local user. If a Cardinal JWT is given, the cloud account
     * will be validated.
     */
--  async createUser(createUserDto: CreateUser): Promise<User | null> {
-+  async createUser(createUserArgs: CreateUser, secureArgs?: SecureArgs, queryRunner?: QueryRunner): Promise<User | null> {
+-  async createUser(createUserArgs: CreateUser, secureArgs?: SecureArgs, queryRunner?: QueryRunner): Promise<User | null> {
++  async createUser(args: CreateUserArgs): Promise<User | null> {
++    const {
++      dto,
++      secure,
++    } = args
      let cardinalCloudUser
  
      // Fetch the user from the auth servers for this JWT and validate it
--    if (createUserDto?.cardinalJWT) {
--      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserDto.cardinalJWT)
-+    if (createUserArgs?.cardinalJWT) {
-+      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserArgs.cardinalJWT)
+-    if (createUserArgs?.cardinalJWT) {
+-      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(createUserArgs.cardinalJWT)
++    if (dto?.cardinalJWT) {
++      cardinalCloudUser = await this.cloudUserService.getCardinalCloudUser(dto.cardinalJWT)
        this.cloudUserService.throwIfInvalidCardinalAccount(cardinalCloudUser)
      }
  
-     let createdUser = null
+-    let createdUser = null
++    const queryRunner = this.dataSource.createQueryRunner()
++    await queryRunner.connect()
++    await queryRunner.startTransaction()
  
      try {
--      createdUser = await this.userRepository.save({
-+      const newUserData = {
+-      const newUserData = {
++      const createdUser = await queryRunner.manager.save(User, {
          userId: uuid(),
          cardinalId: cardinalCloudUser ? cardinalCloudUser.userId : null,
          cachedCloudUser: cardinalCloudUser ? cardinalCloudUser : null,
          cachedCloudUserAt: cardinalCloudUser ? new Date() : null,
--        ssoToken: cardinalCloudUser ? createUserDto.cardinalJWT : null,
--        role: createUserDto.role,
--        designation: null,
--      })
-+        ssoToken: cardinalCloudUser ? createUserArgs.cardinalJWT : null,
-+        designation: secureArgs?.designation || null,
-+      }
+-        ssoToken: cardinalCloudUser ? createUserArgs.cardinalJWT : null,
+-        designation: secureArgs?.designation || null,
+-      }
++        ssoToken: cardinalCloudUser ? dto.cardinalJWT : null,
++        designation: secure?.designation || null,
++      })
+ 
+-      if (queryRunner) {
+-        createdUser = await queryRunner.manager.save(User, newUserData)
+-      } else {
+-        createdUser = await this.userRepository.save(newUserData)
+-      }
++      const roleAssignments = dto?.role
++        ? await this.rbacService.assignRole(dto.role, [createdUser], queryRunner)
++        : undefined
 +
-+      if (queryRunner) {
-+        createdUser = await queryRunner.manager.save(User, newUserData)
-+      } else {
-+        createdUser = await this.userRepository.save(newUserData)
-+      }
++      await queryRunner.commitTransaction()
+ 
+-      Logger.log(`Created new local user ${createdUser.userId}`, 'User')
++      Logger.log(`Created new local user [userId=${createdUser.userId}] [role=${roleAssignments[0].role}]`, 'User')
 +
-       Logger.log(`Created new local user ${createdUser.userId}`, 'User')
++      return createdUser
      } catch (error) {
++      await queryRunner.rollbackTransaction()
        Logger.error(`Could not create local user`, 'User')
-@@ -83,15 +96,23 @@ export class UserService {
-    * Creates the guest account.
-    */
-   async createGuestAccount(): Promise<User> {
-+    if (await this.getGuestAccount()) {
-+      throw new Error('Cannot create multiple Guest accounts')
-+    }
-+
-     const queryRunner = this.dataSource.createQueryRunner()
-     await queryRunner.connect()
-     await queryRunner.startTransaction()
- 
-     try {
--      const guestAccount = await queryRunner.manager.save(User, {
--        userId: uuid(),
--        designation: Designations.GUEST_ACCOUNT,
--      })
-+      // fixme new syntax
-+      const guestAccount = await this.createUser(
-+        {},
-+        {
-+          designation: Designations.GUEST_ACCOUNT,
-+        },
-+        queryRunner,
-+      )
- 
-       await this.rbacService.assignRole('administrator', [guestAccount], queryRunner)
- 
-@@ -179,12 +215,23 @@ export class UserService {
-    * has claimed this Media Server.
-    */
-   async getServerOwner(): Promise<User | null> {
--    return await this.userRepository.findOne({
--      where: {
--        cardinalId: Not(IsNull()),
--        role: Roles.OWNER,
--      },
--    })
-+    const ownerAssignment = await this.rbacService.getRoleAssignments('owner')
-+
-+    if (!ownerAssignment.length) {
-+      return null
-+    }
-+
-+    if (ownerAssignment.length > 1) {
-+      Logger.error('More than 1 server owner detected.')
-+      return null
-+    }
-+
-+    if (!ownerAssignment[0]?.user) {
-+      Logger.error('Invalid owner role assignment detected.')
-+      return null
-+    }
-+
-+    return ownerAssignment[0].user
++      Logger.error(error)
++    } finally {
++      await queryRunner.release()
+     }
+-
+-    return createdUser
    }
  
    /**
+    * Creates the guest account.
+    */
+-  async createGuestAccount(): Promise<User> {
++  async createGuestAccount(): Promise<User | null> {
+     if (await this.getGuestAccount()) {
+       throw new Error('Cannot create multiple Guest accounts')
+     }
+ 
+-    const queryRunner = this.dataSource.createQueryRunner()
+-    await queryRunner.connect()
+-    await queryRunner.startTransaction()
+-
+     try {
+-      // fixme new syntax
+-      const guestAccount = await this.createUser(
+-        {},
+-        {
+-          designation: Designations.GUEST_ACCOUNT,
+-        },
+-        queryRunner,
+-      )
+-
+-      await this.rbacService.assignRole('administrator', [guestAccount], queryRunner)
+-
+-      await queryRunner.commitTransaction()
++      const guestAccount = await this.createUser({
++        dto: { role: 'administrator' },
++        secure: { designation: Designations.GUEST_ACCOUNT },
++      })
+ 
+       return guestAccount
+     } catch (error) {
+-      await queryRunner.rollbackTransaction()
+       Logger.error(error)
+-    } finally {
+-      await queryRunner.release()
++      return null
+     }
+   }
+ 
