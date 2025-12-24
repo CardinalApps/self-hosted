@@ -1,31 +1,10 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx b/apps/admin-web/src/pages/FirstTimeSetup/FirstTimeSetup.tsx	(rejected hunks)
-@@ -30,6 +30,7 @@ function FirstTimeSetup() {
-   const dispatch = useAppDispatch()
-   const navigate = useNavigate()
-   const health = useAppSelector(homeServerSelectors.health)
-+  const firstTimeSetupComplete = useAppSelector(homeServerSelectors.firstTimeSetupComplete)
-   const homeServerUserLoggedIn = useAppSelector(homeServerUserSelectors.loggedIn)
-   const [finishButtonState, setFinishButtonState] = useState<string>()
-   const [step, setStep] = useState(1)
-@@ -80,6 +81,7 @@ function FirstTimeSetup() {
-     })
-       .then((res: { localUser: { userId } }) => {
-         setFinishButtonState('')
-+        dispatch(homeServerActions.setFirstTimeSetupComplete(true))
-         if (res?.localUser) {
-           dispatch(homeServerLogin({
-             userId: res.localUser.userId,
-@@ -111,11 +113,10 @@ function FirstTimeSetup() {
-    * Exit the First Time Setup once the setup is complete.
-    */
-   useEffect(() => {
--    if (homeServerUserLoggedIn && health !== 'not_setup') {
--      dispatch(homeServerActions.setFirstTimeSetupComplete(true))
-+    if (homeServerUserLoggedIn && firstTimeSetupComplete) {
-       navigate(routes.LOGIN)
-     }
--  }, [homeServerUserLoggedIn])
-+  }, [homeServerUserLoggedIn, firstTimeSetupComplete])
- 
-   return (
+@@ -122,7 +122,7 @@ function FirstTimeSetup() {
      <div className={'firstTimeSetup'}>
+       {(step >= 2 || step === null) &&
+         <motion.div
+-          className={'topLogo'}
++          className={'top-logo logo'}
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1, transition: { delay: 0.6, duration: 0.8, type: 'tween' } }}
+         >

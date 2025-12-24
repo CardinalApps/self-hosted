@@ -1,10 +1,49 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/i18n.json b/apps/admin-web/src/pages/FirstTimeSetup/i18n.json	(rejected hunks)
-@@ -78,7 +78,7 @@
-     "en": "(Go set a public name!)"
+@@ -39,10 +39,10 @@
+     "en": "Telemetry"
    },
-   "help.title": {
--    "en": "Community and help"
-+    "en": "Getting help"
+   "usage-data.message-p1": {
+-    "en": "Enabling telemetry allows Cardinal Apps Inc. to collect completely anonymous data about how your apps are used."
++    "en": "Enabling telemetry allows Cardinal Apps Inc. to collect <strong>anonymous</strong> data about how your apps are used. Telemetry data provides valuable insights, and is used to make smarter product decisions. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more <i class=\"fas fa-external-link-alt\"></i></a>."
+   },
+   "usage-data.message-p2": {
+-    "en": ""
++    "en": "Cardinal Apps Inc. is subject to Canadian data privacy laws, and complies with a strict <a href=\"https://cardinalapps.io/privacy-policy\" target=\"_blank\">Privacy Policy <i class=\"fas fa-external-link-alt\"></i></a> that protects your data."
+   },
+   "usage-data.read-more-link": {
+     "en": "More information"
+@@ -57,7 +57,7 @@
+     "en": "Privacy & terms"
+   },
+   "privacy.message-p1": {
+-    "en": "Make sure you understand the <a href='https://cardinalapps.io/privacy-policy' target='_blank'>Privacy Policy<i class='fas fa-external-link-alt'></i></a> and <a href='https://cardinalapps.io/terms-and-conditions' target='_blank'>Terms & Conditions<i class='fas fa-external-link-alt'></i></a> that your Cardinal Media Server is subject to."
++    "en": "Ensure that you read and understand the <a href='https://cardinalapps.io/privacy-policy' target='_blank'>Privacy Policy <i class='fas fa-external-link-alt'></i></a> and <a href='https://cardinalapps.io/terms-and-conditions' target='_blank'>Terms & Conditions <i class='fas fa-external-link-alt'></i></a> that your Cardinal applications are subject to."
+   },
+   "privacy.next": {
+     "en": "I understand & agree"
+@@ -66,10 +66,10 @@
+     "en": "Claim your server"
+   },
+   "login.message-p1": {
+-    "en": "You can claim this server by logging in with a <a href='https://account.cardinalapps.io' target='_blank'>Cardinal account<i class='fas fa-external-link-alt'></i></a>, or you can skip this and just use the guest account."
++    "en": "You can claim this server by logging in with a <a href='https://account.cardinalapps.io' target='_blank'>Cardinal account <i class='fas fa-external-link-alt'></i></a>. Accounts are free to create, provide secure authentication for your server, and connect you to Cardinal's cloud services. <a href='https://cardinalapps.io/cloud-services/cardinal-account' target='_blank'>Read more <i class='fas fa-external-link-alt'></i></a>."
+   },
+   "login.message-p2": {
+-    "en": "<a href='https://account.cardinalapps.io' target='_blank'>Create an account<i class='fas fa-external-link-alt'></i></a>, then log in below to claim your Media Server."
++    "en": "Or, skip making an account by using the Guest Account. It's a convenient way to take Cardinal for a test flight, and it can also be used long term."
+   },
+   "login.logged-in-as": {
+     "en": "This server will be claimed by"
+@@ -81,10 +81,10 @@
+     "en": "Getting help"
    },
    "help.message-p1": {
-     "en": "You are invited to join the <a href='https://forums.cardinalapps.io' target='_blank'>Community Forums<i class='fas fa-external-link-alt'></i></a>."
+-    "en": "You are invited to join the <a href='https://forums.cardinalapps.io' target='_blank'>Community Forums<i class='fas fa-external-link-alt'></i></a>."
++    "en": "You are invited to join the <a href='https://forums.cardinalapps.io' target='_blank'>Community Forums <i class='fas fa-external-link-alt'></i></a>."
+   },
+   "help.message-p2": {
+-    "en": "Official docs, tutorials, guides, and FAQ are available on the <a href='https://help.cardinalapps.io' target='_blank'>help site<i class='fas fa-external-link-alt'></i></a>."
++    "en": "Official docs, tutorials, guides, and FAQ are available on the <a href='https://help.cardinalapps.io' target='_blank'>help site <i class='fas fa-external-link-alt'></i></a>."
+   },
+   "help.next": {
+     "en": "Cool"

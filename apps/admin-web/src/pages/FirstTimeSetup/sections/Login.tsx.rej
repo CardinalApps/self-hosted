@@ -1,19 +1,17 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx	(rejected hunks)
-@@ -10,7 +10,7 @@ import LoginWithCardinal from '../../../components/LoginWithCardinal'
- 
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import authAPI from '@cardinalapps/ui/src/lib/auth/authAPI'
--import { HomeServerUser } from '@cardinalapps/ui/src/store/slices/homeServerUser'
-+import { UserType } from '@cardinalapps/ui/src/types/user'
- 
- import i18n from '../i18n.json'
- 
-@@ -45,7 +45,7 @@ function Login({
-       JWT: JWT,
-     })
-       .then((user) => {
--        setUserObjectOfFutureOwner(user as HomeServerUser)
-+        setUserObjectOfFutureOwner(user as UserType)
-         setSsoJWTOfFutureOwner(JWT)
-       })
-       .catch((error) => {
+@@ -62,12 +62,9 @@ function Login({
+         <Card
+           className={'card'}
+           padding="thick"
+-          header={
+-            <>
+-              <i className="fas fa-id-card" />
+-              <H2 className={'title'}>{i18n['login.title'][lang]}</H2>
+-            </>
+-          }
++          icon={<i className="fas fa-id-card" />}
++          iconSize="l"
++          header={<H2 className={'title'}>{i18n['login.title'][lang]}</H2>}
+           footer={
+             <>
+               <Button onClick={prev} textual={true}>

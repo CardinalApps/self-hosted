@@ -1,0 +1,17 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/ServerName.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/ServerName.tsx	(rejected hunks)
+@@ -47,12 +47,9 @@ function ServerName({
+         <Card
+           className={'card'}
+           padding="thick"
+-          header={
+-            <>
+-              <i className="fas fa-signature" />
+-              <H2 className={'title'}>{i18n['server-name.title'][lang]}</H2>
+-            </>
+-          }
++          icon={<i className="fas fa-signature" />}
++          iconSize="l"
++          header={<H2 className={'title'}>{i18n['server-name.title'][lang]}</H2>}
+           footer={
+             <>
+               <Button onClick={prev} textual={true}>

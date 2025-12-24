@@ -1,0 +1,17 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Privacy.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Privacy.tsx	(rejected hunks)
+@@ -33,12 +33,9 @@ function Privacy({
+         <Card
+           className={'card'}
+           padding="thick"
+-          header={
+-            <>
+-              <i className="fas fa-handshake" />
+-              <H2 className={'title'}>{i18n['privacy.title'][lang]}</H2>
+-            </>
+-          }
++          icon={<i className="fas fa-handshake" />}
++          iconSize="l"
++          header={<H2 className={'title'}>{i18n['privacy.title'][lang]}</H2>}
+           footer={
+             <>
+               <Button onClick={prev} textual={true}>

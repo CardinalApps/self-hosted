@@ -1,11 +1,26 @@
 diff a/libraries/ui/src/components/layout/Card/Card.tsx b/libraries/ui/src/components/layout/Card/Card.tsx	(rejected hunks)
-@@ -66,8 +66,8 @@ const Card = ({
+@@ -19,6 +19,7 @@ export type CardProps = {
+   style?: CSSProperties,
+   bottomAlignContent?: boolean,
+   icon?: React.ReactNode,
++  iconSize?: 'm' | 'l',
+   header?: ReactNode,
+   headerRight?: ReactNode,
+   footer?: ReactNode,
+@@ -38,6 +39,7 @@ const Card = ({
+   style,
+   bottomAlignContent,
+   icon,
++  iconSize = 'm',
+   header,
+   headerRight,
+   footer,
+@@ -66,7 +68,7 @@ const Card = ({
      >
        {(!!header || !!icon) &&
          <header className="card-header">
-+          {!!icon && <div className="card-icon">{icon}</div>}
+-          {!!icon && <div className="card-icon">{icon}</div>}
++          {!!icon && <div className={clsx(`card-icon`, `size-${iconSize}`)}>{icon}</div>}
            <div className="card-title">
--            {icon}
              {header}
            </div>
-           <div>{headerRight}</div>

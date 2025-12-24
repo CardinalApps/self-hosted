@@ -1,23 +1,300 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/styles.css b/apps/admin-web/src/pages/FirstTimeSetup/styles.css	(rejected hunks)
-@@ -40,6 +40,10 @@
-   position: fixed;
-   top: 20px;
-   left: 20px;
+@@ -36,16 +36,6 @@
+   }
+ }
+ 
+-.topLogo {
+-  position: fixed;
+-  top: 20px;
+-  left: 20px;
+-
+-  .logo {
+-    margin-bottom: 20px;
+-  }
+-}
+-
+ .firstTimeSetup {
+   width: 100vw;
+   height: 100vh;
+@@ -55,6 +45,20 @@
+   justify-content: center;
+   background-color: var(--background-color);
+ 
++  .top-logo {
++    position: fixed;
++    top: 20px;
++    left: 20px;
++  }
 +
 +  .logo {
 +    margin-bottom: 20px;
 +  }
- }
- 
- .firstTimeSetup {
-@@ -101,10 +105,6 @@
++
++  .welcome-logo {
++    margin-bottom: 20px;
++  }
++
+   form {
+     padding-top: 10px;
+     margin-bottom: 25px;
+@@ -103,161 +107,134 @@
+       flex-wrap: wrap;
+     }
    }
- }
- 
--.logo {
+-}
+-
+-.title {
+-  width: 100%;
 -  margin-bottom: 20px;
 -}
 -
- .title {
-   width: 100%;
-   margin-bottom: 20px;
+-.subtitle {
+-  width: 100%;
+-  font-size: 18px;
+-  font-weight: 400;
+-  margin-bottom: 25px;
+-}
+-
+-.message {
+-  width: 100%;
+-  font-size: 17px;
+-  font-weight: 400;
+-  line-height: 1.5em;
+-  margin-bottom: 20px;
+-
+-  a, a:visited, a:link {
+-    white-space: nowrap;
+-    color: var(--accent-color);
+-  }
+ 
+-  a:hover {
+-    text-decoration: underline;
++  .title {
++    width: 100%;
++    margin-bottom: 20px;
+   }
+ 
+-  a[target="_blank"] {
+-    
+-    i {
+-      margin: 0 0 0 5px;
+-      font-size: 10px;
+-      position: relative;
+-      top: -2px;
+-    }
++  .subtitle {
++    width: 100%;
++    font-size: 18px;
++    font-weight: 400;
++    margin-bottom: 25px;
+   }
+-}
+ 
+-.footerLink {
+-  flex-grow: 1;
+-  padding-left: 20px;
+-  display: flex;
+-  align-items: center;
++  .message {
++    width: 100%;
++    font-size: 17px;
++    font-weight: 400;
++    line-height: 1.5em;
++    margin-bottom: 20px;
+ 
+-  a {
+-    color: var(--accent-color);
++    a, a:visited, a:link {
++      white-space: nowrap;
++      color: var(--accent-color);
++    }
+ 
+-    &:hover {
++    a:hover {
+       text-decoration: underline;
+     }
++
++    a[target="_blank"] {
++      
++      i {
++        margin: 0 4px 0 2px;
++        font-size: 10px;
++        position: relative;
++        top: -2px;
++      }
++    }
+   }
+ 
+-  i {
+-    margin: 0 5px;
+-    font-size: 10px !important;
+-    color: var(--accent-color) !important;
+-    position: relative;
+-    top: -1px;
++  .center {
++    text-align: center;
+   }
+ 
+-  @media (max-width: 768px) {
+-    width: 100%;
+-    padding-left: 0;
+-    margin-bottom: 20px;
++  .themeSwatches {
++    padding: 30px 0;
++    display: flex;
++    justify-content: center;
+   }
+-}
+ 
+-.center {
+-  text-align: center;
+-}
++  .themeSwatch {
++    width: 200px;
++    height: 200px;
++    padding: 10px;
++    margin: 0 20px;
++    justify-content: center;
++    align-content: center;
++    display: flex;
++    flex-wrap: wrap;
++    position: relative;
++    border-radius: var(--border-radius);
++    border: 1px solid var(--border-color-1);
++    cursor: pointer;
+ 
+-.themeSwatches {
+-  padding: 30px 0;
+-  display: flex;
+-  justify-content: center;
+-}
++    i {
++      margin: 0 auto;
++      font-size: 38px;
++    }
+ 
+-.themeSwatch {
+-  width: 200px;
+-  height: 200px;
+-  padding: 10px;
+-  margin: 0 20px;
+-  justify-content: center;
+-  align-content: center;
+-  display: flex;
+-  flex-wrap: wrap;
+-  position: relative;
+-  border-radius: var(--border-radius);
+-  border: 1px solid var(--border-color-1);
+-  cursor: pointer;
+-
+-  i {
+-    margin: 0 auto;
+-    font-size: 38px;
++    p {
++      text-align: left;
++      position: absolute;
++      bottom: 10px;
++      left: 15px;
++      font-weight: 400;
++      font-size: 17px;
++      font-family: var(--font-family);
++    }
++
++    @media (max-width: 768px) {
++      width: 125px;
++      height: 125px;
++    }
+   }
+ 
+-  p {
+-    text-align: left;
+-    position: absolute;
+-    bottom: 10px;
+-    left: 15px;
+-    font-weight: 400;
+-    font-size: 17px;
+-    font-family: var(--font-family);
++  .themeNext {
++    padding-top: 10px;
++    text-align: center;
+   }
+ 
+-  @media (max-width: 768px) {
+-    width: 125px;
+-    height: 125px;
++  .controls {
++    width: 100%;
++    padding-top: 10px;
++    display: flex;
++    gap: 10px;
+   }
+-}
+ 
+-.themeNext {
+-  padding-top: 10px;
+-  text-align: center;
+-}
++  .loginButton {
++    margin-bottom: 25px;
++    padding-top: 10px;
++  }
+ 
+-.controls {
+-  width: 100%;
+-  padding-top: 10px;
+-  display: flex;
+-  gap: 10px;
+-}
++  .currentUser {
++    font-weight: 700;
++    font-size: 17px;
+ 
+-.loginButton {
+-  margin-bottom: 25px;
+-  padding-top: 10px;
+-}
++    i {
++      margin-right: 10px;
++      color: var(--success);
++    }
++  }
+ 
+-.currentUser {
+-  font-weight: 700;
+-  font-size: 17px;
++  .agree {
++    display: flex;
++    align-items: center;
+ 
+-  i {
+-    margin-right: 10px;
+-    color: var(--success);
++    p {
++      margin-right: 10px;
++      font-size: 17px;
++      font-weight: 600;
++    }
+   }
+-}
+ 
+-.agree {
+-  display: flex;
+-  align-items: center;
+-
+-  p {
+-    margin-right: 10px;
+-    font-size: 17px;
+-    font-weight: 600;
++  .setupFetchError {
++    width: 100%;
++    text-align: center;
++    color: var(--danger);
+   }
+ }
+ 
+-.setupFetchError {
+-  width: 100%;
+-  text-align: center;
+-  color: var(--danger);
+-}
++

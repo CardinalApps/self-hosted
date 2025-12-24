@@ -1,9 +1,20 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -92,7 +92,6 @@
-     .note {
-       display: flex;
-       align-items: flex-start;
--      font-size: 11px;
-       gap: 10px;
-       justify-content: flex-end;
+@@ -58,10 +58,17 @@
  
+     .card-icon {
+       margin-right: 10px;
+-      font-size: 19px;
+       position: relative;
+       color: var(--text-color-2);
+       top: -1px;
++
++      &.size-l {
++        font-size: 26px;
++      }
++
++      &.size-m {
++        font-size: 19px;
++      }
+     }
+ 
+     > .card-title {

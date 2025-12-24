@@ -1,0 +1,41 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/UsageData.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/UsageData.tsx	(rejected hunks)
+@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
+ import { motion, TargetAndTransition } from 'framer-motion'
+ 
+ import H2 from '@cardinalapps/ui/src/components/typography/H2'
+-import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+ import Button from '@cardinalapps/ui/src/components/interaction/Button'
+ import Card from '@cardinalapps/ui/src/components/layout/Card'
+ import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
+@@ -40,20 +39,11 @@ function UsageData({
+         <Card
+           className={'card'}
+           padding="thick"
+-          header={
+-            <>
+-              <i className="fas fa-user-shield" />
+-              <H2 className={'title'}>{i18n['usage-data.title'][lang]}</H2>
+-            </>
+-          }
++          icon={<i className="fas fa-user-shield" />}
++          iconSize="l"
++          header={<H2 className={'title'}>{i18n['usage-data.title'][lang]}</H2>}
+           footer={
+             <>
+-              <div className={'footerLink'}>
+-                <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>
+-                  {i18n['usage-data.read-more-link'][lang]}
+-                  <Icon fa="fas fa-external-link-alt" />
+-                </a>
+-              </div>
+               <Button onClick={prev} textual={true}>
+                 {i18n['prev'][lang]}
+               </Button>
+@@ -64,6 +54,7 @@ function UsageData({
+           }
+         >
+           <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['usage-data.message-p1'][lang] }} />
++          <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['usage-data.message-p2'][lang] }} />
+           <div className={'agree'}>
+             <p>
+               {i18n['usage-data.agree']['en']}

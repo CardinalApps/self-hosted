@@ -1,0 +1,17 @@
+diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Help.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Help.tsx	(rejected hunks)
+@@ -33,12 +33,9 @@ function Help({
+         <Card
+           className={'card'}
+           padding="thick"
+-          header={
+-            <>
+-              <i className="fas fa-comments" />
+-              <H2 className={'title'}>{i18n['help.title'][lang]}</H2>
+-            </>
+-          }
++          icon={<i className="fas fa-comments" />}
++          iconSize="l"
++          header={<H2 className={'title'}>{i18n['help.title'][lang]}</H2>}
+           footer={
+             <>
+               <Button onClick={prev} textual={true}>
