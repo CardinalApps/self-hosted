@@ -1,22 +1,10 @@
 diff a/servers/media/src/modules/rbac/rbac.controller.ts b/servers/media/src/modules/rbac/rbac.controller.ts	(rejected hunks)
-@@ -8,6 +8,7 @@ import {
-   Delete,
-   Param,
-   Query,
-+  BadRequestException,
- } from '@nestjs/common'
- import {
-   ApiTags,
-@@ -98,6 +99,12 @@ export class RBACController {
-       userEntities.push(entity)
-     }
- 
-+    // Do not allow changes to the Guest Account role. It can be disabled
-+    // entirely with the Disable Account feature.
-+    if (userEntities.find((user) => user.designation === 'guest_account')) {
-+      throw new BadRequestException()
-+    }
-+
-     const deleted = await this.rbacService.revokeRole(role, userEntities)
-     return deleted
+@@ -44,7 +44,7 @@ export class RBACController {
+   @ApiOperation({ summary: "Get all role assignments." })
+   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getRoleAssignments(): Promise<RoleAssignment[]> {
+-    const assignments = await this.rbacService.getAndCountRoleAssignments()
++    const assignments = await this.rbacService.getAndCountAllRoleAssignments()
+     return assignments
    }
+ 

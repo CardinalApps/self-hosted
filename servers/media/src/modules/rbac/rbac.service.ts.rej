@@ -1,43 +1,36 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
-@@ -1,6 +1,6 @@
- import { Injectable, Logger } from '@nestjs/common'
- import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
--import { DataSource, Repository } from 'typeorm'
-+import { DataSource, QueryRunner, Repository } from 'typeorm'
- import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
- 
- import { RoleAssignment } from './role-assignment.entity'
-@@ -69,7 +69,7 @@ export class RBACService {
-    * Assigns roles. If the user already has the role, this quietly returns
-    * success.
+@@ -18,7 +18,7 @@ export class RBACService {
+   /**
+    * Gets all assignments for a single user.
     */
--  async assignRole(role: RoleNames, users: User[]): Promise<RoleAssignment[]> {
-+  async assignRole(role: RoleNames, users: User[], queryRunner?: QueryRunner): Promise<RoleAssignment[]> {
-     const assignments = []
+-  async getAndCountRoleAssignments(): Promise<RoleAssignment[]> {
++  async getAndCountAllRoleAssignments(): Promise<RoleAssignment[]> {
+     let found = null
  
-     for (const user of users) {
-@@ -82,10 +82,20 @@ export class RBACService {
-       }
+     try {
+@@ -34,6 +34,25 @@ export class RBACService {
+     return found
+   }
  
-       try {
--        const newAssignment = await this.roleAssignmentRepository.save({
--          user,
--          role: role,
--        })
-+        let newAssignment
++  /**
++   * Gets all assignments for a single role.
++   */
++  async getRoleAssignments(role: RoleNames): Promise<RoleAssignment[]> {
++    try {
++      const found = await this.roleAssignmentRepository.find({
++        where: {
++          role,
++        },
++        relations: {
++          user: true,
++        },
++      })
++      return found
++    } catch (error) {
++      Logger.error(error, 'RBAC')
++    }
++  }
 +
-+        if (queryRunner) {
-+          newAssignment = await queryRunner.manager.save(RoleAssignment, {
-+            user,
-+            role,
-+          })
-+        } else {
-+          newAssignment = await this.roleAssignmentRepository.save({
-+            user,
-+            role,
-+          })
-+        }
-+
-         assignments.push(newAssignment)
-       } catch (error) {
-         Logger.error(`Failed to assign role ${role} to user ${user.userId}`)
+   /**
+    * Gets all assignments for a single user.
+    */

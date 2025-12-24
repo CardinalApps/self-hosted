@@ -214,12 +214,27 @@ export class UserService {
       throw new Error('Cannot create multiple server owners')
     }
 
-    const newOwnerAccount = await this.createUser({
-      role: Roles.OWNER,
-      cardinalJWT: cardinalSSOJWT,
-    })
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
 
-    return newOwnerAccount
+    try {
+      // fixme new syntax
+      const ownerAccount = await this.createUser({
+        cardinalJWT: cardinalSSOJWT,
+      }, {}, queryRunner)
+
+      await this.rbacService.assignRole('owner', [ownerAccount], queryRunner)
+
+      await queryRunner.commitTransaction()
+
+      return ownerAccount
+    } catch (error) {
+      await queryRunner.rollbackTransaction()
+      Logger.error(error)
+    } finally {
+      await queryRunner.release()
+    }
   }
 
   /**
