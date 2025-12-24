@@ -1,10 +1,117 @@
 diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
-@@ -156,8 +156,6 @@ function RolesList() {
-     [drawerRoleSlug, roleAssignments],
-   )
+@@ -130,7 +131,7 @@ function RolesList() {
+         type: numAffected === 0 ? 'warning' : 'success',
+       }))
+     }
+-  }, [createRoleAssignmentsResult])
++  }, [createRoleAssignmentsResult.isSuccess])
  
--  console.log('memoizedUsersWithoutRole', memoizedUsersWithoutRole)
+   /**
+    * When roles are revoked.
+@@ -144,17 +145,45 @@ function RolesList() {
+         type: numAffected === 0 ? 'warning' : 'success',
+       }))
+     }
+-  }, [deleteRoleAssignmentsResult])
++  }, [deleteRoleAssignmentsResult.isSuccess])
+ 
+-  const memoizedUsersWithRole = useMemo(
+-    () => usersWithRole(drawerRoleSlug),
+-    [drawerRoleSlug, roleAssignments],
+-  )
 -
+-  const memoizedUsersWithoutRole = useMemo(
+-    () => usersWithoutRole(drawerRoleSlug),
+-    [drawerRoleSlug, roleAssignments],
+-  )
++  const MemoizedAddRemove = useMemo(() => {
++    return (
++      <AddRemove
++        name="role-assignments"
++        availableTitle={i18n['roles.drawer.user-list.available'][lang]}
++        initialSelectedItems={
++          usersWithRole(drawerRoleSlug)
++            .map((user) => ({
++              name: user?.designation === 'guest_account'
++                ? i18n['roles.drawer.user-list.guest'][lang]
++                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
++              value: user.userId,
++              canDelete: user?.designation !== 'guest_account',
++              avatar: user?.designation === 'guest_account'
++                ? { type: 'guest' }
++                : user?.cachedCloudUser?.avatar
++                  ? { ...user?.cachedCloudUser?.avatar }
++                  : undefined,
++            }))
++        }
++        initialAvailableItems={
++          usersWithoutRole(drawerRoleSlug)
++            .map((user) => ({
++              name: user?.designation === 'guest_account'
++                ? i18n['roles.drawer.user-list.guest'][lang]
++                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
++              value: user.userId,
++              avatar: user?.designation === 'guest_account'
++              ? { type: 'guest' }
++              : user?.cachedCloudUser?.avatar
++                ? { ...user?.cachedCloudUser?.avatar }
++                : undefined,
++            }))
++        }
++      />
++    )
++  }, [drawerRoleSlug, roleAssignments.length])
+ 
    return (
      <CardGrid.Card
-       size="m"
+@@ -209,45 +238,16 @@ function RolesList() {
+                 <Form
+                   onSubmit={handleUpdateRoleAssignments}
+                   controls={
+-                    <Button type="submit">
++                    <Button
++                      type="submit"
++                      animation={createRoleAssignmentsResult.isLoading || deleteRoleAssignmentsResult.isLoading ? 'loading' : undefined}
++                    >
+                       {i18n['roles.drawer.user-list.save'][lang]}
+                     </Button>
+                   }
+                 >
+                   <FormField>
+-                    <AddRemove
+-                      name="role-assignments"
+-                      availableTitle={i18n['roles.drawer.user-list.available'][lang]}
+-                      initialSelectedItems={
+-                        memoizedUsersWithRole
+-                          .map((user) => ({
+-                            name: user?.designation === 'guest_account'
+-                              ? i18n['roles.drawer.user-list.guest'][lang]
+-                              :  user?.cachedCloudUser?.publicName || 'Cardinal User',
+-                            value: user.userId,
+-                            canDelete: user?.designation !== 'guest_account',
+-                            avatar: user?.designation === 'guest_account'
+-                              ? { type: 'guest' }
+-                              : user?.cachedCloudUser?.avatar
+-                                ? { ...user?.cachedCloudUser?.avatar }
+-                                : undefined,
+-                          }))
+-                      }
+-                      initialAvailableItems={
+-                        memoizedUsersWithoutRole
+-                          .map((user) => ({
+-                            name: user?.designation === 'guest_account'
+-                              ? i18n['roles.drawer.user-list.guest'][lang]
+-                              :  user?.cachedCloudUser?.publicName || 'Cardinal User',
+-                            value: user.userId,
+-                            avatar: user?.designation === 'guest_account'
+-                            ? { type: 'guest' }
+-                            : user?.cachedCloudUser?.avatar
+-                              ? { ...user?.cachedCloudUser?.avatar }
+-                              : undefined,
+-                          }))
+-                      }
+-                    />
++                    {MemoizedAddRemove}
+                   </FormField>
+                 </Form>
+               )

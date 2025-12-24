@@ -120,6 +120,10 @@
           opacity: 0.5;
         }
 
+        .item-list-item-avatar {
+          opacity: 0.5;
+        }
+
         i {
           color: var(--danger-bg);
         }

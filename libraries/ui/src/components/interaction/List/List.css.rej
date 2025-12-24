@@ -1,19 +1,12 @@
 diff a/libraries/ui/src/components/interaction/List/List.css b/libraries/ui/src/components/interaction/List/List.css	(rejected hunks)
-@@ -59,7 +59,7 @@
- 
+@@ -97,6 +97,10 @@
          .item-list-item-name {
-           padding: 5px 0;
--          font-size: 13px;
-+          font-size: 14px;
-           font-weight: 500;
-           color: var(--text-color-2);
+           opacity: 0.5;
          }
-@@ -67,7 +67,7 @@
-     }
- 
-     .item-list-item-label {
--      font-size: 13px;
-+      font-size: 14px;
-     }
- 
-     .item-list-empty {
++
++        .item-list-item-avatar {
++          opacity: 0.5;
++        }
+       }
+       
+       &.pending-delete {

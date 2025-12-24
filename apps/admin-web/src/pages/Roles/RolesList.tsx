@@ -69,7 +69,8 @@ function RolesList() {
       return false
     }
 
-    return !userRoleAssignments.find((assignment) => assignment.role === role)
+    const u = !userRoleAssignments.find((assignment) => assignment.role === role)
+    return u
   })
 
   /**
