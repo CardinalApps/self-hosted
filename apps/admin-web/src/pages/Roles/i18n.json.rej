@@ -1,23 +1,10 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -72,12 +72,18 @@
+@@ -72,7 +72,7 @@
      "en": "{total} total capabilities"
    },
    "caps-list.only-component": {
--    "en": "{component} has {num} of {total} capabilities"
-+    "en": "{num} of {total} {capabilities} belong to {component}"
+-    "en": "{num} of {total} {capabilities} belong to {component}"
++    "en": "{num} of {total} capabilities belong to {component}"
    },
    "caps-list.only-role": {
--    "en": "{role} has {num} of {total} capabilities"
-+    "en": "{role} has {num} of {total} {capabilities}"
-   },
-   "caps-list.component-and-role": {
--    "en": "{role} has {num} {component} capabilities"
-+    "en": "{role} has {num} {component} {capabilities}"
-+  },
-+  "caps.singular": {
-+    "en": "capability"
-+  },
-+  "caps.plural": {
-+    "en": "capabilities"
-   }
- }
+     "en": "{role} has {num} of {total} {capabilities}"
