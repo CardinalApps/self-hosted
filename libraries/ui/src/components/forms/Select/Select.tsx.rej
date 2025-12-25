@@ -1,0 +1,25 @@
+diff a/libraries/ui/src/components/forms/Select/Select.tsx b/libraries/ui/src/components/forms/Select/Select.tsx	(rejected hunks)
+@@ -27,6 +27,7 @@ type SelectProps = {
+   min?: number,
+   max?: number,
+   size?: 'l' | 'm' | 's',
++  layout?: 'underline',
+   onChange?: (selected) => void,
+   style?: CSSProperties,
+   className?: string,
+@@ -95,6 +96,7 @@ const Select = ({
+   min,
+   max,
+   size = "l",
++  layout,
+   onChange = () => {},
+   style,
+   className,
+@@ -306,6 +308,7 @@ const Select = ({
+           'custom-select',
+           `size-${size}`,
+           'select',
++          layout && 'layout-underline',
+           className,
+         )}
+         style={style}

@@ -1,29 +1,23 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -59,8 +59,11 @@
-   "caps-list.title": {
-     "en": "Capabilities"
-   },
-+  "caps-list.component-filter": {
-+    "en": "Component"
-+  },
-   "caps-list.role-filter": {
--    "en": "Fitler by role"
-+    "en": "Role"
-   },
-   "caps.drawer.title": {
-     "en": "Capability"
-@@ -68,7 +71,13 @@
-   "caps-list.total": {
+@@ -72,12 +72,18 @@
      "en": "{total} total capabilities"
    },
--  "caps-list.filtered-count": {
-+  "caps-list.only-component": {
-+    "en": "{component} has {num} of {total} capabilities"
+   "caps-list.only-component": {
+-    "en": "{component} has {num} of {total} capabilities"
++    "en": "{num} of {total} {capabilities} belong to {component}"
+   },
+   "caps-list.only-role": {
+-    "en": "{role} has {num} of {total} capabilities"
++    "en": "{role} has {num} of {total} {capabilities}"
+   },
+   "caps-list.component-and-role": {
+-    "en": "{role} has {num} {component} capabilities"
++    "en": "{role} has {num} {component} {capabilities}"
 +  },
-+  "caps-list.only-role": {
-     "en": "{role} has {num} of {total} capabilities"
++  "caps.singular": {
++    "en": "capability"
 +  },
-+  "caps-list.component-and-role": {
-+    "en": "{role} has {num} {component} capabilities"
++  "caps.plural": {
++    "en": "capabilities"
    }
  }

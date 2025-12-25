@@ -237,3 +237,45 @@
     }
   }
 }
+
+.custom-select.layout-underline {
+
+  &.size-s {
+    .down-icon {
+      right: 5px;
+    }
+
+    .erase-icon {
+      right: 5px;
+    }
+
+    .search-icon {
+      right: 2px;
+    }
+  }
+
+  .typing-area {
+    color: var(--text-color-2);
+  }
+
+  .icon-button {
+    /* right: 2px; */
+    background: none !important;
+  }
+  
+  .typing-area {
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    border-bottom: 2px solid var(--border-color-1);
+
+    .selected {
+
+      &.upper {
+        padding-left: 2px;
+      }
+    }
+  }
+}

@@ -473,4 +473,79 @@ export const Underline = () => {
   )
 }
 
+export const Underline = () => {
+  const field = 'dropdown-underline'
+  const [selected, setSelected] = useState()
+  return (
+    <Select
+      name={field}
+      value={selected}
+      onChange={(val) => setSelected(val)}
+      layout="underline"
+      options={[
+        {
+          label: `Labrador`,
+          value: 'dog',
+        },
+        {
+          label: `Standard Issue House Cat`,
+          value: 'cat',
+        },
+        {
+          label: `Horse`,
+          value: 'horse',
+        },
+        {
+          label: `North American House Hippo`,
+          value: 'house-hippo',
+        },
+        {
+          label: `Snek`,
+          value: 'snek',
+        },
+        {
+          label: `Labrador`,
+          value: 'dog2',
+        },
+        {
+          label: `Standard Issue House Cat`,
+          value: 'cat2',
+        },
+        {
+          label: `Horse`,
+          value: 'horse2',
+        },
+        {
+          label: `North American House Hippo`,
+          value: 'house-hippo2',
+        },
+        {
+          label: `Snek`,
+          value: 'snek2',
+        },
+        {
+          label: `Labrador`,
+          value: 'dog3',
+        },
+        {
+          label: `Standard Issue House Cat`,
+          value: 'cat3',
+        },
+        {
+          label: `Horse`,
+          value: 'horse3',
+        },
+        {
+          label: `North American House Hippo`,
+          value: 'house-hippo3',
+        },
+        {
+          label: `Snek`,
+          value: 'snek3',
+        },
+      ]}
+    />
+  )
+}
+
 export default meta
