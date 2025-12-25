@@ -1,62 +1,30 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -19,13 +19,13 @@ import H5 from '@cardinalapps/ui/src/components/typography/H5'
- import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
- import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
- import { useGetLicensingSeatsQuery } from '@cardinalapps/ui/src/store/apis/licensing'
-+import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUsers'
+@@ -111,7 +111,7 @@ function Users() {
  
- import ManageInvitationsDrawer from './ManageInvitationsDrawer'
- import UserManagementDrawer from './UserManagementDrawer'
- 
- import i18n from './i18n.json'
- import './styles.css'
--import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUsers'
- 
- function Users() {
-   const { lang } = useSelector(settingsSelectors.current)
-@@ -36,7 +36,7 @@ function Users() {
-   const serverOwnerRes = useGetActiveUsersQuery({})
-   const serverOwner = serverOwnerRes.data?.[0]
- 
--  const usersRes = useGetUsersQuery({ take: 9999 })
-+  const usersRes = useGetUsersQuery({ take: 9999, roles: true })
-   const users = usersRes?.data ? usersRes.data?.[0] : []
-   const serverIsClaimed = !!serverOwner
- 
-@@ -61,8 +61,13 @@ function Users() {
- 
-   const roleCol = (user: UserType) => {
+   const controlsCol = (user) => {
      return (
--      <Table.Col key="role">
--        <span className="capitalize">{user?.role}</span>
-+      <Table.Col key="status">
-+        <span className="capitalize">
-+          {user?.roles.length === 1
-+            ? user?.roles?.[0]?.role
-+            : i18n['users.roles.count'][lang].replace('{num}', user?.roles.length)
-+          }
-+        </span>
-       </Table.Col>
-     )
-   }
-@@ -119,15 +124,15 @@ function Users() {
-       return []
-     }
- 
--    const allUsersExceptGuest = users
--      .filter((user: UserType) => user.designation !== 'guest_account')
--      .filter((user: UserType) => user.role !== 'owner')
-     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
--    const ownerAccount = users.find((user: UserType) => user.role === 'owner')
-+    const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
-+    const otherUsers = users
-+      .filter((user: UserType) => user.userId !== guestAccount.userId)
-+      .filter((user: UserType) => user.userId !== ownerAccount.userId)
- 
-     const ordered = [
-       ownerAccount,
--      ...allUsersExceptGuest,
-+      ...otherUsers,
-       guestAccount,
-     ]
- 
+-      <Table.Col key="controls" align='right'>
++      <Table.Col key="controls" align='right' width={140}>
+         <Button icon="fas fa-users-cog" onClick={() => setConfiguringUser(user)}>
+           {i18n['users.table.controls.settings'][lang]}
+         </Button>
+@@ -141,8 +141,8 @@ function Users() {
+       .map((user: UserType) => {
+         return [
+           nameCol(user),
+-          roleCol(user),
+           enabledStatusCol(user),
++          roleCol(user),
+           lastSeenCol(user?.activityStatusUpdatedAt),
+           controlsCol(user),
+         ]
+@@ -241,8 +241,8 @@ function Users() {
+         className="server-user-list"
+         header={[
+           i18n['users.table.header.name'][lang],
+-          i18n['users.table.header.role'][lang],
+           i18n['users.table.header.status'][lang],
++          i18n['users.table.header.role'][lang],
+           i18n['users.table.header.last-seen'][lang],
+           null,
+         ]}

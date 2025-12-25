@@ -1,74 +1,9 @@
 diff a/libraries/ui/src/components/interaction/Table/Table.tsx b/libraries/ui/src/components/interaction/Table/Table.tsx	(rejected hunks)
-@@ -1,5 +1,5 @@
--import { useState } from 'react'
--import type { ReactNode } from 'react'
-+import react, { useState } from 'react'
-+import type { JSXElementConstructor, PropsWithChildren, ReactElement } from 'react'
- import { useSelector } from 'react-redux'
- import clsx from 'clsx'
- 
-@@ -13,13 +13,14 @@ import i18n from './i18n'
- 
- import './Table.css'
- 
--export type TableColumn = {
--  props: {
--    [prop: string]: unknown,
--    children: ReactNode,
--  }
-+type TableColumnProps = {
-+  className?: string,
-+  index?: number,
-+  align?: 'left' | 'right',
-+  onMouseEnter?: () => void,
-+  onMouseLeave?: () => void,
+@@ -17,6 +17,7 @@ type TableColumnProps = {
+   className?: string,
+   index?: number,
+   align?: 'left' | 'right',
++  width?: number | string,
+   onMouseEnter?: () => void,
+   onMouseLeave?: () => void,
  }
--
-+export type TableColumn = ReactElement<TableColumnProps, string | JSXElementConstructor<TableColumnProps>>
- export type TableRow = TableColumn[]
- 
- type TableProps = {
-@@ -76,8 +77,9 @@ const Table = ({
-                 <th
-                   key={`th-${index}`}
-                   className="th"
--                  {...head.props}
--                />
-+                >
-+                  {head}
-+                </th>
-               ))}
-             </tr>
-           </thead>
-@@ -97,23 +99,22 @@ const Table = ({
-                       className={clsx('tr', bodyRowClassName)}
-                     >
-                       {!!row.length && row.map((col, index) => (
--                        <td
--                          key={`col-${index}`}
--                          className={clsx("td", colHighlight === index || rowHighlight === rowIndex ? 'highlight' : '')}
--                          onMouseEnter={() => {
-+                        react.cloneElement(col, {
-+                          className: clsx("td", colHighlight === index || rowHighlight === rowIndex ? 'highlight' : ''),
-+                          index,
-+                          onMouseEnter: () => {
-                             if (highlightColOnHover) {
-                               setColHighlight(index)
-                             }
-                             if (highlightRowOnHover) {
-                               setRowHighlight(rowIndex)
-                             }
--                          }}
--                          onMouseLeave={() => {
-+                          },
-+                          onMouseLeave: () => {
-                             setColHighlight(null)
-                             setRowHighlight(null)
--                          }}
--                          {...col.props}
--                        />
-+                          },
-+                        })
-                       ))}
-                     </tr>
-                   ))}
