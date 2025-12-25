@@ -1,30 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -111,7 +111,7 @@ function Users() {
+@@ -61,7 +61,7 @@ function Users() {
  
-   const controlsCol = (user) => {
+   const roleCol = (user: UserType) => {
      return (
--      <Table.Col key="controls" align='right'>
-+      <Table.Col key="controls" align='right' width={140}>
-         <Button icon="fas fa-users-cog" onClick={() => setConfiguringUser(user)}>
-           {i18n['users.table.controls.settings'][lang]}
-         </Button>
-@@ -141,8 +141,8 @@ function Users() {
-       .map((user: UserType) => {
-         return [
-           nameCol(user),
--          roleCol(user),
-           enabledStatusCol(user),
-+          roleCol(user),
-           lastSeenCol(user?.activityStatusUpdatedAt),
-           controlsCol(user),
-         ]
-@@ -241,8 +241,8 @@ function Users() {
-         className="server-user-list"
-         header={[
-           i18n['users.table.header.name'][lang],
--          i18n['users.table.header.role'][lang],
-           i18n['users.table.header.status'][lang],
-+          i18n['users.table.header.role'][lang],
-           i18n['users.table.header.last-seen'][lang],
-           null,
-         ]}
+-      <Table.Col key="status">
++      <Table.Col key="role">
+         <span className="capitalize">
+           {user?.roles.length === 1
+             ? user?.roles?.[0]?.role
