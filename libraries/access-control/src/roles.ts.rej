@@ -1,50 +1,37 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,5 +1,11 @@
- import { CapabilityAssignments } from "./capabilities"
- 
-+export enum RoleName {
-+  OWNER = 'owner',
-+  ADMINISTRATIOR = 'administrator',
-+  NEWCOMER = 'newcomer',
-+}
-+
- /**
-  * Roles are sets of capabilities. Users can be assigned multiple different
-  * roles to form a superset of capabilities.
-@@ -8,15 +14,15 @@ export type Role = {
-   assignable: boolean,
-   unassignable: boolean,
-   maxUsers: number | null, // Use null for unlimited
--  name: string,
-+  name: `${RoleName}`,
-   capabilities: CapabilityAssignments,
- }
- 
- /**
-  * Master list of all roles and their capabilities.
+@@ -12,7 +12,7 @@ export enum RoleName {
   */
--export const Roles: Record<string, Role> = {
--  owner: {
-+export const Roles: Record<`${RoleName}`, Role> = {
-+  [RoleName.OWNER]: {
+ export type Role = {
+   assignable: boolean,
+-  unassignable: boolean,
++  revocable: boolean,
+   maxUsers: number | null, // Use null for unlimited
+   name: `${RoleName}`,
+   capabilities: CapabilityAssignments,
+@@ -24,7 +24,7 @@ export type Role = {
+ export const Roles: Record<`${RoleName}`, Role> = {
+   [RoleName.OWNER]: {
      assignable: false,
-     unassignable: false,
+-    unassignable: false,
++    revocable: false,
      maxUsers: 1,
-@@ -25,7 +31,7 @@ export const Roles: Record<string, Role> = {
-       '*.*',
-     ],
+     name: 'owner',
+     capabilities: [
+@@ -33,7 +33,7 @@ export const Roles: Record<`${RoleName}`, Role> = {
    },
--  administrator: {
-+  [RoleName.ADMINISTRATIOR]: {
+   [RoleName.ADMINISTRATIOR]: {
      assignable: true,
-     unassignable: true,
+-    unassignable: true,
++    revocable: true,
      maxUsers: null,
-@@ -34,7 +40,7 @@ export const Roles: Record<string, Role> = {
-       '*.*',
-     ],
+     name: 'administrator',
+     capabilities: [
+@@ -42,7 +42,7 @@ export const Roles: Record<`${RoleName}`, Role> = {
    },
--  newcomer: {
-+  [RoleName.NEWCOMER]: {
+   [RoleName.NEWCOMER]: {
      assignable: true,
-     unassignable: true,
+-    unassignable: true,
++    revocable: true,
      maxUsers: null,
+     name: 'newcomer',
+     capabilities: [

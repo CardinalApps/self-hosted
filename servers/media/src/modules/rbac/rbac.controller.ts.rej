@@ -1,10 +1,19 @@
 diff a/servers/media/src/modules/rbac/rbac.controller.ts b/servers/media/src/modules/rbac/rbac.controller.ts	(rejected hunks)
-@@ -44,7 +44,7 @@ export class RBACController {
-   @ApiOperation({ summary: "Get all role assignments." })
-   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-   async getRoleAssignments(): Promise<RoleAssignment[]> {
--    const assignments = await this.rbacService.getAndCountRoleAssignments()
-+    const assignments = await this.rbacService.getAndCountAllRoleAssignments()
-     return assignments
-   }
+@@ -52,8 +52,6 @@ export class RBACController {
+    * Assigns roles by creating a role assignments. If the user already has the
+    * role, the existing assignment will silently returned instead of creating a
+    * new one.
+-   * 
+-   * TODO check for Role.Assign capability
+    */
+   @Post('/:role/assignments')
+   @UseGuards(AuthGuard)
+@@ -81,8 +79,6 @@ export class RBACController {
  
+   /**
+    * Revokes roles by deleting the assignment.
+-   * 
+-   * TODO check for Role.Assign capability
+    */
+   @Delete('/:role/assignments')
+   @ApiOperation({ summary: 'Revoke roles.' })

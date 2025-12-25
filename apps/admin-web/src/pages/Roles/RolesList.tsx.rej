@@ -1,117 +1,26 @@
 diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
-@@ -130,7 +131,7 @@ function RolesList() {
-         type: numAffected === 0 ? 'warning' : 'success',
-       }))
-     }
--  }, [createRoleAssignmentsResult])
-+  }, [createRoleAssignmentsResult.isSuccess])
- 
-   /**
-    * When roles are revoked.
-@@ -144,17 +145,45 @@ function RolesList() {
-         type: numAffected === 0 ? 'warning' : 'success',
-       }))
-     }
--  }, [deleteRoleAssignmentsResult])
-+  }, [deleteRoleAssignmentsResult.isSuccess])
- 
--  const memoizedUsersWithRole = useMemo(
--    () => usersWithRole(drawerRoleSlug),
--    [drawerRoleSlug, roleAssignments],
--  )
--
--  const memoizedUsersWithoutRole = useMemo(
--    () => usersWithoutRole(drawerRoleSlug),
--    [drawerRoleSlug, roleAssignments],
--  )
-+  const MemoizedAddRemove = useMemo(() => {
-+    return (
-+      <AddRemove
-+        name="role-assignments"
-+        availableTitle={i18n['roles.drawer.user-list.available'][lang]}
-+        initialSelectedItems={
-+          usersWithRole(drawerRoleSlug)
-+            .map((user) => ({
-+              name: user?.designation === 'guest_account'
-+                ? i18n['roles.drawer.user-list.guest'][lang]
-+                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
-+              value: user.userId,
-+              canDelete: user?.designation !== 'guest_account',
-+              avatar: user?.designation === 'guest_account'
-+                ? { type: 'guest' }
-+                : user?.cachedCloudUser?.avatar
-+                  ? { ...user?.cachedCloudUser?.avatar }
-+                  : undefined,
-+            }))
-+        }
-+        initialAvailableItems={
-+          usersWithoutRole(drawerRoleSlug)
-+            .map((user) => ({
-+              name: user?.designation === 'guest_account'
-+                ? i18n['roles.drawer.user-list.guest'][lang]
-+                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
-+              value: user.userId,
-+              avatar: user?.designation === 'guest_account'
-+              ? { type: 'guest' }
-+              : user?.cachedCloudUser?.avatar
-+                ? { ...user?.cachedCloudUser?.avatar }
-+                : undefined,
-+            }))
-+        }
-+      />
-+    )
-+  }, [drawerRoleSlug, roleAssignments.length])
- 
-   return (
-     <CardGrid.Card
-@@ -209,45 +238,16 @@ function RolesList() {
+@@ -219,13 +219,13 @@ function RolesList() {
+                 },
+                 {
+                   name: i18n['roles.drawer.can-be-assigned'][lang],
+-                  label: Roles[drawerRoleSlug].assignable
++                  label: Roles[drawerRoleSlug].revocable
+                     ? i18n['roles.drawer.can-be-assigned.true'][lang]
+                     : i18n['roles.drawer.can-be-assigned.false'][lang],
+                 },
+                 {
+                   name: i18n['roles.drawer.can-be-revoked'][lang],
+-                  label: Roles[drawerRoleSlug].unassignable
++                  label: Roles[drawerRoleSlug].revocable
+                     ? i18n['roles.drawer.can-be-assigned.true'][lang]
+                     : i18n['roles.drawer.can-be-assigned.false'][lang],
+                 },
+@@ -233,7 +233,7 @@ function RolesList() {
+             />
+           </Drawer.Section>
+           <Drawer.Section title={i18n['roles.drawer.user-list-title'][lang]}>
+-            {drawerRole.assignable && drawerRole.unassignable
++            {drawerRole.assignable && drawerRole.revocable
+               ? (
                  <Form
                    onSubmit={handleUpdateRoleAssignments}
-                   controls={
--                    <Button type="submit">
-+                    <Button
-+                      type="submit"
-+                      animation={createRoleAssignmentsResult.isLoading || deleteRoleAssignmentsResult.isLoading ? 'loading' : undefined}
-+                    >
-                       {i18n['roles.drawer.user-list.save'][lang]}
-                     </Button>
-                   }
-                 >
-                   <FormField>
--                    <AddRemove
--                      name="role-assignments"
--                      availableTitle={i18n['roles.drawer.user-list.available'][lang]}
--                      initialSelectedItems={
--                        memoizedUsersWithRole
--                          .map((user) => ({
--                            name: user?.designation === 'guest_account'
--                              ? i18n['roles.drawer.user-list.guest'][lang]
--                              :  user?.cachedCloudUser?.publicName || 'Cardinal User',
--                            value: user.userId,
--                            canDelete: user?.designation !== 'guest_account',
--                            avatar: user?.designation === 'guest_account'
--                              ? { type: 'guest' }
--                              : user?.cachedCloudUser?.avatar
--                                ? { ...user?.cachedCloudUser?.avatar }
--                                : undefined,
--                          }))
--                      }
--                      initialAvailableItems={
--                        memoizedUsersWithoutRole
--                          .map((user) => ({
--                            name: user?.designation === 'guest_account'
--                              ? i18n['roles.drawer.user-list.guest'][lang]
--                              :  user?.cachedCloudUser?.publicName || 'Cardinal User',
--                            value: user.userId,
--                            avatar: user?.designation === 'guest_account'
--                            ? { type: 'guest' }
--                            : user?.cachedCloudUser?.avatar
--                              ? { ...user?.cachedCloudUser?.avatar }
--                              : undefined,
--                          }))
--                      }
--                    />
-+                    {MemoizedAddRemove}
-                   </FormField>
-                 </Form>
-               )

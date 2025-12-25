@@ -1,36 +1,79 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
-@@ -18,7 +18,7 @@ export class RBACService {
-   /**
-    * Gets all assignments for a single user.
+@@ -1,7 +1,7 @@
+ import { Injectable, Logger } from '@nestjs/common'
+ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+ import { DataSource, QueryRunner, Repository } from 'typeorm'
+-import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
++import { getRole, RoleNames } from '@cardinalapps/access-control/dist/cjs'
+ 
+ import { RoleAssignment } from './role-assignment.entity'
+ import { User } from '../user/user.entity'
+@@ -88,11 +88,16 @@ export class RBACService {
+    * Assigns roles. If the user already has the role, this quietly returns
+    * success.
     */
--  async getAndCountRoleAssignments(): Promise<RoleAssignment[]> {
-+  async getAndCountAllRoleAssignments(): Promise<RoleAssignment[]> {
-     let found = null
- 
-     try {
-@@ -34,6 +34,25 @@ export class RBACService {
-     return found
-   }
- 
-+  /**
-+   * Gets all assignments for a single role.
-+   */
-+  async getRoleAssignments(role: RoleNames): Promise<RoleAssignment[]> {
-+    try {
-+      const found = await this.roleAssignmentRepository.find({
-+        where: {
-+          role,
-+        },
-+        relations: {
-+          user: true,
-+        },
-+      })
-+      return found
-+    } catch (error) {
-+      Logger.error(error, 'RBAC')
-+    }
-+  }
+-  async assignRole(role: RoleNames, users: User[], queryRunner?: QueryRunner): Promise<RoleAssignment[]> {
++  async assignRole(roleName: RoleNames, users: User[], queryRunner?: QueryRunner): Promise<RoleAssignment[]> {
+     const assignments = []
++    const role = getRole(roleName)
 +
-   /**
-    * Gets all assignments for a single user.
++    if (!role.assignable) {
++      throw new Error(`The role "${roleName}" is not assignable.`)
++    }
+ 
+     for (const user of users) {
+-      const assignment = await this.hasRole(user, role)
++      const assignment = await this.hasRole(user, roleName)
+ 
+       // Quietly use the existing assignment
+       if (assignment) {
+@@ -106,18 +111,18 @@ export class RBACService {
+         if (queryRunner) {
+           newAssignment = await queryRunner.manager.save(RoleAssignment, {
+             user,
+-            role,
++            role: roleName,
+           })
+         } else {
+           newAssignment = await this.roleAssignmentRepository.save({
+             user,
+-            role,
++            role: roleName,
+           })
+         }
+ 
+         assignments.push(newAssignment)
+       } catch (error) {
+-        Logger.error(`Failed to assign role ${role} to user ${user.userId}`)
++        Logger.error(`Failed to assign role ${roleName} to user ${user.userId}`)
+         Logger.error(error)
+       }
+     }
+@@ -129,11 +134,16 @@ export class RBACService {
+    * Revokes roles. If the user does not have the role, this quietly continues.
+    * Returns an array of the deleted assignments.
     */
+-  async revokeRole(role: RoleNames, users: User[]): Promise<RoleAssignment[]> {
++  async revokeRole(roleName: RoleNames, users: User[]): Promise<RoleAssignment[]> {
+     const revoked: RoleAssignment[] = []
++    const role = getRole(roleName)
++
++    if (!role.revocable) {
++      throw new Error(`The role "${roleName}" is not revocable.`)
++    }
+ 
+     for (const user of users) {
+-      const assignment = await this.hasRole(user, role)
++      const assignment = await this.hasRole(user, roleName)
+ 
+       if (assignment.role === 'owner') {
+         throw new Error('Cannot unassign Owner role.')
+@@ -146,7 +156,7 @@ export class RBACService {
+             revoked.push(deleted)
+           }
+         } catch (error) {
+-          Logger.error(`Failed to revoke role ${role}`)
++          Logger.error(`Failed to revoke role ${roleName}`)
+           Logger.error(error)
+         }
+       }
