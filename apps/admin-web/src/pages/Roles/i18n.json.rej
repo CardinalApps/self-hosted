@@ -1,13 +1,29 @@
 diff a/apps/admin-web/src/pages/Roles/i18n.json b/apps/admin-web/src/pages/Roles/i18n.json	(rejected hunks)
-@@ -65,7 +65,10 @@
+@@ -59,8 +59,11 @@
+   "caps-list.title": {
+     "en": "Capabilities"
+   },
++  "caps-list.component-filter": {
++    "en": "Component"
++  },
+   "caps-list.role-filter": {
+-    "en": "Fitler by role"
++    "en": "Role"
+   },
    "caps.drawer.title": {
      "en": "Capability"
+@@ -68,7 +71,13 @@
+   "caps-list.total": {
+     "en": "{total} total capabilities"
    },
-+  "caps-list.total": {
-+    "en": "{total} total capabilities"
+-  "caps-list.filtered-count": {
++  "caps-list.only-component": {
++    "en": "{component} has {num} of {total} capabilities"
 +  },
-   "caps-list.filtered-count": {
--    "en": "Showing {num} of {total}"
-+    "en": "{role} has {num} of {total} capabilities"
++  "caps-list.only-role": {
+     "en": "{role} has {num} of {total} capabilities"
++  },
++  "caps-list.component-and-role": {
++    "en": "{role} has {num} {component} capabilities"
    }
  }

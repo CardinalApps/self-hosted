@@ -1,16 +1,159 @@
 diff a/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx b/apps/admin-web/src/pages/Roles/CapabilitiesList.tsx	(rejected hunks)
-@@ -56,9 +56,13 @@ function CapabilitiesList({
+@@ -1,5 +1,13 @@
+ import { useEffect, useState } from 'react'
+-import { ACi18n, Capabilities, Roles, hasCapability } from '@cardinalapps/access-control/src'
++import {
++  ACi18n,
++  Capabilities,
++  Roles,
++  hasCapability,
++  Components,
++  ComponentNames,
++  RoleNames,
++} from '@cardinalapps/access-control/src'
+ 
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ 
+@@ -15,28 +23,64 @@ import i18n from './i18n.json'
+ import Form from '@cardinalapps/ui/src/components/forms/Form'
+ 
+ type CapabilitiesListProps = {
+-  globallySelectedRole: string,
+-  setGloballySelectedRole: (string) => void
++  globallySelectedComponent: ComponentNames,
++  globallySelectedRole: RoleNames,
++  setGloballySelectedComponent: (ComponentNames) => void
++  setGloballySelectedRole: (RoleNames) => void
+ }
+ 
+ function CapabilitiesList({
++  globallySelectedComponent,
+   globallySelectedRole,
++  setGloballySelectedComponent,
+   setGloballySelectedRole,
+ }: CapabilitiesListProps) {
+   const { lang } = useAppSelector(settingsSelectors.current)
+   const [filteredItems, setFilteredItems] = useState([])
+ 
+-  const handleRoleChange = (role) => {
+-    setGloballySelectedRole(role)
++  const filteredString = () => {
++    if (!globallySelectedComponent && !globallySelectedRole) {
++      return i18n['caps-list.total'][lang]
++        .replace('{total}', Capabilities.length)
++    }
++
++    if (!globallySelectedComponent && globallySelectedRole) {
++      return i18n['caps-list.only-role'][lang]
++        .replace('{role}', ACi18n[`role.${globallySelectedRole}.name`]?.[lang])
++        .replace('{num}', filteredItems.length)
++        .replace('{total}', Capabilities.length)
++    }
++
++    if (globallySelectedComponent && !globallySelectedRole) {
++      return i18n['caps-list.only-component'][lang]
++        .replace('{component}', globallySelectedComponent)
++        .replace('{num}', filteredItems.length)
++        .replace('{total}', Capabilities.length)
++    }
++
++    if (globallySelectedComponent && globallySelectedRole) {
++      return i18n['caps-list.component-and-role'][lang]
++        .replace('{role}', ACi18n[`role.${globallySelectedRole}.name`]?.[lang])
++        .replace('{component}', globallySelectedComponent)
++        .replace('{num}', filteredItems.length)
++        .replace('{total}', Capabilities.length)
++    }
+   }
+ 
+   useEffect(() => {
+     const filtered = Capabilities
+       .filter((cap) => {
+         if (globallySelectedRole) {
+-          return hasCapability(cap, Roles?.[globallySelectedRole]?.capabilities)
++          return !!hasCapability(cap, Roles?.[globallySelectedRole]?.capabilities)
++        } else {
++          return true
++        }
++      })
++      .filter((cap) => {
++        if (globallySelectedComponent) {
++          return !!cap.includes(globallySelectedComponent)
+         } else {
+-          return cap
++          return true
+         }
+       })
+       .sort()
+@@ -48,38 +92,46 @@ function CapabilitiesList({
+       })
+ 
+     setFilteredItems(filtered)
+-  }, [globallySelectedRole])
++  }, [globallySelectedComponent, globallySelectedRole])
+ 
+   return (
+     <CardGrid.Card
+-      size="m"
++      size="xl"
        className={'capabilities-list'}
        header={<H5 className={'title'}>{i18n['caps-list.title'][lang]}</H5>}
-       footer={
--        i18n['caps-list.filtered-count'][lang]
-+        globallySelectedRole
-+        ? i18n['caps-list.filtered-count'][lang]
-+          .replace('{role}', ACi18n[`role.${globallySelectedRole}.name`][lang])
-           .replace('{num}', filteredItems.length)
-           .replace('{total}', Capabilities.length)
-+        : i18n['caps-list.total'][lang]
-+          .replace('{total}', Capabilities.length)
-       }
+-      footer={
+-        globallySelectedRole
+-        ? i18n['caps-list.filtered-count'][lang]
+-          .replace('{role}', ACi18n[`role.${globallySelectedRole}.name`][lang])
+-          .replace('{num}', filteredItems.length)
+-          .replace('{total}', Capabilities.length)
+-        : i18n['caps-list.total'][lang]
+-          .replace('{total}', Capabilities.length)
+-      }
++      footer={filteredString()}
        headerRight={(
          <Form>
+-          <Select
+-            name="role"
+-            size='s'
+-            multi={false}
+-            selectPlaceholder={i18n['caps-list.role-filter'][lang]}
+-            value={globallySelectedRole}
+-            options={Object.keys(Roles).map((role) => {
+-              return {
+-                label: ACi18n[`role.${role}.name`]?.[lang],
+-                value: role,
+-              }
+-            })}
+-            onChange={(selected) => handleRoleChange(selected)}
+-          />
++          <>
++            <Select
++              name="component"
++              size='s'
++              multi={false}
++              selectPlaceholder={i18n['caps-list.component-filter'][lang]}
++              value={globallySelectedComponent}
++              options={Components.map((component) => {
++                return {
++                  label: component,
++                  value: component,
++                }
++              })}
++              onChange={(selected) => setGloballySelectedComponent(selected)}
++            />
++            <Select
++              name="role"
++              size='s'
++              multi={false}
++              selectPlaceholder={i18n['caps-list.role-filter'][lang]}
++              value={globallySelectedRole}
++              options={Object.keys(Roles).map((role) => {
++                return {
++                  label: ACi18n[`role.${role}.name`]?.[lang],
++                  value: role,
++                }
++              })}
++              onChange={(selected) => setGloballySelectedRole(selected)}
++            />
++          </>
+         </Form>
+       )}
+     >

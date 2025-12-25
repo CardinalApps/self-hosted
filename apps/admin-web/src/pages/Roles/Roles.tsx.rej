@@ -1,16 +1,30 @@
 diff a/apps/admin-web/src/pages/Roles/Roles.tsx b/apps/admin-web/src/pages/Roles/Roles.tsx	(rejected hunks)
-@@ -15,12 +15,12 @@ import './styles.css'
+@@ -1,5 +1,6 @@
+ import { useState } from 'react'
+ import { useSelector } from 'react-redux'
++import { ComponentNames, RoleNames } from '@cardinalapps/access-control/src'
+ 
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+ 
+@@ -15,13 +16,19 @@ import './styles.css'
  
  function Roles() {
    const { lang } = useSelector(settingsSelectors.current)
--  const [globallySelectedRole, setGloballySelectedRole] = useState()
-+  const [globallySelectedRole, setGloballySelectedRole] = useState<string>()
+-  const [globallySelectedRole, setGloballySelectedRole] = useState<string>()
++  const [globallySelectedComponent, setGloballySelectedComponent] = useState<ComponentNames>()
++  const [globallySelectedRole, setGloballySelectedRole] = useState<RoleNames>()
  
    return (
      <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title'][lang]}>
        <CardGrid rowHeight='l'>
--        <RolesList globallySelectedRole={globallySelectedRole} setGloballySelectedRole={setGloballySelectedRole} />
-+        <RolesList />
-         <CapabilitiesList globallySelectedRole={globallySelectedRole} setGloballySelectedRole={setGloballySelectedRole} />
+         <RolesList />
+-        <CapabilitiesList globallySelectedRole={globallySelectedRole} setGloballySelectedRole={setGloballySelectedRole} />
++        <CapabilitiesList
++          globallySelectedComponent={globallySelectedComponent}
++          setGloballySelectedComponent={setGloballySelectedComponent}
++          globallySelectedRole={globallySelectedRole}
++          setGloballySelectedRole={setGloballySelectedRole}
++        />
        </CardGrid>
      </AppPage>
+   )
