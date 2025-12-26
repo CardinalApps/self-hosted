@@ -1,73 +1,44 @@
 diff a/libraries/ui/src/components/features/AppBase/AppPage.tsx b/libraries/ui/src/components/features/AppBase/AppPage.tsx	(rejected hunks)
-@@ -2,6 +2,7 @@ import { useContext, useEffect } from 'react'
+@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react'
  import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
  import { useDispatch, useSelector } from 'react-redux'
  import clsx from 'clsx'
-+import { CapabilityString } from '@cardinalapps/access-control/src'
+-import { CapabilityString } from '@cardinalapps/access-control/src'
++import { NamedCapability } from '@cardinalapps/access-control/src'
  
  import {
    layoutActions,
-@@ -12,15 +13,19 @@ import {
+@@ -13,7 +13,7 @@ import {
    SIDEBAR_MODE,
  } from '../../../store/slices/layout'
  import { RouterContext } from '../../../context/router'
-+import CurrentUserIsCapable from '../../layout/HasAccess'
-+import AccessError, { NetworkError } from '../../layout/AccessError/AccessError'
+-import CurrentUserIsCapable from '../../layout/HasAccess'
++import HasCapabilities from '../../layout/HasCapabilities'
+ import AccessError, { NetworkError } from '../../layout/AccessError/AccessError'
  
  type AppPageProps = {
-   layout?: string,
+@@ -21,7 +21,7 @@ type AppPageProps = {
    pageTitle?: string,
    pageDocLink?: string,
    className?: string | string[],
-+  capabilities?: CapabilityString[],
+-  capabilities?: CapabilityString[],
++  capabilities?: NamedCapability[],
    loading?: boolean,
    restoreScrollPoint?: boolean,
    toolbar?: ReactNode,
-+  networkError?: NetworkError,
-   virtualLayout?: ReactNode,
-   style?: CSSProperties,
-   children?: ReactNode,
-@@ -34,10 +39,12 @@ function AppPage({
-   pageTitle,
-   pageDocLink,
-   className = [],
-+  capabilities,
-   loading = false,
-   children,
-   restoreScrollPoint = true,
-   toolbar,
-+  networkError,
-   style,
-   ...props
- }: PropsWithChildren<AppPageProps>) {
-@@ -91,12 +98,24 @@ function AppPage({
-       style={style}
-       className={clsx('app-page', className, sidebarIsCollapsed && 'sidebar-is-collapsed', loading && 'loading')}
-     >
--      {!!toolbar && (
--        <div className="page-toolbar">
--          {toolbar}
--        </div>
--      )}
--      {children}
-+      {
-+        networkError
-+          // All page-level errors, like 404's for dynamic routes
-+          ? <AccessError networkError={networkError} />
-+          : <>
-+              {!!toolbar && (
-+                <div className="page-toolbar">
-+                  {toolbar}
-+                </div>
-+              )}
-+              {capabilities
-+                ? <CurrentUserIsCapable capabilities={capabilities}>
-+                    {children}
-+                  </CurrentUserIsCapable>
-+                : children
-+              }
-+            </>
-+      }
+@@ -108,12 +108,9 @@ function AppPage({
+                   {toolbar}
+                 </div>
+               )}
+-              {capabilities
+-                ? <CurrentUserIsCapable capabilities={capabilities}>
+-                    {children}
+-                  </CurrentUserIsCapable>
+-                : children
+-              }
++              <HasCapabilities capabilities={capabilities}>
++                {children}
++              </HasCapabilities>
+             </>
+       }
      </div>
-   )
- }

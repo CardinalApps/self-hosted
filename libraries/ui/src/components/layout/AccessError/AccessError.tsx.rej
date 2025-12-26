@@ -1,0 +1,17 @@
+diff a/libraries/ui/src/components/layout/AccessError/AccessError.tsx b/libraries/ui/src/components/layout/AccessError/AccessError.tsx	(rejected hunks)
+@@ -1,5 +1,5 @@
+ import { useSelector } from 'react-redux'
+-import { CapabilityString } from '@cardinalapps/access-control/src'
++import { NamedCapability } from '@cardinalapps/access-control/src'
+ 
+ import { settingsSelectors } from '../../../store/slices/settings'
+ 
+@@ -27,7 +27,7 @@ type ErrorPageProps = {
+   code?: 403 | 404,
+   networkError?: NetworkError,
+   overrides?: StringList,
+-  capabilities?: CapabilityString[],
++  capabilities?: NamedCapability[],
+ }
+ 
+ /**
