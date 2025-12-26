@@ -1,4 +1,4 @@
-.error-page {
+.error-page, .component-error {
   width: 100%;
   height: 100%;
   display: flex;
@@ -23,5 +23,9 @@
     font-size: 14px;
     font-weight: 400;
     font-family: monospace;
+
+    p {
+      margin-bottom: 10px;
+    }
   }
 }

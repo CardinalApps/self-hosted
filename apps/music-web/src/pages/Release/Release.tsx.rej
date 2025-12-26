@@ -1,10 +1,10 @@
 diff a/apps/music-web/src/pages/Release/Release.tsx b/apps/music-web/src/pages/Release/Release.tsx	(rejected hunks)
-@@ -90,7 +90,7 @@ function ReleasePage() {
-                   return (
-                     <MusicTrack
-                       key={musicTrack.id}
--                      musicTrackId={musicTrack?.id}
-+                      musicTrackId={musicTrack?.musicTrackId}
-                       trackTitle={musicTrack?.title}
-                       releaseId={musicTrack?.release?.id}
-                       trackNumber={musicTrack.trackNumber}
+@@ -53,7 +53,7 @@ function ReleasePage() {
+   }, [data?.tracks])
+ 
+   if (error) {
+-    return <ErrorPage error={error as ErrorObject} />
++    return <ErrorPage networkError={error as ErrorObject} />
+   }
+ 
+   return (

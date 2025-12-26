@@ -9,6 +9,8 @@ import i18n from './i18n'
 
 import './ErrorPage.css'
 
+type ErrorLevels = 'page' | 'component'
+
 type StringList = {
   name?: string,
   code?: number,
@@ -26,12 +28,14 @@ export type ErrorObject = {
 }
 
 type ErrorPageProps = {
-  error?: ErrorObject,
+  level?: ErrorLevels,
+  networkError?: ErrorObject,
   overrides?: StringList,
 }
 
 const ErrorPage = ({
-  error,
+  level = 'page',
+  networkError: error,
   overrides,
 }: ErrorPageProps) => {
   const { lang } = useSelector(settingsSelectors.current)
@@ -53,19 +57,37 @@ const ErrorPage = ({
 
   const strings = getStrings()
 
-  return (
-    <AppPage
-      className="error-page"
-      layout={PAGE_LAYOUT.fixed}
-    >
+  const wrapper = (content) => {
+    if (level === 'page') {
+      return (
+        <AppPage
+          className="error-page"
+          layout={PAGE_LAYOUT.fixed}
+        >
+          {content}
+        </AppPage>
+      )
+    } else if (level === 'component') {
+      return (
+        <div
+          className="component-error"
+        >
+          {content}
+        </div>
+      )
+    }
+  }
+
+  return wrapper(
+    <>
       <div className="error-information">
         <p className="error-name">
           {!!strings?.code && <span className="error-code">[{strings?.code}] </span>}
           {strings?.name}
         </p>
-        {!!strings?.message && <div className="error-message">{strings?.message}</div>}
+        {!!strings?.message && <div className="error-message" dangerouslySetInnerHTML={{ __html: strings?.message }} />}
       </div>
-    </AppPage>
+    </>,
   )
 }
 
