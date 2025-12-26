@@ -1,83 +1,63 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -6,15 +6,18 @@
-  * Resources, Features, Applications, and Services are all categorized as
-  * components within the Access Control layer.
+@@ -69,7 +69,7 @@ export const Capabilities = [
+ /**
+  * A type that includes all capabilities.
   */
--export type Components =
--    'Users'
--  | 'AdminApp'
--  | 'MusicApp'
--  | 'MusicTracks'
--  | 'MusicReleases'
--  | 'MusicArtists'
--  | 'PhotosApp'
--  | 'CinemaApp'
-+export const Components = [
-+  'AdminApp',
-+  'MusicApp',
-+  'MusicTracks',
-+  'MusicReleases',
-+  'MusicArtists',
-+  'PhotosApp',
-+  'CinemaApp',
-+  'Users',
-+] as const
-+
-+export type ComponentNames = typeof Components[number]
+-export type CapabilityString = typeof Capabilities[number]
++export type NamedCapability = typeof Capabilities[number]
  
  /**
-  * Master list of all capabilities.
-@@ -74,18 +77,21 @@ export type CapabilityString = typeof Capabilities[number]
-  * selecting broader ranges of capabilities.
-  * 
-  *    `*.*` - Matches all components and all actions, granting all current and
-- *    future capabilities. Reserved for Owner account.
-+ *    future capabilities.
-  * 
-  *    `MusicApp.*` - Matches all actions in the MusicApp component, granting all
-  *    current and future MusicApp capabilities.
-  * 
-- *    `*.Login` - Matches only Login actions on all current and future
-+ *    `*.Login` - Matches only the Login action on all current and future
-  *    components.
-+ * 
-+ *    `CinemaApp.Login` - Matches only the Login action on the CinemaApp
-+ *    component.
+  * Capability Assignments are stored as an array of capability strings. The
+@@ -89,7 +89,7 @@ export type CapabilityString = typeof Capabilities[number]
+  *    component.
   */
  export type CapabilityAssignment =
-   CapabilityString
+-  CapabilityString
++  NamedCapability
    | '*.*'
--  | `${Components}.*`
-+  | `${ComponentNames}.*`
+   | `${ComponentNames}.*`
    | `*.${string}`
+@@ -140,10 +140,11 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []):
+ }
  
- export type CapabilityAssignments = CapabilityAssignment[]
-@@ -121,7 +127,7 @@ const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean =>
  /**
-  * Validate the syntax of an array of capability assignments.
-  */
--const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments): boolean => {
-+const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []): boolean => {
-   let allAreValid = true
- 
-   for (const capability of capabilityList) {
-@@ -138,7 +144,7 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments): bool
+- * Checks whether the capability assignment exists in the list of capabilities.
++ * Checks whether the required capability is satisfied by any of the given
++ * capability assignments.
   */
  export function hasCapability(
-   requiredCapability: CapabilityString,
--  assignments: CapabilityAssignments,
-+  assignments: CapabilityAssignments = [],
+-  requiredCapability: CapabilityString,
++  requiredCapability: NamedCapability,
+   assignments: CapabilityAssignments = [],
  ) {
    if (!validateCapabilitySyntax(requiredCapability)) {
-     return false
-@@ -148,6 +154,10 @@ export function hasCapability(
-     return false
-   }
+@@ -186,3 +187,29 @@ export function hasCapability(
  
-+  if (!assignments.length) {
+   return false
+ }
++
++/**
++ * Like `hasCapability()` but for more than 1 capability. Returns true if ALL
++ * capabilities are satisfied.
++ */
++export function hasCapabilities(
++  requiredCapabilities: NamedCapability[],
++  assignments: CapabilityAssignments = [],
++) {
++  if (!requiredCapabilities) {
++    return true
++  }
++
++  if (!Array.isArray(requiredCapabilities) || !requiredCapabilities.length) {
 +    return false
 +  }
 +
-   const [requiredComponent, requiredAction] = requiredCapability.split('.')
- 
-   for (const assignment of assignments) {
++  const allCapabilitiesAreSatisfied = requiredCapabilities.every((requiredCapability) => {
++    const satisfiedByRole = assignments?.find((assignment: CapabilityAssignment) => {
++      return !!hasCapability(requiredCapability, [assignment])
++    })
++    return !!satisfiedByRole
++  })
++
++  return allCapabilitiesAreSatisfied
++}

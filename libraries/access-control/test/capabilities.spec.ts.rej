@@ -1,8 +1,33 @@
 diff a/libraries/access-control/test/capabilities.spec.ts b/libraries/access-control/test/capabilities.spec.ts	(rejected hunks)
-@@ -1,4 +1,5 @@
--// @ts-nocheck File contains intentional type mismatches.
-+// @ts-nocheck File contains intentional type mismatches to check against
-+// runtime role tampering.
+@@ -7,7 +7,7 @@ import {
+   describe,
+ } from '@jest/globals'
  
- import {
-   test,
+-import { CapabilityAssignments, hasCapability } from '../src'
++import { CapabilityAssignments, hasCapability, hasCapabilities } from '../src'
+ 
+ describe('hasCapability()', () => {
+   const userWithValidStaticAssignments: CapabilityAssignments = [
+@@ -87,3 +87,22 @@ describe('hasCapability()', () => {
+     expect(hasCapability('.', [])).toEqual(false)
+   })
+ })
++
++describe('hasAllCapabilities()', () => {
++  const userWithWildcardAssignments: CapabilityAssignments = [
++    'AdminApp.*',
++    'AdminApp.Login',
++    '*.Login',
++    'MusicReleases.List',
++    'MusicArtists.Read',
++    'MusicArtists.List',
++  ]
++
++  test('Multi', () => {
++    expect(hasCapabilities(['MusicArtists.Read', 'AdminApp.Login'], userWithWildcardAssignments)).toEqual(true)
++    expect(hasCapabilities(['AdminApp.Login', 'MusicArtists.List'], userWithWildcardAssignments)).toEqual(true)
++
++    expect(hasCapabilities(['AdminApp.Login', 'MusicArtists.List', 'MusicReleases.invalid'], userWithWildcardAssignments)).toEqual(false)
++    expect(hasCapabilities(['CinemaApp.List'], userWithWildcardAssignments)).toEqual(false)
++  })
++})
