@@ -1,10 +1,17 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -61,7 +61,7 @@ function Users() {
+@@ -163,7 +163,14 @@ function Users() {
+   }, [users])
  
-   const roleCol = (user: UserType) => {
-     return (
--      <Table.Col key="status">
-+      <Table.Col key="role">
-         <span className="capitalize">
-           {user?.roles.length === 1
-             ? user?.roles?.[0]?.role
+   return (
+-    <AppPage className="users-page" layout={PAGE_LAYOUT.standard} pageTitle={i18n['users.title'][lang]}>
++    <AppPage
++      className="users-page"
++      layout={PAGE_LAYOUT.standard}
++      pageTitle={i18n['users.title'][lang]}
++      capabilities={[
++        'Users.List',
++      ]}
++    >
+       <CardGrid>
+         {
+         /*

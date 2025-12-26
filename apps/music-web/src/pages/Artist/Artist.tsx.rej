@@ -1,10 +1,38 @@
 diff a/apps/music-web/src/pages/Artist/Artist.tsx b/apps/music-web/src/pages/Artist/Artist.tsx	(rejected hunks)
-@@ -24,7 +24,7 @@ function ArtistPage() {
+@@ -1,17 +1,16 @@
+ import { useContext } from 'react'
+ 
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+-
++import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError/AccessError'
+ import { RouterContext } from '@cardinalapps/ui/src/context/router'
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ import { useGetMusicArtistQuery } from '@cardinalapps/ui/src/store/apis/musicArtists'
+ import H1 from '@cardinalapps/ui/src/components/typography/H1'
+-import ErrorPage, { ErrorObject } from '@cardinalapps/ui/src/components/layout/ErrorPage/ErrorPage'
++import ArtistReleases from './ArtistReleases'
+ 
+ import i18n from './i18n.json'
+ 
+ import './styles.css'
+-import ArtistReleases from './ArtistReleases'
+ 
+ function ArtistPage() {
+   const { useParams } = useContext(RouterContext)
+@@ -23,15 +22,12 @@ function ArtistPage() {
+     error,
    } = useGetMusicArtistQuery({ id: artistId })
  
-   if (error) {
--    return <ErrorPage error={error as ErrorObject} />
-+    return <ErrorPage networkError={error as ErrorObject} />
-   }
- 
+-  if (error) {
+-    return <ErrorPage networkError={error as ErrorObject} />
+-  }
+-
    return (
+     <AppPage
+       className="music-artist-page"
+       layout={PAGE_LAYOUT.standard}
+       pageTitle={i18n['music-artist.title']['en']}
++      networkError={error as NetworkError}
+       loading={isLoading}
+     >
+       <H1 className="release-name">{data?.name}</H1>

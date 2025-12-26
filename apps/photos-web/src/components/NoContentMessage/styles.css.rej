@@ -1,0 +1,10 @@
+diff a/apps/photos-web/src/components/NoContentMessage/styles.css b/apps/photos-web/src/components/NoContentMessage/styles.css	(rejected hunks)
+@@ -21,7 +21,7 @@
+     width: 100%;
+     font-size: 16px;
+     font-weight: 600;
+-    line-height: 1.4em;
++    line-height: 1.6em;
+     color: var(--text-color-2);
+ 
+     a, a:link, a:visited {

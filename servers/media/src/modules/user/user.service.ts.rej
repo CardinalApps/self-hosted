@@ -1,19 +1,26 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -309,13 +309,16 @@ export class UserService {
-    * Returns all users according to the query.
+@@ -271,7 +271,15 @@ export class UserService {
     */
-   async query(getUsersDto: GetUsersDto): Promise<[User[], number]> {
--    const { take, skip, order, sort } = getUsersDto
-+    const { take, skip, order, sort, roles: roleAssignments } = getUsersDto
-     return await this.userRepository.findAndCount({
-       take,
-       skip,
-       order: {
-         [sort]: order,
-       },
-+      relations: {
-+        ...(roleAssignments ? { roles: true } : {}),
+   async getUserByLocalJWT(localJWT: string): Promise<User | null> {
+     const payload = getJWTPayload(localJWT) as LocalUserJWTPayload
+-    return await this.userRepository.findOneBy({ userId: payload?.uid })
++    const a = await this.userRepository.findOne({
++      where: {
++        userId: payload?.uid,
 +      },
-     })
++      relations: {
++        roles: true,
++      },
++    })
++    return a
    }
  
+   /**
+@@ -386,6 +394,7 @@ export class UserService {
+       cardinalId: userObject.cardinalId,
+       cachedCloudUser: userObject.cachedCloudUser,
+       cachedCloudUserAt: userObject.cachedCloudUserAt,
++      roles: userObject.roles,
+     }
+   }
+ }

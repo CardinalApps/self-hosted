@@ -1,13 +1,16 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -405,6 +405,11 @@
-     }
+@@ -326,6 +326,14 @@
+     opacity: 0;
    }
  
-+  .audio-player-list {
-+    position: relative;
-+    min-height: 146px;
++  > .access-error {
++    position: absolute;
++    top: 0;
++    left: 0;
++    right: 0;
++    bottom: 0;
 +  }
 +
-   @media (max-width: 768px) {
-     position: fixed;
-     right: 90px;
+   /* &.sidebar-is-collapsed {
+     height: 100%;
+     padding-top: 40px;

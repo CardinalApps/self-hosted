@@ -1,23 +1,21 @@
 diff a/servers/media/src/modules/rbac/rbac.controller.ts b/servers/media/src/modules/rbac/rbac.controller.ts	(rejected hunks)
-@@ -43,8 +43,19 @@ export class RBACController {
-   @UseGuards(AuthGuard)
-   @ApiOperation({ summary: "Get all role assignments." })
-   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
--  async getRoleAssignments(): Promise<RoleAssignment[]> {
--    const assignments = await this.rbacService.getAndCountAllRoleAssignments()
-+  async getRoleAssignments(@Query('userId') userId?: string): Promise<RoleAssignment[]> {
-+    let assignments = []
-+
-+    if (userId) {
-+      const user = await this.userService.getUserByLocalId(userId)
-+      if (!user) {
-+        throw new BadRequestException('Invalid user ID')
-+      }
-+      assignments = await this.rbacService.getAndCountAllRoleAssignments(user)
-+    } else {
-+      assignments = await this.rbacService.getAndCountAllRoleAssignments()
+@@ -15,7 +15,7 @@ import {
+   ApiSecurity,
+   ApiOperation,
+ } from '@nestjs/swagger'
+-import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
++import { getRole, RoleNames } from '@cardinalapps/access-control/dist/cjs'
+ 
+ import { AuthGuard } from '../../guards/auth.guard'
+ import { ApiSecurityTypes } from '../../guards/types'
+@@ -79,6 +79,10 @@ export class RBACController {
+       userEntities.push(entity)
+     }
+ 
++    if (!getRole(role).assignable) {
++      throw new Error(`The role "${role}" is not assignable.`)
 +    }
 +
-     return assignments
-   }
+     const assignments = await this.rbacService.assignRole(role, userEntities)
  
+     if (!Array.isArray(assignments)) {

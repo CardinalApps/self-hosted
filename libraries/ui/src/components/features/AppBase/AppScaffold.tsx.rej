@@ -1,19 +1,20 @@
 diff a/libraries/ui/src/components/features/AppBase/AppScaffold.tsx b/libraries/ui/src/components/features/AppBase/AppScaffold.tsx	(rejected hunks)
-@@ -8,7 +8,7 @@ import DocLink from '../../interaction/DocLink'
- import SidebarNav from '../../interaction/SidebarNav'
- import { GlobalAudioPlayer } from '../AudioPlayer'
- import { DirectoryTreeSidebarPortal, DirectoryTreeMobileButton } from '../../interaction/DirectoryTree'
--import H2 from '../../typography/H1'
-+import H2 from '../../typography/H2'
- 
+@@ -13,7 +13,7 @@ import H2 from '../../typography/H2'
  import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
  import { SCROLL_RESTORATION_KEYS, PAGE_LAYOUT } from '../../../store/slices/layout'
-@@ -97,7 +97,7 @@ function AppScaffold({
-             <section className={clsx('page-title-bar')}>
-               <Columns>
-                 <Column>
--                  {!!pageTitle && <H2>{pageTitle}</H2>}
-+                  {!!pageTitle && <H2 className="page-title">{pageTitle}</H2>}
-                 </Column>
-                 <Column>
-                   {!!pageDocLink && <DocLink href={pageDocLink} />}
+ import { RouterContext } from '../../../context/router'
+-import ErrorPage from '../../layout/ErrorPage'
++import AccessError from '../../layout/AccessError'
+ 
+ export type SidebarOptions = {
+   overflow: boolean,
+@@ -107,7 +107,8 @@ function AppScaffold({
+           )}
+           <Routes>
+             {privateScaffoldRoutes ? privateScaffoldRoutes : null}
+-            <Route path="*" element={<ErrorPage overrides={{ code: 404 }} />} />
++            {/* Top-level page error handling */}
++            <Route path="*" element={<AccessError code={404} />} />
+           </Routes>
+         </main>
+       </section>

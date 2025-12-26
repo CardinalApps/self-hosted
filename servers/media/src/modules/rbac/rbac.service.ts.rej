@@ -1,26 +1,13 @@
 diff a/servers/media/src/modules/rbac/rbac.service.ts b/servers/media/src/modules/rbac/rbac.service.ts	(rejected hunks)
-@@ -16,20 +16,21 @@ export class RBACService {
-   ) {}
- 
-   /**
--   * Gets all assignments for a single user.
-+   * Gets all assignments for all or one user.
+@@ -91,11 +91,6 @@ export class RBACService {
     */
--  async getAndCountAllRoleAssignments(): Promise<RoleAssignment[]> {
-+  async getAndCountAllRoleAssignments(user?: User): Promise<RoleAssignment[]> {
-     let found = null
+   async assignRole(roleName: RoleNames, users: User[], queryRunner?: QueryRunner): Promise<RoleAssignment[]> {
+     const assignments = []
+-    const role = getRole(roleName)
+-
+-    if (!role.assignable) {
+-      throw new Error(`The role "${roleName}" is not assignable.`)
+-    }
  
-     try {
-       found = await this.roleAssignmentRepository.findAndCount({
-+        ...(user ? { where: { user: { userId: user.userId } } } : {}),
-         relations: {
-           user: true,
-         },
-       })
-     } catch (error) {
-       Logger.error(error, 'RBAC')
--  }
-+    }
- 
-     return found
-   }
+     for (const user of users) {
+       const assignment = await this.hasRole(user, roleName)
