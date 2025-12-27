@@ -91,8 +91,8 @@ export const ACi18n: StringList = {
   },
   "role.administrator.description": {
     "en": `
-      <p>The Administrator role is a powerful role with the same capabilities as the Owner role.</p>
-      <p>It is automatically assigned to the Guest Account, allowing users to access all of their server's features without needing to create a Cardinal account. It cannot be revoked from the Guest Account.</p>
+      <p>The Administrator role is a powerful role with the same capabilities as the Owner role, but it can be assigned to multiple users.</p>
+      <p>It is automatically assigned to the Guest Account, allowing unauthenticated users to access all of their server's features without needing to create a Cardinal account. It cannot be revoked from the Guest Account.</p>
     `,
   },
 

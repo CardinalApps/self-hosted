@@ -1,63 +1,39 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -69,7 +69,7 @@ export const Capabilities = [
- /**
-  * A type that includes all capabilities.
+@@ -31,11 +31,6 @@ export type ComponentNames = typeof Components[number]
+  * any arbitrary string except an asterisk (*).
   */
--export type CapabilityString = typeof Capabilities[number]
-+export type NamedCapability = typeof Capabilities[number]
+ export const Capabilities = [
+-  /**
+-   * Users
+-   */
+-  'Users.List',
+-
+   /**
+    * Admin
+    */
+@@ -47,13 +42,10 @@ export const Capabilities = [
+   'MusicApp.Login',
+ 
+   'MusicTracks.Read',
+-  'MusicTracks.List',
+ 
+   'MusicReleases.Read',
+-  'MusicReleases.List',
+ 
+   'MusicArtists.Read',
+-  'MusicArtists.List',
+ 
+   /**
+    * Photos
+@@ -64,6 +56,11 @@ export const Capabilities = [
+    * Cinema
+    */
+   'CinemaApp.Login',
++
++  /**
++   * Users
++   */
++  'Users.List',
+ ] as const
  
  /**
-  * Capability Assignments are stored as an array of capability strings. The
-@@ -89,7 +89,7 @@ export type CapabilityString = typeof Capabilities[number]
-  *    component.
-  */
- export type CapabilityAssignment =
--  CapabilityString
-+  NamedCapability
-   | '*.*'
-   | `${ComponentNames}.*`
-   | `*.${string}`
-@@ -140,10 +140,11 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []):
- }
- 
- /**
-- * Checks whether the capability assignment exists in the list of capabilities.
-+ * Checks whether the required capability is satisfied by any of the given
-+ * capability assignments.
-  */
- export function hasCapability(
--  requiredCapability: CapabilityString,
-+  requiredCapability: NamedCapability,
-   assignments: CapabilityAssignments = [],
- ) {
-   if (!validateCapabilitySyntax(requiredCapability)) {
-@@ -186,3 +187,29 @@ export function hasCapability(
- 
-   return false
- }
-+
-+/**
-+ * Like `hasCapability()` but for more than 1 capability. Returns true if ALL
-+ * capabilities are satisfied.
-+ */
-+export function hasCapabilities(
-+  requiredCapabilities: NamedCapability[],
-+  assignments: CapabilityAssignments = [],
-+) {
-+  if (!requiredCapabilities) {
-+    return true
-+  }
-+
-+  if (!Array.isArray(requiredCapabilities) || !requiredCapabilities.length) {
-+    return false
-+  }
-+
-+  const allCapabilitiesAreSatisfied = requiredCapabilities.every((requiredCapability) => {
-+    const satisfiedByRole = assignments?.find((assignment: CapabilityAssignment) => {
-+      return !!hasCapability(requiredCapability, [assignment])
-+    })
-+    return !!satisfiedByRole
-+  })
-+
-+  return allCapabilitiesAreSatisfied
-+}
