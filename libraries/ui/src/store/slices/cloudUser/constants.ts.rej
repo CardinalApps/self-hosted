@@ -1,0 +1,7 @@
+diff a/libraries/ui/src/store/slices/cloudUser/constants.ts b/libraries/ui/src/store/slices/cloudUser/constants.ts	(rejected hunks)
+@@ -1,4 +1,4 @@
+-import { CLOUD_AUTH_HOST } from '../../../../env.js'
++import { CLOUD_AUTH_HOST } from '../../../../env'
+ 
+ export const STORE_KEY = 'cloudUser'
+ 

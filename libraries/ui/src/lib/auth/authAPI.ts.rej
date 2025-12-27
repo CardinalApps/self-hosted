@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/lib/auth/authAPI.ts b/libraries/ui/src/lib/auth/authAPI.ts	(rejected hunks)
+@@ -1,6 +1,6 @@
+-import { JWT_TYPE, authorizedFetchHeaders } from './jwt.js'
++import { JWT_TYPE, authorizedFetchHeaders } from './jwt'
+ 
+-import { CLOUD_AUTH_HOST } from '../../../env.js'
++import { CLOUD_AUTH_HOST } from '../../../env'
+ 
+ const defaults = {
+   body: {},
