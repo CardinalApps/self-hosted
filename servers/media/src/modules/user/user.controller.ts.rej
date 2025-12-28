@@ -1,66 +1,148 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -43,7 +43,7 @@ import { CapabilitiesGuard } from '../../guards/capabilities.guard'
+@@ -15,12 +15,10 @@ import {
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiHeader,
+   ApiSecurity,
+-  ApiOperation,
+-  ApiUnauthorizedResponse,
+   ApiMethodNotAllowedResponse,
+ } from '@nestjs/swagger'
++import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
+ 
+ import { UserService } from './user.service'
+ import { LocalUserService } from './local-user.service'
+@@ -30,6 +28,7 @@ import { CreateUser } from './dtos/CreateUser.dto'
+ import { UpdateUserDto } from './dtos/UpdateUser.dto'
+ import { GetUserResponse } from './dtos/GetUserResponse.dto'
+ import { CurrentUser } from '../../decorators/CurrentUser.decorator'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ import { AuthGuard } from '../../guards/auth.guard'
+ import { ApiSecurityTypes } from '../../guards/types'
+@@ -37,21 +36,24 @@ import { getJWTFromHeaders } from '../../utils/jwt'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
+ import { SeatsService } from './seats.service'
+ import { Designations } from './types'
+-import { Capabilities } from '../../decorators/Capabilities.decorator'
+ import { CapabilitiesGuard } from '../../guards/capabilities.guard'
+ 
++class SecureController {
++  protected capabilities: Record<string, NamedCapability[]>
++}
++
  @Controller()
  @UseGuards(AuthGuard)
  @UseGuards(CapabilitiesGuard)
--@ApiTags('User')
-+@ApiTags('Users')
+ @ApiTags('Users')
  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
- export class UserController {
+-export class UserController {
++export class UserController extends SecureController {
    constructor(
-@@ -60,10 +60,10 @@ export class UserController {
+     private readonly userService: UserService,
+     private readonly localUserService: LocalUserService,
+     private readonly cloudUserService: CloudUserService,
+     private readonly seatsService: SeatsService,
+-  ) {}
++  ) { super() }
+ 
+   /**
+    * Returns information about the currently logged in user. Local online
+@@ -60,10 +62,11 @@ export class UserController {
     * This may trigger a refresh of the cached cloud user data.
     */
    @Get('/user')
--  @Capabilities(['Users.List'])
-+  @Capabilities(['Users.Read'])
-   @ApiOperation({ summary: 'Get the currently logged in local user.' })
-   @ApiHeader({ name: 'CardinalTolkien' })
--  @ApiUnauthorizedResponse({ description: 'Returns an Unauthorized error if there is an issue with the token.' })
-+  @ApiUnauthorizedResponse()
+-  @Capabilities(['Users.Read'])
+-  @ApiOperation({ summary: 'Get the currently logged in local user.' })
+-  @ApiHeader({ name: 'CardinalTolkien' })
+-  @ApiUnauthorizedResponse()
++  @StandardEndpoint({
++    summary: 'Get the currently logged in user.',
++    capabilities: ['Users.Read'],
++    cloudUserHeader: true,
++  })
    async getCurrentUser(@Headers() headers): Promise<GetUserResponse> {
      const localUserJWT = getJWTFromHeaders(headers)
  
-@@ -102,6 +102,7 @@ export class UserController {
+@@ -102,8 +105,10 @@ export class UserController {
     * Returns the user for the given local user ID.
     */
    @Get('/user/:id')
-+  @Capabilities(['Users.Read'])
-   @ApiOperation({ summary: 'Get a specific user.' })
+-  @Capabilities(['Users.Read'])
+-  @ApiOperation({ summary: 'Get a specific user.' })
++  @StandardEndpoint({
++    summary: 'Get a specific user.',
++    capabilities: ['Users.Read'],
++  })
    async getUser(@Param('id') id: string): Promise<User | Record<never, never>> {
      return await this.userService.getUserByLocalId(id)
-@@ -111,7 +112,7 @@ export class UserController {
+   }
+@@ -112,8 +117,10 @@ export class UserController {
     * Returns all users in this server.
     */
    @Get('/users')
--  @Capabilities(['Users.List'])
-+  @Capabilities(['Users.Read'])
-   @ApiOperation({ summary: 'Get all users in this server.' })
+-  @Capabilities(['Users.Read'])
+-  @ApiOperation({ summary: 'Get all users in this server.' })
++  @StandardEndpoint({
++    summary: 'Get all users in this server.',
++    capabilities: ['Users.Read'],
++  })
    async getUsers(@Query() query: GetUsersDto): Promise<[Partial<User>[], number]> {
      return await this.userService.query(query)
-@@ -121,6 +122,7 @@ export class UserController {
+   }
+@@ -122,7 +129,10 @@ export class UserController {
     * Returns the server owner, if there is one.
     */
    @Get('/users/owner')
-+  @Capabilities(['Users.Read'])
+-  @Capabilities(['Users.Read'])
++  @StandardEndpoint({
++    summary: 'Returns the server owner, if there is one.',
++    capabilities: ['Users.Read'],
++  })
    async getOwner(): Promise<Partial<User> | null> {
      return await this.userService.getServerOwner()
    }
-@@ -129,6 +131,7 @@ export class UserController {
+@@ -131,8 +141,10 @@ export class UserController {
     * Returns all active users for this server.
     */
    @Get('/users/active')
-+  @Capabilities(['Users.Read'])
-   @ApiOperation({ summary: 'Get active Media Server users.' })
+-  @Capabilities(['Users.Read'])
+-  @ApiOperation({ summary: 'Get active Media Server users.' })
++  @StandardEndpoint({
++    summary: 'Get active Media Server users.',
++    capabilities: ['Users.Read'],
++  })
    async getActiveUsers(): Promise<User[]> {
      return await this.userService.getActiveUsers()
-@@ -164,9 +167,6 @@ export class UserController {
+   }
+@@ -151,7 +163,10 @@ export class UserController {
+    * Account".
+    */
+   @Post('/user')
+-  @ApiOperation({ summary: 'Create a new local Media Server user.' })
++  @StandardEndpoint({
++    summary: 'Create a new local Media Server user.',
++    capabilities: ['Users.Create'],
++  })
+   @ApiMethodNotAllowedResponse({ description: 'The server will refuse to create more than 1 `online` account and will refuse to create `offline` accounts.' })
+   async createLocalUser(@Body() createUserDto: CreateUser): Promise<User> {
+     // TODO offline accounts feature
+@@ -167,8 +182,16 @@ export class UserController {
      return await this.userService.createUser({ dto: createUserDto })
    }
  
--  /**
--   * FIXME this endpoint needs proper RBAC
--   */
++  /**
++   * TODO split this into two separate endpoints, one for updating your own
++   * user, and one for updating other users. The endpoint for yourself should
++   * require Users.UpdateSelf and the one for other users should require
++   * Users.Update.
++   */
    @Patch('/user/:id')
-   @ApiOperation({ summary: 'Update a user.' })
+-  @ApiOperation({ summary: 'Update a user.' })
++  @StandardEndpoint({
++    summary: 'Update a user.',
++  })
    async updateUser(
+     @Param('id') id,
+     @Body() updateUserDto: UpdateUserDto,

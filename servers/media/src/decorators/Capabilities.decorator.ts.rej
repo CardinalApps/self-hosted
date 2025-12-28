@@ -1,0 +1,11 @@
+diff a/servers/media/src/decorators/Capabilities.decorator.ts b/servers/media/src/decorators/Capabilities.decorator.ts	(rejected hunks)
+@@ -1,4 +1,8 @@
+-import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
+ import { Reflector } from '@nestjs/core'
++import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
+ 
++/**
++ * Used to set which capabilities are required on the endpoint. They will be
++ * valided by the CapabilitiesGuard.
++ */
+ export const Capabilities = Reflector.createDecorator<NamedCapability[]>()
