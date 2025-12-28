@@ -1,10 +1,108 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -181,7 +181,7 @@ export class UserController {
-       throw new MethodNotAllowedException('Cannot create new online account because this server has already been claimed by a Cardinal account.')
-     }
+@@ -37,8 +37,14 @@ import { getJWTFromHeaders } from '../../utils/jwt'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
+ import { SeatsService } from './seats.service'
+ import { Designations } from './types'
++import { Capabilities } from '../../decorators/Capabilities.decorator'
++import { CapabilitiesGuard } from '../../guards/capabilities.guard'
  
--    return await this.userService.createUser(createUserDto)
-+    return await this.userService.createUser({ dto: createUserDto })
+ @Controller()
++@UseGuards(AuthGuard)
++@UseGuards(CapabilitiesGuard)
++@ApiTags('User')
++@ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+ export class UserController {
+   constructor(
+     private readonly userService: UserService,
+@@ -54,12 +60,10 @@ export class UserController {
+    * This may trigger a refresh of the cached cloud user data.
+    */
+   @Get('/user')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
++  @Capabilities(['Users.List'])
+   @ApiOperation({ summary: 'Get the currently logged in local user.' })
+   @ApiHeader({ name: 'CardinalTolkien' })
+   @ApiUnauthorizedResponse({ description: 'Returns an Unauthorized error if there is an issue with the token.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getCurrentUser(@Headers() headers): Promise<GetUserResponse> {
+     const localUserJWT = getJWTFromHeaders(headers)
+ 
+@@ -98,10 +102,7 @@ export class UserController {
+    * Returns the user for the given local user ID.
+    */
+   @Get('/user/:id')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
+   @ApiOperation({ summary: 'Get a specific user.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getUser(@Param('id') id: string): Promise<User | Record<never, never>> {
+     return await this.userService.getUserByLocalId(id)
+   }
+@@ -110,10 +111,8 @@ export class UserController {
+    * Returns all users in this server.
+    */
+   @Get('/users')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
++  @Capabilities(['Users.List'])
+   @ApiOperation({ summary: 'Get all users in this server.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getUsers(@Query() query: GetUsersDto): Promise<[Partial<User>[], number]> {
+     return await this.userService.query(query)
+   }
+@@ -122,31 +121,15 @@ export class UserController {
+    * Returns the server owner, if there is one.
+    */
+   @Get('/users/owner')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getOwner(): Promise<Partial<User> | null> {
+     return await this.userService.getServerOwner()
    }
  
+-  /**
+-   * Returns a curated list of sanitized user objects meant to be shown on the login screen.
+-   */
+-  @Get('/users/public')
+-  @ApiTags('User')
+-  @ApiOperation({ summary: 'Get all users in this server.' })
+-  async getPublicUsers(): Promise<Partial<User>[]> {
+-    return await this.userService.getUsersForPublic()
+-  }
+-
    /**
+    * Returns all active users for this server.
+    */
+   @Get('/users/active')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
+   @ApiOperation({ summary: 'Get active Media Server users.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getActiveUsers(): Promise<User[]> {
+     return await this.userService.getActiveUsers()
+   }
+@@ -165,11 +148,8 @@ export class UserController {
+    * Account".
+    */
+   @Post('/user')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
+   @ApiOperation({ summary: 'Create a new local Media Server user.' })
+   @ApiMethodNotAllowedResponse({ description: 'The server will refuse to create more than 1 `online` account and will refuse to create `offline` accounts.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async createLocalUser(@Body() createUserDto: CreateUser): Promise<User> {
+     // TODO offline accounts feature
+     if (!createUserDto?.cardinalJWT) {
+@@ -188,10 +168,7 @@ export class UserController {
+    * FIXME this endpoint needs proper RBAC
+    */
+   @Patch('/user/:id')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('User')
+   @ApiOperation({ summary: 'Update a user.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async updateUser(
+     @Param('id') id,
+     @Body() updateUserDto: UpdateUserDto,
