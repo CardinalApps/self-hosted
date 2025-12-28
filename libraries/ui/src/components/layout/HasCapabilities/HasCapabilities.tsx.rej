@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/layout/HasCapabilities/HasCapabilities.tsx b/libraries/ui/src/components/layout/HasCapabilities/HasCapabilities.tsx	(rejected hunks)
+@@ -15,7 +15,7 @@ type HasAccessProps = {
+  * 
+  * @param capabilities - An array of required capabilities.
+  * 
+- *    - `['Users.List', 'AdminApp.Login']` - ALL capabilities must be satsfied
++ *    - `['Users.Read', 'AdminApp.Login']` - ALL capabilities must be satsfied
+  *      by the current users roles to be granted access to the content.
+  * 
+  *    - `[]` - An empty array means that a capability check is required, but the

@@ -1,0 +1,21 @@
+diff a/servers/media/src/utils/openApi.ts b/servers/media/src/utils/openApi.ts	(rejected hunks)
+@@ -17,19 +17,6 @@ export const setupOpenApiDoc = () => {
+       <p>None of the deletion endpoints in this API will delete your source media files. The only files that Cardinal will delete are the ones from its own cache. Rest assured that you can delete things from your database and your original files will stay safe.</p>
+     `)
+     .setVersion('')
+-
+-    // One tag per module
+-    .addTag('General')
+-    .addTag('Events')
+-    .addTag('Authentication')
+-    .addTag('Settings')
+-    .addTag('User')
+-    .addTag('Indexing')
+-    .addTag('Jobs')
+-    .addTag('Libraries')
+-    .addTag('Music')
+-    .addTag('Photos')
+-    .addTag('Photo Albums')
+     .addBearerAuth(
+       {
+         name: 'Authorization',

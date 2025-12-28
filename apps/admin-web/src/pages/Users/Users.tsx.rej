@@ -1,18 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -167,14 +167,12 @@ function Users() {
+@@ -167,7 +167,7 @@ function Users() {
        className="users-page"
        layout={PAGE_LAYOUT.standard}
        pageTitle={i18n['users.title'][lang]}
--      capabilities={[
--        'Users.List',
--      ]}
-+      capabilities={['Users.List']}
+-      capabilities={['Users.List']}
++      capabilities={['Users.Read']}
      >
        <CardGrid>
          {
-         /*
--         * "Server is unclaimed" warning card. 
-+         * "Server is unclaimed" warning card.
-          */
-         }
-         {usersRes.isSuccess && !serverIsClaimed && (
