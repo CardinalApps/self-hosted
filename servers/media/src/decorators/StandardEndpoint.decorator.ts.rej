@@ -1,0 +1,98 @@
+diff a/servers/media/src/decorators/StandardEndpoint.decorator.ts b/servers/media/src/decorators/StandardEndpoint.decorator.ts	(rejected hunks)
+@@ -1,56 +1,79 @@
+-import { applyDecorators } from '@nestjs/common'
+-import { ApiForbiddenResponse, ApiHeader, ApiOperation } from '@nestjs/swagger'
++import { applyDecorators, UseGuards } from '@nestjs/common'
++import {
++  ApiForbiddenResponse,
++  ApiHeader,
++  ApiOperation,
++  ApiSecurity,
++  ApiUnauthorizedResponse,
++} from '@nestjs/swagger'
+ import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
+ import { Capabilities } from './Capabilities.decorator'
++import { CapabilitiesGuard } from '../guards/capabilities.guard'
++import { AuthGuard } from '../guards/auth.guard'
++import { ApiSecurityTypes } from '../guards/types'
++
++const ICON = '🛡️'
+ 
+ export type StandardEndpointOptionsType = {
++  auth?: boolean,
+   summary?: string,
+   description?: string,
+   capabilities?: NamedCapability[],
+-  cloudUserHeader?: boolean
++  cloudUserHeader?: boolean,
+ }
+ 
+ /**
+- * The StandardEndpoint combines all of the required decorators for securing the
+- * endpoint with authentication and RBAC, and adds other options for avoiding
+- * decorator hell in controllers.
++ * The StandardEndpoint automatically applies all of the required decorators for
++ * securing the API endpoint with authentication and RBAC, and adds other
++ * options for avoiding decorator hell in controllers.
++ * 
++ * This decorator will also apply OpenAPI decorators for documenting the
++ * endpoint.
+  * 
+- * It also adds the Swagger ApiOperation decorator, but it can be overridden at
+- * the controller method level.
++ * @param [options.auth] - Enable local auth on this endpoint. Enabled by default.
++ * @param [options.capabilities] - Required capabilities for this endpoint. Not
++ * set by default. These will be documented in the OpenAPI docs.
++ * @param [options.summary] - OpenAPI docs summary text (publicly viewable).
++ * @param [options.description] - OpenAPI docs description text (publicly viewable).
++ * @param [options.cloudUserHeader] - Enables the Cardinal Account JWT header
++ * for receiving the cloud user JWT from a local user. Disabled by default.
+  */
+ export function StandardEndpoint(options: StandardEndpointOptionsType) {
+   const {
++    auth = true,
++    capabilities,
+     summary = '',
+     description = '',
+-    capabilities,
+     cloudUserHeader = false,
+   } = options
+ 
+   const publicSummary = (
+-    (capabilities ? '🛡️ ' : '')
++    (capabilities ? ICON + ' ' : '')
+     + summary
+   )
+ 
+   const publicDescription = (
+      description
+      + (description && capabilities ? '<br /><hr />' : '')
+-     + `<h3>🛡️ Requires Capabilities: ${capabilities ? capabilities.map((cap) => `<code>${cap}</code>`).join(' ') : 'None'}</h3>`
++     + `<h3>${ICON} Requires Capabilities: ${capabilities ? capabilities.map((cap) => `<code>${cap}</code>`).join(' ') : 'None'}</h3>`
+   )
+ 
+   return applyDecorators(
+-    // Basic docs for this endpoint
+     ApiOperation({
+       summary: publicSummary,
+       description: publicDescription,
+-    }, { overrideExisting: false }),
++    }, {
++      overrideExisting: false,
++    }),
+ 
+-    // Capabilities decorator will trigger the guard
+-    ...(capabilities ? [Capabilities(capabilities)] : []),
++    ...(auth ? [UseGuards(AuthGuard)] : []),
++    ...(auth ? [ApiUnauthorizedResponse()] : []),
++    ...(auth ? [ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)] : []),
+ 
+-    // Any endpoint that uses capabilities can return a 403
++    ...(capabilities ? [UseGuards(CapabilitiesGuard)] : []),
++    ...(capabilities ? [Capabilities(capabilities)] : []),
+     ...(capabilities ? [ApiForbiddenResponse()] : []),
+ 
+-    // Cardinal Account JWT header for receiving the cloud user JWT from a local user
+     ...(cloudUserHeader ? [ApiHeader({ name: 'CardinalTolkien' })] : []),
+   )
+ }

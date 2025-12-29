@@ -1,10 +1,15 @@
 diff a/libraries/ui/src/store/apis/homeServerUsers.ts b/libraries/ui/src/store/apis/homeServerUsers.ts	(rejected hunks)
-@@ -49,7 +49,7 @@ export const usersApi = baseHomeServerApi
+@@ -49,11 +49,11 @@ export const usersApi = baseHomeServerApi
        }),
  
        /**
--       * Create a photo album.
-+       * Create a user.
+-       * Create a user.
++       * Update a user.
         */
        updateUser: builder.mutation({
          query: ({ id, body }) => ({
+-          url: `/user/${id}`,
++          url: `/users/${id}`,
+           method: 'PATCH',
+           body,
+         }),

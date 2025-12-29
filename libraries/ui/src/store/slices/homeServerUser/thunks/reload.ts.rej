@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/store/slices/homeServerUser/thunks/reload.ts b/libraries/ui/src/store/slices/homeServerUser/thunks/reload.ts	(rejected hunks)
+@@ -15,7 +15,7 @@ const reloadUser = createAsyncThunk(`${STORE_KEY}/reload`, async (data, thunkAPI
+   let response
+ 
+   try {
+-    response = await homeServerAPI('/user')
++    response = await homeServerAPI('/users/current')
+   } catch(error) {
+     // Session was revoked via the auth app
+     if (error?.statusCode == 405) {
