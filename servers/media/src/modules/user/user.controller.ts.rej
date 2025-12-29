@@ -1,105 +1,19 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -5,18 +5,18 @@ import {
-   Body,
-   Get,
-   Post,
--  UseGuards,
-   MethodNotAllowedException,
-   Query,
-   Patch,
-   UnauthorizedException,
-   ForbiddenException,
-   InternalServerErrorException,
-+  Logger,
- } from '@nestjs/common'
- import {
-   ApiTags,
--  ApiSecurity,
-   ApiMethodNotAllowedResponse,
-+  ApiExcludeEndpoint,
- } from '@nestjs/swagger'
- import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
- 
-@@ -30,23 +30,17 @@ import { GetUserResponse } from './dtos/GetUserResponse.dto'
- import { CurrentUser } from '../../decorators/CurrentUser.decorator'
- import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
- 
--import { AuthGuard } from '../../guards/auth.guard'
--import { ApiSecurityTypes } from '../../guards/types'
- import { getJWTFromHeaders } from '../../utils/jwt'
- import { GetUsersDto } from './dtos/GetUsers.dto'
- import { SeatsService } from './seats.service'
- import { Designations } from './types'
--import { CapabilitiesGuard } from '../../guards/capabilities.guard'
- 
- class SecureController {
-   protected capabilities: Record<string, NamedCapability[]>
- }
- 
- @Controller()
--@UseGuards(AuthGuard)
--@UseGuards(CapabilitiesGuard)
- @ApiTags('Users')
--@ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
- export class UserController extends SecureController {
-   constructor(
-     private readonly userService: UserService,
-@@ -61,7 +55,7 @@ export class UserController extends SecureController {
-    * 
-    * This may trigger a refresh of the cached cloud user data.
-    */
--  @Get('/user')
-+  @Get('/users/current')
+@@ -58,7 +58,7 @@ export class UserController extends SecureController {
+   @Get('/users/current')
    @StandardEndpoint({
      summary: 'Get the currently logged in user.',
-     capabilities: ['Users.Read'],
-@@ -104,7 +98,7 @@ export class UserController extends SecureController {
-   /**
-    * Returns the user for the given local user ID.
-    */
--  @Get('/user/:id')
-+  @Get('/users/:id')
-   @StandardEndpoint({
-     summary: 'Get a specific user.',
-     capabilities: ['Users.Read'],
-@@ -162,7 +156,7 @@ export class UserController extends SecureController {
-    * passwordless one that comes included with the Media Server, called "Offline
-    * Account".
-    */
--  @Post('/user')
-+  @Post('/users')
-   @StandardEndpoint({
-     summary: 'Create a new local Media Server user.',
-     capabilities: ['Users.Create'],
-@@ -182,15 +176,30 @@ export class UserController extends SecureController {
-     return await this.userService.createUser({ dto: createUserDto })
-   }
- 
-+  // TODO can this be deleted? I cannot find any usages of it on the client
-+  // side, but it comes from a time before RTK APIs so I'm only 99% sure I've
-+  // tracked down every use. It just maps to the other method above anyway.
-+  @Post('/user')
-+  @StandardEndpoint({
-+    description: '"POST /user" is deprecated. User "POST /users" instead.',
-+    capabilities: ['Users.Create'],
-+  })
-+  @ApiExcludeEndpoint()
-+  async legacyCreateLocalUser(@Body() createUserDto: CreateUser): Promise<User> {
-+    Logger.warn('"POST /user" is deprecated. User "POST /users" instead.')
-+    return await this.createLocalUser(createUserDto)
-+  }
-+
+-    capabilities: ['Users.Read'],
++    capabilities: ['CurrentUser.Read'],
+     cloudUserHeader: true,
+   })
+   async getCurrentUser(@Headers() headers): Promise<GetUserResponse> {
+@@ -193,7 +193,7 @@ export class UserController extends SecureController {
    /**
     * TODO split this into two separate endpoints, one for updating your own
     * user, and one for updating other users. The endpoint for yourself should
-    * require Users.UpdateSelf and the one for other users should require
+-   * require Users.UpdateSelf and the one for other users should require
++   * require CurrentUser.Update and the one for other users should require
     * Users.Update.
     */
--  @Patch('/user/:id')
-+  @Patch('/users/:id')
-   @StandardEndpoint({
-     summary: 'Update a user.',
-+    capabilities: ['Users.Update'],
-   })
-   async updateUser(
-     @Param('id') id,
+   @Patch('/users/:id')

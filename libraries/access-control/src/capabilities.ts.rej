@@ -1,17 +1,9 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -60,9 +60,13 @@ export const Capabilities = [
+@@ -66,7 +66,6 @@ export const Capabilities = [
+    * My profile
     */
-   'Users.Create',
-   'Users.Read',
--  'Users.ReadSelf',
-   'Users.Update',
--  'Users.UpdateSelf',
-+
-+  /**
-+   * My profile
-+   */
-+  'CurrentUser.Read',
-+  'CurrentUser.Update',
+   'CurrentUser.Read',
+-  'CurrentUser.Update',
  ] as const
  
  /**
