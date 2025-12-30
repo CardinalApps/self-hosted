@@ -1,81 +1,11 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -263,7 +263,14 @@ export class UserService {
-    * Returns the local user that is associated with the given local ID.
-    */
-   async getUserByLocalId(userId: string): Promise<User | null> {
--    return await this.userRepository.findOneBy({ userId })
-+    return await this.userRepository.findOne({
-+      where: {
-+        userId,
-+      },
-+      relations: {
-+        roles: true,
-+      },
-+    })
-   }
+@@ -93,7 +93,8 @@ export class UserService {
  
-   /**
-@@ -271,7 +278,7 @@ export class UserService {
-    */
-   async getUserByLocalJWT(localJWT: string): Promise<User | null> {
-     const payload = getJWTPayload(localJWT) as LocalUserJWTPayload
--    const a = await this.userRepository.findOne({
-+    return await this.userRepository.findOne({
-       where: {
-         userId: payload?.uid,
-       },
-@@ -279,14 +286,20 @@ export class UserService {
-         roles: true,
-       },
-     })
--    return a
-   }
+       Logger.log(`Created new local user [userId=${createdUser.userId}] [role=${roleAssignments[0].role}]`, 'User')
  
-   /**
-    * Returns the local user that is associated with the given Cardinal ID.
-    */
-   async getUserByCardinalId(cardinalId: string): Promise<User | null> {
--    return await this.userRepository.findOneBy({ cardinalId })
-+    return await this.userRepository.findOne({
-+       where: {
-+        cardinalId,
-+      },
-+      relations: {
-+        roles: true,
-+      },
-+    })
-   }
- 
-   /**
-@@ -294,7 +307,14 @@ export class UserService {
-    */
-   async getUserByCardinalJWT(cardinalJWT: string): Promise<User | null> {
-     const payload = getJWTPayload(cardinalJWT) as CloudUserJWTPayload
--    return await this.userRepository.findOneBy({ cardinalId: payload?.userId })
-+    return await this.userRepository.findOne({
-+      where: {
-+        cardinalId: payload?.userId,
-+      },
-+      relations: {
-+        roles: true,
-+      },
-+    })
-   }
- 
-   /**
-@@ -302,7 +322,14 @@ export class UserService {
-    * guarentee it exists.
-    */
-   async getGuestAccount(): Promise<User> {
--    return await this.userRepository.findOneBy({ designation: Designations.GUEST_ACCOUNT })
-+    return await this.userRepository.findOne({
-+      where: {
-+        designation: Designations.GUEST_ACCOUNT,
-+      },
-+      relations: {
-+        roles: true,
-+      },
-+    })
-   }
- 
-   /**
+-      return createdUser
++      // Return with roles
++      return await this.getUserByLocalId(createdUser.userId)
+     } catch (error) {
+       await queryRunner.rollbackTransaction()
+       Logger.error(`Could not create local user`, 'User')

@@ -1,87 +1,31 @@
 diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
-@@ -1,4 +1,5 @@
- import { Injectable, Logger } from '@nestjs/common'
-+import { getRole, hasCapability, RoleName } from '@cardinalapps/access-control/dist/cjs'
- 
- import { UserService } from '../../user/user.service'
- import { CloudUserService } from '../../user/cloud-user.service'
-@@ -6,6 +7,10 @@ import { SeatsService } from '../../user/seats.service'
- 
- import { LoginResponse } from '../dtos/LoginResponse.dto'
- import { TokenService } from '../token.service'
-+import { User } from '../../user/user.entity'
-+import { CardinalApp } from '../../../utils/apps'
-+
-+import { APP_LOGIN_CAPABILITY } from '../types'
- 
- /**
-  * Logs a user into a Cardinal cloud account.
-@@ -24,7 +29,7 @@ export class CardinalSSOStrategy {
-    * login method can trigger several side effects, including sending emails and
-    * claiming ownership of the server.
-    */
--  async login(localUserId: string, cardinalSSOToken): Promise<LoginResponse> {
-+  async login(localUserId: string, cardinalSSOToken, app: CardinalApp): Promise<LoginResponse> {
-     const cloudUser = await this.validateJWT(cardinalSSOToken)
- 
-     if (!cloudUser) {
-@@ -32,16 +37,19 @@ export class CardinalSSOStrategy {
-     }
- 
-     /**
--     * Check 1: Main path, the SSO JWT matches an existing user. Log into their
--     * local account.
-+     * Path 1:
-+     * 
-+     *    - Main path, the SSO JWT matches an existing user. Log into their
-+     *      local account.
+@@ -98,7 +98,7 @@ export class CardinalSSOStrategy {
+      * Grant the user a seat by creating a local account for them.
       */
-     const localUser = await this.userService.getUserByCardinalJWT(cardinalSSOToken)
-     if (localUser) {
-+      this.throwIfFailedLoginRBAC(localUser, app)
-       return await this.loginSuccess(localUser, cardinalSSOToken)
+     if (allowToJoin) {
+-      return await this.handleNewCardinalUser(cardinalSSOToken)
++      return await this.handleNewCardinalUser(cardinalSSOToken, app)
+     } else {
+       throw new Error('User login failed.')
      }
- 
-     /**
--     * Check 2: 
-+     * Path 2: 
-      * 
-      *    - The SSO JWT didn't match a user.
-      * 
-@@ -54,7 +62,7 @@ export class CardinalSSOStrategy {
-     }
- 
-     /**
--     * Check 3:
-+     * Path 3:
-      * 
-      *    - The SSO JWT didn't match a user.
-      *    - We have >=1 seated users in the database.
-@@ -66,7 +74,7 @@ export class CardinalSSOStrategy {
-     }
- 
-     /**
--     * Check 4:
-+     * Path 4:
-      * 
-      *    - The SSO JWT didn't match a user.
-      *    - We have >=1 seated users in the database.
-@@ -153,4 +161,18 @@ export class CardinalSSOStrategy {
-       cloudUser: user.cachedCloudUser,
-     }
-   }
+@@ -135,13 +135,19 @@ export class CardinalSSOStrategy {
+    * When a new Cardinal user is logging in for the first time, create a local
+    * user for them.
+    */
+-  private async handleNewCardinalUser(cardinalSSOToken): Promise<LoginResponse> {
++  private async handleNewCardinalUser(cardinalSSOToken, app: CardinalApp): Promise<LoginResponse> {
+     const newUser = await this.userService.createUser({
+       dto: {
+         cardinalJWT: cardinalSSOToken,
+         role: 'newcomer',
+       },
+     })
 +
-+  /**
-+   * Throws an error if the user does not have the login capability for the app.
-+   */
-+  private throwIfFailedLoginRBAC(user: User, app: CardinalApp): boolean {
-+    if (!user || !app) {
-+      throw new Error(`Login failed, could not determine which app the user is trying to log into, got: ${app}`)
-+    }
-+    if (hasCapability(APP_LOGIN_CAPABILITY?.[app], user.roles?.flatMap((role) => getRole(role.role as RoleName).capabilities))) {
-+      return true
-+    } else {
-+      throw new Error(`Login failed, user does not have the ${APP_LOGIN_CAPABILITY?.[app]} capability`)
-+    }
-+  }
- }
++    // If the new user's first login attempt in in an app that they don't have
++    // access to, then their account will still be made but their session will
++    // be denied
++    this.throwIfFailedLoginRBAC(newUser, app)
++
+     return await this.loginSuccess(newUser, cardinalSSOToken)
+   }
+ 
