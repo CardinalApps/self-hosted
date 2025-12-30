@@ -1,10 +1,96 @@
 diff a/servers/media/src/modules/auth/auth.service.ts b/servers/media/src/modules/auth/auth.service.ts	(rejected hunks)
-@@ -34,7 +34,7 @@ export class AuthService {
+@@ -1,10 +1,19 @@
+ import { Injectable, Logger } from '@nestjs/common'
++import { getRole, hasCapability, NamedCapability, RoleName } from '@cardinalapps/access-control/dist/cjs'
+ 
+ import { UserService } from '../user/user.service'
+ 
+ import { LoginResponse } from './dtos/LoginResponse.dto'
+ import { CardinalSSOStrategy } from './strategies/cardinal-sso.service'
+ import { LocalAuthStrategy } from './strategies/local.service'
++import { CardinalApp } from '../../utils/apps'
++import { User } from '../user/user.entity'
++
++type LoginOptions = {
++  localUserId?: string,
++  ssoJWT?: string,
++  app: CardinalApp,
++}
+ 
+ @Injectable()
+ export class AuthService {
+@@ -20,12 +29,25 @@ export class AuthService {
+    * This currently only supports Cardinal cloud accounts and a single shared
+    * Guest Account.
+    */
+-  async login(localUserId?: string, ssoJWT?: string): Promise<LoginResponse> {
++  async login(options: LoginOptions): Promise<LoginResponse> {
++    const {
++      localUserId,
++      ssoJWT,
++      app,
++    } = options
++
+     if (!localUserId && !ssoJWT) {
+       throw new Error('Either a local user ID or a SSO token is required to log in')
+     }
+ 
++    // Logging in with a local user ID
+     if (localUserId && !ssoJWT) {
++      const desiredUser = await this.userService.getUserByLocalId(localUserId)
++
++      if (!this.canUserLogin(desiredUser, app)) {
++        throw new Error(`User does not have a role that allows them to log into the ${app} app.`)
++      }
++
+       try {
+         return await this.localAuthStrategy.login(localUserId)
+       } catch (error) {
+@@ -34,8 +56,47 @@ export class AuthService {
        }
      }
  
--    if (!localUserId && ssoJWT) {
-+    if (ssoJWT) {
++    // Logging in with a cloud account
+     if (ssoJWT) {
++      const desiredUser = await this.userService.getUserByCardinalJWT(ssoJWT)
++
++      if (!this.canUserLogin(desiredUser, app)) {
++        throw new Error(`User does not have a role that allows them to log into the ${app} app.`)
++      }
++
        return await this.cardinalSSOStrategy.login(localUserId, ssoJWT)
      }
    }
++
++  /**
++   * Checks whether a user has the capability needed to log into an app.
++   */
++  canUserLogin(user: User, app): boolean {
++    let requiredCapability: NamedCapability
++
++    switch (app) {
++      case CardinalApp.ADMIN:
++        requiredCapability = 'AdminApp.Login'
++        break
++      case CardinalApp.MUSIC:
++        requiredCapability = 'MusicApp.Login'
++        break
++      case CardinalApp.PHOTOS:
++        requiredCapability = 'PhotosApp.Login'
++        break
++      case CardinalApp.CINEMA:
++        requiredCapability = 'CinemaApp.Login'
++        break
++    }
++
++    if (!requiredCapability) {
++      throw new Error(`Login failed, could not determine which app the user is trying to log into, got: ${app}`)
++    }
++
++    if (hasCapability(requiredCapability, user.roles?.flatMap((role) => getRole(role.role as RoleName).capabilities))) {
++      return true
++    } else {
++      return false
++    }
++  }
+ }

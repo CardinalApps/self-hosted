@@ -1,68 +1,71 @@
 diff a/servers/media/src/modules/auth/auth.controller.ts b/servers/media/src/modules/auth/auth.controller.ts	(rejected hunks)
-@@ -1,13 +1,12 @@
- import {
-   Controller,
--  Body,
--  Post,
-   Logger,
-   ForbiddenException,
-+  Post,
-+  Body,
+@@ -6,6 +6,7 @@ import {
+   Body,
  } from '@nestjs/common'
  import {
++  ApiHeader,
    ApiTags,
--  ApiOperation,
    ApiUnauthorizedResponse,
  } from '@nestjs/swagger'
- 
-@@ -15,26 +14,40 @@ import { LoginDetails } from './dtos/LoginDetails.dto'
- import { AuthService } from './auth.service'
- 
+@@ -16,40 +17,53 @@ import { AuthService } from './auth.service'
  import { LoginResponse } from './dtos/LoginResponse.dto'
-+import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
-+import { OriginApp } from '../../decorators/OriginApp'
-+
-+const loginEndpointDescription =
-+`Logs the user into a local account.
-+
-+If logging into a local offline account, no credentials are required.
-+
-+If logging into a local online account, a valid Cardinal SSO token is required.`
-+
-+const loginEndpointUnauthorizedDescription = 'Returns a 401 if there is an issue with the SSO token.'
+ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ import { OriginApp } from '../../decorators/OriginApp'
++import { CardinalApp } from '../../utils/apps'
  
+ const loginEndpointDescription =
+-`Logs the user into a local account.
++`Logs the user into a client application that is hosted (bundled web app) or served by this server.
+ 
+-If logging into a local offline account, no credentials are required.
++If logging into the Guest Account, no credentials are required. If logging into a Cardinal Account, a valid Cardinal SSO token is required.
+ 
+-If logging into a local online account, a valid Cardinal SSO token is required.`
++The client app <strong>must</strong> set the <code>cardinal-app</code> header for this request.
++
++Only the capability corresponding to the application that you are trying to log into will be validated.`
+ 
+ const loginEndpointUnauthorizedDescription = 'Returns a 401 if there is an issue with the SSO token.'
+ 
++/**
++ * When logging in, users do not send the JWT in the Authorization header like
++ * they do when they are actually logged in, so RBAC is done manually.
++ */
  @Controller()
-+@ApiTags('Authentication')
- export class AuthController {
+ @ApiTags('Authentication')
+-export class AuthController {
++export class LoginController {
    constructor(
      private readonly authService: AuthService,
    ) {}
  
    /**
--   * Logs the user into a local account.
--   * 
--   * If logging into a local offline account, no credentials are required.
--   * 
--   * If logging into a local online account, a valid Cardinal SSO token is
--   * required.
-+   * Handler for all app logins that have passed auth and RBAC.
+-   * Handler for all app logins that have passed auth and RBAC.
++   * Logs a user into this server.
     */
    @Post('/login')
--  @ApiTags('Authentication')
--  @ApiOperation({ summary: 'Log into a local account.' })
--  @ApiUnauthorizedResponse({ description: 'Returns an Unauthorized error if there is an issue with the Cardinal token.' })
--  async login(@Body() loginDetails: LoginDetails): Promise<LoginResponse> {
-+  @StandardEndpoint({
-+    auth: false,
-+    manualCapabilities: ['AdminApp.Login'],
-+    summary: 'Log into an application.',
-+    description: loginEndpointDescription,
-+  })
-+  @ApiUnauthorizedResponse({ description: loginEndpointUnauthorizedDescription })
-+  async login(
-+    @Body() loginDetails: LoginDetails,
-+    @OriginApp() originApp,
-+  ): Promise<LoginResponse> {
+   @StandardEndpoint({
+     auth: false,
+-    manualCapabilities: ['AdminApp.Login'],
+-    summary: 'Log into an application.',
++    manualCapabilities: ['AdminApp.Login', 'MusicApp.Login', 'PhotosApp.Login', 'CinemaApp.Login'],
++    manualCapabilitiesAreAllRequired: false,
++    summary: 'Log into a Cardinal app.',
+     description: loginEndpointDescription,
+   })
++  @ApiHeader({ name: 'cardinal-app', enum: CardinalApp })
+   @ApiUnauthorizedResponse({ description: loginEndpointUnauthorizedDescription })
+   async login(
+     @Body() loginDetails: LoginDetails,
+     @OriginApp() originApp,
+   ): Promise<LoginResponse> {
      try {
-       const loginResult  = await this.authService.login(loginDetails?.userId, loginDetails?.cardinalJWT)
+-      const loginResult  = await this.authService.login(loginDetails?.userId, loginDetails?.cardinalJWT)
++      const loginResult  = await this.authService.login({
++        localUserId: loginDetails?.userId,
++        ssoJWT: loginDetails?.cardinalJWT,
++        app: originApp,
++      })
  
+       if (!loginResult) {
+         throw new ForbiddenException('Login was not successful.')

@@ -1,69 +1,71 @@
 diff a/servers/media/src/decorators/StandardEndpoint.decorator.ts b/servers/media/src/decorators/StandardEndpoint.decorator.ts	(rejected hunks)
-@@ -19,6 +19,7 @@ export type StandardEndpointOptionsType = {
-   summary?: string,
+@@ -20,24 +20,32 @@ export type StandardEndpointOptionsType = {
    description?: string,
    capabilities?: NamedCapability[],
-+  manualCapabilities?: NamedCapability[],
+   manualCapabilities?: NamedCapability[],
++  manualCapabilitiesAreAllRequired?: boolean,
    cloudUserHeader?: boolean,
  }
  
-@@ -31,8 +32,12 @@ export type StandardEndpointOptionsType = {
-  * endpoint.
+ /**
+- * The StandardEndpoint automatically applies all of the required decorators for
+- * securing the API endpoint with authentication and RBAC, and adds other
+- * options for avoiding decorator hell in controllers.
++ * The StandardEndpoint decorator automatically combines and applies all of the
++ * required decorators for securing the API endpoint with authentication and
++ * RBAC, and adds other options for avoiding decorator hell in controllers.
+  * 
+- * This decorator will also apply OpenAPI decorators for documenting the
+- * endpoint.
++ * This decorator will also automatically apply OpenAPI decorators for
++ * documenting the endpoint.
   * 
   * @param [options.auth] - Enable local auth on this endpoint. Enabled by default.
-- * @param [options.capabilities] - Required capabilities for this endpoint. Not
-- * set by default. These will be documented in the OpenAPI docs.
-+ * @param [options.capabilities] - Automatically require capabilities for this
-+ * endpoint. Undefined by default. These will be documented in the OpenAPI docs.
-+ * @param [options.manualCapabilities] - If this endpoint would prefer to not
-+ * use the automatic `@Capabilities()` decorator, and instead handle capability
-+ * validation internally, then leave the regular `capabilities` array undefined
-+ * and set the capabilities in this one for documentation only.
+- * @param [options.capabilities] - Automatically require capabilities for this
+- * endpoint. Undefined by default. These will be documented in the OpenAPI docs.
+- * @param [options.manualCapabilities] - If this endpoint would prefer to not
+- * use the automatic `@Capabilities()` decorator, and instead handle capability
+- * validation internally, then leave the regular `capabilities` array undefined
+- * and set the capabilities in this one for documentation only.
++ * @param [options.capabilities] - Automatically enable RBAC capability
++ * validation for this endpoint. If more than one capability is given, all will
++ * be required. Undefined (off) by default. These will be documented publicly in
++ * the OpenAPI docs.
++ * @param [options.manualCapabilities] - If this endpoint would prefer not to
++ * use the automatic `capabilities` option, and instead handle capability
++ * validation downstream of this decorator, then leave the regular
++ * `capabilities` array undefined and set the capabilities in this one for
++ * documentation purposes only.
++ * @param [options.manualCapabilitiesAreAllRequired] - Sets whether the
++ * capabilities set in the `manualCapabilities` array are being validated with
++ * logical `AND` or `OR`. This is for documentation purposes only; it is still
++ * up to the downstream validation to implement the behaviour that is set here.
   * @param [options.summary] - OpenAPI docs summary text (publicly viewable).
   * @param [options.description] - OpenAPI docs description text (publicly viewable).
   * @param [options.cloudUserHeader] - Enables the Cardinal Account JWT header
-@@ -42,20 +47,32 @@ export function StandardEndpoint(options: StandardEndpointOptionsType) {
-   const {
+@@ -48,6 +56,7 @@ export function StandardEndpoint(options: StandardEndpointOptionsType) {
      auth = true,
      capabilities,
-+    manualCapabilities,
+     manualCapabilities,
++    manualCapabilitiesAreAllRequired = true,
      summary = '',
      description = '',
      cloudUserHeader = false,
-   } = options
- 
-   const publicSummary = (
--    (capabilities ? ICON + ' ' : '')
-+    (capabilities || manualCapabilities ? ICON + ' ' : '')
-     + summary
-   )
- 
+@@ -61,7 +70,7 @@ export function StandardEndpoint(options: StandardEndpointOptionsType) {
    const publicDescription = (
       description
       + (description ? '<br /><hr />' : '')
--     + `<h3>${ICON} Requires Capabilities: ${capabilities ? capabilities.map((cap) => `<code>${cap}</code>`).join(' ') : 'None'}</h3>`
-+     + `<h3>${ICON} Requires Capabilities: `
-+     + (() => {
-+          if (!capabilities && !manualCapabilities) {
-+            return 'None'
-+          }
-+          const mergedCaps = Array.from(new Set([].concat(capabilities).concat(manualCapabilities)))
-+          return mergedCaps
-+            .filter((cap) => !!cap)
-+            .map((cap) => `<code>${cap}</code>`)
-+            .join(', ')
-+       })()
-+     + '</h3>'
+-     + `<h3>${ICON} Requires Capabilities: `
++     + `<h3>${ICON} ${capabilities || manualCapabilitiesAreAllRequired ? 'Requires Capabilities: ' : 'Requires one of these Capabilities: '}`
+      + (() => {
+           if (!capabilities && !manualCapabilities) {
+             return 'None'
+@@ -70,7 +79,7 @@ export function StandardEndpoint(options: StandardEndpointOptionsType) {
+           return mergedCaps
+             .filter((cap) => !!cap)
+             .map((cap) => `<code>${cap}</code>`)
+-            .join(', ')
++            .join(' ')
+        })()
+      + '</h3>'
    )
- 
-   return applyDecorators(
-@@ -67,8 +84,8 @@ export function StandardEndpoint(options: StandardEndpointOptionsType) {
-     }),
- 
-     ...(auth ? [UseGuards(AuthGuard)] : []),
--    ...(auth ? [ApiUnauthorizedResponse()] : []),
-     ...(auth ? [ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)] : []),
-+    ...(auth ? [ApiUnauthorizedResponse()] : []),
- 
-     ...(capabilities ? [UseGuards(CapabilitiesGuard)] : []),
-     ...(capabilities ? [Capabilities(capabilities)] : []),

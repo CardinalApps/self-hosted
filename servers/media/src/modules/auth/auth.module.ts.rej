@@ -1,27 +1,18 @@
 diff a/servers/media/src/modules/auth/auth.module.ts b/servers/media/src/modules/auth/auth.module.ts	(rejected hunks)
-@@ -8,6 +8,9 @@ import { AuthService } from './auth.service'
- import { AuthController } from './auth.controller'
+@@ -5,7 +5,7 @@ import { SettingsModule } from '../settings/settings.module'
+ import { UserModule } from '../user/user.module'
+ 
+ import { AuthService } from './auth.service'
+-import { AuthController } from './auth.controller'
++import { LoginController } from './auth.controller'
  
  import { getSigningSecret } from '../../utils/jwt'
-+import { TokenService } from './token.service'
-+import { CardinalSSOStrategy } from './strategies/cardinal-sso.service'
-+import { LocalAuthStrategy } from './strategies/local.service'
- 
- @Module({
-   imports: [
-@@ -19,9 +22,15 @@ import { getSigningSecret } from '../../utils/jwt'
+ import { TokenService } from './token.service'
+@@ -32,6 +32,6 @@ import { LocalAuthStrategy } from './strategies/local.service'
+     LocalAuthStrategy,
+     CardinalSSOStrategy,
    ],
-   exports: [
-     AuthService,
-+    TokenService,
-+    LocalAuthStrategy,
-+    CardinalSSOStrategy,
-   ],
-   providers: [
-     AuthService,
-+    TokenService,
-+    LocalAuthStrategy,
-+    CardinalSSOStrategy,
-   ],
-   controllers: [AuthController],
+-  controllers: [AuthController],
++  controllers: [LoginController],
  })
+ export class AuthModule {}

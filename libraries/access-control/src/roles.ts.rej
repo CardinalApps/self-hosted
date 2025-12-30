@@ -3,8 +3,8 @@ diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/role
      name: 'newcomer',
      capabilities: [
        'MusicApp.Login',
--      'PhotosApp.Login',
-+      //'PhotosApp.Login',
+-      //'PhotosApp.Login',
++      'PhotosApp.Login',
        'CinemaApp.Login',
      ],
    },
