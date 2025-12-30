@@ -1,10 +1,41 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -167,7 +167,7 @@ function Users() {
-       className="users-page"
-       layout={PAGE_LAYOUT.standard}
-       pageTitle={i18n['users.title'][lang]}
--      capabilities={['Users.List']}
-+      capabilities={['Users.Read']}
-     >
-       <CardGrid>
+@@ -8,6 +8,7 @@ import Button from '@cardinalapps/ui/src/components/interaction/Button'
+ import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+ //import { Subscriptions } from '@cardinalapps/products/src'
+ 
++import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import { useGetUsersQuery } from '@cardinalapps/ui/src/store/apis/homeServerUsers'
+ import { UserType } from '@cardinalapps/ui/src/types/user'
+@@ -30,6 +31,7 @@ import './styles.css'
+ function Users() {
+   const { lang } = useSelector(settingsSelectors.current)
+   const currentUser = useSelector(homeServerUserSelectors.current)
++  const canUserCreateInvitiations = useHasCapability('Invitations.Create')
+   const [configuringUser, setConfiguringUser] = useState<UserType>()
+   const [showManageInvitationsDrawer, setShowManageInvitationsDrawer] = useState<boolean>(false)
+ 
+@@ -201,7 +203,7 @@ function Users() {
+         </CardGrid.Card>
          {
+         /*
+-         * User invitations card. 
++         * User invitations card.
+          */
+         }
+         <CardGrid.Card
+@@ -213,12 +215,14 @@ function Users() {
+               <Button
+                 onClick={() => setShowManageInvitationsDrawer(true)}
+                 type="button"
++                disabled={!canUserCreateInvitiations}
+               >
+                 {i18n['users.invite-links.manage-button'][lang]}
+               </Button>
+             </>
+           )}
+           bottomAlignContent={true}
++          capabilities={['Invitations.Read']}
+         >
+           {activeIntiations.length
+             ? activeIntiations.length === 1

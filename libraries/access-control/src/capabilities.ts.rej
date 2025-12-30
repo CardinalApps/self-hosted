@@ -1,13 +1,58 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -45,6 +45,11 @@ export const Capabilities = [
-   'Jobs.Read',
-   'Jobs.Operate',
+@@ -5,16 +5,19 @@
+  * access restricted.
+  */
+ export const Aspects = [
++  'Users',
+   'AdminApp',
++  'Invitations',
+   'RoleAssignments',
+   'Indexing',
++  'Jobs',
++  'Libraries',
+   'MusicApp',
+-  'MusicTracks',
+-  'MusicReleases',
+-  'MusicArtists',
++  // 'MusicTracks',
++  // 'MusicReleases',
++  // 'MusicArtists',
+   'PhotosApp',
+   'CinemaApp',
+-  'Users',
+ ] as const
  
-+  'Libraries.Create',
-+  'Libraries.Read',
-+  'Libraries.Update',
-+  'Libraries.Delete',
+ export type AspectNames = typeof Aspects[number]
+@@ -31,8 +34,19 @@ export type AspectNames = typeof Aspects[number]
+  * arbitrary string except an asterisk (*).
+  */
+ export const Capabilities = [
++  'CurrentUser.Read',
 +
-   'MusicApp.Login',
+   'AdminApp.Login',
  
++  'Users.Create',
++  'Users.Read',
++  'Users.Update',
++
++  'Invitations.Create',
++  'Invitations.Read',
++  'Invitations.Update',
++  'Invitations.Delete',
++
+   'RoleAssignments.Create',
+   'RoleAssignments.Read',
+   'RoleAssignments.Delete',
+@@ -55,12 +69,6 @@ export const Capabilities = [
    'PhotosApp.Login',
+ 
+   'CinemaApp.Login',
+-
+-  'Users.Create',
+-  'Users.Read',
+-  'Users.Update',
+-
+-  'CurrentUser.Read',
+ ] as const
+ 
+ /**
