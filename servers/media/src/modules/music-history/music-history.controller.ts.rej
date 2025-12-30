@@ -1,10 +1,51 @@
 diff a/servers/media/src/modules/music-history/music-history.controller.ts b/servers/media/src/modules/music-history/music-history.controller.ts	(rejected hunks)
-@@ -26,7 +26,7 @@ import { GetMusicHistoryEntriesDto } from './dtos/GetMusicHistoryEntries.dto'
+@@ -9,8 +9,6 @@ import {
+ import {
+   ApiTags,
+   ApiSecurity,
+-  ApiOperation,
+-  ApiOkResponse,
+ } from '@nestjs/swagger'
+ import { InjectRepository } from '@nestjs/typeorm'
+ import { Repository } from 'typeorm'
+@@ -25,8 +23,10 @@ import { CreateMusicHistoryEntryDto } from './dtos/CreateMusicHistoryEntry.dto'
+ import { GetMusicHistoryEntriesDto } from './dtos/GetMusicHistoryEntries.dto'
  
  import { MusicHistoryService } from './music-history.service'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
  
--@Controller('playback-history')
-+@Controller('music/history')
+ @Controller('music/history')
++@ApiTags('Music')
  export class MusicHistoryController {
    constructor(
      @InjectRepository(MusicHistory)
+@@ -38,10 +38,10 @@ export class MusicHistoryController {
+    * Create a history entry.
+    */
+   @Post()
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Save playback history.' })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Save playback history.',
++    capabilities: ['MusicHistory.Create'],
++  })
+   async createPlaybackHistoryEntry(
+     @CurrentUser() user,
+     @Body() createPlaybackEntryDto: CreateMusicHistoryEntryDto,
+@@ -54,11 +54,9 @@ export class MusicHistoryController {
+    * Get the users playback history.
+    */
+   @Get()
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Query playback history for the currently logged in user.' })
+-  @ApiOkResponse({
+-    status: 200,
+-    description: 'Returns an array where the first item is the paginated set of results, and the second item is the total number of results for this query.',
++  @StandardEndpoint({
++    summary: 'Query playback history for the currently logged in user.',
++    capabilities: ['MusicHistory.Read'],
+   })
+   @UseGuards(AuthGuard)
+   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)

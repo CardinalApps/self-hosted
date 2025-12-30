@@ -1,42 +1,9 @@
 diff a/apps/music-web/src/pages/Tracks/Tracks.tsx b/apps/music-web/src/pages/Tracks/Tracks.tsx	(rejected hunks)
-@@ -17,7 +17,7 @@ function TracksPage() {
-   return (
-     <AppPage
+@@ -19,6 +19,7 @@ function TracksPage() {
        layout={PAGE_LAYOUT.virtual}
--      pageTitle={i18n['title']['en']}
-+      pageTitle={i18n['music-tracks.title']['en']}
+       pageTitle={i18n['music-tracks.title']['en']}
        restoreScrollPoint={false}
++      capabilities={['MusicTracks.Read']}
        toolbar={(
          <Toolbar
-@@ -31,16 +31,24 @@ function TracksPage() {
-             {
-               slug: 'sort',
-               render: ToolbarItem.SORT,
--              initialValue: 'number',
-+              initialValue: 'title',
-               options: [
-                 {
--                  label: 'Number',
--                  value: 'number',
-+                  label: i18n['music-tracks.order-by.title']['en'],
-+                  value: 'title',
-+                },
-+                {
-+                  label: i18n['music-tracks.order-by.track-num']['en'],
-+                  value: 'trackNumber',
-+                },
-+                {
-+                  label: i18n['music-tracks.order-by.duration']['en'],
-+                  value: 'duration',
-+                },
-+                {
-+                  label: i18n['music-tracks.order-by.bitrate']['en'],
-+                  value: 'bitrate',
-                 },
--                // {
--                //   label: 'Random',
--                //   value: 'random',
--                // },
-               ],
-             },
-           ]}
+           name={TOOLBAR_NAME}

@@ -1,9 +1,9 @@
 diff a/apps/music-web/src/pages/History/History.tsx b/apps/music-web/src/pages/History/History.tsx	(rejected hunks)
-@@ -27,6 +27,7 @@ function MusicHistoryPage() {
-             {
-               slug: 'order',
-               render: ToolbarItem.ORDER,
-+              initialValue: 'desc',
-             },
-           ]}
-         />
+@@ -19,6 +19,7 @@ function MusicHistoryPage() {
+       layout={PAGE_LAYOUT.virtual}
+       pageTitle={i18n['music-history.title']['en']}
+       restoreScrollPoint={false}
++      capabilities={['MusicHistory.Read']}
+       toolbar={(
+         <Toolbar
+           name={TOOLBAR_NAME}

@@ -1,0 +1,48 @@
+diff a/servers/media/src/modules/music-genres/music-genre.controller.ts b/servers/media/src/modules/music-genres/music-genre.controller.ts	(rejected hunks)
+@@ -1,28 +1,23 @@
+ import {
+   Controller,
+   Get,
+-  UseGuards,
+   NotFoundException,
+   Param,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+-  ApiOkResponse,
+ } from '@nestjs/swagger'
+ 
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+-
+ import { MusicGenre } from './music-genre.entity'
+ import { MusicGenreService } from './music-genre.service'
+ 
+ import { GetMusicGenreDto } from './dtos/GetMusicGenre.dto'
+ 
+ import { EventService } from '../event/event.service'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ @Controller()
++@ApiTags('Music')
+ export class MusicGenreController {
+   constructor(
+     private readonly musicGenreService: MusicGenreService,
+@@ -33,11 +28,10 @@ export class MusicGenreController {
+    * Get a music genre.
+    */
+   @Get('/music/genre/:id')
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Get a single music genre.' })
+-  @ApiOkResponse({ status: 200 })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Get a single music genre.',
++    capabilities: ['MusicGenres.Read'],
++  })
+   async getMusicArtist(@Param() { id }: GetMusicGenreDto): Promise<MusicGenre> {
+     const musicGenre = await this.musicGenreService.get(id, {
+       releases: {

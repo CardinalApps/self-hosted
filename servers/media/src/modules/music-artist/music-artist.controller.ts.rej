@@ -1,0 +1,67 @@
+diff a/servers/media/src/modules/music-artist/music-artist.controller.ts b/servers/media/src/modules/music-artist/music-artist.controller.ts	(rejected hunks)
+@@ -2,20 +2,13 @@ import {
+   Controller,
+   Get,
+   Query,
+-  UseGuards,
+   NotFoundException,
+   Param,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+-  ApiOkResponse,
+ } from '@nestjs/swagger'
+ 
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+-
+ import { MusicArtist } from './music-artist.entity'
+ import { MusicArtistService } from './music-artist.service'
+ 
+@@ -23,8 +16,10 @@ import { GetMusicArtistDto } from './dtos/GetMusicArtist.dto'
+ import { GetMusicArtistsDto } from './dtos/GetMusicArtists.dto'
+ 
+ import { EventService } from '../event/event.service'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ @Controller()
++@ApiTags('Music')
+ export class MusicArtistController {
+   constructor(
+     private readonly musicArtistService: MusicArtistService,
+@@ -35,11 +30,10 @@ export class MusicArtistController {
+    * Get a music artist.
+    */
+   @Get('/music/artist/:id')
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Get a single music artist.' })
+-  @ApiOkResponse({ status: 200 })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Get a single music artist.',
++    capabilities: ['MusicArtists.Read'],
++  })
+   async getMusicArtist(@Param() { id }: GetMusicArtistDto): Promise<MusicArtist> {
+     const musicArtist = await this.musicArtistService.get(id, {
+       releases: true,
+@@ -57,14 +51,10 @@ export class MusicArtistController {
+    * Get the users music artists.
+    */
+   @Get('/music/artists')
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Query music artists.' })
+-  @ApiOkResponse({
+-    status: 200,
+-    description: 'Returns an array where the first item is the paginated set of results, and the second item is the total number of results for this query.',
++  @StandardEndpoint({
++    summary: 'Query music artists.',
++    capabilities: ['MusicArtists.Read'],
+   })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getMusicArtists(@Query() query: GetMusicArtistsDto): Promise<[MusicArtist[], number]> {
+     return await this.musicArtistService.query(query)
+   }

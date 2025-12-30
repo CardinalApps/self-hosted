@@ -1,43 +1,9 @@
 diff a/apps/music-web/src/pages/Artists/Artists.tsx b/apps/music-web/src/pages/Artists/Artists.tsx	(rejected hunks)
-@@ -17,7 +17,7 @@ function ArtistsPage() {
-   return (
-     <AppPage
+@@ -19,6 +19,7 @@ function ArtistsPage() {
        layout={PAGE_LAYOUT.virtual}
--      pageTitle={i18n['title']['en']}
-+      pageTitle={i18n['music-artists.title']['en']}
+       pageTitle={i18n['music-artists.title']['en']}
        restoreScrollPoint={false}
++      capabilities={['MusicArtists.Read']}
        toolbar={(
          <Toolbar
-@@ -28,21 +28,17 @@ function ArtistsPage() {
-               slug: 'order',
-               render: ToolbarItem.ORDER,
-             },
--            // {
--            //   slug: 'sort',
--            //   render: ToolbarItem.SORT,
--            //   initialValue: 'number',
--            //   options: [
--            //     {
--            //       label: 'Number',
--            //       value: 'number',
--            //     },
--            //     {
--            //       label: 'Random',
--            //       value: 'random',
--            //     },
--            //   ],
--            // },
-+            {
-+              slug: 'sort',
-+              render: ToolbarItem.SORT,
-+              initialValue: 'name',
-+              options: [
-+                {
-+                  label: i18n['music-artists.order-by.name']['en'],
-+                  value: 'name',
-+                },
-+              ],
-+            },
-           ]}
-         />
-       )}
+           name={TOOLBAR_NAME}

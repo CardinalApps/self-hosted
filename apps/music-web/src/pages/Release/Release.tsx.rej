@@ -1,27 +1,9 @@
 diff a/apps/music-web/src/pages/Release/Release.tsx b/apps/music-web/src/pages/Release/Release.tsx	(rejected hunks)
-@@ -9,7 +9,7 @@ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
- import { useGetMusicReleaseQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
- import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
- import H1 from '@cardinalapps/ui/src/components/typography/H1'
--import ErrorPage, { ErrorObject } from '@cardinalapps/ui/src/components/layout/ErrorPage/ErrorPage'
-+import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError/AccessError'
- 
- import ReleaseArtists from './ReleaseArtists'
- import ReleaseMeta from './ReleaseMeta'
-@@ -52,15 +52,12 @@ function ReleasePage() {
-     return groupedByDisc.map((disc) => disc.sort((a: MusicTrackType, b: MusicTrackType) => a.trackNumber - b.trackNumber))
-   }, [data?.tracks])
- 
--  if (error) {
--    return <ErrorPage networkError={error as ErrorObject} />
--  }
--
-   return (
-     <AppPage
-       className="music-release-page"
-       layout={PAGE_LAYOUT.standard}
+@@ -59,6 +59,7 @@ function ReleasePage() {
        pageTitle={i18n['music-release.title']['en']}
-+      networkError={error as NetworkError}
+       networkError={error as NetworkError}
        loading={isLoading}
++      capabilities={['MusicReleases.Read']}
      >
        <H1 className="release-name">{data?.title}</H1>
+       <div className="release-page-cols">

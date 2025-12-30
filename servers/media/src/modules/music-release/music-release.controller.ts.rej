@@ -1,10 +1,85 @@
 diff a/servers/media/src/modules/music-release/music-release.controller.ts b/servers/media/src/modules/music-release/music-release.controller.ts	(rejected hunks)
-@@ -51,7 +51,7 @@ export class MusicReleaseController {
-     const musicRelease = await this.musicReleaseService.get(id, {
-       artists,
-       genres,
--      tracks,
-+      ...(tracks ? { tracks: { metadata: true } } : false),
-       thumbnails,
-     })
+@@ -3,21 +3,14 @@ import {
+   Controller,
+   Get,
+   Query,
+-  UseGuards,
+   NotFoundException,
+   Param,
+   StreamableFile,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+-  ApiOkResponse,
+ } from '@nestjs/swagger'
  
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+-
+ import { MusicRelease } from './music-release.entity'
+ import { MusicReleaseService } from './music-release.service'
+ 
+@@ -27,8 +20,10 @@ import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
+ import { EventService } from '../event/event.service'
+ import { GetMusicReleaseCover } from './dtos/GetMusicReleaseCover.dto'
+ import { getAppDir } from '../../utils/env'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ @Controller()
++@ApiTags('Music')
+ export class MusicReleaseController {
+   constructor(
+     private readonly musicReleaseService: MusicReleaseService,
+@@ -39,11 +34,10 @@ export class MusicReleaseController {
+    * Get a music release.
+    */
+   @Get('/music/release/:id')
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Get a single music release.' })
+-  @ApiOkResponse({ status: 200 })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Get a single music release.',
++    capabilities: ['MusicReleases.Read'],
++  })
+   async getMusicArtist(
+     @Param() { id }: { id: string },
+     @Query() { artists, tracks, genres, thumbnails }: GetMusicReleaseDto,
+@@ -66,14 +60,10 @@ export class MusicReleaseController {
+    * Get the users music releases.
+    */
+   @Get('/music/releases')
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Query music releases.' })
+-  @ApiOkResponse({
+-    status: 200,
+-    description: 'Returns an array where the first item is the paginated set of results, and the second item is the total number of results for this query.',
++  @StandardEndpoint({
++    summary: 'Query music releases.',
++    capabilities: ['MusicReleases.Read'],
+   })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getMusicReleases(@Query() query: GetMusicReleasesDto): Promise<[MusicRelease[], number]> {
+     return await this.musicReleaseService.query(query)
+   }
+@@ -82,13 +72,10 @@ export class MusicReleaseController {
+    * Returns the blob data of a release cover. Supports numeric row ID and musicReleaseId col.
+    */
+   @Get('/music/releases/:id/cover')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Music')
+-  @ApiOperation({ summary: 'Get the cover image of a release.' })
+-  @ApiOkResponse({
+-    status: 200,
++  @StandardEndpoint({
++    summary: 'Get the cover image of a release.',
++    capabilities: ['MusicReleases.Read'],
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getReleaseCoverBlob(
+     @Param('id') id: string | number,
+     @Query() query: GetMusicReleaseCover,
