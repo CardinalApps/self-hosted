@@ -1,0 +1,282 @@
+diff a/servers/media/src/modules/indexing/indexing.controller.ts b/servers/media/src/modules/indexing/indexing.controller.ts	(rejected hunks)
+@@ -7,13 +7,10 @@ import {
+   Delete,
+   Query,
+   ConflictException,
+-  UseGuards,
+ } from '@nestjs/common'
+ import { InjectRepository } from '@nestjs/typeorm'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+   ApiOkResponse,
+   ApiConflictResponse,
+ } from '@nestjs/swagger'
+@@ -27,8 +24,6 @@ import { Run } from './entities/run.entity'
+ import { File } from './entities/file.entity'
+ import { User } from '../user/user.entity'
+ 
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+ import { StateChangeActionDto } from './dtos/StateChangeAction.dto'
+ import { GetFilesDto } from './dtos/GetFiles.dto'
+ import { GetRunsDto } from './dtos/GetRuns.dto'
+@@ -40,8 +35,12 @@ import { CurrentUser } from '../../decorators/CurrentUser.decorator'
+ import { getMediaDirs } from '../../utils/env'
+ import { MediaDirsType } from '../../utils/media'
+ import { enumToCodeTags } from '../../utils/docs'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
++
++import i18n from './i18n'
+ 
+ @Controller()
++@ApiTags('Indexing')
+ export class IndexingController {
+   constructor(
+     private readonly indexingService: IndexingService,
+@@ -50,25 +49,23 @@ export class IndexingController {
+   ) {}
+ 
+   /**
+-   * Returns the real time state of the indexing service. Use this endpoint for
+-   * one-time checks. For instant updates when the state changes, use the
+-   * `/events/subscribe` endpoint instead.
++   * Get current current indexing state.
+    */
+   @Get('/index/state')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Get the current state of the indexing service.' })
++  @StandardEndpoint({
++    summary: 'Get the current state of the indexing service.',
++    description: i18n['indexing.get.state.description']['en'],
++    capabilities: ['Indexing.Read'],
++  })
+   @ApiOkResponse({
+     status: 200,
+-    description: `The returned object will contain the state of the indexing service. 
+-      Possible states are ${enumToCodeTags(IndexingStates)}.`,
++    description: `${i18n['indexing.get.state.200']['en'].replace('{states}', enumToCodeTags(IndexingStates))}`,
+     schema: {
+       example: {
+         state: IndexingStates.IDLE,
+       },
+     },
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   getState(): GETIndexStateResponse {
+     return {
+       state: this.indexingService.getCurrentState(),
+@@ -77,36 +74,15 @@ export class IndexingController {
+   }
+ 
+   /**
+-   * Update the state of the currently running indexing operation. This endpoint
+-   * is dedicated to controlling the indexing service from the frontend, and
+-   * cannot update completed runs.
+-   * 
+-   * This endpoint is designed to accept actions. Instead of sending the desired
+-   * state, send an action and let the indexing service handle the change
+-   * internally. So, you send "stop", and internally the service will terminate
+-   * the run and change the state to `idle`.
+-   * 
+-   * Accepted actions are:
+-   * 
+-   *  - `pause` - Pauses the run after the current file has completed indexing.
+-   *    The internal state will change to `paused`.
+-   *  - `resume` - Resumes a run and continues with the next file. Triggering
+-   *    resume on a run that isn't paused will have no effect. The internal
+-   *    state will change to `indexing`.
+-   *  - `stop` - Stops a run after the current file has completed indexing. The
+-   *    internal state will change to `idle`, and a new run can be started.
++   * Update the current indexing state.
+    */
+   @Patch('/index/state')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Control the current indexing run.' })
+-  @ApiConflictResponse({
+-    description: `Returns a 409 if the action is not compatible 
+-    with the current indexing state. For example, sending \`stop\` 
+-    while the server is \`idle\`.`,
++  @StandardEndpoint({
++    summary: 'Control the current indexing run.',
++    description: i18n['indexing.patch.state.description']['en'],
++    capabilities: ['Indexing.Operate'],
+   })
+-  //@UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @ApiConflictResponse({ description: i18n['indexing.patch.state.409']['en'] })
+   async changeState(@Body() stateChangeActionDto: StateChangeActionDto): Promise<void> {
+     if (stateChangeActionDto.action === 'pause') {
+       if (this.indexingService.getCurrentState() !== IndexingStates.INDEXING) {
+@@ -131,33 +107,23 @@ export class IndexingController {
+    * variables.
+    */
+   @Get('/index/directories')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Get your media directories.' })
+-  @ApiOkResponse({
+-    status: 200,
++  @StandardEndpoint({
++    summary: 'Get your media directories.',
+     description: 'Returns an array of all media directories that the user told Cardinal Media Server to use.',
+-    schema: {
+-      example: {
+-        music: '/path/to/my/music',
+-        photos: '/path/to/my/photos',
+-        movies: '/path/to/my/movies',
+-        tv: '/path/to/my/tv',
+-      } as MediaDirsType,
+-    },
++    capabilities: ['Indexing.Read'],
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   getDirectories(): MediaDirsType {
+     return getMediaDirs()
+   }
+ 
+   /**
+-   * Get the home server's file counts.
++   * Get the file counts.
+    */
+   @Get('/index/counts')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Count your files.' })
++  @StandardEndpoint({
++    summary: 'Count your files.',
++    capabilities: ['Indexing.Read'],
++  })
+   @ApiOkResponse({
+     status: 200,
+     schema: {
+@@ -169,21 +135,19 @@ export class IndexingController {
+       },
+     },
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getFileCounts() {
+     return await this.indexingService.countIndexedFiles()
+   }
+ 
+   /**
+-   * Get all of the the user's previous indexing runs.
++   * Get all of the previous indexing runs.
+    */
+   @Get('/index/runs')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Get your previous indexing runs.' })
++  @StandardEndpoint({
++    summary: 'Get your previous indexing runs.',
++    capabilities: ['Indexing.Read'],
++  })
+   @ApiOkResponse({
+-    status: 200,
+-    description: 'Returns an array where the first item is an array of query results, and the second item is the total number of runs.',
+     schema: {
+       example: [
+         [
+@@ -193,25 +157,20 @@ export class IndexingController {
+       ] as [Run[], number],
+     },
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getRuns(@Query() query: GetRunsDto): Promise<[Run[], number]> {
+     const pagination = { take: query.take, skip: query.skip }
+     return await this.indexingService.getRuns(pagination, query.includeEmptyRuns)
+   }
+ 
+   /**
+-   * Creates a new Run in the database and starts the indexing operation for
+-   * that Run. This endpoint can only be used if there is not currently a run
+-   * running.
+-   * 
+-   * The indexing operation will continue to run on the server after this
+-   * endpoint has returned a response.
++   * Start a new run.
+    */
+   @Post('/index/run')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Start an indexing run.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Start an indexing run.',
++    description: i18n['indexing.post.runs.description']['en'],
++    capabilities: ['Indexing.Operate'],
++  })
+   async startManualIndexingRun(
+     @CurrentUser() user: User,
+     @Body() options: CreateRunDto,
+@@ -229,20 +188,14 @@ export class IndexingController {
+   }
+ 
+   /**
+-   * Get one or more files from your index. Depending on the filetype, addtional
+-   * information will be returned about the entities that were extracted from
+-   * the file.
++   * Get files from your index.
+    */
+   @Get('/index/file')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Get files from your index.' })
+-  @ApiOkResponse({
+-    status: 200,
+-    description: 'Returns the file object with optional entities.',
+-    schema: {},
++  @StandardEndpoint({
++    summary: 'Get files from your index.',
++    description: i18n['indexing.get.files.description']['en'],
++    capabilities: ['Indexing.Operate'],
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getFile(@Query() query: GetFilesDto) {
+     return await this.fileRepository.find({
+       where: {
+@@ -260,27 +213,14 @@ export class IndexingController {
+   }
+ 
+   /**
+-   * Deindexes one or more files. To "deindex" means to delete the file entity
+-   * and all of its derived entities like songs and episodes, and all of their
+-   * derived entities like metadata and thumbnails.
+-   * 
+-   * Deindexing however does not delete cached static resources on the disk like
+-   * the thumbnail files that the server generates when initially indexing
+-   * things. Those now stale assets will eventually be deleted by a cleanup cron
+-   * job.
+-   * 
+-   * If a wildcard (`*`) is given as the sole item in the array, all files will
+-   * be deindexed. The wildcard method only supports hard deleting, so you must
+-   * also set `hardDelete` to true to activate it. Only a `true` boolean will be
+-   * returned when the wildcard operation is done.
+-   * 
+-   * By default, this deindexing is a soft delete. To perform a hard delete, set
+-   * the `hardDelete` param to true.
++   * Deindex files.
+    */
+   @Delete('/index/files')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Indexing')
+-  @ApiOperation({ summary: 'Deindex one or more of your files.' })
++  @StandardEndpoint({
++    summary: 'Deindex one or more of your files.',
++    description: i18n['indexing.delete.description']['en'],
++    capabilities: ['Indexing.Deindex'],
++  })
+   @ApiOkResponse({
+     status: 200,
+     description: 'Returns an object of file IDs and booleans, indicating whether each file was successfully deindexed.',
+@@ -290,7 +230,6 @@ export class IndexingController {
+       },
+     },
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async deleteFiles(@Query() query: DeleteFilesDto): Promise<Record<string, boolean> | boolean> {
+     if (query.ids.length === 1 && query.ids[0] === '*' && query.hardDelete) {
+       await this.indexingService.deleteAllIndexedData()
