@@ -1,71 +1,20 @@
 diff a/libraries/ui/src/components/layout/Drawer/Drawer.css b/libraries/ui/src/components/layout/Drawer/Drawer.css	(rejected hunks)
-@@ -34,6 +34,69 @@
-     z-index: 2;
+@@ -110,6 +110,18 @@
+     &:last-of-type {
+       margin-bottom: 0;
+     }
++
++    .access-error {
++      
++      .error-information {
++        gap: 2px;
++      }
++      
++      .error-name,
++      .error-message {
++        font-size: 12px;
++      }
++    }
    }
  
-+  .drawer-tabs {
-+
-+    &[data-active="0"] .drawer-tab[data-index="0"] { display: block; }
-+    &[data-active="1"] .drawer-tab[data-index="1"] { display: block; }
-+    &[data-active="2"] .drawer-tab[data-index="2"] { display: block; }
-+    &[data-active="3"] .drawer-tab[data-index="3"] { display: block; }
-+    &[data-active="4"] .drawer-tab[data-index="4"] { display: block; }
-+    &[data-active="5"] .drawer-tab[data-index="5"] { display: block; }
-+    &[data-active="6"] .drawer-tab[data-index="6"] { display: block; }
-+    &[data-active="7"] .drawer-tab[data-index="7"] { display: block; }
-+    &[data-active="8"] .drawer-tab[data-index="8"] { display: block; }
-+    &[data-active="9"] .drawer-tab[data-index="9"] { display: block; }
-+
-+    .drawer-tabs-row {
-+      width: calc(100% + 80px);
-+      margin: 10px -40px 30px;
-+      display: flex;
-+    }
-+
-+    .drawer-tab-button {
-+      padding: 15px;
-+      border-left: none;
-+      border-right: 1px solid var(--border-color-3);
-+      border-top: 1px solid var(--border-color-3);
-+      border-bottom: 1px solid var(--border-color-3);
-+      font-family: var(--font-family);
-+      color: var(--text-color-2);
-+      font-weight: 500;
-+      display: flex;
-+      flex-grow: 1;
-+      cursor: pointer;
-+      align-items: center;
-+      justify-content: center;
-+      position: relative;
-+      background: none;
-+
-+      &:last-of-type {
-+        border-right: none;
-+      }
-+
-+      &:hover {
-+        background-color: var(--bg-3);
-+      }
-+
-+      &.active {
-+        &:after {
-+          content: '';
-+          height: 2px;
-+          position: absolute;
-+          bottom: 0;
-+          left: 0;
-+          right: 0;
-+          background-color: var(--accent-color);
-+        }
-+      }
-+    }
-+
-+    .drawer-tab {
-+      display: none;
-+      margin-bottom: 25px;
-+    }
-+  }
-+
-   .drawer-section {
-     margin-bottom: 25px;
- 
+   .drawer-close {

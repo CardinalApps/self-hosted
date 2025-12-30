@@ -1,21 +1,121 @@
 diff a/servers/media/src/modules/rbac/rbac.controller.ts b/servers/media/src/modules/rbac/rbac.controller.ts	(rejected hunks)
-@@ -15,7 +15,7 @@ import {
-   ApiSecurity,
-   ApiOperation,
+@@ -3,23 +3,18 @@ import {
+   Body,
+   Get,
+   InternalServerErrorException,
+-  UseGuards,
+   Post,
+   Delete,
+   Param,
+   Query,
+   BadRequestException,
++  ForbiddenException,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
  } from '@nestjs/swagger'
--import { RoleNames } from '@cardinalapps/access-control/dist/cjs'
-+import { getRole, RoleNames } from '@cardinalapps/access-control/dist/cjs'
+ import { getRole, RoleNames } from '@cardinalapps/access-control/dist/cjs'
  
- import { AuthGuard } from '../../guards/auth.guard'
- import { ApiSecurityTypes } from '../../guards/types'
-@@ -79,6 +79,10 @@ export class RBACController {
-       userEntities.push(entity)
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+-
+ import { RBACService } from './rbac.service'
+ import { RoleAssignment } from './role-assignment.entity'
+ import { AssignRolesDto } from './dtos/AssignRoles.dto'
+@@ -27,9 +22,11 @@ import { RevokeRolesDto } from './dtos/RevokeRoles.dto'
+ 
+ import { User } from '../user/user.entity'
+ import { UserService } from '../user/user.service'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
++import { GetRoleAssignmentsDto } from './dtos/GetRoleAssignments.dto'
+ 
+-@ApiTags('Role Assignments')
+ @Controller('/roles')
++@ApiTags('Role Assignments')
+ export class RBACController {
+   constructor(
+     private readonly rbacService: RBACService,
+@@ -40,14 +37,19 @@ export class RBACController {
+    * Returns all role assignments for all users.
+    */
+   @Get('/assignments')
+-  @UseGuards(AuthGuard)
+-  @ApiOperation({ summary: "Get all role assignments." })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+-  async getRoleAssignments(@Query('userId') userId?: string): Promise<RoleAssignment[]> {
++  @StandardEndpoint({
++    summary: 'Get role assignments.',
++    description: 'Get all role assignments for all users, or all role assignments for just one user.',
++    capabilities: ['RoleAssignments.Read'],
++    errors: {
++      400: [],
++    },
++  })
++  async getRoleAssignments(@Query() query: GetRoleAssignmentsDto): Promise<RoleAssignment[]> {
+     let assignments = []
+ 
+-    if (userId) {
+-      const user = await this.userService.getUserByLocalId(userId)
++    if (query?.userId) {
++      const user = await this.userService.getUserByLocalId(query.userId)
+       if (!user) {
+         throw new BadRequestException('Invalid user ID')
+       }
+@@ -60,14 +62,18 @@ export class RBACController {
+   }
+ 
+   /**
+-   * Assigns roles by creating a role assignments. If the user already has the
+-   * role, the existing assignment will silently returned instead of creating a
+-   * new one.
++   * Assigns roles by creating a role assignments.
+    */
+   @Post('/:role/assignments')
+-  @UseGuards(AuthGuard)
+-  @ApiOperation({ summary: 'Assign one or more roles.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Assign roles.',
++    description: 'Assign a role to one or more users by creating role assignments. If the user already has the role, the existing assignment will be returned.',
++    capabilities: ['RoleAssignments.Create'],
++    errors: {
++      400: [],
++      403: ['The role is non-assignable'],
++    },
++  })
+   async assignRoles(
+     @Body() { userIds }: AssignRolesDto,
+     @Param('role') role: RoleNames,
+@@ -80,7 +86,7 @@ export class RBACController {
      }
  
-+    if (!getRole(role).assignable) {
-+      throw new Error(`The role "${role}" is not assignable.`)
-+    }
-+
-     const assignments = await this.rbacService.assignRole(role, userEntities)
+     if (!getRole(role).assignable) {
+-      throw new Error(`The role "${role}" is not assignable.`)
++      throw new ForbiddenException(`The role "${role}" is not assignable.`)
+     }
  
-     if (!Array.isArray(assignments)) {
+     const assignments = await this.rbacService.assignRole(role, userEntities)
+@@ -93,12 +99,17 @@ export class RBACController {
+   }
+ 
+   /**
+-   * Revokes roles by deleting the assignment.
++   * Revokes roles by deleting role assignments.
+    */
+   @Delete('/:role/assignments')
+-  @ApiOperation({ summary: 'Revoke roles.' })
+-  @UseGuards(AuthGuard)
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Revoke roles.',
++    description: 'Revoke a role from one or more users by deleting role assignments. If the user does not have the role, nothing will happen. The Guest Account is protected from having its roles removed.',
++    capabilities: ['RoleAssignments.Delete'],
++    errors: {
++      400: ['You are attempting to update the Guest Account'],
++    },
++  })
+   async revokeRoles(
+     @Query() { userIds }: RevokeRolesDto,
+     @Param('role') role: RoleNames,

@@ -1,24 +1,18 @@
 diff a/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx b/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx	(rejected hunks)
-@@ -1,4 +1,5 @@
- import { useSelector } from 'react-redux'
-+import { ACi18n } from '@cardinalapps/access-control/src'
+@@ -16,6 +16,7 @@ import EnableDisable from './EnableDisable'
  
- import Alert from '@cardinalapps/ui/src/components/interaction/Alert'
- import Button from '@cardinalapps/ui/src/components/interaction/Button'
-@@ -109,6 +110,16 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
+ import i18n from './i18n.json'
+ import './styles.css'
++import HasCapabilities from '@cardinalapps/ui/src/components/layout/HasCapabilities'
+ 
+ type UserManagementDrawerProps = {
+   user: UserType,
+@@ -110,7 +111,7 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
            ]}
          />
        </Drawer.Section>
-+      <Drawer.Section title={i18n['users.settings.roles'][lang]}>
-+        <List
-+          maxHeight={220}
-+          items={user?.roles?.map((roleAssignment) => {
-+            return {
-+              name: ACi18n?.[`role.${roleAssignment.role}.name`]?.[lang],
-+            }
-+          })}
-+        />
-+      </Drawer.Section>
-       <Drawer.Section className="user-actions" title={i18n['users.settings.actions'][lang]}>
-         <EnableDisable user={user} />
-         {removeUserButton()}
+-      <Drawer.Section title={i18n['users.settings.roles'][lang]}>
++      <Drawer.Section title={i18n['users.settings.roles'][lang]} capabilities={['RoleAssignments.Read']}>
+         <List
+           maxHeight={220}
+           items={user?.roles?.map((roleAssignment) => {

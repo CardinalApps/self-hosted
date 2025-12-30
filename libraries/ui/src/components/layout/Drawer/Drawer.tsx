@@ -17,6 +17,8 @@ import { modalSelectors } from '../../../store/slices/modal'
 import Card from '../Card'
 
 import './Drawer.css'
+import HasCapabilities from '../HasCapabilities'
+import { NamedCapability } from '@cardinalapps/access-control/src'
 
 type DrawerProps = {
   width?: number,
@@ -171,14 +173,17 @@ Drawer.Tab = ({ className, index, children }: PropsWithChildren<DrawerTabPropsTy
 type DrawerSectionPropsType = {
   className?: string,
   title?: string,
+  capabilities?: NamedCapability[],
 }
 
-Drawer.Section = ({ className, title, children }: PropsWithChildren<DrawerSectionPropsType>) => {
+Drawer.Section = ({ className, title, capabilities, children }: PropsWithChildren<DrawerSectionPropsType>) => {
   return (
     <section className={clsx('drawer-section')}>
       {!!title && <p className="drawer-section-title">{title}</p>}
       <div className={clsx('drawer-section-content', className)}>
-        {children}
+        <HasCapabilities capabilities={capabilities}>
+          {children}
+        </HasCapabilities>
       </div>
     </section>
   )

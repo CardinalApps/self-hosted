@@ -1,16 +1,56 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -39,11 +39,11 @@ export const Capabilities = [
-    */
-   'MusicApp.Login',
+@@ -6,6 +6,7 @@
+  */
+ export const Aspects = [
+   'AdminApp',
++  'RoleAssignments',
+   'MusicApp',
+   'MusicTracks',
+   'MusicReleases',
+@@ -29,42 +30,22 @@ export type AspectNames = typeof Aspects[number]
+  * arbitrary string except an asterisk (*).
+  */
+ export const Capabilities = [
+-  /**
+-   * Admin
+-   */
+   'AdminApp.Login',
  
--  'MusicTracks.Read',
-+  //'MusicTracks.Read',
+-  /**
+-   * Music
+-   */
+-  'MusicApp.Login',
+-
+-  //'MusicTracks.Read',
++  'RoleAssignments.Create',
++  'RoleAssignments.Read',
++  'RoleAssignments.Delete',
  
--  'MusicReleases.Read',
-+  //'MusicReleases.Read',
+-  //'MusicReleases.Read',
+-
+-  //'MusicArtists.Read',
++  'MusicApp.Login',
  
--  'MusicArtists.Read',
-+  //'MusicArtists.Read',
+-  /**
+-   * Photos
+-   */
+   'PhotosApp.Login',
  
-   /**
-    * Photos
+-  /**
+-   * Cinema
+-   */
+   'CinemaApp.Login',
+ 
+-  /**
+-   * Users
+-   */
+   'Users.Create',
+   'Users.Read',
+   'Users.Update',
+ 
+-  /**
+-   * My profile
+-   */
+   'CurrentUser.Read',
+ ] as const
+ 

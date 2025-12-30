@@ -1,17 +1,19 @@
 diff a/libraries/ui/src/components/forms/AddRemove/AddRemove.tsx b/libraries/ui/src/components/forms/AddRemove/AddRemove.tsx	(rejected hunks)
-@@ -216,7 +216,6 @@ const AddRemove = ({
-             }
-             onRemove={(item) => handleRemove(item)}
-             onDelete={(item) => togglePendingDelete(item)}
--            showOutline={listOutline}
-           />
-         </div>
-       }
-@@ -230,7 +229,6 @@ const AddRemove = ({
-               .filter((item) => !pendingAdd.find((pending) => pending?.value === item?.value))
-             }
-             onAdd={(item) => handleAdd(item)}
--            showOutline={listOutline}
-           />
-         </div>
-       }
+@@ -17,6 +17,8 @@ import './AddRemove.css'
+ type Item = {
+   name: string,
+   value: string,
++  canAdd?: boolean,
++  canDelete?: boolean,
+ }
+ 
+ type AddRemoveProps = {
+@@ -126,7 +128,7 @@ const AddRemove = ({
+     if (isPendingAdd) {
+       controls.push('remove')
+     }
+-    if (isAvailable && !isPendingAdd) {
++    if (item?.canAdd !== false && isAvailable && !isPendingAdd) {
+       controls.push('add')
+     }
+ 

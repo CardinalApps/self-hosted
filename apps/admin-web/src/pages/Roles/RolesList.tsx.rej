@@ -1,46 +1,42 @@
 diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
-@@ -46,14 +46,14 @@ function RolesList() {
-   /**
-    * Return all users with the given role.
-    */
--  const usersWithRole = (role) => roleAssignments
-+  const usersWithRole = (role: string) => roleAssignments
-     .filter((assignment: RoleAssignmentEntity) => assignment.role === role)
--    .map((assignment) => users.find((user) => user?.userId === assignment.user?.userId))
-+    .map((assignment) => assignment.user)
+@@ -13,6 +13,7 @@ import AddRemove from '@cardinalapps/ui/src/components/forms/AddRemove'
+ import Form from '@cardinalapps/ui/src/components/forms/Form'
+ import FormField from '@cardinalapps/ui/src/components/forms/FormField'
+ import Button from '@cardinalapps/ui/src/components/interaction/Button'
++import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
  
-   /**
-    * Return all users that don't have the given role.
-    */
--  const usersWithoutRole = (role) => users.filter((user: UserType) => {
-+  const usersWithoutRole = (role: string) => users.filter((user: UserType) => {
-     const userRoleAssignments = roleAssignments.filter((assignment) => assignment.user?.userId === user?.userId)
+ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+@@ -24,11 +25,15 @@ import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
  
-     // Never show the owner in the available users
-@@ -158,7 +157,7 @@ function RolesList() {
-               name: user?.designation === 'guest_account'
+ import i18n from './i18n.json'
+ 
++
++
+ function RolesList() {
+   const dispatch = useAppDispatch()
+   const { lang } = useAppSelector(settingsSelectors.current)
+   const [drawerRoleSlug, setDrawerRoleSlug] = useState<RoleNames>()
+   const drawerRole: Role = getRole(drawerRoleSlug)
++  const userCanAddRole = useHasCapability('RoleAssignments.Create')
++  const userCanDeleteRole = useHasCapability('RoleAssignments.Delete')
+ 
+   const usersRes = useGetUsersQuery({ take: 9999 })
+   const users = usersRes?.data ? usersRes.data?.[0] : []
+@@ -158,7 +163,7 @@ function RolesList() {
                  ? i18n['roles.drawer.user-list.guest'][lang]
                  :  user?.cachedCloudUser?.publicName || 'Cardinal User',
--              value: user.userId,
-+              value: user?.userId,
-               canDelete: user?.designation !== 'guest_account',
+               value: user?.userId,
+-              canDelete: user?.designation !== 'guest_account',
++              canDelete: userCanDeleteRole ? user?.designation !== 'guest_account' : false,
                avatar: user?.designation === 'guest_account'
                  ? { type: 'guest' }
-@@ -173,7 +172,7 @@ function RolesList() {
-               name: user?.designation === 'guest_account'
+                 : user?.cachedCloudUser?.avatar
+@@ -173,6 +178,7 @@ function RolesList() {
                  ? i18n['roles.drawer.user-list.guest'][lang]
                  :  user?.cachedCloudUser?.publicName || 'Cardinal User',
--              value: user.userId,
-+              value: user?.userId,
+               value: user?.userId,
++              canAdd: userCanAddRole,
                avatar: user?.designation === 'guest_account'
                ? { type: 'guest' }
                : user?.cachedCloudUser?.avatar
-@@ -183,7 +182,7 @@ function RolesList() {
-         }
-       />
-     )
--  }, [drawerRoleSlug, roleAssignments.length])
-+  }, [drawerRoleSlug, roleAssignments.length, users.length])
- 
-   return (
-     <CardGrid.Card

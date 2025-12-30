@@ -1,89 +1,36 @@
 diff a/docs/access-control.md b/docs/access-control.md	(rejected hunks)
-@@ -10,35 +10,68 @@ https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-cont
+@@ -20,22 +20,23 @@ Capabilities, and all other Cardinal apps must use these lists.
+ ## 2. Client-side Access Control
  
- ## 1. The Core Library
- 
--The core library is `@cardinalapps/access-control` and it can be found at
-+1. The core library is `@cardinalapps/access-control` and it can be found at
- `/libraries/access-control`. It defines types for all of the foundational
- concepts like Roles and Capabilities, and exports pure functions for running
- access control logic.
--
--It also contains the read-only master lists of all Roles, Components, and
-+1. It also contains the read-only master lists of all Roles, Components, and
- Capabilities, and all other Cardinal apps must use these lists.
- 
--## 2. Client-side Access Checks
-+## 2. Client-side Access Control
- 
--When checking capabilities in the UI, use the `<HasCapabilities />` component
-+1. When checking capabilities in the UI, use the `<HasCapabilities />` component
- for conditional rendering.
--
--Some common components like `<AppPage />` have a `capabilities` prop built in
-+1. Some common components like `<AppPage />` have a `capabilities` prop built in
+ 1. When checking capabilities in the UI, use the `<HasCapabilities />` component
+-for conditional rendering.
++or the `useHasCapabilities()` hook for conditional rendering.
+ 1. Some common components like `<AppPage />` have a `capabilities` prop built in
  for convenience, while other components exist solely to wrap other components in
  capability checks, like `<CardWithCapabilities />`.
-+1. Some server-side endpoints additionally need to know the Cardinal app context (Music app,
-+Admin app, etc). This is done with a header called `cardinal-app`, and it's
-+handled automatically by the RTK base API. Non-RTK-API calls may need to add the
-+header.
+-1. Some server-side endpoints additionally need to know the Cardinal app context (Music app,
+-Admin app, etc). This is done with a header called `cardinal-app`, and it's
+-handled automatically by the RTK base API. Non-RTK-API calls may need to add the
+-header.
++1. Some server-side endpoints additionally need to know the Cardinal app context
++(Music app, Admin app, etc). This is done with a header called `cardinal-app`,
++and it's handled automatically by the RTK base API. Non-RTK-API calls may need
++to add the header.
  
--- **Important (1):** Never do access control checks in hooks or useEffects, and
--  don't store the results in state. Doing so will lead to extra renders and
--  undesirable flashes of content. With `<HasAccess />` you get exactly 1 check
--  per render per component mount. The result is memoized, so it's truly only 1
--  check until the component is unmounted. All custom checks should behave the
--  same way.
-+- **Important (1):** Never do *initial* access control checks in hooks or
-+  useEffects, and don't store the results in state. Doing so will lead to extra
-+  renders and undesirable flashes of content. With `<HasAccess />` you get
-+  exactly 1 check on component mount and no more. The result is memoized, so
-+  it's truly only 1 check until the component is unmounted or a memoization
-+  dependency changes (unlikely). All custom checks should behave the same way
-+  (use the roles definied in the user.current slice).
+-- **Important (1):** Never do *initial* access control checks in hooks or
++- **Important (1):** If doing custom access checks (without the hasCapabilities
++  component or hook), never do *initial* access control checks in hooks or
+   useEffects, and don't store the results in state. Doing so will lead to extra
+-  renders and undesirable flashes of content. With `<HasAccess />` you get
+-  exactly 1 check on component mount and no more. The result is memoized, so
+-  it's truly only 1 check until the component is unmounted or a memoization
+-  dependency changes (unlikely). All custom checks should behave the same way
+-  (use the roles definied in the user.current slice).
++  renders and undesirable flashes of content. With `<HasCapabilities />` or
++  `useHasCapabilities()` you get exactly 1 check on component mount and no more.
++  The result is memoized, so it's truly only 1 check until the component is
++  unmounted or a memoization dependency changes (unlikely). All custom checks
++  should behave the same way (use the roles definied in the user.current slice).
  - **Important (2):** When adding capability checks to the UI library, remember
--  that components that use capability checks will crash if used in an app
--  *without* a user context and a Media Server connection. So, don't do any
--  access control checks in components that are used on the website, account
--  portal, etc (wrap them instead).
-+  that components will crash if used in an app *without* a user context and a
-+  Media Server connection. So, don't do any access control checks in components
-+  that are used on the website, account portal, etc (wrap them instead).
-+
-+## 3. Server-side Access Control
-+
-+### Role Assignments
-+
-+The RBAC module only implements Role Assignments, *not* Roles and Capabilities
-+themselves. Role Assignments are stored in the database, and each one contains a
-+single role assigned to one user.
-+
-+### Performing Checks
-+
-+Access checks are designed to happen in controllers, but can also be performed
-+in any service.
-+
-+#### In Controllers
-+
-+There exists a decorator called `@Capabilities()` and a guard called
-+`CapabilitiesGuard`, but using them directly is discouraged. Instead, use the
-+`@StandardEndpoint()` decorator with the `capabilities` option. This will
-+automatically apply the correct decorators to secure the endpoint, perform
-+capability checks, and also apply OpenAPI decorators to document the capabilties
-+and response types for the endpoint.
-+
-+If your access check has to happen downstream of the decorators, then use the
-+`manualDecorators` option and implement the check in the controller manually.
-+
-+All failed access control checks should return a 403.
- 
--## 3. Server-side Access Checks
-+#### In Services
- 
--Todo.
-+If the access check has to happen in a service, then the service should import
-+the `hasCapability()` and/or `hasCapabilities()` functions from the
-+`@cardinalapps/access-control` library. An array containing all of the user's
-+capabilities will need to be created using their Role Assignments. Use
-+`getRole()` to get a role's capabilities.
+   that components will crash if used in an app *without* a user context and a
+   Media Server connection. So, don't do any access control checks in components
