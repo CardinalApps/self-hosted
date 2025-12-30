@@ -1,25 +1,13 @@
 diff a/libraries/ui/src/components/forms/Select/Select.tsx b/libraries/ui/src/components/forms/Select/Select.tsx	(rejected hunks)
-@@ -27,6 +27,7 @@ type SelectProps = {
-   min?: number,
-   max?: number,
-   size?: 'l' | 'm' | 's',
-+  layout?: 'underline',
-   onChange?: (selected) => void,
-   style?: CSSProperties,
-   className?: string,
-@@ -95,6 +96,7 @@ const Select = ({
-   min,
-   max,
-   size = "l",
-+  layout,
-   onChange = () => {},
-   style,
-   className,
-@@ -306,6 +308,7 @@ const Select = ({
-           'custom-select',
-           `size-${size}`,
-           'select',
-+          layout && 'layout-underline',
-           className,
-         )}
-         style={style}
+@@ -206,9 +206,9 @@ const Select = ({
+    * Blur event for options.
+    */
+   const onSelectBlur = (e) => {
+-    const isOutside = !e.relatedTarget?.closest('.custom-select')
++    const isOutside = !e.relatedTarget?.closest(`.custom-select[data-name=${name}]`)
+ 
+-    if (isOutside && !e?.relatedTarget?.closest('.custom-select')) {
++    if (isOutside && !e?.relatedTarget?.closest(`.custom-select[data-name=${name}]`)) {
+       setPopoutOpen(false)
+     }
+   }
