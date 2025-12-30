@@ -1,0 +1,140 @@
+diff a/servers/media/src/modules/job/job.controller.ts b/servers/media/src/modules/job/job.controller.ts	(rejected hunks)
+@@ -6,36 +6,31 @@ import {
+   Patch,
+   Query,
+   Param,
+-  UseGuards,
+   ParseArrayPipe,
+   InternalServerErrorException,
+ } from '@nestjs/common'
+ import { InjectRepository } from '@nestjs/typeorm'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+-  ApiOkResponse,
+   ApiQuery,
+ } from '@nestjs/swagger'
+ import { Repository } from 'typeorm'
+ 
+ import { JobStatus, JobType } from './enums'
+-//import { GETIndexStateResponse } from './types'
+ 
+ import { Job } from './job.entity'
+ import { JobTask } from './job-task.entity'
+ import { JobService } from './job.service'
+ 
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+ import { UpdateJobDto } from './dtos/UpdateJob.dto'
+ import { CreateJobDto } from './dtos/CreateJob.dto'
+ import { GetJobsDto } from './dtos/GetJobs.dto'
+ import { GetJobTasksDto } from './dtos/GetJobTasks.dto'
+ import { JobQueueService } from './job-queue.service'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ @Controller()
++@ApiTags('Jobs')
+ export class JobController {
+   constructor(
+     @InjectRepository(Job)
+@@ -48,10 +43,11 @@ export class JobController {
+    * Create a new job and automatically runs it.
+    */
+   @Post('/job')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: 'Create a new job.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Create a new job.',
++    description: 'The job will automatically start running.',
++    capabilities: ['Jobs.Create'],
++  })
+   async createJob(@Body() createJobDto: CreateJobDto): Promise<Job> {
+     const job = await this.jobService.createJob({
+       createJobDto,
+@@ -63,12 +59,12 @@ export class JobController {
+    * Query, sort, and filter server jobs.
+    */
+   @Get('/jobs')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: 'Fetch server jobs.' })
++  @StandardEndpoint({
++    summary: 'Fetch server jobs.',
++    capabilities: ['Jobs.Read'],
++  })
+   @ApiQuery({ name: 'status', isArray: true, description: Object.values(JobStatus).join(', ') })
+   @ApiQuery({ name: 'type', isArray: true, description: Object.values(JobType).join(', ') })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getJobs(
+     @Query() getJobsDto: GetJobsDto,
+     @Query('status', new ParseArrayPipe({ items: String, separator: ',', optional: true })) status: JobStatus[],
+@@ -86,24 +82,24 @@ export class JobController {
+    * Get a single job by ID.
+    */
+   @Get('/job/:id')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: 'Get a single job by ID.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Get a single job.',
++    capabilities: ['Jobs.Read'],
++  })
+   async getJob(@Param('id') id: number) {
+     const job = await this.jobService.getJob(id, { tasks: false })
+     return job
+   }
+ 
+   /**
+-   * If the job is currently in progress then the job runner will notice the
+-   * change before starting the next item in the job.
++   * Control a job.
+    */
+   @Patch('/job/:id')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: 'Update a job.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Control a job.',
++    description: `Control a job by updating its status. Pausing will only kick in between the next job tasks, resuming is instant.`,
++    capabilities: ['Jobs.Operate'],
++  })
+   async updateJob(@Param('id') id: number, @Body() updateJobDto: UpdateJobDto): Promise<Job> {
+     const result = await this.jobService.updateJob(id, { ...updateJobDto })
+     if (!result) {
+@@ -116,10 +112,10 @@ export class JobController {
+    * Get all the tasks of a job.
+    */
+   @Get('/job/:id/tasks')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: "Get a job's tasks." })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: "Get a job's tasks.",
++    capabilities: ['Jobs.Read'],
++  })
+   async getJobTasks(@Param('id') id: number, @Query() query: GetJobTasksDto): Promise<[JobTask[], number]> {
+     const pagination = { take: query.take, skip: query.skip }
+     return await this.jobService.getJobTasks(id, query.type, pagination)
+@@ -151,13 +147,10 @@ export class JobController {
+    * Get all job types.
+    */
+   @Get('/jobs/types')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Jobs')
+-  @ApiOperation({ summary: 'Get all job types.' })
+-  @ApiOkResponse({
+-    status: 200,
++  @StandardEndpoint({
++    summary: "Get all job types.",
++    capabilities: ['Jobs.Read'],
+   })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
+   async getJobTypes() {
+     return Object.values(JobType)
+   }

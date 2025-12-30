@@ -1,0 +1,25 @@
+diff a/apps/admin-web/src/pages/Jobs/components/StartJob/StartJob.tsx b/apps/admin-web/src/pages/Jobs/components/StartJob/StartJob.tsx	(rejected hunks)
+@@ -17,6 +17,7 @@ import {
+ import i18n from '../../i18n.json'
+ 
+ import './styles.css'
++import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
+ 
+ type StartJobProps = {
+   jobType: string,
+@@ -31,6 +32,7 @@ function StartJob({
+ }: StartJobProps) {
+   const dispatch = useDispatch()
+   const { lang } = useSelector(settingsSelectors.current)
++  const userCanStartJobs = useHasCapability('Jobs.Create')
+   const [showConfigure, setShowConfigure] = useState(false)
+   const [startJob, startJobResult] = useStartJobMutation()
+ 
+@@ -97,6 +99,7 @@ function StartJob({
+                 onClick={() => startJob({ type: jobType })}
+                 textual
+                 animation={startJobResult.isLoading ? 'loading' : undefined}
++                disabled={!userCanStartJobs}
+               >
+                 {i18n[`job.button.start`]?.[lang]}
+               </Button>

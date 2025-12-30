@@ -1,19 +1,11 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -7,6 +7,7 @@
- export const Aspects = [
-   'AdminApp',
-   'RoleAssignments',
-+  'Indexing',
-   'MusicApp',
-   'MusicTracks',
-   'MusicReleases',
-@@ -36,6 +37,10 @@ export const Capabilities = [
-   'RoleAssignments.Read',
-   'RoleAssignments.Delete',
+@@ -41,6 +41,10 @@ export const Capabilities = [
+   'Indexing.Operate',
+   'Indexing.Deindex',
  
-+  'Indexing.Read',
-+  'Indexing.Operate',
-+  'Indexing.Deindex',
++  'Jobs.Create',
++  'Jobs.Read',
++  'Jobs.Operate',
 +
    'MusicApp.Login',
  

@@ -1,38 +1,52 @@
 diff a/libraries/ui/src/components/features/AppHeader/componenets/ActivityIcon.tsx b/libraries/ui/src/components/features/AppHeader/componenets/ActivityIcon.tsx	(rejected hunks)
-@@ -14,6 +14,7 @@ import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
- import useContextAwareLink from '../../../../hooks/useContextAwareLink'
- import { useAppDispatch } from '../../../../hooks/useAppDispatch'
- import { useAppSelector } from '../../../../hooks/useAppSelector'
-+import useHasCapability from '../../../../hooks/useHasCapability'
- 
- import MenuButton from '../../../interaction/MenuButton'
- 
-@@ -28,6 +29,7 @@ const ActivityIcon = () => {
-   const dispatch = useAppDispatch()
+@@ -30,6 +30,7 @@ const ActivityIcon = () => {
    const { Link } = useContext(RouterContext)
    const { lang, open_apps_in_new_tab } = useAppSelector(settingsSelectors.current)
-+  const userCanReadIndexing = useHasCapability('Indexing.Read')
+   const userCanReadIndexing = useHasCapability('Indexing.Read')
++  const userCanReadJobs = useHasCapability('Jobs.Read')
    const indexingServiceState = useAppSelector(indexingSelectors.serverState)
    const numFilesFound = useAppSelector(indexingSelectors.filesFound)
    const numFilesIndexed = useAppSelector(indexingSelectors.filesIndexed)
-@@ -42,7 +44,10 @@ const ActivityIcon = () => {
-     // isLoading: activeJobsLoading,
-     // isError: activeJobsError,
+@@ -46,7 +47,7 @@ const ActivityIcon = () => {
      refetch: refetchActiveJobs,
--  } = useGetJobsQuery({ take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'asc' })
-+  } = useGetJobsQuery(
-+    { take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'asc' },
-+    { skip: !userCanReadIndexing },
-+  )
+   } = useGetJobsQuery(
+     { take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'asc' },
+-    { skip: !userCanReadIndexing },
++    { skip: !userCanReadJobs },
+   )
    const [activeJobs] = activeJobsResponse || []
  
-   const indexingIsActive = indexingServiceState === 'paused' || indexingServiceState === 'indexing'
-@@ -138,7 +143,7 @@ const ActivityIcon = () => {
+@@ -58,14 +59,16 @@ const ActivityIcon = () => {
+    * Refetch data when jobs trigger events on the server.
+    */
+   useEffect(() => {
+-    switch (latestEvent?.type) {
+-      case 'sse/job.preparing':
+-      case 'sse/job.prepared':
+-      case 'sse/job.started':
+-      case 'sse/job.resume':
+-      case 'sse/job.completed':
+-        refetchActiveJobs()
+-        break
++    if (userCanReadJobs) {
++      switch (latestEvent?.type) {
++        case 'sse/job.preparing':
++        case 'sse/job.prepared':
++        case 'sse/job.started':
++        case 'sse/job.resume':
++        case 'sse/job.completed':
++          refetchActiveJobs()
++          break
++      }
+     }
+   }, [latestEvent])
+ 
+@@ -155,7 +158,7 @@ const ActivityIcon = () => {
          }
  
-         {/* Indexing activity */}
--        {!!indexingIsActive &&
-+        {userCanReadIndexing && !!indexingIsActive &&
-           <div className="activity">
-             {indexingLink(
-               <>
+         {/* Job activity */}
+-        {!!jobIsActive && activeJobs.map((job) => {
++        {userCanReadJobs && !!jobIsActive && activeJobs.map((job) => {
+           return (
+             <div key={job?.jobId} className="activity">
+               {jobsLink(
