@@ -1,18 +1,9 @@
 diff a/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx b/apps/admin-web/src/pages/Users/UserManagementDrawer.tsx	(rejected hunks)
-@@ -16,6 +16,7 @@ import EnableDisable from './EnableDisable'
+@@ -16,7 +16,6 @@ import EnableDisable from './EnableDisable'
  
  import i18n from './i18n.json'
  import './styles.css'
-+import HasCapabilities from '@cardinalapps/ui/src/components/layout/HasCapabilities'
+-import HasCapabilities from '@cardinalapps/ui/src/components/layout/HasCapabilities'
  
  type UserManagementDrawerProps = {
    user: UserType,
-@@ -110,7 +111,7 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
-           ]}
-         />
-       </Drawer.Section>
--      <Drawer.Section title={i18n['users.settings.roles'][lang]}>
-+      <Drawer.Section title={i18n['users.settings.roles'][lang]} capabilities={['RoleAssignments.Read']}>
-         <List
-           maxHeight={220}
-           items={user?.roles?.map((roleAssignment) => {
