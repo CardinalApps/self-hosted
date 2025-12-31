@@ -1,0 +1,57 @@
+diff a/servers/media/src/modules/settings/settings.controller.ts b/servers/media/src/modules/settings/settings.controller.ts	(rejected hunks)
+@@ -6,25 +6,21 @@ import {
+   Patch,
+   BadRequestException,
+   InternalServerErrorException,
+-  UseGuards,
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiSecurity,
+-  ApiOperation,
+ } from '@nestjs/swagger'
+ 
+-import { AuthGuard } from '../../guards/auth.guard'
+-import { ApiSecurityTypes } from '../../guards/types'
+-
+ import { SettingsService } from './settings.service'
+ 
+ import { GetAppSettings } from './dtos/GetAppSettings.dto'
+ import { GetAppSettingsResponse } from './dtos/GetAppSettingsResponse.dto'
+ import { UpsertSettings } from './dtos/UpsertSettings.dto'
+ import { UpsertSettingsResponse } from './dtos/UpsertSettingsResponse.dto'
++import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
+ @Controller()
++@ApiTags('Settings')
+ export class SettingsController {
+   constructor(
+     private readonly settingsService: SettingsService,
+@@ -34,10 +30,9 @@ export class SettingsController {
+    * Gets all settings for a single app.
+    */
+   @Get('/settings/:app')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Settings')
+-  @ApiOperation({ summary: 'Get app settings.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Get app settings.',
++  })
+   async getAppSettings(@Param() params: GetAppSettings): Promise<GetAppSettingsResponse> {
+     const settings = await this.settingsService.getAppSettings(params.app)
+ 
+@@ -50,10 +45,9 @@ export class SettingsController {
+    * Updates one or more settings in the database for a Cardinal app.
+    */
+   @Patch('/settings')
+-  @UseGuards(AuthGuard)
+-  @ApiTags('Settings')
+-  @ApiOperation({ summary: 'Save app settings.' })
+-  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
++  @StandardEndpoint({
++    summary: 'Save app settings.',
++  })
+   async upsertSettings(@Body() { app, settings }: UpsertSettings): Promise<UpsertSettingsResponse> {
+     if (!Object.keys(settings).length) {
+       throw new BadRequestException()
