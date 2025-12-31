@@ -1,0 +1,30 @@
+diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
+@@ -21,6 +21,9 @@ type SSOLoginProps = {
+   ssoUrl?: string,
+   debug?: boolean,
+   style?: CSSProperties,
++
++  // Temporary flag for OIDC login
++  isOIDC?: boolean,
+ }
+ 
+ /**
+@@ -37,6 +40,7 @@ const SSOLogin = ({
+   ssoUrl,
+   debug = false,
+   style,
++  isOIDC = false,
+ }: PropsWithChildren<SSOLoginProps>) => {
+   const popupWindow = useRef(null)
+   const popupWindowClosedInterval = useRef(null)
+@@ -124,7 +128,9 @@ const SSOLogin = ({
+             const popupHeight = 670
+             const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
+             const popupright = (window.outerHeight / 2) - (popupHeight / 2)
+-            const popup = window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++            const popup = isOIDC
++              ? window.open(`${ssoUrl}/login-oidc`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++              : window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+             popupWindow.current = popup
+             setPopupWindowIsOpen(true)
+           }
