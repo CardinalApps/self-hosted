@@ -1,10 +1,11 @@
 diff a/libraries/access-control/src/i18n.ts b/libraries/access-control/src/i18n.ts	(rejected hunks)
-@@ -41,7 +41,7 @@ export const ACi18n: StringList = {
+@@ -15,7 +15,8 @@ export const ACi18n: StringList = {
    },
-   "role.newcomer.description": {
+   "role.owner.description": {
      "en": `
--      <p>The Newcomer role is the default role assigned to all users when they first join your server. It lets users log into the apps, but does not allow them to access any media.</p>
-+      <p>The Newcomer role is the default role assigned to users when they first join your server. It lets users log into the apps, but does not allow them to access any media.</p>
-       <p>The role exists as a waiting room for new users, allowing server administrators to start each new user from a position of least privilege.</p>
+-      <p>The Owner role is the most powerful role, with unrestricted capabilities. It is assigned to the first Cardinal Account that logs into the server, and can only be removed by performing a factory reset.</p>
++      <p>The Owner role is the most powerful role, with unrestricted capabilities. It is automatically assigned to the first Cardinal Account that logs into the server, and can only be removed by performing a factory reset.</p>
++      <p>It grants the user complete administrative control over the server, allowing them to invite users, delegate roles, index media, and more.</p>
+       <p>The Owner role also links the Media Server to Cardinal's Cloud, allowing the Media Server to use the features included in the owner's subscription. It is the only role that is limited to a single user.</p>
      `,
    },

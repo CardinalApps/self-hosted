@@ -1,10 +1,107 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -47,7 +47,7 @@ export const Roles: Record<`${RoleName}`, Role> = {
-     name: 'newcomer',
+@@ -3,6 +3,10 @@ import { CapabilityAssignments } from "./capabilities"
+ export enum RoleName {
+   OWNER = 'owner',
+   ADMINISTRATIOR = 'administrator',
++  MEDIA_APPS_USER = 'media_apps_user',
++  MUSIC_USER = 'music_user',
++  PHOTOS_USER = 'photos_user',
++  CINEMA_USER = 'cinema_user',
+   NEWCOMER = 'newcomer',
+ }
+ 
+@@ -18,6 +22,34 @@ export type Role = {
+   capabilities: CapabilityAssignments,
+ }
+ 
++/**
++ * Mapped for convience for spreading into the master list below.
++ */
++const MUSIC_APP_CAPABILITIES: CapabilityAssignments = [
++  'MusicApp.*',
++  'MusicArtists.*',
++  'MusicReleases.*',
++  'MusicGenres.*',
++  'MusicTracks.*',
++  'MusicHistory.*',
++]
++const PHOTOS_APP_CAPABILITIES: CapabilityAssignments = [
++  'PhotosApp.*',
++  'Photos.*',
++  'PhotoFaces.*',
++  'PhotoAlbums.*',
++  'PhotoAlbums.*',
++]
++const CINEMA_APP_CAPABILITIES: CapabilityAssignments = [
++  'CinemaApp.*',
++  'TVChannels.*',
++  'CinemaHistory.*',
++  'CinemaCollections.*',
++  'CinemaPlaylists.*',
++  'Movies.*',
++  'TVEpisodes.*',
++]
++
+ /**
+  * Master list of all roles and their capabilities.
+  */
+@@ -26,7 +58,7 @@ export const Roles: Record<`${RoleName}`, Role> = {
+     assignable: false,
+     revocable: false,
+     maxUsers: 1,
+-    name: 'owner',
++    name: RoleName.OWNER,
      capabilities: [
-       'MusicApp.Login',
--      //'PhotosApp.Login',
-+      'PhotosApp.Login',
-       'CinemaApp.Login',
+       '*.*',
+     ],
+@@ -35,16 +67,48 @@ export const Roles: Record<`${RoleName}`, Role> = {
+     assignable: true,
+     revocable: true,
+     maxUsers: null,
+-    name: 'administrator',
++    name: RoleName.ADMINISTRATIOR,
+     capabilities: [
+       '*.*',
      ],
    },
++  [RoleName.MEDIA_APPS_USER]: {
++    assignable: true,
++    revocable: true,
++    maxUsers: null,
++    name: RoleName.MEDIA_APPS_USER,
++    capabilities: [
++      ...MUSIC_APP_CAPABILITIES,
++      ...PHOTOS_APP_CAPABILITIES,
++      ...CINEMA_APP_CAPABILITIES,
++    ],
++  },
++  [RoleName.MUSIC_USER]: {
++    assignable: true,
++    revocable: true,
++    maxUsers: null,
++    name: RoleName.MUSIC_USER,
++    capabilities: MUSIC_APP_CAPABILITIES,
++  },
++  [RoleName.PHOTOS_USER]: {
++    assignable: true,
++    revocable: true,
++    maxUsers: null,
++    name: RoleName.PHOTOS_USER,
++    capabilities: PHOTOS_APP_CAPABILITIES,
++  },
++  [RoleName.CINEMA_USER]: {
++    assignable: true,
++    revocable: true,
++    maxUsers: null,
++    name: RoleName.CINEMA_USER,
++    capabilities: CINEMA_APP_CAPABILITIES,
++  },
+   [RoleName.NEWCOMER]: {
+     assignable: true,
+     revocable: true,
+     maxUsers: null,
+-    name: 'newcomer',
++    name: RoleName.NEWCOMER,
+     capabilities: [
+       'MusicApp.Login',
+       'PhotosApp.Login',
