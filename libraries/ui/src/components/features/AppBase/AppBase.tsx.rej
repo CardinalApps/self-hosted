@@ -1,23 +1,55 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -19,6 +19,7 @@ import
-   registerHomeServerAPIMiddleware,
-   removeHomeServerAPIMiddleware,
- } from '../../../lib/homeserver/homeServerAPI'
-+import handle401 from './middleware/handle401'
- import handle410 from './middleware/handle410'
+@@ -78,6 +78,7 @@ type AppBaseProps = {
+   publicRoutes?: ReactNode,
+   privateRoutes?: ReactNode,
+   privateScaffoldRoutes?: ReactNode,
++  oidcSsoButton?: ReactNode,
+ }
  
- import AppHeader from '../AppHeader'
-@@ -158,8 +159,12 @@ function AppBase({
-    * Register Media Server API middleware with the app.
-    */
-   useEffect(() => {
-+    registerHomeServerAPIMiddleware('handle_401', (...args) => handle401(args[0], args[1], args[2], args[3], dispatch, lang))
-     registerHomeServerAPIMiddleware('handle_410', (...args) => handle410(args[0], args[1], args[2], args[3], dispatch, lang))
--    return () => removeHomeServerAPIMiddleware('handle_410')
-+    return () => {
-+      removeHomeServerAPIMiddleware('handle_401')
-+      removeHomeServerAPIMiddleware('handle_410')
-+    }
-   }, [])
+ /**
+@@ -108,6 +109,7 @@ function AppBase({
+   publicRoutes,
+   privateRoutes,
+   privateScaffoldRoutes,
++  oidcSsoButton,
+ }: AppBaseProps) {
+   useServerSideEvents()
+   useHowler()
+@@ -129,20 +131,23 @@ function AppBase({
+     developer_mode = initialDeveloperMode,
+   } = useSelector(settingsSelectors.current)
  
-   /**
+-  const ssoButton = (
+-    <SSOLogin
+-      appId={cardinalAppId}
+-      permissions={cardinalAppPermissions}
+-      saveJWTInLocalStorage={true}
+-      onSSOSuccess={(JWT) => {
+-        dispatch(homeServerLogin({
+-          cardinalSSOToken: JWT,
+-          //redirectOutOfNextLoginPageVisit: window.location.href.includes(routes.LOGIN),
+-        }))
+-        onLoginSuccess?.()
+-      }}
+-    />
+-  )
++  const ssoButton = oidcSsoButton
++    ? oidcSsoButton
++    // TODO remove this once all apps provide an OIDC button
++    : (
++        <SSOLogin
++          appId={cardinalAppId}
++          permissions={cardinalAppPermissions}
++          saveJWTInLocalStorage={true}
++          onSSOSuccess={(JWT) => {
++            dispatch(homeServerLogin({
++              cardinalSSOToken: JWT,
++              //redirectOutOfNextLoginPageVisit: window.location.href.includes(routes.LOGIN),
++            }))
++            onLoginSuccess?.()
++          }}
++        />
++      )
+ 
+   const defaultHeader = (
+     <AppHeader
