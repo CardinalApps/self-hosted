@@ -1,0 +1,10 @@
+diff a/apps/photos-web/src/pages/Photo/Photo.tsx b/apps/photos-web/src/pages/Photo/Photo.tsx	(rejected hunks)
+@@ -15,7 +15,7 @@ export default function Photo() {
+   const { photoObj, photoError } = usePhoto(photoId)
+ 
+   return (
+-    <AppPage>
++    <AppPage capabilities={['Photos.Read']}>
+       <div className="photoPage">
+         {photoObj &&
+           <PhotoViewer

@@ -1,0 +1,13 @@
+diff a/apps/photos-web/src/pages/Locations/Locations.tsx b/apps/photos-web/src/pages/Locations/Locations.tsx	(rejected hunks)
+@@ -60,7 +60,10 @@ function LocationsPage() {
+   }, [data])
+ 
+   return (
+-    <AppPage layout={PAGE_LAYOUT.full}>
++    <AppPage
++      layout={PAGE_LAYOUT.full}
++      capabilities={['Photos.Read']}
++    >
+       <div className="locations">
+         <Map
+           renderDelay={400}

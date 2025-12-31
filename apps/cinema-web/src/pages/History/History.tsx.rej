@@ -1,10 +1,14 @@
 diff a/apps/cinema-web/src/pages/History/History.tsx b/apps/cinema-web/src/pages/History/History.tsx	(rejected hunks)
-@@ -12,7 +12,7 @@ import { HOME_SERVER_HOST } from '../../env'
+@@ -12,7 +12,11 @@ import { HOME_SERVER_HOST } from '../../env'
  
  function HistoryPage() {
    return (
--    <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title']['en']}>
-+    <AppPage layout={PAGE_LAYOUT.fixed} pageTitle={i18n['title']['en']}>
+-    <AppPage layout={PAGE_LAYOUT.fixed} pageTitle={i18n['title']['en']}>
++    <AppPage
++      layout={PAGE_LAYOUT.fixed}
++      pageTitle={i18n['title']['en']}
++      capabilities={['CinemaHistory.Read']}
++    >
        <section>
          <NoContentMessage
            showUnavailableMessage={true}

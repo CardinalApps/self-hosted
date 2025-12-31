@@ -1,10 +1,14 @@
 diff a/apps/cinema-web/src/pages/Channels/Channels.tsx b/apps/cinema-web/src/pages/Channels/Channels.tsx	(rejected hunks)
-@@ -12,7 +12,7 @@ import { HOME_SERVER_HOST } from '../../env'
+@@ -12,7 +12,11 @@ import { HOME_SERVER_HOST } from '../../env'
  
  function ChannelsPage() {
    return (
--    <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title']['en']}>
-+    <AppPage layout={PAGE_LAYOUT.fixed} pageTitle={i18n['title']['en']}>
+-    <AppPage layout={PAGE_LAYOUT.fixed} pageTitle={i18n['title']['en']}>
++    <AppPage
++      layout={PAGE_LAYOUT.fixed}
++      pageTitle={i18n['title']['en']}
++      capabilities={['TVChannels.Read']}
++    >
        <section>
          <NoContentMessage
            showUnavailableMessage={true}

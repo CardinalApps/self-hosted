@@ -1,33 +1,59 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -5,6 +5,7 @@
-  * access restricted.
+@@ -6,8 +6,8 @@
   */
  export const Aspects = [
-+  'CurrentUser',
-   'Users',
+   'CurrentUser',
+-  'Users',
    'AdminApp',
++  'Users',
    'Invitations',
-@@ -17,6 +18,8 @@ export const Aspects = [
+   'RoleAssignments',
+   'Indexing',
+@@ -16,11 +16,20 @@ export const Aspects = [
+   'MusicApp',
+   'MusicArtists',
    'MusicReleases',
++  'MusicGenres',
    'MusicTracks',
++  'MusicHistory',
    'PhotosApp',
-+  'Photos',
-+  'PhotoAlbums',
+   'Photos',
++  'PhotoFaces',
+   'PhotoAlbums',
    'CinemaApp',
++  'TVChannels',
++  'CinemaHistory',
++  'CinemaCollections',
++  'CinemaPlaylists',
++  'Movies',
++  'TVEpisodes',
  ] as const
  
-@@ -80,6 +83,14 @@ export const Capabilities = [
+ export type AspectNames = typeof Aspects[number]
+@@ -86,12 +95,26 @@ export const Capabilities = [
+   'Photos.Read',
+   'Photos.Update',
  
-   'PhotosApp.Login',
++  'PhotoFaces.Read',
++
+   'PhotoAlbums.Create',
+   'PhotoAlbums.Read',
+   'PhotoAlbums.Update',
+   'PhotoAlbums.Delete',
  
-+  'Photos.Read',
-+  'Photos.Update',
-+
-+  'PhotoAlbums.Create',
-+  'PhotoAlbums.Read',
-+  'PhotoAlbums.Update',
-+  'PhotoAlbums.Delete',
-+
    'CinemaApp.Login',
++
++  'TVChannels.Read',
++
++  'CinemaHistory.Read',
++
++  'CinemaCollections.Read',
++
++  'CinemaPlaylists.Read',
++
++  'Movies.Read',
++
++  'TVEpisodes.Read',
  ] as const
  
+ /**
