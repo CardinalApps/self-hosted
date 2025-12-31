@@ -1,10 +1,9 @@
 diff a/package.json b/package.json	(rejected hunks)
-@@ -18,7 +18,7 @@
-     "build:status:image": "docker build -f Dockerfile.status-app -t cardinalapps/status:latest .",
-     "build:website:image": "docker build -f Dockerfile.website -t cardinalapps/website:latest .",
-     "serve": "turbo run serve",
--    "test": "turbo run test --concurrency=1 --filter=!@cardinalapps/logger"
-+    "test": "turbo run test --force --concurrency=1"
-   },
-   "devDependencies": {
-     "turbo": "^2.4.2",
+@@ -8,6 +8,7 @@
+   "scripts": {
+     "dev": "turbo run dev --ui=tui --concurrency=25",
+     "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
++    "dev:woas": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server",
+     "lint": "turbo run lint --continue -- --max-warnings 0",
+     "typecheck": "turbo run typecheck --continue",
+     "build": "turbo run build",
