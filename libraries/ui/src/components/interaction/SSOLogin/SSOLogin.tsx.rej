@@ -1,30 +1,23 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -21,6 +21,9 @@ type SSOLoginProps = {
-   ssoUrl?: string,
-   debug?: boolean,
-   style?: CSSProperties,
-+
-+  // Temporary flag for OIDC login
-+  isOIDC?: boolean,
- }
+@@ -113,6 +113,12 @@ const SSOLogin = ({
+     }
+   }, [popupWindowIsOpen])
  
- /**
-@@ -37,6 +40,7 @@ const SSOLogin = ({
-   ssoUrl,
-   debug = false,
-   style,
-+  isOIDC = false,
- }: PropsWithChildren<SSOLoginProps>) => {
-   const popupWindow = useRef(null)
-   const popupWindowClosedInterval = useRef(null)
-@@ -124,7 +128,9 @@ const SSOLogin = ({
-             const popupHeight = 670
++  const oidcUrl = new URL('http://localhost:4013/oidc/auth')
++  oidcUrl.searchParams.append('client_id', 'cardinal-admin')
++  oidcUrl.searchParams.append('response_type', 'code')
++  oidcUrl.searchParams.append('scope', 'openid')
++  oidcUrl.searchParams.append('redirect_uri', 'http://localhost:3077')
++
+   return (
+     <>
+       <a
+@@ -129,7 +135,7 @@ const SSOLogin = ({
              const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
              const popupright = (window.outerHeight / 2) - (popupHeight / 2)
--            const popup = window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
-+            const popup = isOIDC
-+              ? window.open(`${ssoUrl}/login-oidc`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
-+              : window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+             const popup = isOIDC
+-              ? window.open(`${ssoUrl}/login-oidc`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++              ? window.open(oidcUrl.href, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+               : window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
              popupWindow.current = popup
              setPopupWindowIsOpen(true)
-           }
