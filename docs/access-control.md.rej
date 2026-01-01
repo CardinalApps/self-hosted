@@ -1,36 +1,59 @@
 diff a/docs/access-control.md b/docs/access-control.md	(rejected hunks)
-@@ -20,22 +20,23 @@ Capabilities, and all other Cardinal apps must use these lists.
+@@ -14,8 +14,9 @@ https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-cont
+ `/libraries/access-control`. It defines types for all of the foundational
+ concepts like Roles and Capabilities, and exports pure functions for running
+ access control logic.
+-1. It also contains the read-only master lists of all Roles, Components, and
+-Capabilities, and all other Cardinal apps must use these lists.
++1. It also contains the read-only master lists of all Roles, Aspects, and
++Capabilities, and even exports i18n for app UIs. All Cardinal apps must use this
++data.
+ 
  ## 2. Client-side Access Control
  
- 1. When checking capabilities in the UI, use the `<HasCapabilities />` component
--for conditional rendering.
-+or the `useHasCapabilities()` hook for conditional rendering.
- 1. Some common components like `<AppPage />` have a `capabilities` prop built in
- for convenience, while other components exist solely to wrap other components in
- capability checks, like `<CardWithCapabilities />`.
--1. Some server-side endpoints additionally need to know the Cardinal app context (Music app,
--Admin app, etc). This is done with a header called `cardinal-app`, and it's
--handled automatically by the RTK base API. Non-RTK-API calls may need to add the
--header.
-+1. Some server-side endpoints additionally need to know the Cardinal app context
-+(Music app, Admin app, etc). This is done with a header called `cardinal-app`,
-+and it's handled automatically by the RTK base API. Non-RTK-API calls may need
-+to add the header.
- 
--- **Important (1):** Never do *initial* access control checks in hooks or
-+- **Important (1):** If doing custom access checks (without the hasCapabilities
-+  component or hook), never do *initial* access control checks in hooks or
+@@ -32,23 +33,23 @@ to add the header.
+ - **Important (1):** If doing custom access checks (without the hasCapabilities
+   component or hook), never do *initial* access control checks in hooks or
    useEffects, and don't store the results in state. Doing so will lead to extra
--  renders and undesirable flashes of content. With `<HasAccess />` you get
--  exactly 1 check on component mount and no more. The result is memoized, so
--  it's truly only 1 check until the component is unmounted or a memoization
--  dependency changes (unlikely). All custom checks should behave the same way
--  (use the roles definied in the user.current slice).
-+  renders and undesirable flashes of content. With `<HasCapabilities />` or
-+  `useHasCapabilities()` you get exactly 1 check on component mount and no more.
-+  The result is memoized, so it's truly only 1 check until the component is
-+  unmounted or a memoization dependency changes (unlikely). All custom checks
-+  should behave the same way (use the roles definied in the user.current slice).
+-  renders and undesirable flashes of content. With `<HasCapabilities />` or
+-  `useHasCapabilities()` you get exactly 1 check on component mount and no more.
+-  The result is memoized, so it's truly only 1 check until the component is
+-  unmounted or a memoization dependency changes (unlikely). All custom checks
+-  should behave the same way (use the roles definied in the user.current slice).
++  renders and undesirable flashes of content. With `<HasCapabilities />` and
++  `useHasCapabilities()` you will execute exactly 1 RBAC check on initial
++  component mount. The result is memoized, so it's truly only 1 check until the
++  component is unmounted or a memoization dependency changes (unlikely). All
++  custom checks should behave the same way and not produce extra renders.
  - **Important (2):** When adding capability checks to the UI library, remember
    that components will crash if used in an app *without* a user context and a
    Media Server connection. So, don't do any access control checks in components
+-  that are used on the website, account portal, etc (wrap them instead).
++  that are shred with the website, account portal, etc (wrap them instead).
+ 
+ ## 3. Server-side Access Control
+ 
+ ### Role Assignments
+ 
+-The RBAC module only implements Role Assignments, *not* Roles and Capabilities
+-themselves. Role Assignments are stored in the database, and each one contains a
+-single role assigned to one user.
++The RBAC module in the Media Server only implements Role Assignments, *not*
++Roles and Capabilities themselves. Role Assignments are stored in the database,
++and each one contains a single role assigned to one user.
+ 
+ ### Performing Checks
+ 
+@@ -58,9 +59,9 @@ in any service.
+ #### In Controllers
+ 
+ There exists a decorator called `@Capabilities()` and a guard called
+-`CapabilitiesGuard`, but using them directly is discouraged. Instead, use the
+-`@StandardEndpoint()` decorator with the `capabilities` option. This will
+-automatically apply the correct decorators to secure the endpoint, perform
++`CapabilitiesGuard`, but using them directly is strongly discouraged. Instead,
++use the `@StandardEndpoint()` decorator with the `capabilities` option. This
++will automatically apply the correct decorators to secure the endpoint, perform
+ capability checks, and also apply OpenAPI decorators to document the capabilties
+ and response types for the endpoint.
+ 
