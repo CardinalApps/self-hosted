@@ -1,28 +1,49 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
+@@ -1,5 +1,6 @@
+ import { useState, useEffect, useRef } from 'react'
  import type { CSSProperties, PropsWithChildren } from 'react'
++import { v4 as uuid } from 'uuid'
  
  import BrandLogo from '../../layout/BrandLogo'
-+import { useAppSelector } from '../../../hooks/useAppSelector'
-+import { settingsSelectors } from '../../../store/slices/settings'
- 
- import { setJwt, JWT_TYPE } from '../../../lib/auth/jwt'
- import { CLOUD_AUTH_HOST, ACCOUNT_APP_HOST } from '../../../../env'
-@@ -50,6 +52,8 @@ const SSOLogin = ({
+ import { useAppSelector } from '../../../hooks/useAppSelector'
+@@ -51,6 +52,7 @@ const SSOLogin = ({
+   const popupWindow = useRef(null)
    const popupWindowClosedInterval = useRef(null)
    const [popupWindowIsOpen, setPopupWindowIsOpen] = useState(false)
++  const [oidcState] = useState(uuid())
  
-+  const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
-+
-   if (!ssoUrl) {
-     ssoUrl = window.location.href.includes('//localhost:') || window.location.href.includes('//127.0.0.1:')
-       ? SSO_URL_DEV
-@@ -120,7 +124,7 @@ const SSOLogin = ({
+   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
  
-   const getPopupUrl = () => {
-     // Legacy URL
--    if (!oidc) {
-+    if (!enable_oidc_beta) {
-       return `${ssoUrl}/login?sso`
-     }
+@@ -131,7 +133,10 @@ const SSOLogin = ({
+     const oidcUrl = new URL(`${CLOUD_AUTH_HOST}/oidc/auth`)
+     oidcUrl.searchParams.append('response_type', 'code')
+     oidcUrl.searchParams.append('scope', 'openid')
+-    oidcUrl.searchParams.append('redirect_uri', ACCOUNT_APP_HOST)
++    // oidcUrl.searchParams.append('state', oidcState)
++    // oidcUrl.searchParams.append('nonce', uuid())
++    //oidcUrl.searchParams.append('redirect_uri', `${ACCOUNT_APP_HOST}/oidc`) // real
++    oidcUrl.searchParams.append('redirect_uri', `${CLOUD_AUTH_HOST}/oidc`) // dev
+     oidcUrl.searchParams.append('client_id', oidc.client_id)
  
+     return oidcUrl.href
+@@ -148,13 +153,14 @@ const SSOLogin = ({
+           if (popupWindow.current) {
+             popupWindow.current.focus()
+           } else {
+-            const popupWidth = 525
+-            const popupHeight = 670
+-            const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
+-            const popupright = (window.outerHeight / 2) - (popupHeight / 2)
+-            const popup = window.open(getPopupUrl(), '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++            // const popupWidth = 525
++            // const popupHeight = 670
++            // const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
++            // const popupright = (window.outerHeight / 2) - (popupHeight / 2)
++            //const popup = window.open(getPopupUrl(), '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++            const popup = window.open(getPopupUrl(), '_blank', `popup=false`)
+             popupWindow.current = popup
+-            setPopupWindowIsOpen(true)
++            //setPopupWindowIsOpen(true)
+           }
+         }}
+       >

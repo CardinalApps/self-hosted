@@ -1,9 +1,10 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
-@@ -14,6 +14,7 @@
-     "serve": "serve ./storybook-static"
+@@ -39,7 +39,7 @@
+     "react-router-dom": "^7.2.0",
+     "serve": "^14.2.1",
+     "slugify": "^1.6.6",
+-    "uuid": "^11.0.5",
++    "uuid": "^11.1.0",
+     "vanilla-js-wheel-zoom": "8.1.0"
    },
-   "dependencies": {
-+    "@cardinalapps/access-control": "workspace:*",
-     "@cardinalapps/app-settings": "workspace:*",
-     "@cardinalapps/dtos": "workspace:*",
-     "@reduxjs/toolkit": "2.6.1",
+   "devDependencies": {
