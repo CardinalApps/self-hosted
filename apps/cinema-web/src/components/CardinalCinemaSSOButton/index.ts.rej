@@ -1,0 +1,7 @@
+diff a/apps/cinema-web/src/components/CardinalCinemaSSOButton/index.ts b/apps/cinema-web/src/components/CardinalCinemaSSOButton/index.ts	(rejected hunks)
+@@ -1,3 +1,3 @@
+-import CardinalAdminSSOButton from "./CardinalCinemaSSOButton"
++import CardinalCinemaSSOButton from "./CardinalCinemaSSOButton"
+ 
+-export default CardinalAdminSSOButton
++export default CardinalCinemaSSOButton
