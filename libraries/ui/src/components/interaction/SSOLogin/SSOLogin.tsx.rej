@@ -1,11 +1,65 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -134,7 +134,8 @@ const SSOLogin = ({
-       return `${ssoUrl}/login?sso`
-     }
+@@ -7,7 +7,7 @@ import { useAppSelector } from '../../../hooks/useAppSelector'
+ import { settingsSelectors } from '../../../store/slices/settings'
  
--    const oidcUrl = new URL(`${CLOUD_AUTH_HOST}/oidc/auth`)
-+    const oidcUrl = new URL(`${ACCOUNT_APP_HOST}/oidc`)
-+    //const oidcUrl = new URL(`${CLOUD_AUTH_HOST}/oidc/auth`)
+ import { setJwt, JWT_TYPE } from '../../../lib/auth/jwt'
+-import { CLOUD_AUTH_HOST, ACCOUNT_APP_HOST } from '../../../../env'
++import { ACCOUNT_APP_HOST } from '../../../../env'
+ 
+ import './SSOLogin.css'
+ 
+@@ -25,9 +25,6 @@ type SSOLoginProps = {
+   ssoUrl?: string,
+   debug?: boolean,
+   style?: CSSProperties,
+-  oidc?: {
+-    client_id: string,
+-  },
+ }
+ 
+ /**
+@@ -47,12 +44,10 @@ const SSOLogin = ({
+   ssoUrl,
+   debug = false,
+   style,
+-  oidc,
+ }: PropsWithChildren<SSOLoginProps>) => {
+   const ssoFlowWindow = useRef(null)
+   const ssoWindowClosedInterval = useRef(null)
+   const [ssoFlowIsOpen, setSSOFlowIsOpen] = useState(false)
+-  const [oidcState] = useState(uuid())
+ 
+   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
+ 
+@@ -137,9 +132,9 @@ const SSOLogin = ({
+     const oidcUrl = new URL(`${ACCOUNT_APP_HOST}/oidc`)
+     //const oidcUrl = new URL(`${CLOUD_AUTH_HOST}/oidc/auth`)
      oidcUrl.searchParams.append('response_type', 'code')
-     oidcUrl.searchParams.append('client_id', oidc.client_id)
+-    oidcUrl.searchParams.append('client_id', oidc.client_id)
++    //oidcUrl.searchParams.append('client_id', oidc.client_id)
      oidcUrl.searchParams.append('scope', 'openid')
+-    oidcUrl.searchParams.append('state', oidcState)
++    //oidcUrl.searchParams.append('state', oidcState)
+     oidcUrl.searchParams.append('nonce', uuid())
+     oidcUrl.searchParams.append('redirect_uri', `${ACCOUNT_APP_HOST}/oidc`)
+     //oidcUrl.searchParams.append('redirect_uri', `${CLOUD_AUTH_HOST}/oidc`) // oidc-provider dev mode
+@@ -158,16 +153,14 @@ const SSOLogin = ({
+           if (ssoFlowWindow.current) {
+             ssoFlowWindow.current.focus()
+           } else {
+-            // TODO maybe make this a user option?
+-            const openInPopup = false
+             const popupWidth = 525
+             const popupHeight = 670
+             const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
+             const popupright = (window.outerHeight / 2) - (popupHeight / 2)
+ 
+-            ssoFlowWindow.current = openInPopup
+-              ? window.open(getPopupUrl(), '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+-              : window.open(getPopupUrl())
++            ssoFlowWindow.current = enable_oidc_beta
++              ? window.open(getPopupUrl())
++              : window.open(getPopupUrl(), '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+ 
+             setSSOFlowIsOpen(true)
+           }

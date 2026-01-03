@@ -1,20 +1,21 @@
 diff a/apps/admin-web/src/components/AppRoot/AppRoot.tsx b/apps/admin-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -14,6 +14,8 @@ import Libraries from '../../pages/Libraries'
+@@ -14,7 +14,7 @@ import Libraries from '../../pages/Libraries'
  import FirstTimeSetup from '../../pages/FirstTimeSetup'
  import Roles from '../../pages/Roles'
  
-+import LoginWithCardinalOIDC from '../LoginWithCardinalOIDC'
-+
+-import LoginWithCardinalOIDC from '../LoginWithCardinalOIDC'
++import CardinalAdminSSOButton from '../CardinalAdminSSOButton'
+ 
  import * as routes from '../../routes'
  
- import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
-@@ -50,6 +52,9 @@ function AppRoot() {
+@@ -52,9 +52,7 @@ function AppRoot() {
        }}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
        cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-+      oidcSsoButton={
-+        <LoginWithCardinalOIDC />
-+      }
+-      oidcSsoButton={
+-        <LoginWithCardinalOIDC />
+-      }
++      oidcSsoButton={<CardinalAdminSSOButton />}
        onHomeServerRequiresFirstTimeSetup={() => {
          navigate(routes.FIRST_TIME_SETUP)
        }}

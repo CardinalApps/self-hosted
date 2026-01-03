@@ -1,17 +1,19 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx	(rejected hunks)
-@@ -62,12 +62,9 @@ function Login({
-         <Card
-           className={'card'}
-           padding="thick"
--          header={
--            <>
--              <i className="fas fa-id-card" />
--              <H2 className={'title'}>{i18n['login.title'][lang]}</H2>
--            </>
--          }
-+          icon={<i className="fas fa-id-card" />}
-+          iconSize="l"
-+          header={<H2 className={'title'}>{i18n['login.title'][lang]}</H2>}
-           footer={
-             <>
-               <Button onClick={prev} textual={true}>
+@@ -6,7 +6,7 @@ import H2 from '@cardinalapps/ui/src/components/typography/H2'
+ import Button from '@cardinalapps/ui/src/components/interaction/Button'
+ import Card from '@cardinalapps/ui/src/components/layout/Card'
+ 
+-import LoginWithCardinal from '../../../components/LoginWithCardinal'
++import CardinalAdminSSOButton from '../../../components/CardinalAdminSSOButton'
+ 
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import authAPI from '@cardinalapps/ui/src/lib/auth/authAPI'
+@@ -84,7 +84,7 @@ function Login({
+                 <p className={'currentUser'}>
+                   <i className="fas fa-check" /> {i18n['login.logged-in-as']['en']} {userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang]}
+                 </p>
+-              : <LoginWithCardinal
++              : <CardinalAdminSSOButton
+                   onSSOSuccess={onSSOSuccess}
+                   saveJWTInLocalStorage={false}
+                 />
