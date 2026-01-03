@@ -1,10 +1,9 @@
 diff a/libraries/ui/src/lib/auth/authAPI.ts b/libraries/ui/src/lib/auth/authAPI.ts	(rejected hunks)
-@@ -1,6 +1,6 @@
--import { JWT_TYPE, authorizedFetchHeaders } from './jwt.js'
-+import { JWT_TYPE, authorizedFetchHeaders } from './jwt'
- 
--import { CLOUD_AUTH_HOST } from '../../../env.js'
-+import { CLOUD_AUTH_HOST } from '../../../env'
- 
- const defaults = {
-   body: {},
+@@ -41,6 +41,7 @@ export default function authAPI<T>(endpoint, method = 'GET', options?): Promise<
+     fetch(`${CLOUD_AUTH_HOST}${endpoint}`, {
+       method: method,
+       headers: options.headers,
++      credentials: 'include',
+       body: options?.body && Object.keys(options.body).length ? JSON.stringify(options.body) : undefined,
+     })
+       .then((res) => {
