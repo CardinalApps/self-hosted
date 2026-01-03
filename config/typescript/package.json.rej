@@ -1,0 +1,10 @@
+diff a/config/typescript/package.json b/config/typescript/package.json	(rejected hunks)
+@@ -10,6 +10,7 @@
+     "./base": "./base.json",
+     "./library": "./library.json",
+     "./react-csr": "./react-csr.json",
+-    "./server-cjs": "./server-cjs.json"
++    "./server-nest": "./server-nest.json",
++    "./server-express": "./server-express.json"
+   }
+ }

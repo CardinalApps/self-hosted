@@ -1,0 +1,8 @@
+diff a/servers/media/tsconfig.json b/servers/media/tsconfig.json	(rejected hunks)
+@@ -1,5 +1,5 @@
+ {
+-  "extends": ["../../config/typescript/server-cjs"],
++  "extends": ["../../config/typescript/server-nest"],
+   "compilerOptions": {
+     "baseUrl": "./",
+     "outDir": "./dist",
