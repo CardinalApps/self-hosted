@@ -1,64 +1,58 @@
 diff a/pnpm-lock.yaml b/pnpm-lock.yaml	(rejected hunks)
-@@ -1177,6 +1177,9 @@ importers:
+@@ -1174,9 +1174,18 @@ importers:
+       '@types/oidc-provider':
+         specifier: ^8.8.1
+         version: 8.8.1
++      '@types/swagger-jsdoc':
++        specifier: ^6.0.4
++        version: 6.0.4
++      '@types/swagger-ui-express':
++        specifier: ^4.1.8
++        version: 4.1.8
        '@types/uuid':
          specifier: ^9.0.8
          version: 9.0.8
-+      swagger-ui-express:
-+        specifier: ^5.0.1
-+        version: 5.0.1(express@5.2.1)
-       tap:
-         specifier: ^16.3.10
-         version: 16.3.10(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@25.0.3)(typescript@5.9.3))(typescript@5.9.3)
-@@ -14208,6 +14211,12 @@ packages:
-   swagger-ui-dist@5.17.14:
-     resolution: {integrity: sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw==}
++      swagger-jsdoc:
++        specifier: ^6.2.8
++        version: 6.2.8(openapi-types@12.1.3)
+       swagger-ui-express:
+         specifier: ^5.0.1
+         version: 5.0.1(express@5.2.1)
+@@ -6128,6 +6155,12 @@ packages:
+   '@types/supertest@2.0.16':
+     resolution: {integrity: sha512-6c2ogktZ06tr2ENoZivgm7YnprnhYE4ZoXGMY+oA7IuAf17M8FWvujXZGmxLv8y0PTyts4x5A+erSwVUFA8XSg==}
  
-+  swagger-ui-express@5.0.1:
-+    resolution: {integrity: sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==}
-+    engines: {node: '>= v0.10.32'}
-+    peerDependencies:
-+      express: '>=4.0.0 || >=5.0.0-beta'
++  '@types/swagger-jsdoc@6.0.4':
++    resolution: {integrity: sha512-W+Xw5epcOZrF/AooUM/PccNMSAFOKWZA5dasNyMujTwsBkU74njSJBpvCCJhHAJ95XRMzQrrW844Btu0uoetwQ==}
 +
-   swap-case@1.1.2:
-     resolution: {integrity: sha512-BAmWG6/bx8syfc6qXPprof3Mn5vQgf5dwdUNJhsNqU9WdPt5P+ES/wQ5bxfijy8zwZgZZHslC3iAsxsuQMCzJQ==}
++  '@types/swagger-ui-express@4.1.8':
++    resolution: {integrity: sha512-AhZV8/EIreHFmBV5wAs0gzJUNq9JbbSXgJLQubCC0jtIo6prnI9MIRRxnU4MZX9RB9yXxF1V4R7jtLl/Wcj31g==}
++
+   '@types/through@0.0.33':
+     resolution: {integrity: sha512-HsJ+z3QuETzP3cswwtzt2vEIiHBk/dCcHGhbmG5X3ecnwFD/lPrMpliGXxSCg03L9AhrdwA4Oz/qfspkDW+xGQ==}
  
-@@ -17041,18 +17043,6 @@ snapshots:
-       '@babel/parser': 7.27.2
-       '@babel/types': 7.27.1
+@@ -9278,6 +9322,10 @@ packages:
+     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+     hasBin: true
  
--  '@babel/traverse@7.27.1':
--    dependencies:
--      '@babel/code-frame': 7.27.1
--      '@babel/generator': 7.27.1
--      '@babel/parser': 7.27.2
--      '@babel/template': 7.27.2
--      '@babel/types': 7.27.1
--      debug: 4.4.3
--      globals: 11.12.0
--    transitivePeerDependencies:
--      - supports-color
--
-   '@babel/traverse@7.27.1(supports-color@5.5.0)':
++  glob@7.1.6:
++    resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
++    deprecated: Glob versions prior to v9 are no longer supported
++
+   glob@7.1.7:
+     resolution: {integrity: sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==}
+     deprecated: Glob versions prior to v9 are no longer supported
+@@ -22401,6 +22500,13 @@ snapshots:
      dependencies:
-       '@babel/code-frame': 7.27.1
-@@ -26003,8 +25981,6 @@ snapshots:
+       '@types/superagent': 8.1.9
  
-   fn.name@1.1.0: {}
- 
--  follow-redirects@1.15.9: {}
--
-   follow-redirects@1.15.9(debug@4.3.4):
-     optionalDependencies:
-       debug: 4.3.4
-@@ -32673,6 +32649,11 @@ snapshots:
- 
-   swagger-ui-dist@5.17.14: {}
- 
-+  swagger-ui-express@5.0.1(express@5.2.1):
++  '@types/swagger-jsdoc@6.0.4': {}
++
++  '@types/swagger-ui-express@4.1.8':
 +    dependencies:
-+      express: 5.2.1
-+      swagger-ui-dist: 5.17.14
++      '@types/express': 4.17.22
++      '@types/serve-static': 1.15.7
 +
-   swap-case@1.1.2:
+   '@types/through@0.0.33':
      dependencies:
-       lower-case: 1.1.4
+       '@types/node': 22.15.21
