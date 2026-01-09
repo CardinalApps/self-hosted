@@ -1,31 +1,64 @@
 diff a/pnpm-lock.yaml b/pnpm-lock.yaml	(rejected hunks)
-@@ -12,8 +12,8 @@ importers:
-         specifier: ^2.4.2
-         version: 2.5.3
-       typescript:
--        specifier: 5.7.3
--        version: 5.7.3
-+        specifier: 5.9.3
-+        version: 5.9.3
- 
-   apps/account-web:
-     dependencies:
-@@ -1107,9 +1107,6 @@ importers:
- 
-   servers/auth:
-     dependencies:
--      '@cardinalapps/logger':
--        specifier: workspace:*
--        version: link:../../libraries/logger
-       body-parser:
-         specifier: ^2.2.1
-         version: 2.2.1
-@@ -1181,7 +1178,7 @@ importers:
+@@ -1177,6 +1177,9 @@ importers:
+       '@types/uuid':
          specifier: ^9.0.8
          version: 9.0.8
++      swagger-ui-express:
++        specifier: ^5.0.1
++        version: 5.0.1(express@5.2.1)
        tap:
--        specifier: ^16.0.1
-+        specifier: ^16.3.10
+         specifier: ^16.3.10
          version: 16.3.10(ts-node@10.9.2(@swc/core@1.11.29(@swc/helpers@0.5.17))(@types/node@25.0.3)(typescript@5.9.3))(typescript@5.9.3)
-       typescript:
-         specifier: ^5.9.3
+@@ -14208,6 +14211,12 @@ packages:
+   swagger-ui-dist@5.17.14:
+     resolution: {integrity: sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw==}
+ 
++  swagger-ui-express@5.0.1:
++    resolution: {integrity: sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==}
++    engines: {node: '>= v0.10.32'}
++    peerDependencies:
++      express: '>=4.0.0 || >=5.0.0-beta'
++
+   swap-case@1.1.2:
+     resolution: {integrity: sha512-BAmWG6/bx8syfc6qXPprof3Mn5vQgf5dwdUNJhsNqU9WdPt5P+ES/wQ5bxfijy8zwZgZZHslC3iAsxsuQMCzJQ==}
+ 
+@@ -17041,18 +17043,6 @@ snapshots:
+       '@babel/parser': 7.27.2
+       '@babel/types': 7.27.1
+ 
+-  '@babel/traverse@7.27.1':
+-    dependencies:
+-      '@babel/code-frame': 7.27.1
+-      '@babel/generator': 7.27.1
+-      '@babel/parser': 7.27.2
+-      '@babel/template': 7.27.2
+-      '@babel/types': 7.27.1
+-      debug: 4.4.3
+-      globals: 11.12.0
+-    transitivePeerDependencies:
+-      - supports-color
+-
+   '@babel/traverse@7.27.1(supports-color@5.5.0)':
+     dependencies:
+       '@babel/code-frame': 7.27.1
+@@ -26003,8 +25981,6 @@ snapshots:
+ 
+   fn.name@1.1.0: {}
+ 
+-  follow-redirects@1.15.9: {}
+-
+   follow-redirects@1.15.9(debug@4.3.4):
+     optionalDependencies:
+       debug: 4.3.4
+@@ -32673,6 +32649,11 @@ snapshots:
+ 
+   swagger-ui-dist@5.17.14: {}
+ 
++  swagger-ui-express@5.0.1(express@5.2.1):
++    dependencies:
++      express: 5.2.1
++      swagger-ui-dist: 5.17.14
++
+   swap-case@1.1.2:
+     dependencies:
+       lower-case: 1.1.4
