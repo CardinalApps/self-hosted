@@ -1,4 +1,4 @@
-diff a/libraries/ui/tsconfig.json b/libraries/ui/tsconfig.json	(rejected hunks)
+diff a/apps/music-web/tsconfig.app.json b/apps/music-web/tsconfig.app.json	(rejected hunks)
 @@ -1,4 +1,4 @@
  {
 -  "extends": ["../../config/typescript/react-csr"],

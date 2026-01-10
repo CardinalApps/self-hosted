@@ -1,10 +1,14 @@
 diff a/config/typescript/package.json b/config/typescript/package.json	(rejected hunks)
-@@ -10,6 +10,7 @@
+@@ -8,9 +8,9 @@
+   "type": "module",
+   "exports": {
      "./base": "./base.json",
++    "./express": "./express.json",
      "./library": "./library.json",
-     "./react-csr": "./react-csr.json",
--    "./server-cjs": "./server-cjs.json"
-+    "./server-nest": "./server-nest.json",
-+    "./server-express": "./server-express.json"
+-    "./react-csr": "./react-csr.json",
+-    "./server-nest": "./server-nest.json",
+-    "./server-express": "./server-express.json"
++    "./nest": "./nest.json",
++    "./vite": "./vite.json"
    }
  }

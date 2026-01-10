@@ -1,0 +1,8 @@
+diff a/apps/cinema-web/tsconfig.json b/apps/cinema-web/tsconfig.json	(rejected hunks)
+@@ -1,5 +1,5 @@
+ {
+-  "extends": ["../../config/typescript/react-csr"],
++  "extends": ["../../config/typescript/vite"],
+   "include": ["src"],
+   "references": [{ "path": "./tsconfig.node.json" }]
+ }
