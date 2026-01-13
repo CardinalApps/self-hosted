@@ -1,102 +1,86 @@
 diff a/libraries/access-control/src/contexts/media-server.ts b/libraries/access-control/src/contexts/media-server.ts	(rejected hunks)
-@@ -117,7 +117,7 @@ export type MediaServerCapability = typeof MediaServerCapabilities[number]
+@@ -1,8 +1,8 @@
+-import { CapabilityAssignments } from "../capabilities"
++import { CapabilityAssignments, CapabilityAssignment } from "../capabilities"
+ import { Role } from "../roles"
+ 
  /**
-  * Master list of all Media Server roles.
+- * Master list of all Media Server aspects.
++ * Master list of all aspects.
   */
--export enum RoleName {
-+export enum MediaServerRoleName {
+ export const MediaServerAspects = [
+   'CurrentUser',
+@@ -110,12 +110,17 @@ export const MediaServerCapabilities = [
+ ] as const
+ 
+ /**
+- * A type that includes all capabilities.
++ * Type with only literal capabilities.
+  */
+ export type MediaServerCapability = typeof MediaServerCapabilities[number]
+ 
+ /**
+- * Master list of all Media Server roles.
++ * Type that joins literal capabilities with wildcards for assignments.
++ */
++export type MediaServerCapabilityAssignment = CapabilityAssignment<MediaServerCapability>
++
++/**
++ * Master list of all roles.
+  */
+ export enum MediaServerRoleName {
    OWNER = 'owner',
-   ADMINISTRATIOR = 'administrator',
-   MEDIA_APPS_USER = 'media_apps_user',
-@@ -158,62 +158,62 @@ const CINEMA_APP_CAPABILITIES: CapabilityAssignments = [
+@@ -128,9 +133,9 @@ export enum MediaServerRoleName {
+ }
+ 
+ /**
+- * Mapped for convience for spreading into the master list below.
++ * Arrays for spreading into the roles master list.
+  */
+-const MUSIC_APP_CAPABILITIES: CapabilityAssignments = [
++const MUSIC_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> = [
+   'MusicApp.*',
+   'MusicArtists.*',
+   'MusicReleases.*',
+@@ -138,14 +143,14 @@ const MUSIC_APP_CAPABILITIES: CapabilityAssignments = [
+   'MusicTracks.*',
+   'MusicHistory.*',
+ ]
+-const PHOTOS_APP_CAPABILITIES: CapabilityAssignments = [
++const PHOTOS_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> = [
+   'PhotosApp.*',
+   'Photos.*',
+   'PhotoFaces.*',
+   'PhotoAlbums.*',
+   'PhotoAlbums.*',
+ ]
+-const CINEMA_APP_CAPABILITIES: CapabilityAssignments = [
++const CINEMA_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> = [
+   'CinemaApp.*',
+   'TVChannels.*',
+   'CinemaHistory.*',
+@@ -158,7 +163,7 @@ const CINEMA_APP_CAPABILITIES: CapabilityAssignments = [
  /**
   * Master list of all roles and their capabilities.
   */
--export const MediaServerRoles: Record<`${RoleName}`, Role> = {
--  [RoleName.OWNER]: {
-+export const MediaServerRoles: Record<`${MediaServerRoleName}`, Role> = {
-+  [MediaServerRoleName.OWNER]: {
+-export const MediaServerRoles: Record<`${MediaServerRoleName}`, Role> = {
++export const MediaServerRoles: Record<`${MediaServerRoleName}`, Role<MediaServerCapabilityAssignment>> = {
+   [MediaServerRoleName.OWNER]: {
      assignable: false,
      revocable: false,
-     maxUsers: 1,
--    name: RoleName.OWNER,
-+    name: MediaServerRoleName.OWNER,
-     capabilities: [
-       '*.*',
-     ],
-   },
--  [RoleName.ADMINISTRATIOR]: {
-+  [MediaServerRoleName.ADMINISTRATIOR]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.ADMINISTRATIOR,
-+    name: MediaServerRoleName.ADMINISTRATIOR,
-     capabilities: [
-       '*.*',
-     ],
-   },
--  [RoleName.MEDIA_APPS_USER]: {
-+  [MediaServerRoleName.MEDIA_APPS_USER]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.MEDIA_APPS_USER,
-+    name: MediaServerRoleName.MEDIA_APPS_USER,
-     capabilities: [
-       ...MUSIC_APP_CAPABILITIES,
-       ...PHOTOS_APP_CAPABILITIES,
-       ...CINEMA_APP_CAPABILITIES,
-     ],
-   },
--  [RoleName.MUSIC_USER]: {
-+  [MediaServerRoleName.MUSIC_USER]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.MUSIC_USER,
-+    name: MediaServerRoleName.MUSIC_USER,
-     capabilities: MUSIC_APP_CAPABILITIES,
-   },
--  [RoleName.PHOTOS_USER]: {
-+  [MediaServerRoleName.PHOTOS_USER]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.PHOTOS_USER,
-+    name: MediaServerRoleName.PHOTOS_USER,
-     capabilities: PHOTOS_APP_CAPABILITIES,
-   },
--  [RoleName.CINEMA_USER]: {
-+  [MediaServerRoleName.CINEMA_USER]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.CINEMA_USER,
-+    name: MediaServerRoleName.CINEMA_USER,
-     capabilities: CINEMA_APP_CAPABILITIES,
-   },
--  [RoleName.NEWCOMER]: {
-+  [MediaServerRoleName.NEWCOMER]: {
-     assignable: true,
-     revocable: true,
-     maxUsers: null,
--    name: RoleName.NEWCOMER,
-+    name: MediaServerRoleName.NEWCOMER,
-     capabilities: [
-       'MusicApp.Login',
-       'PhotosApp.Login',
-@@ -222,7 +222,11 @@ export const MediaServerRoles: Record<`${RoleName}`, Role> = {
+@@ -222,11 +227,14 @@ export const MediaServerRoles: Record<`${MediaServerRoleName}`, Role> = {
    },
  } as const
  
-+export type MediaServerRoleNames = keyof typeof MediaServerRoles
-+
++/**
++ * Type with all literal role names.
++ */
+ export type MediaServerRoleNames = keyof typeof MediaServerRoles
+ 
  /**
-- * A type with all role slugs.
-+ * Returns a single role.
+  * Returns a single role.
   */
--export type RoleNames = keyof typeof MediaServerRoles
-+export const getMediaServerRole = (role: MediaServerRoleNames): Role | undefined => {
-+  return MediaServerRoles?.[role]
-+}
+-export const getMediaServerRole = (role: MediaServerRoleNames): Role | undefined => {
++export const getMediaServerRole = (role: MediaServerRoleNames): Role<MediaServerCapabilityAssignment> | undefined => {
+   return MediaServerRoles?.[role]
+ }

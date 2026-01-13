@@ -1,25 +1,32 @@
+import { CapabilityAssignment } from "../capabilities"
 import { Role } from "../roles"
 
 /**
- * Master list of all Cloud aspects.
+ * Master list of all aspects.
  */
 export const CloudAspects = [
   'CurrentUser',
-  'AAAACloudAspect',
 ] as const
 
 export type CloudAspect = typeof CloudAspects[number]
 
 /**
- * Master list of all Cloud capabilities.
+ * Master list of all capabilities.
  */
 export const CloudCapabilities = [
   'CurrentUser.Read',
   'CurrentUser.Update',
-  'AAAACloudAspect.Update',
 ] as const
 
+/**
+ * Type with only literal capabilities.
+ */
 export type CloudCapability = typeof CloudCapabilities[number]
+
+/**
+ * Type that joins literal capabilities with wildcards for assignments.
+ */
+export type CloudCapabilityAssignment = CapabilityAssignment<CloudCapability>
 
 /**
  * Master list of all roles and their capabilities.
@@ -29,7 +36,10 @@ export enum CloudRoleName {
   USER = 'user',
 }
 
-export const CloudRoles: Record<`${CloudRoleName}`, Role> = {
+/**
+ * Master list of all roles and their capabilities.
+ */
+export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignment>> = {
   [CloudRoleName.ADMINISTRATIOR]: {
     assignable: true,
     revocable: true,
@@ -51,6 +61,6 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role> = {
 } as const
 
 /**
- * A type with all role slugs.
+ * Type with all literal role names.
  */
 export type CloudRoleNames = keyof typeof CloudRoles

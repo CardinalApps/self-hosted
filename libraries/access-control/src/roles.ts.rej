@@ -1,133 +1,27 @@
 diff a/libraries/access-control/src/roles.ts b/libraries/access-control/src/roles.ts	(rejected hunks)
-@@ -1,15 +1,5 @@
- import { CapabilityAssignments } from "./capabilities"
- 
--export enum RoleName {
--  OWNER = 'owner',
--  ADMINISTRATIOR = 'administrator',
--  MEDIA_APPS_USER = 'media_apps_user',
--  MUSIC_USER = 'music_user',
--  PHOTOS_USER = 'photos_user',
--  CINEMA_USER = 'cinema_user',
--  NEWCOMER = 'newcomer',
--}
+@@ -1,15 +1,18 @@
+-import { CapabilityAssignments } from "./capabilities"
 -
  /**
-  * Roles are sets of capabilities. Users can be assigned multiple different
-  * roles to form a superset of capabilities.
-@@ -18,114 +8,8 @@ export type Role = {
+- * Roles are sets of capabilities. Users can be assigned multiple different
+- * roles to form a superset of capabilities.
++ * Roles are sets of capability assignments. Users can be assigned multiple
++ * different roles to form a superset of capabilities.
+  */
+-export type Role = {
++export type Role<TCaps> = {
    assignable: boolean,
    revocable: boolean,
    maxUsers: number | null, // Use null for unlimited
--  //name: `${RoleName}`,
    name: string,
-   capabilities: CapabilityAssignments,
+-  capabilities: CapabilityAssignments,
++  capabilities: TCaps[],
  }
  
--/**
-- * Mapped for convience for spreading into the master list below.
-- */
--const MUSIC_APP_CAPABILITIES: CapabilityAssignments = [
--  'MusicApp.*',
--  'MusicArtists.*',
--  'MusicReleases.*',
--  'MusicGenres.*',
--  'MusicTracks.*',
--  'MusicHistory.*',
--]
--const PHOTOS_APP_CAPABILITIES: CapabilityAssignments = [
--  'PhotosApp.*',
--  'Photos.*',
--  'PhotoFaces.*',
--  'PhotoAlbums.*',
--  'PhotoAlbums.*',
--]
--const CINEMA_APP_CAPABILITIES: CapabilityAssignments = [
--  'CinemaApp.*',
--  'TVChannels.*',
--  'CinemaHistory.*',
--  'CinemaCollections.*',
--  'CinemaPlaylists.*',
--  'Movies.*',
--  'TVEpisodes.*',
--]
--
--/**
-- * Master list of all roles and their capabilities.
-- */
--export const Roles: Record<`${RoleName}`, Role> = {
--  [RoleName.OWNER]: {
--    assignable: false,
--    revocable: false,
--    maxUsers: 1,
--    name: RoleName.OWNER,
--    capabilities: [
--      '*.*',
--    ],
--  },
--  [RoleName.ADMINISTRATIOR]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.ADMINISTRATIOR,
--    capabilities: [
--      '*.*',
--    ],
--  },
--  [RoleName.MEDIA_APPS_USER]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.MEDIA_APPS_USER,
--    capabilities: [
--      ...MUSIC_APP_CAPABILITIES,
--      ...PHOTOS_APP_CAPABILITIES,
--      ...CINEMA_APP_CAPABILITIES,
--    ],
--  },
--  [RoleName.MUSIC_USER]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.MUSIC_USER,
--    capabilities: MUSIC_APP_CAPABILITIES,
--  },
--  [RoleName.PHOTOS_USER]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.PHOTOS_USER,
--    capabilities: PHOTOS_APP_CAPABILITIES,
--  },
--  [RoleName.CINEMA_USER]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.CINEMA_USER,
--    capabilities: CINEMA_APP_CAPABILITIES,
--  },
--  [RoleName.NEWCOMER]: {
--    assignable: true,
--    revocable: true,
--    maxUsers: null,
--    name: RoleName.NEWCOMER,
--    capabilities: [
--      'MusicApp.Login',
--      'PhotosApp.Login',
--      'CinemaApp.Login',
--    ],
--  },
--} as const
--
--/**
-- * A type with all role slugs.
-- */
--export type RoleNames = keyof typeof Roles
--
--/**
-- * Returns a single role.
-- */
--export const getRole = (role: RoleNames): Role | undefined => {
--  return Roles?.[role]
--}
-+// TODO add generic getRole() with context param
+-// TODO add generic getRole() with context param
++/**
++ * Returns a single role.
++ */
++// export const getMediaServerRole = (role: MediaServerRoleNames): Role<MediaServerCapability[]> | undefined => {
++//   return MediaServerRoles?.[role]
++// }

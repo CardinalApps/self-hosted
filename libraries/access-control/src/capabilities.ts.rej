@@ -1,89 +1,98 @@
 diff a/libraries/access-control/src/capabilities.ts b/libraries/access-control/src/capabilities.ts	(rejected hunks)
-@@ -1,14 +1,9 @@
--import { MediaServerAspect, MediaServerCapability } from "./contexts/media-server"
--
+@@ -1,32 +1,33 @@
  /**
-  * A capability is a single string that combines an aspect and an action,
-  * separating them with a dot.
+- * A capability is a single string that combines an aspect and an action,
+- * separating them with a dot.
++ * A capability is a string that combines an aspect and an action, separating
++ * them with a dot, like so:
   * 
-  *    {Aspect}.{Action}
+- *    {Aspect}.{Action}
++ *    - `{Aspect}.{Action}`
   * 
-- * The aspect must be defined in the Aspects array, and the action can be any
-- * arbitrary string except an asterisk (*).
-- * 
-  * Capability Assignments are stored as an array of capability strings. The
-  * strings can be exact matching capabilities, or can use of a wildcard for
-  * selecting broader ranges of capabilities.
-@@ -26,17 +21,23 @@ import { MediaServerAspect, MediaServerCapability } from "./contexts/media-serve
-  *    aspect.
+- * Capability Assignments are stored as an array of capability strings. The
+- * strings can be exact matching capabilities, or can use of a wildcard for
+- * selecting broader ranges of capabilities.
++ * Capability *Assignments* are either literal capabilities like above, or can
++ * include wildcards for selecting broader ranges of capabilities.
+  * 
+- *    `*.*` - Matches all aspects and all actions, granting all current and
+- *    future capabilities.
++ *    - `*.*` - Matches all aspects and all actions, granting all current and
++ *      future capabilities.
+  * 
+- *    `MusicApp.*` - Matches all actions in the MusicApp aspect, granting all
+- *    current and future MusicApp capabilities.
++ *    - `MusicApp.*` - Matches all actions in the MusicApp aspect, granting all
++ *      current and future MusicApp capabilities.
+  * 
+- *    `*.Login` - Matches only the Login action on all current and future
+- *    aspects.
++ *    - `*.Login` - Matches only the Login action on all current and future
++ *      aspects.
+  * 
+- *    `CinemaApp.Login` - Matches only the Login action on the CinemaApp
+- *    aspect.
++ *    - `CinemaApp.Login` - Matches only the Login action on the CinemaApp
++ *      aspect.
++ * 
++ * Use the generic to scope the CapabilityAssignment to a specific RBAC context.
   */
- export type CapabilityAssignment =
--  MediaServerCapability
+-export type CapabilityAssignment =
++export type CapabilityAssignment<T> =
++  T
    | '*.*'
--  | `${MediaServerAspect}.*`
-+  | `${string}.*`
+   | `${string}.*`
    | `*.${string}`
-+  | `${string}.${string}`
+-  | `${string}.${string}`
  
- export type CapabilityAssignments = CapabilityAssignment[]
+-export type CapabilityAssignments = CapabilityAssignment[]
++export type CapabilityAssignments<T> = CapabilityAssignment<T>[]
  
  /**
-- * Validate the syntax of an capability assignment.
-+ * Validate the syntax of an capability assignment. This will check:
-+ * 
-+ *    - That it's a string
-+ *    - That it has exactly 1 dot
-+ *    - That the left and right sides of the dot are not empty
-+ * 
-+ * This does *not* check that the capability exists in the master list.
+  * Validate the syntax of an capability assignment. This will check:
+@@ -37,7 +38,7 @@ export type CapabilityAssignments = CapabilityAssignment[]
+  * 
+  * This does *not* check that the capability exists in the master list.
   */
--const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean => {
-+const validateCapabilitySyntax = (assignment: string): boolean => {
+-const validateCapabilitySyntax = (assignment: string): boolean => {
++const validateCapabilitySyntax = <TCapabilityContext>(assignment: CapabilityAssignment<TCapabilityContext>): boolean => {
    if (typeof assignment !== 'string') {
      return false
    }
-@@ -62,7 +63,8 @@ const validateCapabilitySyntax = (assignment: CapabilityAssignment): boolean =>
- }
- 
- /**
-- * Validate the syntax of an array of capability assignments.
-+ * Validate the syntax of an array of capability assignments. All array items
-+ * must be valid.
+@@ -66,7 +67,7 @@ const validateCapabilitySyntax = (assignment: string): boolean => {
+  * Validate the syntax of an array of capability assignments. All array items
+  * must be valid.
   */
- const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []): boolean => {
+-const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []): boolean => {
++const validateCapabilitiesSyntax = <TCapabilityContext>(capabilityList: CapabilityAssignments<TCapabilityContext> = []): boolean => {
    let allAreValid = true
-@@ -78,10 +80,11 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []):
  
- /**
-  * Checks whether the required capability is satisfied by any of the given
-- * capability assignments.
-+ * capability assignments. Use the generic for autocomplete.
+   for (const capability of capabilityList) {
+@@ -84,8 +85,7 @@ const validateCapabilitiesSyntax = (capabilityList: CapabilityAssignments = []):
   */
--export function hasCapability(
--  requiredCapability: MediaServerCapability,
-+export function hasCapability<TCapabilityContext extends string>(
-+  requiredCapability: TCapabilityContext,
-+  // FIXME do I need this type? It has all caps from all contexts
-   assignments: CapabilityAssignments = [],
+ export function hasCapability<TCapabilityContext extends string>(
+   requiredCapability: TCapabilityContext,
+-  // FIXME do I need this type? It has all caps from all contexts
+-  assignments: CapabilityAssignments = [],
++  assignments: CapabilityAssignments<TCapabilityContext> = [],
  ) {
    if (!validateCapabilitySyntax(requiredCapability)) {
-@@ -129,8 +132,8 @@ export function hasCapability(
-  * Like `hasCapability()` but for more than 1 capability. Returns true if ALL
-  * capabilities are satisfied.
+     return false
+@@ -134,7 +134,7 @@ export function hasCapability<TCapabilityContext extends string>(
   */
--export function hasCapabilities(
--  requiredCapabilities: MediaServerCapability[],
-+export function hasCapabilities<TCapabilityContext extends string>(
-+  requiredCapabilities: TCapabilityContext[],
-   assignments: CapabilityAssignments = [],
+ export function hasCapabilities<TCapabilityContext extends string>(
+   requiredCapabilities: TCapabilityContext[],
+-  assignments: CapabilityAssignments = [],
++  assignments: CapabilityAssignments<TCapabilityContext> = [],
  ) {
    if (!requiredCapabilities) {
-@@ -143,7 +146,7 @@ export function hasCapabilities(
+     return true
+@@ -145,7 +145,7 @@ export function hasCapabilities<TCapabilityContext extends string>(
+   }
  
    const allCapabilitiesAreSatisfied = requiredCapabilities.every((requiredCapability) => {
-     const satisfiedByRole = assignments?.find((assignment: CapabilityAssignment) => {
--      return !!hasCapability(requiredCapability, [assignment])
-+      return !!hasCapability<TCapabilityContext>(requiredCapability, [assignment])
+-    const satisfiedByRole = assignments?.find((assignment: CapabilityAssignment) => {
++    const satisfiedByRole = assignments?.find((assignment: CapabilityAssignment<TCapabilityContext>) => {
+       return !!hasCapability<TCapabilityContext>(requiredCapability, [assignment])
      })
      return !!satisfiedByRole
-   })
