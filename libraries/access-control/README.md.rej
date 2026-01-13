@@ -1,16 +1,14 @@
 diff a/libraries/access-control/README.md b/libraries/access-control/README.md	(rejected hunks)
-@@ -1,3 +1,13 @@
- # Role-Based Access Control
+@@ -2,9 +2,9 @@
  
--https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control
-+## Core Design
-+
-+The design of the RBAC layer is built on two concepts: Capabilities and Roles.
-+These concepts are documented in detail on the public Help Site page for the
-+Media Server.
-+
-+[https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control](https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control)
-+
-+## Developer Docs
-+
-+[/docs/access-control.md](../../docs/access-control.md)
+ ## Core Design
+ 
+-The design of the RBAC layer is built on two concepts: Capabilities and Roles.
+-These concepts are documented in detail on the public Help Site page for the
+-Media Server.
++The core design of the RBAC layer is based on two concepts: Capabilities and
++Roles. These concepts are documented in detail on the public Help Site page for
++Cardinal Media Server.
+ 
+ [https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control](https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control)
+ 

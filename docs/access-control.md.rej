@@ -1,20 +1,88 @@
 diff a/docs/access-control.md b/docs/access-control.md	(rejected hunks)
-@@ -8,6 +8,18 @@ Before beginning, read the public docs on how RBAC works as a product feature:
+@@ -10,27 +10,30 @@ https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-cont
  
- https://help.cardinalapps.io/guides/cardinal-media-server/role-based-access-control
+ ## Contexts
  
-+## Contexts
+-The RBAC layer is applied in two different contexts: Media Server and Cardinal
+-Cloud. The RBAC layer in each context is implemented identically with the same
+-functions and helpers as described below, but the actual Capabilities and Roles
+-differ.
++Contexts can be thought of as namespaces for RBAC. Cardinal has two contexts:
++*Media Server* and *Cloud*. RBAC is implemented identially in both contexts,
++using the same functions and patterns as described below, but the actual
++Capabilities and Roles differ between the contexts.
+ 
+ This is necessary because these two contexts have different user accounts
+-assigned by different systems. In the Media Server context, `Admin` means
+-something different from `Admin` in the Cardinal Cloud context, and having
+-`Admin` in one does not grant you `Admin` in another.
++assigned by different systems. Both contexts may have a role called `Admin`, but
++within the Media Server context the `Admin` role grants you access to Media
++Server systems, while the Cloud `Admin` role grants access to Cloud systems.
+ 
+-## 1. The Core Library
++There is no overlap between contexts. When performing capability checks, the
++context must always be passed as a generic for typechecking to work correctly.
 +
-+The RBAC layer is applied in two different contexts: Media Server and Cardinal
-+Cloud. The RBAC layer in each context is implemented identically with the same
-+functions and helpers as described below, but the actual Capabilities and Roles
-+differ.
-+
-+This is necessary because these two contexts have different user accounts
-+assigned by different systems. In the Media Server context, `Admin` means
-+something different from `Admin` in the Cardinal Cloud context, and having
-+`Admin` in one does not grant you `Admin` in another.
-+
- ## 1. The Core Library
++## The Core Access Control Library
  
  1. The core library is `@cardinalapps/access-control` and it can be found at
+ `/libraries/access-control`. It defines types for all of the foundational
+ concepts like Roles and Capabilities, and exports pure functions for running
+ access control logic.
+ 1. It also contains the read-only master lists of all Roles, Aspects, and
+-Capabilities, and even exports i18n for app UIs. All Cardinal apps must use this
+-data.
++Capabilities for each Context, and even exports i18n for app UIs. All Cardinal
++apps must use this data.
+ 
+-## 2. Client-side Access Control
++## Implementing Client-side Access Control
+ 
+ 1. When checking capabilities in the UI, use the `<HasCapabilities />` component
+ or the `useHasCapabilities()` hook for conditional rendering.
+@@ -55,20 +58,18 @@ to add the header.
+   Media Server connection. So, don't do any access control checks in components
+   that are shred with the website, account portal, etc (wrap them instead).
+ 
+-## 3. Server-side Access Control
+-
+-### Role Assignments
+-
+-The RBAC module in the Media Server only implements Role Assignments, *not*
+-Roles and Capabilities themselves. Role Assignments are stored in the database,
+-and each one contains a single role assigned to one user.
++## Implementing Server-side Access Control
+ 
+-### Performing Checks
++Servers should only implements Role *Assignments*, not Roles and Capabilities
++themselves. Role Assignments are stored in the database, and each one contains a
++single role assigned to one user.
+ 
+ Access checks are designed to happen in controllers, but can also be performed
+ in any service.
+ 
+-#### In Controllers
++### Media Server
++
++#### Performing Checks in Controllers
+ 
+ There exists a decorator called `@Capabilities()` and a guard called
+ `CapabilitiesGuard`, but using them directly is strongly discouraged. Instead,
+@@ -82,10 +83,15 @@ If your access check has to happen downstream of the decorators, then use the
+ 
+ All failed access control checks should return a 403.
+ 
+-#### In Services
++#### Performing Checks In Services
+ 
+ If the access check has to happen in a service, then the service should import
+ the `hasCapability()` and/or `hasCapabilities()` functions from the
+ `@cardinalapps/access-control` library. An array containing all of the user's
+ capabilities will need to be created using their Role Assignments. Use
+ `getRole()` to get a role's capabilities.
++
++### Express Servers
++
++The Access Control library ships an Express middleware that can be used to
++perform capability checks on a per-endpoint basis.
