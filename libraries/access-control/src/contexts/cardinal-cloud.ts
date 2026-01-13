@@ -64,3 +64,10 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignme
  * Type with all literal role names.
  */
 export type CloudRoleNames = keyof typeof CloudRoles
+
+/**
+ * Returns a single role.
+ */
+export const getCloudRole = (role: CloudRoleNames): Role<CloudCapabilityAssignment> => {
+  return CloudRoles?.[role]
+}
