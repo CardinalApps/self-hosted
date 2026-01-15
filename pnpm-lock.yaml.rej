@@ -1,11 +1,56 @@
 diff a/pnpm-lock.yaml b/pnpm-lock.yaml	(rejected hunks)
-@@ -1107,6 +1107,9 @@ importers:
+@@ -1156,8 +1156,8 @@ importers:
+         specifier: ^5.10.0
+         version: 5.10.0
+       stripe:
+-        specifier: ^14.10.0
+-        version: 14.25.0
++        specifier: ^20.1.2
++        version: 20.1.2(@types/node@25.0.3)
+       ua-parser-js:
+         specifier: ^2.0.7
+         version: 2.0.7
+@@ -12857,6 +12857,10 @@ packages:
+     resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
+     engines: {node: '>=0.6'}
  
-   servers/auth:
++  qs@6.14.1:
++    resolution: {integrity: sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==}
++    engines: {node: '>=0.6'}
++
+   queue-microtask@1.2.3:
+     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+ 
+@@ -14117,9 +14121,14 @@ packages:
+     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
+     engines: {node: '>=8'}
+ 
+-  stripe@14.25.0:
+-    resolution: {integrity: sha512-wQS3GNMofCXwH8TSje8E1SE8zr6ODiGtHQgPtO95p9Mb4FhKC9jvXR2NUTpZ9ZINlckJcFidCmaTFV4P6vsb9g==}
+-    engines: {node: '>=12.*'}
++  stripe@20.1.2:
++    resolution: {integrity: sha512-qU+lQRRJnTxmyvglYBPE24/IepncmywsAg0GDTsTdP2pb+3e3RdREHJZjKgqCmv0phPxN/nmgNPnIPPH8w0P4A==}
++    engines: {node: '>=16'}
++    peerDependencies:
++      '@types/node': '>=16'
++    peerDependenciesMeta:
++      '@types/node':
++        optional: true
+ 
+   strnum@1.1.2:
+     resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
+@@ -32606,10 +32619,11 @@ snapshots:
+ 
+   strip-json-comments@3.1.1: {}
+ 
+-  stripe@14.25.0:
++  stripe@20.1.2(@types/node@25.0.3):
      dependencies:
-+      '@cardinalapps/access-control':
-+        specifier: workspace:*
-+        version: link:../../libraries/access-control
-       body-parser:
-         specifier: ^2.2.1
-         version: 2.2.1
+-      '@types/node': 22.15.21
+-      qs: 6.14.0
++      qs: 6.14.1
++    optionalDependencies:
++      '@types/node': 25.0.3
+ 
+   strnum@1.1.2:
+     optional: true
