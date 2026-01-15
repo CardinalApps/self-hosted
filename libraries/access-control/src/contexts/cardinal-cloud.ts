@@ -5,9 +5,12 @@ import { Role } from "../roles"
  * Master list of all aspects.
  */
 export const CloudAspects = [
+  'Users',
   'CurrentUser',
   'CurrentUserSessions',
-  'Users',
+  'Email',
+  'StoredToken',
+  'Subscription',
 ] as const
 
 export type CloudAspect = typeof CloudAspects[number]
@@ -32,6 +35,8 @@ export const CloudCapabilities = [
   'StoredToken.Create',
   'StoredToken.Consume',
   'StoredToken.Check',
+
+  'Subscription.Purchase',
 ] as const
 
 /**
@@ -75,6 +80,7 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignme
       'CurrentUserSessions.*',
       'Email.*',
       'StoredToken.*',
+      'Subscription.*',
     ],
   },
 } as const
