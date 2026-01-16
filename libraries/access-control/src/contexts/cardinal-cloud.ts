@@ -37,6 +37,7 @@ export const CloudCapabilities = [
   'StoredToken.Check',
 
   'Subscription.Purchase',
+  'Subscription.Manage',
 ] as const
 
 /**
