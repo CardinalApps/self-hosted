@@ -1,35 +1,18 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid'
- import BrandLogo from '../../layout/BrandLogo'
- 
- import { setJwt, JWT_TYPE } from '../../../lib/auth/jwt'
--import { ACCOUNT_APP_HOST } from '../../../../env'
-+import { ACCOUNT_APP_HOST/*, CLOUD_AUTH_HOST*/ } from '../../../../env'
- 
- import './SSOLogin.css'
- 
-@@ -127,17 +127,13 @@ const SSOLogin = ({
+@@ -29,8 +29,6 @@ type SSOLoginProps = {
+ /**
+  * Allows the user to input search queries. OIDC values must match what is in
+  * the app registry.
+- * 
+- * TODO: Remove legacy SSO.
+  */
+ const SSOLogin = ({
+   appId,
+@@ -127,6 +125,7 @@ const SSOLogin = ({
        return `${ssoUrl}/login?sso`
      }
  
--    const oidcUrl = new URL(`${ACCOUNT_APP_HOST}/oidc`)
--    //const oidcUrl = new URL(`${CLOUD_AUTH_HOST}/oidc/auth`)
--    oidcUrl.searchParams.append('response_type', 'code')
--    //oidcUrl.searchParams.append('client_id', oidc.client_id)
--    oidcUrl.searchParams.append('scope', 'openid')
--    //oidcUrl.searchParams.append('state', oidcState)
--    oidcUrl.searchParams.append('nonce', uuid())
--    oidcUrl.searchParams.append('redirect_uri', `${ACCOUNT_APP_HOST}/oidc`)
--    //oidcUrl.searchParams.append('redirect_uri', `${CLOUD_AUTH_HOST}/oidc`) // oidc-provider dev mode
--
--    return oidcUrl.href
-+    const newSsoFlowUrl = new URL(`${ACCOUNT_APP_HOST}/auth`)
-+    newSsoFlowUrl.searchParams.append('response_type', 'code')
-+    newSsoFlowUrl.searchParams.append('scope', 'openid')
-+    newSsoFlowUrl.searchParams.append('nonce', uuid())
-+    newSsoFlowUrl.searchParams.append('redirect_uri', `${ACCOUNT_APP_HOST}/oidc`)
-+
-+    return newSsoFlowUrl.href
-   }
- 
-   return (
++    // New SSO flow. Required
+     const newSsoFlowUrl = new URL(`${ACCOUNT_APP_HOST}/auth`)
+     newSsoFlowUrl.searchParams.append('response_type', 'code')
+     newSsoFlowUrl.searchParams.append('scope', 'openid')
