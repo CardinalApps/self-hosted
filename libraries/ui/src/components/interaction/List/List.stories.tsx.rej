@@ -1,9 +1,10 @@
 diff a/libraries/ui/src/components/interaction/List/List.stories.tsx b/libraries/ui/src/components/interaction/List/List.stories.tsx	(rejected hunks)
-@@ -19,6 +19,7 @@ export const Default = () => {
+@@ -19,7 +19,7 @@ export const Default = () => {
          { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', value: 'item-4' },
          { name: 'Item 5', value: 'item-5' },
          { name: 'Item 6', value: 'item-6' },
-+        { name: 'Item 6', value: 'item-6', label: 'Rows can have this additional label.' },
+-        { name: 'Item 6', value: 'item-6', label: 'Rows can have this additional label.' },
++        { name: 'Item 6', value: 'item-6', label: 'Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label.' },
        ]}
      />
    )

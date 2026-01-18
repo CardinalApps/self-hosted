@@ -1,0 +1,17 @@
+diff a/libraries/ui/src/components/layout/BrandLogo/BrandLogo.tsx b/libraries/ui/src/components/layout/BrandLogo/BrandLogo.tsx	(rejected hunks)
+@@ -23,6 +23,7 @@ export type BrandLogoIcon =
+   'books'|
+   'admin'|
+   'cardinal_server'|
++  'cardinal_media_server' |
+   'home_server'
+ 
+ type BrandLogoProps = {
+@@ -59,6 +60,7 @@ const BrandLogo = ({
+         return CardinalBooks
+       case 'home_server':
+       case 'cardinal_server':
++      case 'cardinal_media_server':
+       case 'admin':
+         return CardinalServer
+     }
