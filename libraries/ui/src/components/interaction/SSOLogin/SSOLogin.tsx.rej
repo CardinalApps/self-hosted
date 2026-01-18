@@ -1,69 +1,24 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -4,8 +4,11 @@ import { v4 as uuid } from 'uuid'
+@@ -6,7 +6,6 @@ import BrandLogo from '../../layout/BrandLogo'
  
- import BrandLogo from '../../layout/BrandLogo'
- 
-+import { toastActions } from '../../../store/slices/toast'
+ import { toastActions } from '../../../store/slices/toast'
  import { setJwt, JWT_TYPE } from '../../../lib/auth/jwt'
- import { ACCOUNT_APP_HOST/*, CLOUD_AUTH_HOST*/ } from '../../../../env'
-+import authAPI from '../../../lib/auth/authAPI'
-+import { useAppDispatch } from '../../../hooks/useAppDispatch'
+-import { ACCOUNT_APP_HOST/*, CLOUD_AUTH_HOST*/ } from '../../../../env'
+ import authAPI from '../../../lib/auth/authAPI'
+ import { useAppDispatch } from '../../../hooks/useAppDispatch'
  
- import './SSOLogin.css'
- 
-@@ -43,8 +46,10 @@ const SSOLogin = ({
-   enableNewSSOFlow = false,
-   style,
- }: PropsWithChildren<SSOLoginProps>) => {
-+  const dispatch = useAppDispatch()
-   const ssoFlowWindow = useRef(null)
+@@ -51,6 +50,7 @@ const SSOLogin = ({
    const ssoWindowClosedInterval = useRef(null)
-+  //const [ssoIsLoading, setSSOIsLoading] = useState(false)
+   //const [ssoIsLoading, setSSOIsLoading] = useState(false)
    const [ssoFlowIsOpen, setSSOFlowIsOpen] = useState(false)
++  const [nonce, setNonce] = useState(uuid())
  
    if (!ssoUrl) {
-@@ -102,7 +107,7 @@ const SSOLogin = ({
-       if (!ssoWindowClosedInterval.current) {
-         // Check every 500ms if the popup is still open.
-         ssoWindowClosedInterval.current = setInterval(() => {
--          if (ssoFlowWindow.current.closed) {
-+          if (ssoFlowWindow?.current?.closed) {
-             clearInterval(ssoWindowClosedInterval.current)
-             ssoWindowClosedInterval.current = null
-             ssoFlowWindow.current = null
-@@ -118,21 +123,68 @@ const SSOLogin = ({
-     }
-   }, [ssoFlowIsOpen])
+     ssoUrl = window.location.href.includes('//localhost:') || window.location.href.includes('//127.0.0.1:')
+@@ -58,6 +58,24 @@ const SSOLogin = ({
+       : SSO_URL_PROD
+   }
  
-+  /**
-+   * Begins the SSO flow by fetching an interactive login session URL from the
-+   * auth server.
-+   */
-+  const getInteractiveSSOLoginUrl = () => {
-+    return new Promise((resolve) => {
-+      authAPI('/sso/interactive-login-session', 'POST', {
-+        body: {
-+          appId,
-+          nonce: uuid(),
-+          scopes: [
-+            'user_id',
-+          ],
-+        },
-+      })
-+        .then(resolve)
-+        .catch((err) => {
-+          dispatch(toastActions.addToQueue({
-+            title: err?.message,
-+            type: 'danger',
-+          }))
-+        })
-+    })
-+  }
- 
--  const getPopupUrl = () => {
--    // Legacy URL
--    if (!enableNewSSOFlow) {
--      return `${ssoUrl}/login?sso`
 +  /**
 +   * TODO remove
 +   */
@@ -79,59 +34,73 @@ diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries
 +      ssoFlowWindow.current = window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
 +
 +      setSSOFlowIsOpen(true)
-     }
-+  }
- 
--    // New SSO flow. Required
--    const newSsoFlowUrl = new URL(`${ACCOUNT_APP_HOST}/auth`)
--    newSsoFlowUrl.searchParams.append('response_type', 'code')
--    newSsoFlowUrl.searchParams.append('scope', 'openid')
--    newSsoFlowUrl.searchParams.append('nonce', uuid())
--    newSsoFlowUrl.searchParams.append('redirect_uri', `${ACCOUNT_APP_HOST}/oidc`)
--
--    return newSsoFlowUrl.href
-+  const handleSSOClick = () => {
-+    if (ssoFlowWindow.current) {
-+      ssoFlowWindow.current.focus()
-+    } else {
-+      const isPopup = true
-+      const popupWidth = 525
-+      const popupHeight = 670
-+      const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
-+      const popupright = (window.outerHeight / 2) - (popupHeight / 2)
-+
-+      getInteractiveSSOLoginUrl()
-+        .then((res: { interactiveLoginUrl: string }) => {
-+          const url = res.interactiveLoginUrl
-+          setSSOFlowIsOpen(true)
-+          ssoFlowWindow.current = isPopup
-+            ? window.open(url)
-+            : window.open(url, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
-+        })
 +    }
++  }
++
+   const handlePopupWindowMessage = (e) => {
+     if (debug) console.log('Received postMessage in SSOLogin', e)
+ 
+@@ -68,7 +86,8 @@ const SSOLogin = ({
+     // Popup says it's ready - send our app ID and permissions
+     if (e.origin === ssoUrl && e?.data?.CARDINAL_SSO_READY) {
+       ssoFlowWindow.current.postMessage({
+-        appId: appId,
++        appId,
++        nonce,
+         requestedPermissions: permissions,
+         userAgentString: navigator.userAgent,
+       }, ssoUrl)
+@@ -112,6 +131,7 @@ const SSOLogin = ({
+             ssoWindowClosedInterval.current = null
+             ssoFlowWindow.current = null
+             setSSOFlowIsOpen(false)
++            setNonce(uuid())
+             if (typeof onPopupClosed === 'function') {
+               onPopupClosed()
+             }
+@@ -132,7 +152,7 @@ const SSOLogin = ({
+       authAPI('/sso/interactive-login-session', 'POST', {
+         body: {
+           appId,
+-          nonce: uuid(),
++          nonce,
+           scopes: [
+             'user_id',
+           ],
+@@ -148,24 +168,6 @@ const SSOLogin = ({
+     })
    }
  
-   return (
-@@ -143,19 +195,10 @@ const SSOLogin = ({
-         rel="noreferrer"
-         style={style}
-         onClick={() => {
--          if (ssoFlowWindow.current) {
--            ssoFlowWindow.current.focus()
-+          if (enableNewSSOFlow) {
-+            handleSSOClick()
-           } else {
--            const popupWidth = 525
--            const popupHeight = 670
--            const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
--            const popupright = (window.outerHeight / 2) - (popupHeight / 2)
+-  /**
+-   * TODO remove
+-   */
+-  const handleLegacySSOClick = () => {
+-    if (ssoFlowWindow.current) {
+-      ssoFlowWindow.current.focus()
+-    } else {
+-      const popupWidth = 525
+-      const popupHeight = 670
+-      const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
+-      const popupright = (window.outerHeight / 2) - (popupHeight / 2)
 -
--            ssoFlowWindow.current = enableNewSSOFlow
--              ? window.open(getPopupUrl())
--              : window.open(getPopupUrl(), '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
+-      ssoFlowWindow.current = window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
 -
--            setSSOFlowIsOpen(true)
-+            handleLegacySSOClick()
-           }
-         }}
-       >
+-      setSSOFlowIsOpen(true)
+-    }
+-  }
+-
+   const handleSSOClick = () => {
+     if (ssoFlowWindow.current) {
+       ssoFlowWindow.current.focus()
+@@ -179,10 +181,10 @@ const SSOLogin = ({
+       getInteractiveSSOLoginUrl()
+         .then((res: { interactiveLoginUrl: string }) => {
+           const url = res.interactiveLoginUrl
+-          setSSOFlowIsOpen(true)
+           ssoFlowWindow.current = isPopup
+             ? window.open(url)
+             : window.open(url, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
++          setSSOFlowIsOpen(true)
+         })
+     }
+   }
