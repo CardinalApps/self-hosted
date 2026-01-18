@@ -1,12 +1,9 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -107,6 +107,10 @@
-     }
-   }
+@@ -101,6 +101,7 @@
+     display: flex;
+     font-size: 13px;
+     justify-content: flex-end;
++    align-items: center;
  
-+  > .access-error {
-+    height: 100%;
-+  }
-+
-   @media screen and (max-width: 768px) {
- 
-     &.padding-thick { padding: 0; }
+     button {
+       margin: 0 5px;
