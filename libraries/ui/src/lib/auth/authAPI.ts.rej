@@ -1,18 +1,14 @@
 diff a/libraries/ui/src/lib/auth/authAPI.ts b/libraries/ui/src/lib/auth/authAPI.ts	(rejected hunks)
-@@ -50,13 +50,9 @@ export default function authAPI<T>(endpoint, method = 'GET', options?): Promise<
-             .then((thing) => resolve(thing))
-             .catch((e) => resolve(e))
+@@ -52,7 +52,11 @@ export default function authAPI<T>(endpoint, method = 'GET', options?): Promise<
          } else {
--          try {
--            res.json().then((thing) => reject(thing))
--          } catch (err) {
--            res.text()
--              .then((msg) => reject(msg))
--              .catch(() => reject(undefined))
--          }
-+          res.json()
-+            .then((thing) => reject(thing))
-+            .catch(() => reject(res.statusText))
+           res.json()
+             .then((thing) => reject(thing))
+-            .catch(() => reject(res.statusText))
++            .catch(() => {
++              res.text()
++                .then((msg) => reject(msg))
++                .catch(() => reject(res.statusText))
++            })
          }
        })
        .catch((err) => {

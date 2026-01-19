@@ -1,15 +1,54 @@
 diff a/libraries/ui/src/components/interaction/Alert/Alert.css b/libraries/ui/src/components/interaction/Alert/Alert.css	(rejected hunks)
-@@ -68,6 +68,13 @@
-     outline: none;
-     margin-left: 12px;
-   }
-+
-+  .alert-controls-col {
-+
-+    button {
-+      white-space: nowrap;
-+    }
-+  }
- }
+@@ -5,14 +5,16 @@
+   display: flex;
+   align-items: center;
+   position: relative;
+-  font-size: 13px;
+-  font-weight: 500;
+   border-radius: var(--border-radius);
  
- @media (max-width: 768px) {
+   &.success {
+     color: white;
+     background: var(--success-bg);
+ 
++    p {
++      color: white;
++    }
++
+     button {
+       color: white;
+       border: 1px solid white;
+@@ -28,6 +30,10 @@
+     color: black;
+     background: var(--warning-bg);
+ 
++    p {
++      color: black;
++    }
++
+     button {
+       color: black;
+       border: 1px solid black;
+@@ -43,6 +49,10 @@
+     color: white;
+     background: var(--danger-bg);
+ 
++    p {
++      color: white;
++    }
++
+     button {
+       color: white;
+       border: 1px solid white;
+@@ -75,8 +85,11 @@
+   }
+ 
+   p {
++    font-size: 13px !important;
++    font-weight: 500 !important;
+     flex-grow: 1;
+     line-height: 1.4em;
++    margin-bottom: 0 !important;
+   }
+ 
+   button {

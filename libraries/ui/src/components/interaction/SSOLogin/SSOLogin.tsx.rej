@@ -1,34 +1,9 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -10,6 +10,8 @@ import authAPI from '../../../lib/auth/authAPI'
- import { useAppDispatch } from '../../../hooks/useAppDispatch'
+@@ -18,6 +18,7 @@ const SSO_URL_PROD = 'https://account.cardinalapps.io'
  
- import './SSOLogin.css'
-+import { useAppSelector } from '../../../hooks/useAppSelector'
-+import { settingsSelectors } from '../../../store/slices/settings'
- 
- const SSO_URL_DEV = 'http://localhost:3077'
- const SSO_URL_PROD = 'https://account.cardinalapps.io'
-@@ -51,6 +53,7 @@ const SSOLogin = ({
-   //const [ssoIsLoading, setSSOIsLoading] = useState(false)
-   const [ssoFlowIsOpen, setSSOFlowIsOpen] = useState(false)
-   const [nonce, setNonce] = useState(uuid())
-+  const { server_name } = useAppSelector(settingsSelectors.current)
- 
-   if (!ssoUrl) {
-     ssoUrl = window.location.href.includes('//localhost:') || window.location.href.includes('//127.0.0.1:')
-@@ -88,6 +91,7 @@ const SSOLogin = ({
-       ssoFlowWindow.current.postMessage({
-         appId,
-         nonce,
-+        serverName: server_name,
-         requestedPermissions: permissions,
-         userAgentString: navigator.userAgent,
-       }, ssoUrl)
-@@ -153,6 +157,7 @@ const SSOLogin = ({
-         body: {
-           appId,
-           nonce,
-+          serverName: server_name,
-           scopes: [
-             'user_id',
-           ],
+ type SSOLoginProps = {
+   appId: string,
++  // FIXME remove this (they are set server side)
+   permissions: string,
+   saveJWTInLocalStorage?: boolean,
+   onPopupOpened?: () => void,
