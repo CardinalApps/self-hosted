@@ -1,21 +1,22 @@
 diff a/libraries/ui/src/store/slices/cloudUser/thunks/fetch.ts b/libraries/ui/src/store/slices/cloudUser/thunks/fetch.ts	(rejected hunks)
-@@ -5,6 +5,7 @@ import { getJWT, deleteJwt, JWT_TYPE, authorizedFetchHeaders } from '../../../..
+@@ -5,7 +5,7 @@ import { getJWT, deleteJwt, JWT_TYPE, authorizedFetchHeaders } from '../../../..
  import { STORE_KEY, USER_DATA_API_URL, USER_DATA_PII_API_URL } from '../constants'
  import { AppDispatch, RootState } from '../../..'
  import { CloudUser } from '..'
-+import authAPI from '../../../../lib/auth/authAPI'
+-import authAPI from '../../../../lib/auth/authAPI'
++//import authAPI from '../../../../lib/auth/authAPI'
  
  export type FetchCloudUserSuccess = {
    status: string | number | boolean,
-@@ -40,6 +41,11 @@ const fetchCloudUser = createAsyncThunk<
-     state: RootState
+@@ -42,9 +42,9 @@ const fetchCloudUser = createAsyncThunk<
    }
  >(`${STORE_KEY}/fetchUser`, async (options?) => {
-+
-+  const test = await authAPI('/user?meeee')
-+
-+  console.log('TEST', test)
-+
+ 
+-  const test = await authAPI('/user?meeee')
++  // const test = await authAPI('/user?meeee')
+ 
+-  console.log('TEST', test)
++  // console.log('TEST', test)
+ 
    if (!getJWT(JWT_TYPE.CLOUD_USER)) {
      console.error('fetchUser requires that the app has a JWT.')
-     throw new Error()
