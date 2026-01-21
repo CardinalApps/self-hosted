@@ -1,9 +1,10 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -101,6 +101,7 @@
-     display: flex;
-     font-size: 13px;
-     justify-content: flex-end;
-+    align-items: center;
+@@ -8,7 +8,7 @@
+   &.padding-thick { padding: 20px; }
+   &.padding-thick > .card-header { padding: 10px 40px; min-height: 90px; }
+   &.padding-thick > .card-content { padding: 30px 40px; }
+-  &.padding-thick > .card-footer { padding: 30px 20px 20px; }
++  &.padding-thick > .card-footer { padding: 30px 20px 20px 40px; }
  
-     button {
-       margin: 0 5px;
+   &.padding-regular > .card-header { padding: 30px 40px; min-height: 90px; }
+   &.padding-regular > .card-content { padding: 30px 40px; }
