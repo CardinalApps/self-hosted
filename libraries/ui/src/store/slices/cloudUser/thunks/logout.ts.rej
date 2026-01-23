@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/store/slices/cloudUser/thunks/logout.ts b/libraries/ui/src/store/slices/cloudUser/thunks/logout.ts	(rejected hunks)
+@@ -9,7 +9,6 @@ import { STORE_KEY } from '../constants'
+  * Logs a user out.
+  */
+ const cloudUserLogout = createAsyncThunk(`${STORE_KEY}/logout`, async () => {
+-  // Do not await - let's keep this non-blocking
+   authAPI('/user/session', 'DELETE')
+   deleteJwt()
+ 

@@ -1,26 +1,12 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -22,7 +22,7 @@ type SSOLoginProps = {
-   permissions?: string,
-   saveJWTInLocalStorage?: boolean,
-   onPopupOpened?: () => void,
--  onSSOSuccess?: (JWT: string) => void,
-+  onSSOSuccess?: (JWT?: string) => void,
-   onPopupClosed?: () => void,
-   label?: string,
-   ssoUrl?: string,
-@@ -114,6 +114,15 @@ const SSOLogin = ({
-         onSSOSuccess(e.data.CARDINAL_USER_JWT)
+@@ -115,10 +115,6 @@ const SSOLogin = ({
        }
      }
-+
-+    if (e.origin === ssoUrl) {
-+      console.log(e)
-+    }
-+
-+    // New SSO flow uses this property
-+    if (e.origin === ssoUrl && e?.data?.checkedOut) {
-+      onSSOSuccess()
-+    }
-   }
  
-   /**
+-    if (e.origin === ssoUrl) {
+-      console.log(e)
+-    }
+-
+     // New SSO flow uses this property
+     if (e.origin === ssoUrl && e?.data?.checkedOut) {
+       onSSOSuccess()
