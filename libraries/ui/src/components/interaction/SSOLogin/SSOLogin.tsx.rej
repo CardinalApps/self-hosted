@@ -1,29 +1,124 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -44,7 +44,7 @@ const SSOLogin = ({
+@@ -16,9 +16,26 @@ import { settingsSelectors } from '../../../store/slices/settings'
+ const SSO_URL_DEV = 'http://localhost:3077'
+ const SSO_URL_PROD = 'https://account.cardinalapps.io'
+ 
++export const SSO_DEBUG_PARAM = '?___debugSSO' as const
++
++export const IPC_HANDSHAKE_READY_SIGNAL = 'CARDINAL_SSO_READY' as const
++export const IPC_HANDSHAKE_SUCCESS_SIGNAL = 'CARDINAL_POPUP_TRUSTS_PARENT' as const
++export const IPC_SSO_DONE_SIGNAL = 'CARDINAL_SSO_DONE' as const
++
++type TokenType = 'JWT' | 'cookie'
++
++export type IPCHandshakeMessageData = {
++  appId: string,
++  nonce: string,
++  serverName: string,
++  userAgentString: string,
++  tokenType: TokenType,
++  debug: boolean,
++}
++
+ type SSOLoginProps = {
+   appId: string,
+-  // FIXME remove this (they are set server side)
++  // FIXME remove this with the old sso (they are set server side now)
+   permissions?: string,
+   saveJWTInLocalStorage?: boolean,
+   onPopupOpened?: () => void,
+@@ -26,8 +43,8 @@ type SSOLoginProps = {
+   onPopupClosed?: () => void,
+   label?: string,
+   ssoUrl?: string,
+-  debug?: boolean,
+   enableNewSSOFlow?: boolean,
++  tokenType?: TokenType,
+   style?: CSSProperties,
+ }
+ 
+@@ -44,8 +61,8 @@ const SSOLogin = ({
    onPopupClosed,
    label = 'Sign in with Cardinal Cloud',
    ssoUrl,
--  debug = false,
-+  debug = true,
+-  debug = true,
    enableNewSSOFlow = false,
++  tokenType = 'JWT',
    style,
  }: PropsWithChildren<SSOLoginProps>) => {
-@@ -89,14 +89,15 @@ const SSOLogin = ({
+   const dispatch = useAppDispatch()
+@@ -56,6 +73,8 @@ const SSOLogin = ({
+   const [nonce, setNonce] = useState(uuid())
+   const { server_name } = useAppSelector(settingsSelectors.current)
+ 
++  const debug = window.location.search.includes(SSO_DEBUG_PARAM)
++
+   if (!ssoUrl) {
+     ssoUrl = window.location.href.includes('//localhost:') || window.location.href.includes('//127.0.0.1:')
+       ? SSO_URL_DEV
+@@ -89,23 +108,26 @@ const SSOLogin = ({
  
      // Popup says it's ready - send our app ID and permissions
      if (e.origin === ssoUrl && e?.data?.CARDINAL_SSO_READY) {
--      ssoFlowWindow.current.postMessage({
-+      const dataToSend = {
+-      const dataToSend = {
++      const dataToSend: IPCHandshakeMessageData = {
          appId,
          nonce,
-         serverName: server_name,
-         requestedPermissions: permissions,
+-        serverName: server_name,
+-        requestedPermissions: permissions,
++        serverName: server_name as string,
          userAgentString: navigator.userAgent,
--      }, ssoUrl)
--      if (debug) console.log('Sent initial postMessage', e)
-+      }
-+      ssoFlowWindow.current.postMessage(dataToSend, ssoUrl)
-+      if (debug) console.log('Sent initial postMessage', dataToSend)
++        tokenType,
++        debug,
++        // @ts-expect-error remove this with the old SSO
++        requestedPermissions: permissions,
+       }
+       ssoFlowWindow.current.postMessage(dataToSend, ssoUrl)
+       if (debug) console.log('Sent initial postMessage', dataToSend)
      }
  
      // Popup got the app ID - handshake complete
+-    if (e.origin === ssoUrl && e?.data?.CARDINAL_POPUP_TRUSTS_PARENT) {
++    if (e.origin === ssoUrl && e?.data?.[IPC_HANDSHAKE_SUCCESS_SIGNAL]) {
+       if (debug) console.log('Cardinal SSO popup initial handshake complete')
+     }
+ 
+-    // Popup says the SSO flow was completed successfully
++    // Popup says the SSO flow was completed successfully (OLD SSO ONLY)
+     if (e.origin === ssoUrl && e?.data?.CARDINAL_USER_JWT) {
+       if (debug) console.log('Cardinal SSO login success')
+       if (saveJWTInLocalStorage) {
+@@ -116,9 +138,11 @@ const SSOLogin = ({
+       }
+     }
+ 
+-    // New SSO flow uses this property
+-    if (e.origin === ssoUrl && e?.data?.checkedOut) {
+-      onSSOSuccess()
++    // New SSO flow uses this property with the JWT attached
++    if (e.origin === ssoUrl && e?.data?.[IPC_SSO_DONE_SIGNAL]) {
++      const JWT = e?.data?.JWT
++      setJwt(JWT, JWT_TYPE.CLOUD_USER)
++      onSSOSuccess(JWT)
+     }
+   }
+ 
+@@ -164,6 +188,7 @@ const SSOLogin = ({
+         body: {
+           appId,
+           nonce,
++          tokenType,
+           serverName: server_name,
+         },
+       })
+@@ -189,7 +214,9 @@ const SSOLogin = ({
+ 
+       getInteractiveSSOLoginUrl()
+         .then((res: { interactiveLoginUrl: string }) => {
+-          const url = res.interactiveLoginUrl
++          const url = debug
++            ? `${res.interactiveLoginUrl}?${SSO_DEBUG_PARAM}`
++            : res.interactiveLoginUrl
+           ssoFlowWindow.current = isPopup
+             ? window.open(url)
+             : window.open(url, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
