@@ -1,10 +1,22 @@
 diff a/libraries/ui/src/components/interaction/UserMenu/UserMenu.css b/libraries/ui/src/components/interaction/UserMenu/UserMenu.css	(rejected hunks)
-@@ -405,7 +405,7 @@
+@@ -282,14 +282,19 @@
  
-       span {
-         font-size: 12px;
--        font-weight: 600;
-+        font-weight: 400;
-         color: var(--text-color-3);
+     .login-with-cardinal-button {
+       width: 100%;
++      min-height: 40px;
+       justify-content: center;
+-      background: var(--bg-4);
++      background: var(--bg-2);
+       font-family: var(--font-family);
+       transition: all 200ms;
  
-         &:after {
+       &:hover {
+         background: var(--bg-3);
+       }
++
++      span {
++        font-size: 12px;
++      }
+     }
+ 
+     .accent-button {
