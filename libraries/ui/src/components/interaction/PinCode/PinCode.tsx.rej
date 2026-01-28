@@ -1,0 +1,10 @@
+diff a/libraries/ui/src/components/interaction/PinCode/PinCode.tsx b/libraries/ui/src/components/interaction/PinCode/PinCode.tsx	(rejected hunks)
+@@ -86,8 +86,6 @@ const PinCode = ({
+               if (prevDigitEl) {
+                 setPinDigit(digitIndex - 1, undefined)
+                 prevDigitEl.focus()
+-              } else {
+-                setIsCompleted(true)
+               }
+             }
+           }}
