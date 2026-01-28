@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/lib/auth/jwt.ts b/libraries/ui/src/lib/auth/jwt.ts	(rejected hunks)
+@@ -140,13 +140,18 @@ export function authorizedFetchHeaders(JWT = JWT_TYPE.CLOUD_USER) {
+ 
+   if (JWT) {
+     if (JWT === JWT_TYPE.CLOUD_USER) {
+-      headers = {
+-        Authorization: `Bearer ${getJwt(JWT_TYPE.CLOUD_USER)}`,
++      const jwt = getJwt(JWT_TYPE.CLOUD_USER)
++      if (jwt) {
++        headers = {
++          Authorization: `Bearer ${jwt}`,
++        }
+       }
+     } else if (JWT === JWT_TYPE.HOME_SERVER_USER) {
++      const homeJwt = getJwt(JWT_TYPE.HOME_SERVER_USER)
++      const cloudJwt = getJwt(JWT_TYPE.CLOUD_USER)
+       headers = {
+-        Authorization: `Bearer ${getJwt(JWT_TYPE.HOME_SERVER_USER)}`,
+-        CardinalTolkien: getJwt(JWT_TYPE.CLOUD_USER),
++        ...(homeJwt ? { Authorization: `Bearer ${getJwt(JWT_TYPE.HOME_SERVER_USER)}` } : {}),
++        ...(cloudJwt ? { CardinalTolkien: getJwt(JWT_TYPE.CLOUD_USER) } : {}),
+       }
+     } else {
+       headers = {
