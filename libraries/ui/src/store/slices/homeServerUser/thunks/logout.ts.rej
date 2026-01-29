@@ -1,0 +1,12 @@
+diff a/libraries/ui/src/store/slices/homeServerUser/thunks/logout.ts b/libraries/ui/src/store/slices/homeServerUser/thunks/logout.ts	(rejected hunks)
+@@ -21,7 +21,9 @@ const homeServerLogout = createAsyncThunk<
+ >(`${STORE_KEY}/logout`, async (data, thunkAPI) => {
+   deleteJWT(JWT_TYPE.HOME_SERVER_USER)
+ 
+-  thunkAPI.dispatch(cloudUserLogout())
++  if (thunkAPI.getState().cloudUser.loggedIn) {
++    thunkAPI.dispatch(cloudUserLogout())
++  }
+ 
+   return true
+ })
