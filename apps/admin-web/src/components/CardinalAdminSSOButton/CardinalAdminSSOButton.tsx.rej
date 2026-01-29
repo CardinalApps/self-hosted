@@ -1,9 +1,9 @@
 diff a/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx b/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx	(rejected hunks)
-@@ -48,7 +48,6 @@ export default function CardinalAdminSSOButton({
+@@ -48,6 +48,7 @@ export default function CardinalAdminSSOButton({
        {!loading &&
          <SSOLogin
            appId={CARDINAL_PUBLIC_APP_ID}
--          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
++          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
            saveJWTInLocalStorage={saveJWTInLocalStorage}
            onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
            enableNewSSOFlow={!!enable_oidc_beta}

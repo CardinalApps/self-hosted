@@ -1,36 +1,9 @@
 diff a/libraries/ui/src/store/slices/app/index.ts b/libraries/ui/src/store/slices/app/index.ts	(rejected hunks)
-@@ -12,7 +12,6 @@ type AppSliceState = {
-   app: CardinalApp,
-   version: string | null,
-   cardinalAppId: string | null,
--  cardinalAppPermissions: string | null,
-   kioskMode: boolean | false,
-   resetAt: number | null,
-   basePath: string,
-@@ -27,7 +26,6 @@ const initialState: AppSliceState = {
-   app: null,
-   version: null,
-   cardinalAppId: null,
--  cardinalAppPermissions: null,
-   kioskMode: false,
-   resetAt: null,
-   basePath: '',
-@@ -50,10 +48,6 @@ const appSlice = createSlice({
-     setCardinalAppId: (state, action: PayloadAction<string>) => {
-       state.cardinalAppId = action.payload
-     },
--    // Verified by the Cardinal App Registry
--    setCardinalAppPermissions: (state, action: PayloadAction<string>) => {
--      state.cardinalAppPermissions = action.payload
--    },
-     setVersion: (state, action: PayloadAction<string>) => {
-       state.version = action.payload
-     },
-@@ -97,7 +91,6 @@ const appSlice = createSlice({
+@@ -91,6 +97,7 @@ const appSlice = createSlice({
    selectors: {
      app: (state) => state.app,
      cardinalAppId: (state) => state.cardinalAppId,
--    cardinalAppPermissions: (state) => state.cardinalAppId,
++    cardinalAppPermissions: (state) => state.cardinalAppId,
      version: (state) => state.version,
      kioskMode: (state) => state.kioskMode,
      cloudStatus: (state) => state.cloudStatus,

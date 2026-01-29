@@ -1,18 +1,9 @@
 diff a/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx b/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx	(rejected hunks)
-@@ -10,7 +10,7 @@ import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/th
- 
- import * as routes from '../../routes'
- 
--import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
-+import { CARDINAL_PUBLIC_APP_ID } from '../../env'
- 
- type LoginWithCardinalProps = {
-   automaticallyLogin?: boolean,
-@@ -48,7 +48,6 @@ export default function CardinalAdminSSOButton({
+@@ -48,6 +48,7 @@ export default function CardinalAdminSSOButton({
        {!loading &&
          <SSOLogin
            appId={CARDINAL_PUBLIC_APP_ID}
--          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
++          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
            saveJWTInLocalStorage={saveJWTInLocalStorage}
            onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
            enableNewSSOFlow={!!enable_oidc_beta}

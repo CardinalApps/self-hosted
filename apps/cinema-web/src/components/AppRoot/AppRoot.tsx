@@ -16,7 +16,7 @@ import WatchNowPage from '../../pages/WatchNow'
 import CardinalCinemaSSOButton from '../CardinalCinemaSSOButton'
 
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
-import { CARDINAL_PUBLIC_APP_ID } from '../../env'
+import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
 
 import i18n from './i18n.json'
 
@@ -48,6 +48,7 @@ function AppRoot() {
         useLocation,
       }}
       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
+      cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
       ssoButton={<CardinalCinemaSSOButton />}
       onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
       topLevelContextMenuItems={[

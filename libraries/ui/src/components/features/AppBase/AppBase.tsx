@@ -61,6 +61,7 @@ type AppBaseProps = {
   version?: string,
   router: RouterContextType,
   cardinalAppId?: string,
+  cardinalAppPermissions?: string,
   authStorage?: 'localStorage' | 'sessionStorage',
   onLoginSuccess?: () => void,
   initialDeveloperMode?: boolean,

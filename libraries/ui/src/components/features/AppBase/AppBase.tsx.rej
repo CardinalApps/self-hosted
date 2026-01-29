@@ -1,25 +1,17 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -60,7 +60,6 @@ type AppBaseProps = {
-   version?: string,
-   router: RouterContextType,
-   cardinalAppId?: string,
--  cardinalAppPermissions?: string,
-   authStorage?: 'localStorage' | 'sessionStorage',
-   onLoginSuccess?: () => void,
-   initialDeveloperMode?: boolean,
-@@ -90,7 +89,6 @@ function AppBase({
+@@ -89,6 +90,7 @@ function AppBase({
    version,
    router,
    cardinalAppId,
--  cardinalAppPermissions,
++  cardinalAppPermissions,
    //authStorage = 'localStorage',
    initialDeveloperMode = false,
    kioskMode = false,
-@@ -235,7 +233,6 @@ function AppBase({
+@@ -233,6 +235,7 @@ function AppBase({
     */
    useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
    useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
--  useEffect(() => { dispatch(appActions.setCardinalAppPermissions(cardinalAppPermissions)) }, [cardinalAppPermissions])
++  useEffect(() => { dispatch(appActions.setCardinalAppPermissions(cardinalAppPermissions)) }, [cardinalAppPermissions])
    useEffect(() => { dispatch(appActions.setKioskMode(kioskMode)) }, [kioskMode])
    useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
  
