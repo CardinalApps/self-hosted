@@ -1,76 +1,25 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -14,7 +14,6 @@ import { ModalLayer } from '../../layout/Modal'
- import { DrawerLayer } from '../../layout/Drawer'
- import PhotoViewerLayer from '../PhotoViewer/PhotoViewerLayer'
- import
--//homeServerAPI,
- {
-   registerHomeServerAPIMiddleware,
-   removeHomeServerAPIMiddleware,
-@@ -23,7 +22,6 @@ import handle401 from './middleware/handle401'
- import handle410 from './middleware/handle410'
- 
- import AppHeader from '../AppHeader'
--import SSOLogin from '../../interaction/SSOLogin'
- 
- import AppLoading from './AppLoading'
- import AppPrivate from './AppPrivate'
-@@ -34,7 +32,6 @@ import DevTools from './DevTools'
- import { globalActions } from '../../../store/constants/actions'
- import healthCheck from '../../../store/slices/homeServer/thunks/healthCheck'
- import reloadHomeServerUser from '../../../store/slices/homeServerUser/thunks/reload'
--import homeServerLogin from '../../../store/slices/homeServerUser/thunks/login'
- import { appSelectors, appActions } from '../../../store/slices/app'
- import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
- import { homeServerSelectors, homeServerActions } from '../../../store/slices/homeServer'
-@@ -78,7 +75,7 @@ type AppBaseProps = {
-   publicRoutes?: ReactNode,
-   privateRoutes?: ReactNode,
-   privateScaffoldRoutes?: ReactNode,
--  oidcSsoButton?: ReactNode,
-+  ssoButton?: ReactNode,
- }
- 
- /**
-@@ -95,7 +92,6 @@ function AppBase({
+@@ -60,7 +60,6 @@ type AppBaseProps = {
+   version?: string,
+   router: RouterContextType,
+   cardinalAppId?: string,
+-  cardinalAppPermissions?: string,
+   authStorage?: 'localStorage' | 'sessionStorage',
+   onLoginSuccess?: () => void,
+   initialDeveloperMode?: boolean,
+@@ -90,7 +89,6 @@ function AppBase({
+   version,
+   router,
    cardinalAppId,
-   cardinalAppPermissions,
+-  cardinalAppPermissions,
    //authStorage = 'localStorage',
--  onLoginSuccess,
    initialDeveloperMode = false,
    kioskMode = false,
-   basePath = '',
-@@ -109,7 +105,7 @@ function AppBase({
-   publicRoutes,
-   privateRoutes,
-   privateScaffoldRoutes,
--  oidcSsoButton,
-+  ssoButton,
- }: AppBaseProps) {
-   useServerSideEvents()
-   useHowler()
-@@ -131,24 +127,6 @@ function AppBase({
-     developer_mode = initialDeveloperMode,
-   } = useSelector(settingsSelectors.current)
+@@ -235,7 +233,6 @@ function AppBase({
+    */
+   useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
+   useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
+-  useEffect(() => { dispatch(appActions.setCardinalAppPermissions(cardinalAppPermissions)) }, [cardinalAppPermissions])
+   useEffect(() => { dispatch(appActions.setKioskMode(kioskMode)) }, [kioskMode])
+   useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
  
--  const ssoButton = oidcSsoButton
--    ? oidcSsoButton
--    // TODO remove this once all apps provide an OIDC button
--    : (
--        <SSOLogin
--          appId={cardinalAppId}
--          permissions={cardinalAppPermissions}
--          saveJWTInLocalStorage={true}
--          onSSOSuccess={(JWT) => {
--            dispatch(homeServerLogin({
--              cardinalSSOToken: JWT,
--              //redirectOutOfNextLoginPageVisit: window.location.href.includes(routes.LOGIN),
--            }))
--            onLoginSuccess?.()
--          }}
--        />
--      )
--
-   const defaultHeader = (
-     <AppHeader
-       app={app}

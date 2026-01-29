@@ -1,61 +1,18 @@
 diff a/apps/photos-web/src/components/AppRoot/AppRoot.tsx b/apps/photos-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
- 
- import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
-+import { PhotoRoutes } from '@cardinalapps/ui/src/lib/net/router'
- 
- import Nav from '../Nav'
- import SettingsPanel from '../SettingsPanel'
-@@ -11,8 +12,7 @@ import PhotoAlbumPage from '../../pages/PhotoAlbum'
- import PeoplePage from '../../pages/People'
- import PhotoPage from '../../pages/Photo'
- import LocationsPage from '../../pages/Locations'
--
--import * as routes from '../../routes'
-+import CardinalPhotosSSOButton from '../CardinalPhotosSSOButton'
+@@ -15,7 +15,7 @@ import LocationsPage from '../../pages/Locations'
+ import CardinalPhotosSSOButton from '../CardinalPhotosSSOButton'
  
  import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
- import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
-@@ -48,6 +48,7 @@ function AppRoot() {
+-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
++import { CARDINAL_PUBLIC_APP_ID } from '../../env'
+ 
+ import i18n from './i18n.json'
+ 
+@@ -47,7 +47,6 @@ function AppRoot() {
+         useLocation,
        }}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-+      ssoButton={<CardinalPhotosSSOButton />}
+-      cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+       ssoButton={<CardinalPhotosSSOButton />}
        onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
        topLevelContextMenuItems={[
-         {
-@@ -71,27 +72,27 @@ function AppRoot() {
-       privateScaffoldRoutes={
-         <>
-           <Route
--            path={routes.ROOT}
-+            path={PhotoRoutes.root}
-             element={<ArchivePage />}
-           />
-           <Route
--            path={routes.PHOTO_ALBUMS}
-+            path={PhotoRoutes.photo_albums}
-             element={<PhotoAlbumsPage />}
-           />
-           <Route
--            path={routes.PHOTO_ALBUM}
-+            path={PhotoRoutes.photo_album}
-             element={<PhotoAlbumPage />}
-           />
-           <Route
--            path={routes.PEOPLE}
-+            path={PhotoRoutes.people}
-             element={<PeoplePage />}
-           />
-           <Route
--            path={routes.LOCATIONS}
-+            path={PhotoRoutes.locations}
-             element={<LocationsPage />}
-           />
-           <Route
--            path={routes.PHOTO}
-+            path={PhotoRoutes.photo}
-             element={<PhotoPage />}
-           />
-         </>

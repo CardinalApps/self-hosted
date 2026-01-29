@@ -1,66 +1,18 @@
 diff a/apps/cinema-web/src/components/AppRoot/AppRoot.tsx b/apps/cinema-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
- 
- import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
-+import { CinemaRoutes } from '@cardinalapps/ui/src/lib/net/router'
- 
- import Nav from '../Nav'
- import SettingsPanel from '../SettingsPanel'
-@@ -12,8 +13,7 @@ import MoviesPage from '../../pages/Movies'
- import PlaylistsPage from '../../pages/Playlists'
- import TVPage from '../../pages/TV'
- import WatchNowPage from '../../pages/WatchNow'
--
--import * as routes from '../../routes'
-+import CardinalCinemaSSOButton from '../CardinalCinemaSSOButton'
+@@ -16,7 +16,7 @@ import WatchNowPage from '../../pages/WatchNow'
+ import CardinalCinemaSSOButton from '../CardinalCinemaSSOButton'
  
  import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
- import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
-@@ -49,6 +49,7 @@ function AppRoot() {
+-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
++import { CARDINAL_PUBLIC_APP_ID } from '../../env'
+ 
+ import i18n from './i18n.json'
+ 
+@@ -48,7 +48,6 @@ function AppRoot() {
+         useLocation,
        }}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-+      ssoButton={<CardinalCinemaSSOButton />}
+-      cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+       ssoButton={<CardinalCinemaSSOButton />}
        onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
        topLevelContextMenuItems={[
-         {
-@@ -72,31 +73,31 @@ function AppRoot() {
-       privateScaffoldRoutes={
-         <>
-           <Route
--            path={routes.ROOT}
-+            path={CinemaRoutes.root}
-             element={<WatchNowPage />}
-           />
-           <Route
--            path={routes.MOVIES}
-+            path={CinemaRoutes.movies}
-             element={<MoviesPage />}
-           />
-           <Route
--            path={routes.TV}
-+            path={CinemaRoutes.tv}
-             element={<TVPage />}
-           />
-           <Route
--            path={routes.CHANNELS}
-+            path={CinemaRoutes.channels}
-             element={<ChannelsPage />}
-           />
-           <Route
--            path={routes.HISTORY}
-+            path={CinemaRoutes.history}
-             element={<HistoryPage />}
-           />
-           <Route
--            path={routes.PLAYLISTS}
-+            path={CinemaRoutes.playlists}
-             element={<PlaylistsPage />}
-           />
-           <Route
--            path={routes.LIBRARIES}
-+            path={CinemaRoutes.libraries}
-             element={<LibrariesPage />}
-           />
-         </>

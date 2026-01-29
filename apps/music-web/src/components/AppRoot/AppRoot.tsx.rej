@@ -1,17 +1,18 @@
 diff a/apps/music-web/src/components/AppRoot/AppRoot.tsx b/apps/music-web/src/components/AppRoot/AppRoot.tsx	(rejected hunks)
-@@ -14,6 +14,7 @@ import ArtistPage from '../../pages/Artist'
- import TracksPage from '../../pages/Tracks'
- import HistoryPage from '../../pages/History'
- import PlaylistsPage from '../../pages/Playlists'
-+import CardinalMusicSSOButton from '../CardinalMusicSSOButton'
+@@ -17,7 +17,7 @@ import PlaylistsPage from '../../pages/Playlists'
+ import CardinalMusicSSOButton from '../CardinalMusicSSOButton'
  
  import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
- import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
-@@ -49,6 +50,7 @@ function AppRoot() {
+-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
++import { CARDINAL_PUBLIC_APP_ID } from '../../env'
+ 
+ import i18n from './i18n.json'
+ 
+@@ -49,7 +49,6 @@ function AppRoot() {
+         useParams,
        }}
        cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-       cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-+      ssoButton={<CardinalMusicSSOButton />}
+-      cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+       ssoButton={<CardinalMusicSSOButton />}
        onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
        topLevelContextMenuItems={[
-         {
