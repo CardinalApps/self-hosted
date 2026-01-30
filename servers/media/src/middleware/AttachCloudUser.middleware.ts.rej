@@ -1,0 +1,38 @@
+diff a/servers/media/src/middleware/AttachCloudUser.middleware.ts b/servers/media/src/middleware/AttachCloudUser.middleware.ts	(rejected hunks)
+@@ -5,8 +5,7 @@ import { AuthService } from '../modules/auth/auth.service'
+ import { UserService } from '../modules/user/user.service'
+ import { CloudUserService } from '../modules/user/cloud-user.service'
+ 
+-import { getCardinalTolkienFromHeaders, getJWTPayload } from '../utils/jwt'
+-import { helpCode } from '../utils/help-codes'
++import { getCardinalTolkienFromHeaders } from '../utils/jwt'
+ 
+ /**
+  * This middleware reads the cloud user JWT in the CardinalTolkien header and
+@@ -43,20 +42,20 @@ export class AttachCloudUserToRequest implements NestMiddleware {
+       return next()
+     }
+ 
+-    const payload = getJWTPayload(cloudUserJWT)
++    //const payload = getJWTPayload(cloudUserJWT)
+ 
+     // It must be a SSO token
+-    if (payload?.sso !== true) {
+-      Logger.error(`Invalid Cardinal token. ${helpCode('0012')}`, 'CloudUserMiddleware')
+-      return next()
+-    }
++    // if (payload?.sso !== true) {
++    //   Logger.error(`Invalid Cardinal token. ${helpCode('0012')}`, 'CloudUserMiddleware')
++    //   return next()
++    // }
+ 
+-    const serverOwner = await this.userService.getServerOwner()
+     const linkedLocalUser = await this.userService.getUserByCardinalJWT(cloudUserJWT)
+ 
+     // There is no local account with this JWT
+     if (!linkedLocalUser) {
+       // If this server already has a server owner, disallow this unknown JWT
++      const serverOwner = await this.userService.getServerOwner()
+       if (serverOwner) {
+         Logger.error('This Media Server has already been claimed by a different Cardinal account')
+         return next()
