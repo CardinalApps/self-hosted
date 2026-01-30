@@ -248,6 +248,7 @@ export const MediaServerRoles: Record<`${MediaServerRoleName}`, Role<MediaServer
       'MusicApp.Login',
       'PhotosApp.Login',
       'CinemaApp.Login',
+      'CurrentUser.Read',
     ],
   },
 } as const
