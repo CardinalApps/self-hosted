@@ -1,0 +1,22 @@
+diff a/servers/media/src/utils/options.ts b/servers/media/src/utils/options.ts	(rejected hunks)
+@@ -3,6 +3,7 @@ type Option = {
+   default: string | boolean | null | undefined,
+ }
+ 
++// FIXME move this to the db service
+ export const OPTIONS = {
+   DATABASE_VERSION: <Option>{
+     name: 'database_version',
+@@ -25,4 +26,12 @@ export const OPTIONS = {
+     name: 'installed_at',
+     default: undefined,
+   },
++  REGISTERED_AT: <Option>{
++    name: 'registered_at',
++    default: undefined,
++  },
++  REGISTRATION_ID: <Option>{
++    name: 'registration_id',
++    default: undefined,
++  },
+ }

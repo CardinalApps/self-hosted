@@ -1,17 +1,17 @@
 diff a/servers/media/src/modules/app/app.module.ts b/servers/media/src/modules/app/app.module.ts	(rejected hunks)
-@@ -31,6 +31,7 @@ import { InvitationModule } from '../invitation/invitation.module'
+@@ -28,6 +28,7 @@ import { RBACModule } from '../rbac/rbac.module'
+ import { LibraryModule } from '../library/library.module'
+ import { MusicHistoryModule } from '../music-history/music-history.module'
+ import { InvitationModule } from '../invitation/invitation.module'
++import { TetherModule } from '../tether/tether.module'
  
  import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
  import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
-+import { AttachOriginApp } from '../../middleware/AttachOriginApp.middleware'
- import { AttachLocalUserToRequest } from '../../middleware/AttachLocalUser.middleware'
- import { AttachCloudUserToRequest } from '../../middleware/AttachCloudUser.middleware'
- import { UserActivity } from '../../middleware/UserActivity.middleware'
-@@ -156,6 +157,7 @@ export class AppModule implements NestModule {
-   // Order matters here
-   configure(consumer: MiddlewareConsumer): void {
-     consumer.apply(HTTPLoggerMiddleware).forRoutes('*')
-+    consumer.apply(AttachOriginApp).forRoutes('*')
-     consumer.apply(AttachLocalUserToRequest).forRoutes('*')
-     consumer.apply(AttachCloudUserToRequest).forRoutes('*')
-     consumer.apply(RevokeDisabledUserSessions).forRoutes('*')
+@@ -121,6 +122,7 @@ const resolvePostgresHost = () => {
+     LibraryModule,
+     MusicHistoryModule,
+     InvitationModule,
++    TetherModule,
+     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
+     ServeStaticModule.forRoot({
+       rootPath: join(__dirname, '..', '..', '..', 'public'),

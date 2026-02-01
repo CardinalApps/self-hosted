@@ -1,20 +1,10 @@
 diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
-@@ -1,5 +1,5 @@
- import { Injectable, Logger } from '@nestjs/common'
--import { getMediaServerRole, hasCapability, MediaServerRoleName } from '@cardinalapps/access-control/dist/cjs'
-+import { getMediaServerRole, hasCapability, MediaServerCapability, MediaServerRoleName } from '@cardinalapps/access-control/dist/cjs'
+@@ -13,7 +13,7 @@ import { CardinalApp } from '../../../utils/apps'
+ import { APP_LOGIN_CAPABILITY } from '../types'
  
- import { UserService } from '../../user/user.service'
- import { CloudUserService } from '../../user/cloud-user.service'
-@@ -175,7 +175,10 @@ export class CardinalSSOStrategy {
-     if (!user || !app) {
-       throw new Error(`Login failed, could not determine which app the user is trying to log into, got: ${app}`)
-     }
--    if (hasCapability(APP_LOGIN_CAPABILITY?.[app], user.roles?.flatMap((role) => getMediaServerRole(role.role as MediaServerRoleName).capabilities))) {
-+    if (hasCapability<MediaServerCapability>(
-+      APP_LOGIN_CAPABILITY?.[app],
-+      user.roles?.flatMap((role) => getMediaServerRole(role.role as MediaServerRoleName).capabilities),
-+    )) {
-       return true
-     } else {
-       throw new Error(`Login failed, user does not have the ${APP_LOGIN_CAPABILITY?.[app]} capability`)
+ /**
+- * Logs a user into a Cardinal cloud account.
++ * Logs a user into their media server using a Cardinal cloud account.
+  */
+ @Injectable()
+ export class CardinalSSOStrategy {

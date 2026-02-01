@@ -1,12 +1,17 @@
 diff a/servers/media/src/modules/user/user.module.ts b/servers/media/src/modules/user/user.module.ts	(rejected hunks)
-@@ -34,9 +34,9 @@ import { PublicUserController } from './users-public.controller'
-     SeatsService,
+@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
+ 
+ import { RBACModule } from '../rbac/rbac.module'
+ import { SettingsModule } from '../settings/settings.module'
++import { EventModule } from '../event/event.module'
+ 
+ import { UserService } from './user.service'
+ import { SeatsService } from './seats.service'
+@@ -19,6 +20,7 @@ import { PublicUserController } from './users-public.controller'
+     TypeOrmModule.forFeature([User, RoleAssignment]),
+     SettingsModule,
+     forwardRef(() => RBACModule),
++    forwardRef(() => EventModule),
    ],
-   controllers: [
-+    PublicUserController,
-     UserController,
-     LicensingController,
--    PublicUserController,
-   ],
- })
- export class UserModule {}
+   exports: [
+     TypeOrmModule,

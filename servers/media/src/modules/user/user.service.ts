@@ -219,6 +219,8 @@ export class UserService {
         dto: { cardinalJWT: cardinalSSOJWT, role: 'owner' },
       })
 
+      this.eventService.emitPrivate(UserEvents.CREATE_OWNER)
+
       return ownerAccount
     } catch (error) {
       Logger.error(error)
