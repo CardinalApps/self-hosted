@@ -1,19 +1,9 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx	(rejected hunks)
-@@ -6,7 +6,7 @@ import H2 from '@cardinalapps/ui/src/components/typography/H2'
- import Button from '@cardinalapps/ui/src/components/interaction/Button'
- import Card from '@cardinalapps/ui/src/components/layout/Card'
- 
--import LoginWithCardinal from '../../../components/LoginWithCardinal'
-+import CardinalAdminSSOButton from '../../../components/CardinalAdminSSOButton'
- 
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import authAPI from '@cardinalapps/ui/src/lib/auth/authAPI'
-@@ -84,7 +84,7 @@ function Login({
+@@ -82,6 +82,7 @@ function Login({
+             {loggedIn
+               ?
                  <p className={'currentUser'}>
++                  {/* FIXME the public name doesnt seem to be working when it's set */}
                    <i className="fas fa-check" /> {i18n['login.logged-in-as']['en']} {userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang]}
                  </p>
--              : <LoginWithCardinal
-+              : <CardinalAdminSSOButton
-                   onSSOSuccess={onSSOSuccess}
-                   saveJWTInLocalStorage={false}
-                 />
+               : <CardinalAdminSSOButton

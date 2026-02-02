@@ -1,52 +1,12 @@
 diff a/libraries/ui/src/components/interaction/Toast/Toast.tsx b/libraries/ui/src/components/interaction/Toast/Toast.tsx	(rejected hunks)
-@@ -3,6 +3,7 @@ import type { PropsWithChildren, ReactNode } from 'react'
- import { motion } from 'framer-motion'
- 
- import './Toast.css'
-+import Icon from '../../typography/Icon'
- 
- type ToastProps = {
-   type?: 'success' | 'warning' | 'danger',
-@@ -13,7 +14,6 @@ type ToastProps = {
-   showClose?: boolean,
-   onClose?: () => void,
-   ttl?: number,
--  overrideColor?: string,
-   className?: string,
- }
- 
-@@ -35,7 +35,6 @@ const Toast = ({
-   showClose = true,
-   ttl,
-   onClose,
--  overrideColor,
-   className,
- }: PropsWithChildren<ToastProps>) => {
-   const [fadeOut, setFadeOut] = useState(false)
-@@ -65,9 +64,14 @@ const Toast = ({
-     <motion.div
-       initial={{ x: animationDirection === 'left' ? 20 : -20 }}
-       animate={{ x: 0 }}
--      className={`toast ${!body && !controls ? 'center-title' : ''} ${fadeOut ? 'fade-out' : ''} ${className ? className : ''}`}
--      data-type={type}>
--      <div className="toast-accent-bar" style={overrideColor ? { backgroundColor: overrideColor } : undefined} />
-+      className={`toast ${body ? 'has-body' : ''} ${fadeOut ? 'fade-out' : ''} ${className ? className : ''}`}
-+      data-type={type}
-+    >
-+      <div className="toast-status-icon">
-+        {type === 'success' && <Icon fa="fas fa-check-circle" />}
-+        {type === 'warning' && <Icon fa="fas fa-exclamation-triangle" />}
-+        {type === 'danger' && <Icon fa="fas fa-minus-circle" />}
-+      </div>
+@@ -73,8 +73,8 @@ const Toast = ({
+         {type === 'danger' && <Icon fa="fas fa-minus-circle" />}
+       </div>
        <div className="toast-content">
-         {title && <p className="toast-title">{title}</p>}
-         {body && <div className="toast-body" dangerouslySetInnerHTML={{ __html: body }} />}
-@@ -75,7 +79,7 @@ const Toast = ({
+-        {title && <p className="toast-title">{title}</p>}
+-        {body && <div className="toast-body" dangerouslySetInnerHTML={{ __html: body }} />}
++        {title && typeof title === 'string' && <p className="toast-title">{title}</p>}
++        {body && typeof body === 'string' && <div className="toast-body" dangerouslySetInnerHTML={{ __html: body }} />}
+         {controls && <div className="toast-controls">{controls}</div>}
        </div>
        {showClose && (
-         <div className={`toast-close-col ${!!controls || !!body ? 'top-close' : ''}`}>
--          <i onClick={handleOnClose} className="toast-close fas fa-times-circle" />
-+          <Icon className="toast-close" onClick={handleOnClose} fa="fas fa-times" />
-         </div>
-       )}
-     </motion.div>

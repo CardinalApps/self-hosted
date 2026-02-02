@@ -1,0 +1,32 @@
+diff a/libraries/topology/src/index.ts b/libraries/topology/src/index.ts	(rejected hunks)
+@@ -1,28 +1,2 @@
+-export enum InfrastructureProvider {
+-  AZURE = "Azure",
+-  AWS = "Amazon Web Services",
+-  GCP = "Google Cloud Platform",
+-}
+-
+-export enum CloudService {
+-  AUTH = "Authentication",
+-  BEV = "Bird's Eye View",
+-  CMS = "Content Management System",
+-  HELP = "Help Site",
+-  STATUS = "Status Site",
+-  WEBSITE = "Website",
+-}
+-
+-export type CloudApp = {
+-  provider: InfrastructureProvider,
+-  service: CloudService,
+-  entry: string,
+-}
+-
+-export const CloudApps = {
+-  auth: {
+-    provider: InfrastructureProvider.AZURE,
+-    service: CloudService.AUTH,
+-    entry: '',
+-  },
+-} as Record<string, CloudApp>
++export * from './cloudEdge'
++export * from './fetch/fetchAuthAPI'

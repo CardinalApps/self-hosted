@@ -1,0 +1,110 @@
+diff a/servers/media/src/utils/cloud.ts b/servers/media/src/utils/cloud.ts	(rejected hunks)
+@@ -1,8 +1,10 @@
+-import { Logger } from '@nestjs/common'
+-import { getCurrentMode, Mode } from './env'
+-import { helpCode } from './help-codes'
++/**
++ * FIXME this file is being replaced with the @cardinalapps/topology package
++ */
+ 
+-type Method = 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH'
++import { fetchAuthAPI, HTTPMethod, MixedAppEnv, Endpoint } from '@cardinalapps/topology/dist/cjs'
++
++import { getCurrentMode, Mode } from './env'
+ 
+ export enum WebsiteUrl {
+   DEVELOPMENT = 'http://localhost:3066',
+@@ -79,7 +81,7 @@ export function outboundHeaders() {
+ /**
+  * Fetches from the cloud auth servers. Endpoint must start with a slash.
+  */
+-export function authAPI(endpoint, method?: Method, options?: AuthFetchOptions): Promise<Record<string, unknown> | null> {
++export function authAPI<T>(endpoint: Endpoint, method?: HTTPMethod, options?: AuthFetchOptions): Promise<T> {
+   return new Promise((resolve, reject) => {
+     let headers = { ...options?.headers }
+ 
+@@ -104,34 +106,49 @@ export function authAPI(endpoint, method?: Method, options?: AuthFetchOptions):
+       ...outboundHeaders(),
+     }
+ 
+-    fetch(`${getAuthServerUrl()}${endpoint}`, {
+-      method: method ? method : 'GET',
+-      headers,
+-      body: options?.body && Object.keys(options.body).length ? JSON.stringify(options.body) : undefined,
+-    })
+-      .then((res) => {
+-        if (res.ok) {
+-          res.json()
+-            .then((thing) => resolve(thing))
+-            .catch((e) => resolve(e))
+-        } else {
+-          Logger.error(`Failed network request to the cloud auth servers: [${res.status} ${res.statusText}]`, 'AuthAPI')
+-
+-          switch(res.status) {
+-            case 401:
+-              Logger.error(`There is an issue with the token that your Media Server has cached. Logging out and back in again might fix it, or the cloud servers might be offline. ${helpCode('0013')}`, 'AuthAPI')
+-              break
+-            case 405:
+-              Logger.error(`This session has been logged out of remotely, and you need to log back in. ${helpCode('0014')}`, 'AuthAPI')
+-              break
+-          }
+-
+-          reject(res.status)
+-        }
++    fetchAuthAPI(
++      endpoint,
++      method ? method : 'GET',
++      getCurrentMode() as MixedAppEnv,
++      {
++        headers,
++        body: options.body,
++      },
++    )
++      .then((res: T) => {
++        resolve(res)
+       })
+-      .catch((e) => {
+-        Logger.error(`Could not communicate with the auth servers. ${e?.message}`, 'AuthAPI')
++      .catch((err) => {
++        reject(err)
+       })
++    // fetch(`${getAuthServerUrl()}${endpoint}`, {
++    //   method: method ? method : 'GET',
++    //   headers,
++    //   body: options?.body && Object.keys(options.body).length ? JSON.stringify(options.body) : undefined,
++    // })
++    //   .then((res) => {
++    //     if (res.ok) {
++    //       res.json()
++    //         .then((thing) => resolve(thing))
++    //         .catch((e) => resolve(e))
++    //     } else {
++    //       Logger.error(`Failed network request to the cloud auth servers: [${res.status} ${res.statusText}]`, 'AuthAPI')
++
++    //       switch(res.status) {
++    //         case 401:
++    //           Logger.error(`There is an issue with the token that your Media Server has cached. Logging out and back in again might fix it, or the cloud servers might be offline. ${helpCode('0013')}`, 'AuthAPI')
++    //           break
++    //         case 405:
++    //           Logger.error(`This session has been logged out of remotely, and you need to log back in. ${helpCode('0014')}`, 'AuthAPI')
++    //           break
++    //       }
++
++    //       reject(res.status)
++    //     }
++    //   })
++    //   .catch((e) => {
++    //     Logger.error(`Could not communicate with the auth servers. ${e?.message}`, 'AuthAPI')
++    //   })
+   })
+ }
+ 
+@@ -148,7 +165,7 @@ export function authAPI(endpoint, method?: Method, options?: AuthFetchOptions):
+  * @param {object} options.body - Non-serialized body.
+  * @param {object} options.headers - Non-serialized headers.
+  */
+-export const websiteAPI = (path, method: Method = 'GET', options?: WebsiteFetchOptions) => new Promise((resolve, reject) => {
++export const websiteAPI = (path, method: HTTPMethod = 'GET', options?: WebsiteFetchOptions) => new Promise((resolve, reject) => {
+   options = { ...websiteFetchDefaults, ...options }
+ 
+   if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {

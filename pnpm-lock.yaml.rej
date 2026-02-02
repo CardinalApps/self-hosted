@@ -1,38 +1,11 @@
 diff a/pnpm-lock.yaml b/pnpm-lock.yaml	(rejected hunks)
-@@ -1113,6 +1113,9 @@ importers:
-       body-parser:
-         specifier: ^2.2.1
-         version: 2.2.1
-+      cookie-session:
-+        specifier: ^2.1.1
-+        version: 2.1.1
-       cors:
-         specifier: ^2.8.5
-         version: 2.8.5
-@@ -7701,6 +7704,10 @@ packages:
-   convert-source-map@2.0.0:
-     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
- 
-+  cookie-session@2.1.1:
-+    resolution: {integrity: sha512-ji3kym/XZaFVew1+tIZk5ZLp9Z/fLv9rK1aZmpug0FsgE7Cu3ZDrUdRo7FT9vFjMYfNimrrUHJzywDwT7XEFlg==}
-+    engines: {node: '>= 0.10'}
-+
-   cookie-signature@1.0.6:
-     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
- 
-@@ -24352,6 +24359,15 @@ snapshots:
- 
-   convert-source-map@2.0.0: {}
- 
-+  cookie-session@2.1.1:
-+    dependencies:
-+      cookies: 0.9.1
-+      debug: 3.2.7
-+      on-headers: 1.1.0
-+      safe-buffer: 5.2.1
-+    transitivePeerDependencies:
-+      - supports-color
-+
-   cookie-signature@1.0.6: {}
- 
-   cookie-signature@1.2.2: {}
+@@ -1252,6 +1252,9 @@ importers:
+       '@cardinalapps/products':
+         specifier: workspace:*
+         version: link:../../libraries/products
++      '@cardinalapps/topology':
++        specifier: workspace:*
++        version: link:../../libraries/topology
+       '@eslint/js':
+         specifier: ^9.21.0
+         version: 9.27.0

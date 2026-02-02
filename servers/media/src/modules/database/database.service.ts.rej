@@ -1,0 +1,10 @@
+diff a/servers/media/src/modules/database/database.service.ts b/servers/media/src/modules/database/database.service.ts	(rejected hunks)
+@@ -65,7 +65,7 @@ export class DatabaseService {
+   /**
+    * Get an option from the options table.
+    */
+-  async getOption(name): Promise<OptionValueType> {
++  async getOption(name: string): Promise<OptionValueType> {
+     const found = await this.optionRepository.findOneBy({ name })
+ 
+     if (found === null) {

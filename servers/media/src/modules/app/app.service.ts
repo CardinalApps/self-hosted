@@ -94,6 +94,19 @@ export class AppService {
   }
 
   /**
+   * Checks if there is an instance ID saved in database, and if not,
+   * sets it.
+   */
+  async ensureInstanceId(): Promise<void> {
+    const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
+    if (!instanceId) {
+      const instanceId = uuid()
+      await this.databaseService.saveOption(OPTIONS.INSTANCE_ID.name, instanceId)
+      Logger.log(`Set instance ID: ${instanceId}`, 'App')
+    }
+  }
+
+  /**
    * Returns the version of the Cardinal Media Server *server*.
    */
   getHomeServerVersion(): string {

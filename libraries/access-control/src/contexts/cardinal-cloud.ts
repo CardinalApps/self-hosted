@@ -30,6 +30,8 @@ export const CloudCapabilities = [
   'CurrentUserSessions.Read',
   'CurrentUserSessions.Delete',
 
+  'SelfHosted.Claim',
+
   'Email.Trigger',
 
   'StoredToken.Create',
@@ -79,6 +81,7 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignme
     capabilities: [
       'CurrentUser.*',
       'CurrentUserSessions.*',
+      'SelfHosted.*',
       'Email.*',
       'StoredToken.*',
       'Subscription.*',

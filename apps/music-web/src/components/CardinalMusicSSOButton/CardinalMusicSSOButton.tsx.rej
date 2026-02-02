@@ -1,9 +1,51 @@
 diff a/apps/music-web/src/components/CardinalMusicSSOButton/CardinalMusicSSOButton.tsx b/apps/music-web/src/components/CardinalMusicSSOButton/CardinalMusicSSOButton.tsx	(rejected hunks)
-@@ -48,6 +48,7 @@ export default function CardinalMusicSSOButton({
-       {!loading &&
-         <SSOLogin
-           appId={CARDINAL_PUBLIC_APP_ID}
-+          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-           saveJWTInLocalStorage={saveJWTInLocalStorage}
-           onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
-           enableNewSSOFlow={!!enable_oidc_beta}
+@@ -1,7 +1,4 @@
+-import { useState } from 'react'
+-
+ import SSOLogin from '@cardinalapps/ui/src/components/interaction/SSOLogin'
+-import Loading from '@cardinalapps/ui/src/components/layout/Loading'
+ 
+ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+@@ -24,7 +21,6 @@ export default function CardinalMusicSSOButton({
+   onSSOSuccess,
+ }: LoginWithCardinalProps) {
+   const dispatch = useAppDispatch()
+-  const [loading, setLoading] = useState(false)
+   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
+ 
+   /**
+@@ -32,7 +28,6 @@ export default function CardinalMusicSSOButton({
+    * server owner account with the SSO token.
+    */
+   const handleSSOSuccess = (JWT: string) => {
+-    setLoading(true)
+     if (automaticallyLogin) {
+       dispatch(homeServerLogin({
+         cardinalSSOToken: JWT,
+@@ -45,18 +40,13 @@ export default function CardinalMusicSSOButton({
+ 
+   return (
+     <>
+-      {!loading &&
+-        <SSOLogin
+-          appId={CARDINAL_PUBLIC_APP_ID}
+-          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+-          saveJWTInLocalStorage={saveJWTInLocalStorage}
+-          onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
+-          enableNewSSOFlow={!!enable_oidc_beta}
+-        />
+-      }
+-      {loading &&
+-        <Loading size="s" />
+-      }
++      <SSOLogin
++        appId={CARDINAL_PUBLIC_APP_ID}
++        permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
++        saveJWTInLocalStorage={saveJWTInLocalStorage}
++        onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
++        enableNewSSOFlow={!!enable_oidc_beta}
++      />
+     </>
+   )
+ }
