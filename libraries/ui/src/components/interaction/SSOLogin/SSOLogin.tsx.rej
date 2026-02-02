@@ -1,43 +1,41 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid'
- import BrandLogo from '../../layout/BrandLogo'
+@@ -33,6 +33,7 @@ type TokenType = 'JWT' | 'cookie'
+ export type IPCHandshakeMessageData = {
+   appId: string,
+   nonce: string,
++  instanceId?: string,
+   serverName: string,
+   userAgentString: string,
+   tokenType: TokenType,
+@@ -41,6 +42,7 @@ export type IPCHandshakeMessageData = {
  
- import { toastActions } from '../../../store/slices/toast'
--import { setJwt, JWT_TYPE } from '../../../lib/auth/jwt'
-+import { setJwt, JWT_TYPE, deleteJWT } from '../../../lib/auth/jwt'
- import authAPI from '../../../lib/auth/authAPI'
- import { useAppDispatch } from '../../../hooks/useAppDispatch'
- 
-@@ -205,7 +205,7 @@ const SSOLogin = ({
-    * auth server.
+ type SSOLoginProps = {
+   appId: string,
++  instanceId?: string,
+   /**
+    * @deprecated USER-22
     */
-   const getInteractiveSSOLoginUrl = () => {
--    return new Promise((resolve) => {
-+    return new Promise((resolve, reject) => {
-       authAPI('/sso/interactive-login-session', 'POST', {
+@@ -62,6 +64,7 @@ type SSOLoginProps = {
+  */
+ const SSOLogin = ({
+   appId,
++  instanceId,
+   permissions,
+   saveJWTInLocalStorage = true,
+   onPopupOpened,
+@@ -127,6 +130,7 @@ const SSOLogin = ({
+       const dataToSend: IPCHandshakeMessageData = {
+         appId,
+         nonce,
++        instanceId,
+         serverName: server_name as string,
+         userAgentString: navigator.userAgent,
+         tokenType,
+@@ -210,6 +214,7 @@ const SSOLogin = ({
          body: {
            appId,
-@@ -216,10 +216,12 @@ const SSOLogin = ({
-       })
-         .then(resolve)
-         .catch((err) => {
-+          deleteJWT(JWT_TYPE.CLOUD_USER)
-           dispatch(toastActions.addToQueue({
--            title: err?.message,
-+            title: err,
-             type: 'danger',
-           }))
-+          reject()
-         })
-     })
-   }
-@@ -241,6 +243,9 @@ const SSOLogin = ({
-           ssoFlowWindow.current = newWin
-           setSSOFlowIsOpen(true)
-         })
-+        .catch(() => {
-+          newWin.close()
-+        })
-     }
-   }
- 
+           nonce,
++          instanceId,
+           tokenType,
+           serverName: server_name,
+         },

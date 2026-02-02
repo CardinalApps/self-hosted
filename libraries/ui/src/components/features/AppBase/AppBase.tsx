@@ -53,6 +53,7 @@ import { routes } from './routes'
 import i18n from './i18n'
 
 import './AppBase.css'
+import fetchInstanceId from '../../../store/slices/app/thunks/fetchInstanceId'
 
 type AppBaseProps = {
   app: CardinalApp,
@@ -113,6 +114,7 @@ function AppBase({
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
   const appVersionInStore = useSelector(appSelectors.version)
+  const instanceIdInStore = useSelector(appSelectors.instanceId)
   const health = useSelector(homeServerSelectors.health)
   const latestHealthResponse = useSelector(homeServerSelectors.latestHealthResponse)
   const firstTimeSetupComplete = useSelector(homeServerSelectors.firstTimeSetupComplete)
@@ -255,6 +257,15 @@ function AppBase({
       dispatch(appActions.setVersion(version))
     }
   }, [version])
+
+  /**
+   * Set the instance ID in the store on first startup.
+   */
+  useEffect(() => {
+    if (!instanceIdInStore) {
+      dispatch(fetchInstanceId())
+    }
+  }, [])
 
   return (
     <RouterContext.Provider value={router}>

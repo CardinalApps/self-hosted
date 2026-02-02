@@ -244,6 +244,29 @@ export class AppController {
     status: 200,
     schema: {
       example: {
+        id: "<id>",
+      },
+    },
+  })
+  async getInstance(): Promise<Instance> {
+    return {
+      instanceId: await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name) as string,
+    }
+  }
+
+  /**
+   * Get a list of versions of things in the Media Server. In the `build_tag`,
+   * the timestamp is of the build, not the commit.
+   */
+  @Get('/instance')
+  @StandardEndpoint({
+    summary: 'Get information about this server instance.',
+    auth: false,
+  })
+  @ApiOkResponse({
+    status: 200,
+    schema: {
+      example: {
         instanceId: "<id>",
         serverName: "My custom name",
         kioskMode: false,
