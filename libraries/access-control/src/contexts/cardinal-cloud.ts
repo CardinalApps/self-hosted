@@ -8,6 +8,8 @@ export const CloudAspects = [
   'Users',
   'CurrentUser',
   'CurrentUserSessions',
+  'CurrentUserAppAuthorizations',
+  'CurrentUserClaims',
   'Email',
   'StoredToken',
   'Subscription',
@@ -32,7 +34,8 @@ export const CloudCapabilities = [
 
   'CurrentUserClaims.Create',
   'CurrentUserClaims.Read',
-  'CurrentUserClaims.Release',
+
+  'CurrentUserAppAuthorizations.Read',
 
   'Email.Trigger',
 
@@ -84,6 +87,7 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignme
       'CurrentUser.*',
       'CurrentUserSessions.*',
       'CurrentUserClaims.*',
+      'CurrentUserAppAuthorizations.*',
       'Email.*',
       'StoredToken.*',
       'Subscription.*',
