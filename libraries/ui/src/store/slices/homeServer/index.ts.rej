@@ -1,0 +1,27 @@
+diff a/libraries/ui/src/store/slices/homeServer/index.ts b/libraries/ui/src/store/slices/homeServer/index.ts	(rejected hunks)
+@@ -15,6 +16,7 @@ type HomeServerSliceState = {
+   },
+   latestEvent: Record<string, unknown> | null,
+   firstTimeSetupComplete: boolean,
++  instanceId: string | null,
+ }
+ 
+ const initialState: HomeServerSliceState = {
+@@ -25,6 +27,7 @@ const initialState: HomeServerSliceState = {
+   },
+   latestEvent: null,
+   firstTimeSetupComplete: null,
++  instanceId: null,
+ }
+ 
+ const homeServerSlice = createSlice({
+@@ -37,6 +40,9 @@ const homeServerSlice = createSlice({
+     setFirstTimeSetupComplete: (state, action: PayloadAction<boolean>) => {
+       state.firstTimeSetupComplete = action.payload
+     },
++    setInstanceId: (state, action: PayloadAction<string>) => {
++      state.instanceId = action.payload
++    },
+   },
+   extraReducers: (builder) => {
+     builder

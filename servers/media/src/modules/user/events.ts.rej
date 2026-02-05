@@ -1,0 +1,9 @@
+diff a/servers/media/src/modules/user/events.ts b/servers/media/src/modules/user/events.ts	(rejected hunks)
+@@ -1,3 +1,7 @@
+ export enum UserEvents {
+   CREATE_OWNER = `user.create_owner`,
+ }
++
++export type CreateOwnerEventPayload = {
++  serverName: string,
++}

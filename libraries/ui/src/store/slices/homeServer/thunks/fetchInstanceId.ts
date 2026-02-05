@@ -13,8 +13,8 @@ const fetchInstanceId = createAsyncThunk<
     dispatch: AppDispatch
     state: RootState
   }
->(`${STORE_KEY}/checkCloudStatus`, async (data: void, thunkAPI) => {
-  const cached = thunkAPI.getState().app.instanceId
+>(`${STORE_KEY}/fetchInstanceId`, async (data: void, thunkAPI) => {
+  const cached = thunkAPI.getState().homeServer.instanceId
 
   if (!cached) {
     const res: Record<string, unknown> = await homeServerAPI('/instance')

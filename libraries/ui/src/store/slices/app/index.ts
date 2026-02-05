@@ -5,12 +5,10 @@ import { globalActions } from '../../constants/actions'
 import { CardinalApp } from '../../../lib/env/cardinal'
 
 import { STORE_KEY } from './constants'
-import fetchInstanceId from './thunks/fetchInstanceId'
 
 type AppSliceState = {
   app: CardinalApp,
   version: string | null,
-  instanceId: string | null,
   cardinalAppId: string | null,
   cardinalAppPermissions: string | null,
   kioskMode: boolean | false,
@@ -26,7 +24,6 @@ type AppSliceState = {
 const initialState: AppSliceState = {
   app: null,
   version: null,
-  instanceId: null,
   cardinalAppId: null,
   cardinalAppPermissions: null,
   kioskMode: false,
@@ -54,9 +51,6 @@ const appSlice = createSlice({
     // Verified by the Cardinal App Registry
     setCardinalAppPermissions: (state, action: PayloadAction<string>) => {
       state.cardinalAppPermissions = action.payload
-    },
-    setInstanceId: (state, action: PayloadAction<string>) => {
-      state.instanceId = action.payload
     },
     setVersion: (state, action: PayloadAction<string>) => {
       state.version = action.payload

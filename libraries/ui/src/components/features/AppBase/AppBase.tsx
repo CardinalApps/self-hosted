@@ -32,6 +32,7 @@ import DevTools from './DevTools'
 
 import { globalActions } from '../../../store/constants/actions'
 import healthCheck from '../../../store/slices/homeServer/thunks/healthCheck'
+import fetchInstanceId from '../../../store/slices/homeServer/thunks/fetchInstanceId'
 import reloadHomeServerUser from '../../../store/slices/homeServerUser/thunks/reload'
 import { appSelectors, appActions } from '../../../store/slices/app'
 import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
@@ -53,7 +54,6 @@ import { routes } from './routes'
 import i18n from './i18n'
 
 import './AppBase.css'
-import fetchInstanceId from '../../../store/slices/app/thunks/fetchInstanceId'
 
 type AppBaseProps = {
   app: CardinalApp,
@@ -114,7 +114,7 @@ function AppBase({
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
   const appVersionInStore = useSelector(appSelectors.version)
-  const instanceIdInStore = useSelector(appSelectors.instanceId)
+  const instanceIdInStore = useSelector(homeServerSelectors.instanceId)
   const health = useSelector(homeServerSelectors.health)
   const latestHealthResponse = useSelector(homeServerSelectors.latestHealthResponse)
   const firstTimeSetupComplete = useSelector(homeServerSelectors.firstTimeSetupComplete)

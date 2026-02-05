@@ -208,8 +208,10 @@ export class UserService {
 
   /**
    * Creates the server owner account.
+   * 
+   * @param serverName - Optionally give a server name to attach to the event.
    */
-  async createServerOwner(cardinalSSOJWT): Promise<User | null> {
+  async createServerOwner(cardinalSSOJWT, serverName?): Promise<User | null> {
     if (await this.getServerOwner()) {
       throw new Error('Cannot create multiple server owners')
     }
@@ -219,7 +221,7 @@ export class UserService {
         dto: { cardinalJWT: cardinalSSOJWT, role: 'owner' },
       })
 
-      this.eventService.emitPrivate(UserEvents.CREATE_OWNER)
+      this.eventService.emitPrivate(UserEvents.CREATE_OWNER, serverName ? { serverName } as CreateOwnerEventPayload : undefined)
 
       return ownerAccount
     } catch (error) {

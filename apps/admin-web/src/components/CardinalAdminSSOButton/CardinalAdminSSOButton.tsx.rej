@@ -1,24 +1,28 @@
 diff a/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx b/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx	(rejected hunks)
-@@ -13,12 +13,14 @@ import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../e
- type LoginWithCardinalProps = {
-   automaticallyLogin?: boolean,
-   saveJWTInLocalStorage?: boolean,
-+  overrideServerName?: string,
-   onSSOSuccess?: (JWT: string) => void,
- }
+@@ -4,7 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
+-import { appSelectors } from '@cardinalapps/ui/src/store/slices/app'
++import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
  
- export default function CardinalAdminSSOButton({
-   automaticallyLogin = true,
-   saveJWTInLocalStorage = true,
-+  overrideServerName,
-   onSSOSuccess,
+ import * as routes from '../../routes'
+ 
+@@ -25,7 +25,7 @@ export default function CardinalAdminSSOButton({
  }: LoginWithCardinalProps) {
    const dispatch = useAppDispatch()
-@@ -45,6 +47,7 @@ export default function CardinalAdminSSOButton({
-       <SSOLogin
-         appId={CARDINAL_PUBLIC_APP_ID}
-         instanceId={instanceId}
-+        overrideServerName={overrideServerName}
+   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
+-  const instanceId = useAppSelector(appSelectors.instanceId)
++  const instanceId = useAppSelector(homeServerSelectors.instanceId)
+ 
+   /**
+    * When the user logs into a Cardinal cloud account, try to log into the local
+@@ -51,7 +57,7 @@ export default function CardinalAdminSSOButton({
          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
          saveJWTInLocalStorage={saveJWTInLocalStorage}
          onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
+-        enableNewSSOFlow={!!enable_oidc_beta}
++        enableNewSSOFlow={newSSOIsEnabled}
+       />
+     </>
+   )

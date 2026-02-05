@@ -1,15 +1,19 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/styles.css b/apps/admin-web/src/pages/FirstTimeSetup/styles.css	(rejected hunks)
-@@ -205,8 +205,13 @@
-   }
+@@ -206,15 +206,15 @@
  
    .loginButton {
-+    width: 100%;
-     margin-bottom: 25px;
+     width: 100%;
+-    margin-bottom: 25px;
      padding-top: 10px;
-+
-+    .login-with-cardinal-button {
-+      max-width: 290px;
-+    }
+ 
+     .login-with-cardinal-button {
+-      max-width: 290px;
++      max-width: 250px;
+     }
    }
  
    .currentUser {
++    margin-bottom: 10px;
+     font-weight: 700;
+     font-size: 17px;
+ 

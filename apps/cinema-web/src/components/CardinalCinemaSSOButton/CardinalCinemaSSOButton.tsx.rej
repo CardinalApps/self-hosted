@@ -1,25 +1,19 @@
 diff a/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx b/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx	(rejected hunks)
-@@ -4,6 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+@@ -4,7 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
  import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
  import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
-+import { appSelectors } from '@cardinalapps/ui/src/store/slices/app'
+-import { appSelectors } from '@cardinalapps/ui/src/store/slices/app'
++import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
  
  import * as routes from '../../routes'
  
-@@ -22,6 +23,7 @@ export default function CardinalAdminSSOButton({
+@@ -23,7 +23,7 @@ export default function CardinalAdminSSOButton({
  }: LoginWithCardinalProps) {
    const dispatch = useAppDispatch()
    const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
-+  const instanceId = useAppSelector(appSelectors.instanceId)
+-  const instanceId = useAppSelector(appSelectors.instanceId)
++  const instanceId = useAppSelector(homeServerSelectors.instanceId)
  
    /**
     * When the user logs into a Cardinal cloud account, try to log into the local
-@@ -42,6 +44,7 @@ export default function CardinalAdminSSOButton({
-     <>
-       <SSOLogin
-         appId={CARDINAL_PUBLIC_APP_ID}
-+        instanceId={instanceId}
-         permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
-         saveJWTInLocalStorage={saveJWTInLocalStorage}
-         onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}

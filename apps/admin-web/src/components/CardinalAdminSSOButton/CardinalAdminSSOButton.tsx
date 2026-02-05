@@ -44,6 +44,12 @@ export default function CardinalAdminSSOButton({
     }
   }
 
+  // Default to true here (same as in the app-settings pkg) because during FTS
+  // this will be undefined. Once logged in, use the setting.
+  const newSSOIsEnabled = typeof enable_oidc_beta !== 'undefined'
+    ? !!enable_oidc_beta
+    : true
+
   return (
     <>
       <SSOLogin

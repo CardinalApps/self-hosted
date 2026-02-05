@@ -1,32 +1,17 @@
 diff a/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx b/apps/admin-web/src/pages/FirstTimeSetup/sections/Login.tsx	(rejected hunks)
-@@ -23,6 +23,7 @@ type LoginProps = {
-   userObjectOfFutureOwner: Record<string, unknown>,
-   setUserObjectOfFutureOwner: (user: Record<string, unknown>) => void,
-   setSsoJWTOfFutureOwner: React.Dispatch<React.SetStateAction<string>>,
-+  overrideServerName: string,
- }
- 
- function Login({
-@@ -32,6 +33,7 @@ function Login({
-   userObjectOfFutureOwner,
-   setUserObjectOfFutureOwner,
-   setSsoJWTOfFutureOwner,
-+  overrideServerName,
- }: LoginProps) {
-   const { lang } = useSelector(settingsSelectors.current)
-   const loggedIn = !!Object.keys(userObjectOfFutureOwner).length
-@@ -82,12 +84,12 @@ function Login({
-             {loggedIn
-               ?
-                 <p className={'currentUser'}>
--                  {/* FIXME the public name doesnt seem to be working when it's set */}
--                  <i className="fas fa-check" /> {i18n['login.logged-in-as']['en']} {userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang]}
-+                  <i className="fas fa-check" /> {i18n['login.logged-in-as']['en'].replace('{name}', userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang])}
-                 </p>
-               : <CardinalAdminSSOButton
-                   onSSOSuccess={onSSOSuccess}
-                   saveJWTInLocalStorage={false}
-+                  overrideServerName={overrideServerName}
-                 />
-             }
-           </div>
+@@ -69,12 +69,15 @@ function Login({
+           header={<H2 className={'title'}>{i18n['login.title'][lang]}</H2>}
+           footer={
+             <>
++            <div>
++
+               <Button onClick={prev} textual={true}>
+                 {i18n['prev'][lang]}
+               </Button>
+               <Button onClick={next} textual={true}>
+                 {i18n['next'][lang]}
+               </Button>
++            </div>
+             </>
+           }
+         >

@@ -1,0 +1,7 @@
+diff a/servers/media/src/modules/app/events.ts b/servers/media/src/modules/app/events.ts	(rejected hunks)
+@@ -1,4 +1,5 @@
+ export enum AppEvents {
++  FIRST_TIME_SETUP_SUCCESS = `first_time_setup_success`,
+   DEINDEX_ALL_MEDIA_SUCCESS = `deindexed_all_media`,
+   FACTORY_RESET_SUCCESS = `factory_reset`,
+ }

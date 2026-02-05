@@ -1,18 +1,10 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -18,6 +18,8 @@ import { CreateUser } from './dtos/CreateUser.dto'
- import { GetUsersDto } from './dtos/GetUsers.dto'
+@@ -19,7 +19,7 @@ import { GetUsersDto } from './dtos/GetUsers.dto'
  import { SeatsService } from './seats.service'
  import { RBACService } from '../rbac/rbac.service'
-+import { EventService } from '../event/event.service'
-+import { UserEvents } from './events'
+ import { EventService } from '../event/event.service'
+-import { UserEvents } from './events'
++import { CreateOwnerEventPayload, UserEvents } from './events'
  
  type CreateUserArgs = {
    dto?: CreateUser,
-@@ -42,6 +44,7 @@ export class UserService {
-     private readonly settingsService: SettingsService,
-     private readonly seatsService: SeatsService,
-     private readonly rbacService: RBACService,
-+    private readonly eventService: EventService,
-   ) {}
- 
-   /**

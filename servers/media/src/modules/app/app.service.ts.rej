@@ -1,17 +1,18 @@
 diff a/servers/media/src/modules/app/app.service.ts b/servers/media/src/modules/app/app.service.ts	(rejected hunks)
-@@ -5,6 +5,7 @@ import { Injectable, Logger } from '@nestjs/common'
- import { differenceInDays, isValid } from 'date-fns'
- import * as ms from 'ms'
- import * as semver from 'semver'
-+import { v4 as uuid } from 'uuid'
+@@ -181,7 +181,7 @@ export class AppService {
+         setupStageSuccess.initialUser = true
+       } else {
+         try {
+-          const newServerOwner = await this.userService.createServerOwner(setupData.userCardinalJWT)
++          const newServerOwner = await this.userService.createServerOwner(setupData.userCardinalJWT, setupData.serverName)
+           accountToLogInto = newServerOwner.userId
+           setupStageSuccess.initialUser = true
+         } catch (error) {
+@@ -225,6 +225,7 @@ export class AppService {
  
- import { DatabaseService } from '../database/database.service'
- import { UserService } from '../user/user.service'
-@@ -49,6 +50,7 @@ export class AppService {
-    */
-   async onModuleInit(): Promise<void> {
-     this.ensureInstallationDate()
-+    this.ensureInstanceId()
-   }
- 
-   /**
+     // All stages successful
+     if (Object.values(setupStageSuccess).every((result) => !!result)) {
++      this.eventService.emitPrivate(AppEvents.FIRST_TIME_SETUP_SUCCESS)
+       return {
+         serverName: setupData.serverName,
+         accountToLogInto,

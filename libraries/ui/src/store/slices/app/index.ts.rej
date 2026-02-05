@@ -1,19 +1,19 @@
 diff a/libraries/ui/src/store/slices/app/index.ts b/libraries/ui/src/store/slices/app/index.ts	(rejected hunks)
-@@ -93,9 +99,17 @@ const appSlice = createSlice({
+@@ -99,17 +93,9 @@ const appSlice = createSlice({
          state.cloudStatus.reachable = false
          state.cloudStatus.lastCheckedAt = Date.now()
        })
-+
-+      .addCase(fetchInstanceId.fulfilled, (state, action: PayloadAction<string>) => {
-+        state.instanceId = action.payload
-+      })
-+      .addCase(fetchInstanceId.rejected, (state) => {
-+        state.instanceId = null
-+      })
+-
+-      .addCase(fetchInstanceId.fulfilled, (state, action: PayloadAction<string>) => {
+-        state.instanceId = action.payload
+-      })
+-      .addCase(fetchInstanceId.rejected, (state) => {
+-        state.instanceId = null
+-      })
    },
    selectors: {
      app: (state) => state.app,
-+    instanceId: (state) => state.instanceId,
+-    instanceId: (state) => state.instanceId,
      cardinalAppId: (state) => state.cardinalAppId,
      cardinalAppPermissions: (state) => state.cardinalAppId,
      version: (state) => state.version,
