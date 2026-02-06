@@ -14,4 +14,3 @@ export const HOME_SERVER_HOST =
 
 // Assigned by Cardinal app registry
 export const CARDINAL_PUBLIC_APP_ID = '9ffa2b5b-c8d1-4239-a68f-1d3a87719265'
-export const CARDINAL_PUBLIC_APP_PERMISSIONS = '*'

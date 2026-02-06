@@ -1,17 +1,17 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -89,6 +90,7 @@ function AppBase({
+@@ -91,7 +90,6 @@ function AppBase({
    version,
    router,
    cardinalAppId,
-+  cardinalAppPermissions,
+-  cardinalAppPermissions,
    //authStorage = 'localStorage',
    initialDeveloperMode = false,
    kioskMode = false,
-@@ -233,6 +235,7 @@ function AppBase({
+@@ -236,7 +234,6 @@ function AppBase({
     */
    useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
    useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
-+  useEffect(() => { dispatch(appActions.setCardinalAppPermissions(cardinalAppPermissions)) }, [cardinalAppPermissions])
+-  useEffect(() => { dispatch(appActions.setCardinalAppPermissions(cardinalAppPermissions)) }, [cardinalAppPermissions])
    useEffect(() => { dispatch(appActions.setKioskMode(kioskMode)) }, [kioskMode])
    useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
  

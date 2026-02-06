@@ -1,17 +1,9 @@
 diff a/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx b/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx	(rejected hunks)
-@@ -24,6 +24,7 @@ export default function CardinalAdminSSOButton({
-   const dispatch = useAppDispatch()
-   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
-   const instanceId = useAppSelector(homeServerSelectors.instanceId)
-+  const serverName = useAppSelector(homeServerSelectors.serverName)
- 
-   /**
-    * When the user logs into a Cardinal cloud account, try to log into the local
-@@ -45,6 +46,7 @@ export default function CardinalAdminSSOButton({
-       <SSOLogin
+@@ -47,7 +47,6 @@ export default function CardinalAdminSSOButton({
          appId={CARDINAL_PUBLIC_APP_ID}
          instanceId={instanceId}
-+        serverName={serverName}
-         permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+         serverName={serverName}
+-        permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
          saveJWTInLocalStorage={saveJWTInLocalStorage}
          onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
+         enableNewSSOFlow={enable_oidc_beta as boolean | undefined}

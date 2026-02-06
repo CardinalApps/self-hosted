@@ -1,79 +1,10 @@
 diff a/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx b/libraries/ui/src/components/interaction/SSOLogin/SSOLogin.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { useState, useEffect, useRef } from 'react'
- import type { CSSProperties, PropsWithChildren } from 'react'
- import { v4 as uuid } from 'uuid'
-+import clsx from 'clsx'
- 
- import BrandLogo from '../../layout/BrandLogo'
- 
-@@ -8,12 +9,9 @@ import { toastActions } from '../../../store/slices/toast'
- import { setJwt, JWT_TYPE, deleteJWT } from '../../../lib/auth/jwt'
- import authAPI from '../../../lib/auth/authAPI'
- import { useAppDispatch } from '../../../hooks/useAppDispatch'
-+import Loading from '../../layout/Loading'
- 
- import './SSOLogin.css'
--import { useAppSelector } from '../../../hooks/useAppSelector'
--import { settingsSelectors } from '../../../store/slices/settings'
--import Loading from '../../layout/Loading'
--import clsx from 'clsx'
- 
- /**
-  * Use topology package
-@@ -54,7 +52,7 @@ type SSOLoginProps = {
-   label?: string,
-   ssoUrl?: string,
-   enableNewSSOFlow?: boolean | undefined,
--  overrideServerName?: string,
-+  serverName?: string,
-   tokenType?: TokenType,
-   style?: CSSProperties,
- }
-@@ -74,7 +72,7 @@ const SSOLogin = ({
-   label = 'Sign in with Cardinal Cloud',
-   ssoUrl,
-   enableNewSSOFlow = true,
--  overrideServerName,
-+  serverName = '(Not set)',
-   tokenType = 'JWT',
-   style,
- }: PropsWithChildren<SSOLoginProps>) => {
-@@ -83,10 +81,6 @@ const SSOLogin = ({
-   const ssoWindowClosedInterval = useRef(null)
-   const [ssoFlowIsOpen, setSSOFlowIsOpen] = useState(false)
-   const [nonce, setNonce] = useState(uuid())
--  const { server_name: serverNameFromSettings } = useAppSelector(settingsSelectors.current)
--  const server_name = overrideServerName
--    ? overrideServerName
--    : serverNameFromSettings as string
- 
-   const debug = window.location.search.includes(SSO_DEBUG_PARAM)
- 
-@@ -136,7 +130,7 @@ const SSOLogin = ({
-         appId,
-         nonce,
-         instanceId,
--        serverName: server_name as string,
-+        serverName: serverName as string,
-         userAgentString: navigator.userAgent,
-         tokenType,
-         debug,
-@@ -221,14 +215,15 @@ const SSOLogin = ({
-           nonce,
-           instanceId,
-           tokenType,
--          serverName: server_name,
-+          serverName: serverName,
-         },
-       })
-         .then(resolve)
-         .catch((err) => {
-           deleteJWT(JWT_TYPE.CLOUD_USER)
-           dispatch(toastActions.addToQueue({
--            title: err,
-+            title: 'Could not create interactive login session',
-+            body: err?.message,
-             type: 'danger',
-           }))
-           reject()
+@@ -64,7 +64,7 @@ type SSOLoginProps = {
+ const SSOLogin = ({
+   appId,
+   instanceId,
+-  permissions,
++  permissions = '*',
+   saveJWTInLocalStorage = true,
+   onPopupOpened,
+   onSSOSuccess,

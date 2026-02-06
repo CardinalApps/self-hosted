@@ -17,7 +17,7 @@ import PlaylistsPage from '../../pages/Playlists'
 import CardinalMusicSSOButton from '../CardinalMusicSSOButton'
 
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
+import { CARDINAL_PUBLIC_APP_ID } from '../../env'
 
 import i18n from './i18n.json'
 
@@ -49,7 +49,6 @@ function AppRoot() {
         useParams,
       }}
       cardinalAppId={CARDINAL_PUBLIC_APP_ID}
-      cardinalAppPermissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
       ssoButton={<CardinalMusicSSOButton />}
       onHomeServerRequiresFirstTimeSetup={() => window.location.href = window.location.origin + '/admin'}
       topLevelContextMenuItems={[

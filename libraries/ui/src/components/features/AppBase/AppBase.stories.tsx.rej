@@ -1,9 +1,9 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.stories.tsx b/libraries/ui/src/components/features/AppBase/AppBase.stories.tsx	(rejected hunks)
-@@ -71,6 +71,7 @@ const DemoApp = () => {
+@@ -71,7 +71,6 @@ const DemoApp = () => {
          version="0.1.2"
          kioskMode={true}
          cardinalAppId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-+        cardinalAppPermissions="*"
+-        cardinalAppPermissions="*"
          enableGlobalAudioPlayer={true}
          onLoginSuccess={() => console.log('Top level onLoginSuccess()')}
          onHomeServerRequiresFirstTimeSetup={() => console.log('Media Server requires first time setup; disregarding in sandbox mode.')}

@@ -8,7 +8,7 @@ import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
 
 import * as routes from '../../routes'
 
-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
+import { CARDINAL_PUBLIC_APP_ID } from '../../env'
 
 type LoginWithCardinalProps = {
   automaticallyLogin?: boolean,

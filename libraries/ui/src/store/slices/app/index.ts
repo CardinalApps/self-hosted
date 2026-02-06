@@ -10,7 +10,6 @@ type AppSliceState = {
   app: CardinalApp,
   version: string | null,
   cardinalAppId: string | null,
-  cardinalAppPermissions: string | null,
   kioskMode: boolean | false,
   resetAt: number | null,
   basePath: string,
@@ -25,7 +24,6 @@ const initialState: AppSliceState = {
   app: null,
   version: null,
   cardinalAppId: null,
-  cardinalAppPermissions: null,
   kioskMode: false,
   resetAt: null,
   basePath: '',
@@ -47,10 +45,6 @@ const appSlice = createSlice({
     // Assigned by the Cardinal App Registry
     setCardinalAppId: (state, action: PayloadAction<string>) => {
       state.cardinalAppId = action.payload
-    },
-    // Verified by the Cardinal App Registry
-    setCardinalAppPermissions: (state, action: PayloadAction<string>) => {
-      state.cardinalAppPermissions = action.payload
     },
     setVersion: (state, action: PayloadAction<string>) => {
       state.version = action.payload
