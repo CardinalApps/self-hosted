@@ -1,10 +1,36 @@
 diff a/apps/admin-web/src/pages/Overview/WidgetServer.tsx b/apps/admin-web/src/pages/Overview/WidgetServer.tsx	(rejected hunks)
-@@ -62,7 +62,7 @@ function WidgetServer() {
+@@ -62,7 +65,7 @@ function WidgetServer() {
  
    return (
      <CardGrid.Card
--      width={330}
-+      size="s"
+-      size="s"
++      size="m"
        icon={<Icon fa="fas fa-server" />}
        header={
          <>
+@@ -85,6 +88,12 @@ function WidgetServer() {
+           className="server-info-list"
+           layout="compact"
+           items={[
++            {
++              name: i18n['server.server-name'][lang],
++              label: serverName,
++              truncateLabel: true,
++              title: serverName,
++            },
+             {
+               name: i18n['server.subscription'][lang],
+               label: subscriptionData?.name?.[lang],
+@@ -101,6 +110,12 @@ function WidgetServer() {
+               name: i18n['server.build'][lang],
+               label: versionsData?.build_tag || i18n['server.build.untagged']['en'],
+             },
++            {
++              name: i18n['server.instance-id'][lang],
++              label: instanceId,
++              truncateLabel: true,
++              title: instanceId,
++            },
+           ]}
+         />
+       </div>

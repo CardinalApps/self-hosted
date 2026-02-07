@@ -1,26 +1,20 @@
 diff a/libraries/ui/src/components/interaction/List/List.tsx b/libraries/ui/src/components/interaction/List/List.tsx	(rejected hunks)
-@@ -43,6 +43,7 @@ type ListProps = {
-   items: ListItem[],
-   controls?: unknown[],
-   layout?: 'default' | 'compact'
-+  maxHeight?: number,
-   onView?: (item: ListItem) => void,
-   onAdd?: (item: ListItem) => void,
-   onRemove?: (item: ListItem) => void,
-@@ -58,6 +59,7 @@ const List = ({
-   items = [],
-   controls = [],
-   layout = 'default',
-+  maxHeight,
-   onView,
-   onAdd,
-   onRemove,
-@@ -119,7 +121,7 @@ const List = ({
-   return (
-     <div {...props} className={clsx('item-list', className)} data-name={name} data-layout={layout}>
-       {items.length
--        ? <ul>
-+        ? <ul style={{ maxHeight }}>
-             {items.map((item, index) => {
-               const controlsToUse = item?.controls
-                 ? item.controls
+@@ -20,6 +20,7 @@ export type ListItem = {
+   title?: string,
+   value?: string,
+   label?: string | React.ReactNode,
++  truncateLabel?: boolean,
+   avatar?: {
+     type: 'image',
+     image: string,
+@@ -146,8 +147,8 @@ const List = ({
+                   )}
+                   <span className="item-list-item-name" title={item?.title}>{item?.name}</span>
+                   {typeof item?.label === 'string'
+-                    ? <span className="item-list-item-label" title={item?.title}>{item?.label}</span>
+-                    : <span className="item-list-item-label">{item?.label || null}</span>
++                    ? <span className={clsx('item-list-item-label', item?.truncateLabel && 'truncate')} title={item?.title}>{item?.label}</span>
++                    : <span className={clsx('item-list-item-label', item?.truncateLabel && 'truncate')}>{item?.label || null}</span>
+                   }
+                   {!!controlsToUse?.length && (
+                     <span className="item-list-item-controls">

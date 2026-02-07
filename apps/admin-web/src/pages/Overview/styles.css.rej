@@ -1,37 +1,11 @@
 diff a/apps/admin-web/src/pages/Overview/styles.css b/apps/admin-web/src/pages/Overview/styles.css	(rejected hunks)
-@@ -28,7 +28,6 @@
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
--    gap: 50px;
+@@ -99,5 +99,9 @@
  
-     .time-ago {
-       font-size: 11px;
-@@ -51,7 +50,7 @@
- }
- 
- .app {
--  width: calc(50% - 3px);
-+  width: 100%;
- 
-   .brandLogo {
-     display: flex;
-@@ -62,11 +61,17 @@
-     }
-   }
- 
-+  .app-meta {
-+    width: 100%;
-+    display: flex;
-+    justify-content: space-between;
-+  }
+   .server-info-list {
+     width: 100%;
 +
-   a {
-     padding: 6px 11px;
-     display: flex;
-     align-items: center;
--    gap: 15px;
-+    gap: 10px;
-     border-radius: var(--border-radius);
-     background-color: var(--bg-2);
-     border: 1px solid var(--border-color-3);
++    .item-list-item-name {
++      min-width: 40%;
++    }
+   }
+ }

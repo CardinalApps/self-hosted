@@ -16,10 +16,13 @@ import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
 
 import i18n from './i18n.json'
 import './styles.css'
+import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
 
 function WidgetServer() {
   const dispatch = useAppDispatch()
   const { lang } = useSelector(settingsSelectors.current)
+  const serverName = useSelector(homeServerSelectors.serverName)
+  const instanceId = useSelector(homeServerSelectors.instanceId)
 
   const versionsQuery = useGetVersionsQuery({})
   const { data: versionsData = {} } = versionsQuery

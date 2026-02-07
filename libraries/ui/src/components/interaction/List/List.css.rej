@@ -1,10 +1,15 @@
 diff a/libraries/ui/src/components/interaction/List/List.css b/libraries/ui/src/components/interaction/List/List.css	(rejected hunks)
-@@ -132,7 +132,7 @@
-       }
- 
-       .item-list-item-name {
--        min-width: 20%;
-+        min-width: 5%;
-         flex-grow: 1;
-         overflow: hidden;
-         text-overflow: ellipsis;
+@@ -161,4 +161,13 @@
+     border: 1px solid var(--border-color-1);
+     border-radius: var(--border-radius);
+   }
++
++  .item-list-item-label {
++
++    &.truncate {
++      text-overflow: ellipsis;
++      overflow: hidden;
++      white-space: nowrap;
++    }
++  }
+ }
