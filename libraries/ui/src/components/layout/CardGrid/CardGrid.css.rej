@@ -1,83 +1,15 @@
 diff a/libraries/ui/src/components/layout/CardGrid/CardGrid.css b/libraries/ui/src/components/layout/CardGrid/CardGrid.css	(rejected hunks)
-@@ -1,10 +1,6 @@
- .card-grid {
-   margin-bottom: var(--gutter);
- 
--  .card-grid-layout {
--    gap: var(--gutter);
--  }
--
-   &[data-layout="flex"] {
-     
-     .card-grid-layout {
-@@ -16,10 +12,28 @@
+@@ -21,11 +21,11 @@
        }
- 
-       .card {
-+        flex-grow: 1;
-+      }
-+
-+      .grid-size-xs {
-+        min-width: 210px;
-+        max-width: 270px;
-+      }
-+      .grid-size-s {
-+        min-width: 270px;
-+        max-width: 300px;
-+      }
-+      .grid-size-m {
+       .grid-size-s {
+         min-width: 270px;
+-        max-width: 300px;
++        max-width: 320px;
+       }
+       .grid-size-m {
          min-width: 300px;
--        max-width: 450px;
--        min-height: 170px;
--        max-height: 360px;
-+        max-width: 380px;
-+      }
-+      .grid-size-l {
-+        min-width: 380px;
-+        max-width: 460px;
-+      }
-+      .grid-size-xl {
-+        min-width: 460px;
-+        max-width: 580px;
+-        max-width: 380px;
++        max-width: 390px;
        }
-     }
-   }
-@@ -28,8 +42,37 @@
-   
-     .card-grid-layout {
-       display: grid;
--      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr) );
-+      grid-template-columns: repeat(2, 20px 1fr);
-     }
-+
-+    .grid-size-m {
-+      grid-column: auto;
-+    }
-+  }
-+
-+  &.row-height-auto {
-+    .card {
-+      height: auto;
-+    }
-+  }
-+  &.row-height-s {
-+    .card {
-+      height: 250px;
-+    }
-+  }
-+  &.row-height-m {
-+    .card {
-+      height: 320px;
-+    }
-+  }
-+  &.row-height-l {
-+    .card {
-+      height: 450px;
-+    }
-+  }
-+
-+  .card-grid-layout {
-+    gap: var(--gutter);
-   }
- 
-   .card-grid-title {
+       .grid-size-l {
+         min-width: 380px;

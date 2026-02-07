@@ -1,11 +1,10 @@
 diff a/apps/admin-web/src/pages/Overview/styles.css b/apps/admin-web/src/pages/Overview/styles.css	(rejected hunks)
-@@ -99,5 +99,9 @@
- 
-   .server-info-list {
+@@ -101,7 +101,7 @@
      width: 100%;
-+
-+    .item-list-item-name {
-+      min-width: 40%;
-+    }
+ 
+     .item-list-item-name {
+-      min-width: 40%;
++      min-width: 35%;
+     }
    }
  }

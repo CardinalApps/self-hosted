@@ -1,18 +1,33 @@
 diff a/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx b/apps/admin-web/src/components/CardinalAdminSSOButton/CardinalAdminSSOButton.tsx	(rejected hunks)
-@@ -26,6 +26,7 @@ export default function CardinalAdminSSOButton({
+@@ -4,7 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
+-import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
++import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
+ 
+ import * as routes from '../../routes'
+ 
+@@ -25,8 +25,9 @@ export default function CardinalAdminSSOButton({
+ }: LoginWithCardinalProps) {
    const dispatch = useAppDispatch()
    const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
-   const instanceId = useAppSelector(homeServerSelectors.instanceId)
-+  const serverName = useAppSelector(homeServerSelectors.serverName)
+-  const instanceId = useAppSelector(homeServerSelectors.instanceId)
+-  const serverName = useAppSelector(homeServerSelectors.serverName)
++
++  const instanceQuery = useGetInstanceQuery()
++  const { data: instanceData } = instanceQuery
  
    /**
     * When the user logs into a Cardinal cloud account, try to log into the local
-@@ -47,7 +48,7 @@ export default function CardinalAdminSSOButton({
+@@ -47,8 +48,8 @@ export default function CardinalAdminSSOButton({
+     <>
        <SSOLogin
          appId={CARDINAL_PUBLIC_APP_ID}
-         instanceId={instanceId}
--        overrideServerName={overrideServerName}
-+        serverName={overrideServerName || serverName}
+-        instanceId={instanceId}
+-        serverName={overrideServerName || serverName}
++        instanceId={instanceData?.instanceId}
++        serverName={overrideServerName || instanceData?.serverName}
          permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
          saveJWTInLocalStorage={saveJWTInLocalStorage}
          onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}

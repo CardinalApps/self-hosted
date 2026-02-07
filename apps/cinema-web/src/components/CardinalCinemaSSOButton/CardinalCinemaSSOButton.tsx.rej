@@ -1,9 +1,33 @@
 diff a/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx b/apps/cinema-web/src/components/CardinalCinemaSSOButton/CardinalCinemaSSOButton.tsx	(rejected hunks)
-@@ -47,7 +47,6 @@ export default function CardinalAdminSSOButton({
+@@ -4,7 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
+-import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
++import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
+ 
+ import * as routes from '../../routes'
+ 
+@@ -23,8 +23,9 @@ export default function CardinalAdminSSOButton({
+ }: LoginWithCardinalProps) {
+   const dispatch = useAppDispatch()
+   const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
+-  const instanceId = useAppSelector(homeServerSelectors.instanceId)
+-  const serverName = useAppSelector(homeServerSelectors.serverName)
++
++  const instanceQuery = useGetInstanceQuery()
++  const { data: instanceData } = instanceQuery
+ 
+   /**
+    * When the user logs into a Cardinal cloud account, try to log into the local
+@@ -45,8 +46,8 @@ export default function CardinalAdminSSOButton({
+     <>
+       <SSOLogin
          appId={CARDINAL_PUBLIC_APP_ID}
-         instanceId={instanceId}
-         serverName={serverName}
--        permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
+-        instanceId={instanceId}
+-        serverName={serverName}
++        instanceId={instanceData?.instanceId}
++        serverName={instanceData?.serverName}
          saveJWTInLocalStorage={saveJWTInLocalStorage}
          onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
          enableNewSSOFlow={enable_oidc_beta as boolean | undefined}

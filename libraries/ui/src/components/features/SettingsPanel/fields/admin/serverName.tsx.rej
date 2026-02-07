@@ -1,17 +1,9 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/admin/serverName.tsx b/libraries/ui/src/components/features/SettingsPanel/fields/admin/serverName.tsx	(rejected hunks)
-@@ -1,7 +1,5 @@
- import { getSetting } from '@cardinalapps/app-settings/src'
- 
--import Desc from '../../layout/Desc'
--
- import TextInput from '../../../../forms/TextInput'
- 
- const serverName = (app, lang) => {
-@@ -23,6 +21,7 @@ const serverName = (app, lang) => {
-           <TextInput
+@@ -22,6 +22,7 @@ const serverName = (app, lang) => {
              name={fieldObj.slug}
              value={value}
-+            size="l"
+             size="l"
++            maxLength={64}
              onChange={(val) => handleServerNameOnChange(val, onChange)}
            />
          </>

@@ -32,7 +32,6 @@ import DevTools from './DevTools'
 
 import { globalActions } from '../../../store/constants/actions'
 import healthCheck from '../../../store/slices/homeServer/thunks/healthCheck'
-import fetchInstance from '../../../store/slices/homeServer/thunks/fetchInstanceId'
 import reloadHomeServerUser from '../../../store/slices/homeServerUser/thunks/reload'
 import { appSelectors, appActions } from '../../../store/slices/app'
 import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
@@ -255,13 +254,6 @@ function AppBase({
       dispatch(appActions.setVersion(version))
     }
   }, [version])
-
-  /**
-   * Set the instance ID in the store on init.
-   */
-  useEffect(() => {
-    dispatch(fetchInstance())
-  }, [])
 
   return (
     <RouterContext.Provider value={router}>
