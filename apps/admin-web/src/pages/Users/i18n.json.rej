@@ -1,38 +1,11 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -132,7 +132,7 @@
-     "en": "Account"
+@@ -158,9 +158,6 @@
+   "users.settings.info.id": {
+     "en": "ID"
    },
-   "users.table.header.role": {
+-  "users.settings.info.role": {
 -    "en": "Role"
-+    "en": "Roles"
+-  },
+   "users.settings.info.enabled": {
+     "en": "Enabled"
    },
-   "users.table.header.status": {
-     "en": "Status"
-@@ -182,6 +182,9 @@
-   "users.settings.info.last-seen": {
-     "en": "Last seen"
-   },
-+  "users.settings.roles": {
-+    "en": "Roles"
-+  },
-   "users.settings.actions": {
-     "en": "Actions"
-   },
-@@ -192,7 +195,7 @@
-     "en": "Enable this user"
-   },
-   "users.settings.actions.cloud-portal-link": {
--    "en": "Manage your Cardinal cloud account"
-+    "en": "Manage your Cardinal cloud account online"
-   },
-   "users.settings.actions.remove": {
-     "en": "Remove this user"
-@@ -232,5 +235,8 @@
-   },
-   "users.updated.disabled.success": {
-     "en": "User has been disabled."
-+  },
-+  "users.roles.count": {
-+    "en": "{num} roles"
-   }
- }
