@@ -1,21 +1,12 @@
 diff a/libraries/ui/src/store/slices/cloudUser/index.ts b/libraries/ui/src/store/slices/cloudUser/index.ts	(rejected hunks)
-@@ -19,7 +19,9 @@ export type CloudUser = {
+@@ -19,9 +19,7 @@ export type CloudUser = {
  }
  
  type CloudUserSliceState = {
--  loggedIn: boolean,
-+  // null indicates a lack of httpOnly cookie, undefined means unknown cookie
-+  // state
-+  loggedIn: boolean | null,
+-  // null indicates a lack of httpOnly cookie, undefined means unknown cookie
+-  // state
+-  loggedIn: boolean | null,
++  loggedIn: boolean,
    loading: boolean,
    fetchStatus: 'success' | 'error' | null,
    updateUserDefinedSettingsIsLoading: boolean,
-@@ -27,7 +29,7 @@ type CloudUserSliceState = {
- }
- 
- const initialState: CloudUserSliceState = {
--  loggedIn: false,
-+  loggedIn: null,
-   loading: false,
-   fetchStatus: null,
-   updateUserDefinedSettingsIsLoading: false,
