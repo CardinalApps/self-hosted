@@ -1,29 +1,22 @@
 diff a/apps/admin-web/src/pages/Indexing/styles.css b/apps/admin-web/src/pages/Indexing/styles.css	(rejected hunks)
-@@ -338,27 +324,6 @@
-     font-size: 13px;
-     white-space: nowrap;
- 
--    .good {
+@@ -190,14 +190,14 @@
+           }
+         }
+       }
 -
--      i {
+-      .importCompletedIcon {
+-        margin-left: 10px;
 -        color: var(--success);
+-        font-size: 18px;
 -      }
--    }
--
--    .warn {
--
--      i {
--        color: var(--warning);
--      }
--    }
--
--    .bad {
--
--      i {
--        color: var(--danger);
--      }
--    }
--
-     i {
-       font-size: 15px;
-       position: relative;
+     }
+   }
++
++  .importCompletedIcon {
++    margin-left: 10px;
++    color: var(--success);
++    font-size: 18px;
++  }
+ }
+ 
+ .importButton {

@@ -1,22 +1,15 @@
 diff a/libraries/ui/src/components/interaction/SearchBar/SearchBar.css b/libraries/ui/src/components/interaction/SearchBar/SearchBar.css	(rejected hunks)
-@@ -38,6 +38,20 @@
-       display: none;
-     }
+@@ -53,13 +53,3 @@
+     transform: translateY(-50%);
    }
-+
-+  label {
-+    position: relative;
-+  }
-+
-+  i {
-+    font-size: 21px;
-+    color: var(--text-color-3);
-+    position: absolute;
-+    top: 50%;
-+    right: 21px;
-+    pointer-events: none;
-+    transform: translateY(-50%);
-+  }
  }
- 
- @media (max-width: 768px) {
+-
+-@media (max-width: 768px) {
+-
+-  .search-bar {
+-
+-    input {
+-      display: none;
+-    }
+-  }
+-}
