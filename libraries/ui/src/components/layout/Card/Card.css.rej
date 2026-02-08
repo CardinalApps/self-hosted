@@ -1,9 +1,22 @@
 diff a/libraries/ui/src/components/layout/Card/Card.css b/libraries/ui/src/components/layout/Card/Card.css	(rejected hunks)
-@@ -116,6 +116,7 @@
+@@ -112,6 +112,11 @@
+     height: 100%;
+   }
+ 
++  .card-empty-text {
++    font-weight: 500;
++    font-size: 14px;
++  }
++
+   @media screen and (max-width: 768px) {
  
      &.padding-thick { padding: 0; }
-     &.padding-thick > .card-content { padding: 15px 20px !important; }
-+    &.padding-thick > .card-footer { padding: 30px 20px 20px 20px; }
+@@ -120,7 +125,7 @@
  
      &.padding-regular > .card-content { padding: 15px 20px !important; }
+ 
+-    &.padding-thin > .card-content { padding: 10px !important; }
++    &.padding-thin > .card-content { padding: 10px 24px !important; }
+ 
+     &.padding-none > .card-content { padding: 0 !important; }
  

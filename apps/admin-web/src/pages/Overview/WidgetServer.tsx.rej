@@ -1,53 +1,9 @@
 diff a/apps/admin-web/src/pages/Overview/WidgetServer.tsx b/apps/admin-web/src/pages/Overview/WidgetServer.tsx	(rejected hunks)
-@@ -12,16 +12,14 @@ import Button from '@cardinalapps/ui/src/components/interaction/Button'
- import { useGetReleaseChannelQuery, useGetVersionsQuery, useLazyGetUpdatesQuery } from '@cardinalapps/ui/src/store/apis/versions'
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import { useGetLicensingSubscriptionQuery } from '@cardinalapps/ui/src/store/apis/licensing'
-+import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
- 
- import i18n from './i18n.json'
- import './styles.css'
--import { homeServerSelectors } from '@cardinalapps/ui/src/store/slices/homeServer'
- 
- function WidgetServer() {
-   const dispatch = useAppDispatch()
-   const { lang } = useSelector(settingsSelectors.current)
--  const serverName = useSelector(homeServerSelectors.serverName)
--  const instanceId = useSelector(homeServerSelectors.instanceId)
- 
-   const versionsQuery = useGetVersionsQuery({})
-   const { data: versionsData = {} } = versionsQuery
-@@ -32,6 +30,9 @@ function WidgetServer() {
-   const subscriptionQuery = useGetLicensingSubscriptionQuery({})
-   const { data: subscriptionData = {} } = subscriptionQuery
- 
-+  const instanceQuery = useGetInstanceQuery()
-+  const { data: instanceData } = instanceQuery
-+
-   const [getUpdates, getUpdatesResult] = useLazyGetUpdatesQuery()
- 
-   const manuallyCheckForUpdates = () => {
-@@ -90,9 +91,9 @@ function WidgetServer() {
-           items={[
+@@ -110,6 +110,7 @@ function WidgetServer() {
              {
-               name: i18n['server.server-name'][lang],
--              label: serverName,
-+              label: instanceData?.serverName,
-               truncateLabel: true,
--              title: serverName,
-+              title: instanceData?.serverName,
-             },
-             {
-               name: i18n['server.subscription'][lang],
-@@ -112,9 +113,9 @@ function WidgetServer() {
+               name: i18n['server.build'][lang],
+               label: versionsData?.build_tag || i18n['server.build.untagged']['en'],
++              truncateLabel: true,
              },
              {
                name: i18n['server.instance-id'][lang],
--              label: instanceId,
-+              label: instanceData?.instanceId,
-               truncateLabel: true,
--              title: instanceId,
-+              title: instanceData?.instanceId,
-             },
-           ]}
-         />

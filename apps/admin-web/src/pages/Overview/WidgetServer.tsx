@@ -69,7 +69,7 @@ function WidgetServer() {
 
   return (
     <CardGrid.Card
-      size="s"
+      size="m"
       icon={<Icon fa="fas fa-server" />}
       header={
         <>

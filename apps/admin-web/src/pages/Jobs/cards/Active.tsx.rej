@@ -1,14 +1,19 @@
 diff a/apps/admin-web/src/pages/Jobs/cards/Active.tsx b/apps/admin-web/src/pages/Jobs/cards/Active.tsx	(rejected hunks)
-@@ -62,11 +62,7 @@ function ActiveJobs() {
+@@ -60,7 +60,7 @@ function ActiveJobs() {
+ 
+   return (
      <CardGrid.Card
-       size="l"
+-      size="l"
++      size="xl"
        header={<H5 className={'title'}>{i18n['active-jobs.title'][lang]}</H5>}
--      footer={
--        <div className="note">
--          {i18n['active-jobs.active-jobs-automatic-notice'][lang]}
--        </div>
--      }
-+      footer={i18n['active-jobs.active-jobs-automatic-notice'][lang]}
+       footer={i18n['active-jobs.active-jobs-automatic-notice'][lang]}
        className={'jobQueue'}
-     >
-       {!!activeJobsLoading && <div className={'loading'}><Loading /></div>}
+@@ -76,7 +76,7 @@ function ActiveJobs() {
+             />
+           )
+         })
+-        : i18n['active-jobs.no-active-jobs'][lang]
++        : <p className="card-empty-text">{i18n['active-jobs.no-active-jobs'][lang]}</p>
+       }
+     </CardGrid.Card>
+   )

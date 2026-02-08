@@ -1,15 +1,24 @@
 diff a/libraries/ui/src/components/layout/CardGrid/CardGrid.css b/libraries/ui/src/components/layout/CardGrid/CardGrid.css	(rejected hunks)
-@@ -21,11 +21,11 @@
+@@ -36,6 +36,14 @@
+         max-width: 580px;
        }
-       .grid-size-s {
-         min-width: 270px;
--        max-width: 300px;
-+        max-width: 320px;
-       }
-       .grid-size-m {
-         min-width: 300px;
--        max-width: 380px;
-+        max-width: 390px;
-       }
-       .grid-size-l {
-         min-width: 380px;
+     }
++
++    @media screen and (max-width: 768px) {
++      
++      .card {
++        max-width: none !important;
++      }
++      
++    }
+   }
+ 
+   &[data-layout="grid"] {
+@@ -80,7 +88,4 @@
+     font-weight: 800;
+     margin-bottom: var(--gutter);
+   }
+-
+-  @media screen and (max-width: 768px) {
+-  }
+ }

@@ -3,8 +3,8 @@ diff a/apps/admin-web/src/pages/Overview/Overview.tsx b/apps/admin-web/src/pages
    const { lang } = useSelector(settingsSelectors.current)
    return (
      <AppPage layout={PAGE_LAYOUT.standard} pageTitle={i18n['title'][lang]}>
--      <CardGrid rowHeight='m'>
-+      <CardGrid rowHeight='auto'>
+-      <CardGrid rowHeight='auto'>
++      <CardGrid rowHeight='l'>
          <WidgetServer />
          <WidgetApps />
          <WidgetActiveUsers />
