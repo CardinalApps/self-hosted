@@ -1,27 +1,27 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.tsx b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.tsx	(rejected hunks)
-@@ -14,6 +14,7 @@ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
- import { modalSelectors } from '../../../store/slices/modal'
- import set from '../../../store/slices/settings/thunks/set'
- import sync from '../../../store/slices/settings/thunks/sync'
-+import Field from './Field'
- 
- import { useAppDispatch } from '../../../hooks/useAppDispatch'
- 
-@@ -148,7 +149,7 @@ const SettingsPanel = ({
+@@ -112,7 +112,7 @@ const SettingsPanel = ({
+           <SidebarNav size="thin" overrideAppLayout="standard" showCollapseButton={false} overrideIsCollapsed={false}>
+             {withCustomTabs(tabs).map((tab, index) => {
+               return (
+-                <li className={`${index === activeTabIndex ? 'active' : ''}`} key={tab?.tabName}>
++                <li className={`${index === activeTabIndex ? 'active' : ''}`} key={index}>
+                   <button type="button" onClick={() => setActiveTabIndex(index)}>
+                     <i className={tab?.tabIcon}></i>
+                     <span>{tab?.tabName}</span>
+@@ -142,14 +142,14 @@ const SettingsPanel = ({
+                 >
+                   {
+                     tab.fields
+-                      ? tab.fields.map((fieldFactory) => {
++                      ? tab.fields.map((fieldFactory, fieldIndex) => {
+                         const field = fieldFactory(app, settings?.lang)
+                         const valueInStore = settings?.[field.slug]
+                         // The field can set the overrideApp value to null to
                          // apply the settings change to all apps
                          const fieldOnChange = (value, overrideApp) => save(field.slug, value, overrideApp === null ? null : app)
                          return (
--                          <div key={field.slug} className={`field ${field.slug} type-${field.type}`}>
-+                          <Field key={field.slug} field={field}>
+-                          <Field key={field.slug} field={field}>
++                          <Field key={field.slug || fieldIndex} field={field}>
                              <div className="settings-input">
                                {field.render({
                                  field: field,
-@@ -157,7 +158,7 @@ const SettingsPanel = ({
-                                 onChange: fieldOnChange,
-                               })}
-                             </div>
--                          </div>
-+                          </Field>
-                         )
-                       })
-                       : tab.tabContent ? tab.tabContent : <>No tab content</>
