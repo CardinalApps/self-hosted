@@ -1,0 +1,17 @@
+diff a/apps/music-web/src/pages/ListenNow/i18n.json b/apps/music-web/src/pages/ListenNow/i18n.json	(rejected hunks)
+@@ -2,13 +2,7 @@
+   "title": {
+     "en": "Listen Now"
+   },
+-  "no-music-card-title": {
+-    "en": "No music"
+-  },
+-  "no-music-card-message": {
+-    "en": "Get started by importing your music with your Cardinal Media Server."
+-  },
+-  "no-music-button": {
+-    "en": "Import music"
++  "action-buttons.true-shuffle": {
++    "en": "Shuffle Library"
+   }
+ }
