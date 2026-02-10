@@ -1,0 +1,33 @@
+diff a/libraries/ui/src/store/slices/library/index.ts b/libraries/ui/src/store/slices/library/index.ts	(rejected hunks)
+@@ -1,29 +1,23 @@
+ import { createSlice } from '@reduxjs/toolkit'
+ 
+ import { globalActions } from '../../constants/actions'
+-import { Library } from '../../apis/libraries'
+ 
+ import { STORE_KEY } from './constants'
+ 
+ export interface LibrarySliceState {
+   current: string,
+-  all: Library[],
+ }
+ 
+ const initialState: LibrarySliceState = {
+   current: null,
+-  all: [],
+ }
+ 
+ const librarySlice = createSlice({
+   name: STORE_KEY,
+   initialState,
+   reducers: {
+-    set: (state, { payload: currentId }) => {
+-      state.current = currentId
+-    },
+-    setAll: (state, { payload: libraries }: { payload: Library[] }) => {
+-      state.all = libraries
++    set: (state, { payload: libraryId }) => {
++      state.current = libraryId
+     },
+   },
+   extraReducers: (builder) => {

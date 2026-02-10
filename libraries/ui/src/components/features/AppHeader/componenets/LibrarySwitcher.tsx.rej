@@ -1,0 +1,59 @@
+diff a/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx b/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx	(rejected hunks)
+@@ -1,40 +1,46 @@
++import { useAppDispatch } from '../../../../hooks/useAppDispatch'
+ import { useAppSelector } from '../../../../hooks/useAppSelector'
+ import { useGetLibrariesQuery } from '../../../../store/apis/libraries'
+-import { librarySelectors } from '../../../../store/slices/library'
++import { libraryActions, librarySelectors } from '../../../../store/slices/library'
+ import { settingsSelectors } from '../../../../store/slices/settings'
+ import Select from '../../../forms/Select'
+ 
+ import i18n from '../i18n'
+ 
+ const LibrarySwitcher = () => {
++  const dispatch = useAppDispatch()
+   const { lang } = useAppSelector(settingsSelectors.current)
+   const currentLibrary = useAppSelector(librarySelectors.current)
+   const {
+     data: allLibrariesResponse,
+   } = useGetLibrariesQuery({ take: 9999, skip: 0, order: 'asc' })
+-
+-
+-
+-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   const allLibraries = allLibrariesResponse
+ 
+-  const libraryOptions = {
+-    '_all': i18n['libraries.all'][lang],
++  const libraryOptions = (): Record<string, string>[] => {
++    if (Array.isArray(allLibraries)) {
++      return allLibraries.map((lib) => {
++        return {
++          label: lib.name,
++          value: lib.libraryId,
++        }
++      })
++    }
+   }
+ 
+-  const handleSwitchLibrary = () => {
+-
++  const handleSwitchLibrary = (val) => {
++    dispatch(libraryActions.set(val))
+   }
+ 
+   return (
+     <div className="library-switcher">
+       <Select
+         name="library-context"
+-        options={libraryOptions as Record<string, string>}
++        selectPlaceholder={i18n['libraries.placeholder'][lang]}
++        options={libraryOptions()}
+         value={currentLibrary}
+         multi={false}
+         size="s"
+-        onChange={handleSwitchLibrary}
++        onChange={(val) => handleSwitchLibrary(val)}
+       />
+     </div>
+   )

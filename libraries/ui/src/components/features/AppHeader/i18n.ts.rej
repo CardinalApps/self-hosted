@@ -1,47 +1,12 @@
 diff a/libraries/ui/src/components/features/AppHeader/i18n.ts b/libraries/ui/src/components/features/AppHeader/i18n.ts	(rejected hunks)
-@@ -13,14 +13,26 @@ const i18n: StringList = {
-   "cinema-title": {
-     "en": "Cinema",
+@@ -52,8 +52,8 @@ const i18n: StringList = {
+   "libraries.label": {
+     "en": "Library",
    },
--  "cloud-status-icon.guest-account": {
--    "en": "Log into a Cardinal account to use the cloud services.",
-+  "cloud-status-icon.media-server.title": {
-+    "en": "Media Server status",
-+  },
-+  "cloud-status-icon.cloud-services.title": {
-+    "en": "Cardinal Cloud status",
-+  },
-+  "cloud-status-icon.title": {
-+    "en": "Connection Status",
-+  },
-+  "cloud-status-icon.dots.connected": {
-+    "en": "Connected",
-   },
--  "cloud-status-icon.unreachable": {
--    "en": "Cardinal's cloud services are unreachable.",
-+  "cloud-status-icon.dots.loading": {
-+    "en": "Loading",
-   },
--  "cloud-status-icon.loading": {
--    "en": "Attempting to connect to Cardinal's cloud services.",
-+  "cloud-status-icon.dots.not-connected": {
-+    "en": "Not connected",
-+  },
-+  "cloud-status-icon.guest-account": {
-+    "en": "Log into a Cardinal account to use Cloud Services",
-   },
-   "cloud-status-icon.reachable": {
-     "en": "Cardinal's cloud services are online.",
-@@ -37,6 +49,12 @@ const i18n: StringList = {
-   "activity.none": {
-     "en": "No noteworthy activity.",
-   },
-+  "libraries.label": {
+-  "libraries.all": {
+-    "en": "All Libraries",
++  "libraries.placeholder": {
 +    "en": "Library",
-+  },
-+  "libraries.all": {
-+    "en": "All Libraries",
-+  },
+   },
  }
  
- export default i18n

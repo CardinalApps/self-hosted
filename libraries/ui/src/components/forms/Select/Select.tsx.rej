@@ -1,13 +1,14 @@
 diff a/libraries/ui/src/components/forms/Select/Select.tsx b/libraries/ui/src/components/forms/Select/Select.tsx	(rejected hunks)
-@@ -206,9 +206,9 @@ const Select = ({
-    * Blur event for options.
-    */
-   const onSelectBlur = (e) => {
--    const isOutside = !e.relatedTarget?.closest('.custom-select')
-+    const isOutside = !e.relatedTarget?.closest(`.custom-select[data-name=${name}]`)
- 
--    if (isOutside && !e?.relatedTarget?.closest('.custom-select')) {
-+    if (isOutside && !e?.relatedTarget?.closest(`.custom-select[data-name=${name}]`)) {
-       setPopoutOpen(false)
-     }
-   }
+@@ -168,7 +168,11 @@ const Select = ({
+       // Only 1 is selected
+       if (selected.length === 1) {
+         const firstSelected = optionsAsArray(options).find((opt) => opt.value === selected[0])
+-        return `${selectedPrefix}${firstSelected?.sentenceCase || firstSelected?.label}`
++        if (firstSelected) {
++          return `${selectedPrefix}${firstSelected?.sentenceCase || firstSelected?.label}`
++        } else {
++          return `${selectedPrefix}`
++        }
+       }
+       // Multiple are selected
+       else {
