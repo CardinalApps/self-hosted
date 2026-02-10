@@ -1,0 +1,220 @@
+diff a/libraries/ui/src/components/features/AppHeader/AppHeader.css b/libraries/ui/src/components/features/AppHeader/AppHeader.css	(rejected hunks)
+@@ -3,6 +3,7 @@
+   padding: 6px 12px 6px 20px;
+   border-bottom: 1px solid var(--border-color-3);
+   display: flex;
++  gap: 15px;
+   align-items: center;
+   justify-content: space-between;
+   position: relative;
+@@ -45,60 +46,95 @@
+   .right {
+     display: flex;
+     justify-content: flex-end;
++    gap: 15px;
++
++    > section {
++      display: flex;
++      gap: 5px
++    }
+   }
+ 
+   .cloud-status-icon {
+     position: relative;
+     top: 1px;
+ 
+-    .mini-icon {
+-
++    .status-dots {
++      display: flex;
++      flex-direction: column;
++      gap: 4px;
+     }
+ 
+-    &[data-status="loading"] {
+-      transform: scale(1);
+-      animation: iconPulse 2s infinite;
++    .status-dot {
++      width: 10px;
++      height: 10px;
++      border-radius: 100%;
++      border: 1px solid var(--border-color-2);
++      position: relative;
++      overflow: hidden;
++      z-index: 5;
+ 
+-      .mini-icon {
+-        color: var(--bg-4);
+-        font-size: 10px !important;
+-        position: absolute;
+-        right: 9px;
+-        top: 6px;
++      &[data-status="connected"] {
++        background-color: var(--border-color-1);
+       }
+-    }
+ 
+-    &[data-status="local-only"] {
++      &[data-status="loading"] {
++        background-color: none;
++
++        &:before {
++          content: '';
++          width: 20px;
++          top: 50%;
++          left: 0;
++          bottom: 0;
++          position: absolute;
++          background-color: var(--border-color-1);
++        }
++      }
+ 
+-      .mini-icon {
+-        color: var(--bg-4);
+-        font-size: 10px !important;
+-        position: absolute;
+-        right: 8px;
+-        top: 6px;
++      &[data-status="not-connected"] {
++        background-color: none;
+       }
+     }
+ 
+-    &[data-status="unreachable"] {
+-
+-      .mini-icon {
+-        color: var(--bg-4);
+-        font-size: 11px !important;
+-        position: absolute;
+-        right: 9px;
+-        top: 6px;
+-        color: var(--danger);
++    .status-overview {
++      width: 260px;
++      padding: 15px 20px 10px 20px;
++      border-radius: 12px;
++      display: flex;
++      flex-direction: column;
++      box-shadow: var(--box-shadow-2);
++      border: 1px solid var(--border-color-1);
++      background-color: var(--bg-1);
++      z-index: 1000;
++
++      .title {
++        margin-bottom: 10px;
++        font-size: 14px;
++        font-weight: 800;
++        color: var(--text-color-1);
++        text-transform: uppercase;
+       }
+-    }
+ 
+-    &[data-status="reachable"] {
++      .dot-legend {
++
++        .status-dot {
++          width: 12px;
++          height: 12px;
++        }
+ 
+-      .mini-icon {
+-        color: var(--bg-4);
+-        font-size: 9px !important;
+-        position: absolute;
+-        right: 8px;
+-        top: 7px;
++        li {
++          padding-left: 10px;
++          margin-bottom: 8px;
++          display: flex;
++          justify-content: space-between;
++          align-items: center;
++
++          span {
++            font-size: 14px;
++            font-weight: 400;
++            color: var(--text-color-2);
++          }
++        }
+       }
+     }
+   }
+@@ -117,7 +153,7 @@
+     .title {
+       margin-bottom: 10px;
+       font-size: 14px;
+-      font-weight: 900;
++      font-weight: 800;
+       color: var(--text-color-1);
+       text-transform: uppercase;
+     }
+@@ -161,61 +197,6 @@
+     }
+   }
+ 
+-  .icons {
+-    margin: 0 15px;
+-    display: flex;
+-    justify-content: space-between;
+-    gap: 6px;
+-
+-    .icon {
+-      width: 45px;
+-      position: relative;
+-      display: flex;
+-      align-items: center;
+-      justify-content: center;
+-
+-      > a {
+-        display: flex;
+-      }
+-
+-      &:not(.no-hover) {
+-        
+-        &:hover i {
+-          color: var(--text-color-3);
+-        }
+-      }
+-
+-      i {
+-        font-size: 20px;
+-        color: var(--text-color-1);
+-      }
+-
+-      &.settings-icon {
+-        width: 40px;
+-        
+-        i {
+-          transition: color 300ms;
+-        }
+-      }
+-
+-      .settings-icon-link {
+-        display: flex;
+-        cursor: pointer;
+-
+-        &:hover {
+-
+-          i {
+-            color: var(--text-color-3);
+-          }
+-        }
+-      }
+-
+-      .settings-icon-nolink {
+-        display: flex;
+-      }
+-    }
+-  }
+-
+   @media screen and (max-width: 768px) {
+     height: auto;
+     margin-left: 0;
+@@ -247,7 +228,6 @@
+     }
+ 
+     .icons {
+-      gap: 2px;
+       
+       .icon {
+         width: 38px;

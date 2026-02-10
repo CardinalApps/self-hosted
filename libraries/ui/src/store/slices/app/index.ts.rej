@@ -1,9 +1,54 @@
 diff a/libraries/ui/src/store/slices/app/index.ts b/libraries/ui/src/store/slices/app/index.ts	(rejected hunks)
-@@ -97,7 +91,6 @@ const appSlice = createSlice({
+@@ -1,7 +1,5 @@
+ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+ 
+-import healthCheck from '../homeServer/thunks/healthCheck'
+-
+ import { globalActions } from '../../constants/actions'
+ 
+ import { CardinalApp } from '../../../lib/env/cardinal'
+@@ -54,12 +52,6 @@ const appSlice = createSlice({
+     setKioskMode: (state, action: PayloadAction<boolean>) => {
+       state.kioskMode = action.payload
+     },
+-    setCloudStatusIsLoading: (state, action: PayloadAction<boolean>) => {
+-      state.cloudStatus.isLoading = action.payload
+-    },
+-    setCloudStatusReachable: (state, action: PayloadAction<boolean>) => {
+-      state.cloudStatus.reachable = action.payload
+-    },
+     setBasePath: (state, action: PayloadAction<string>) => {
+       state.basePath = action.payload
+     },
+@@ -69,31 +61,14 @@ const appSlice = createSlice({
+       .addCase(globalActions.RESET, (state) => {
+         return {
+           ...state,
+-          cloudStatus: { ...initialState.cloudStatus },
+         }
+       })
+-
+-      // TODO the home server should check the cloud health for us
+-      .addCase(healthCheck.pending, (state) => {
+-        state.cloudStatus.isLoading = true
+-      })
+-      .addCase(healthCheck.fulfilled, (state) => {
+-        state.cloudStatus.isLoading = false
+-        state.cloudStatus.reachable = true
+-        state.cloudStatus.lastCheckedAt = Date.now()
+-      })
+-      .addCase(healthCheck.rejected, (state) => {
+-        state.cloudStatus.isLoading = false
+-        state.cloudStatus.reachable = false
+-        state.cloudStatus.lastCheckedAt = Date.now()
+-      })
+   },
    selectors: {
      app: (state) => state.app,
      cardinalAppId: (state) => state.cardinalAppId,
--    cardinalAppPermissions: (state) => state.cardinalAppId,
      version: (state) => state.version,
      kioskMode: (state) => state.kioskMode,
-     cloudStatus: (state) => state.cloudStatus,
+-    cloudStatus: (state) => state.cloudStatus,
+     basePath: (state) => state.basePath,
+   },
+ })

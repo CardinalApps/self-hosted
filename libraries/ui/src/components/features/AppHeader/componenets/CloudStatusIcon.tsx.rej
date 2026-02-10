@@ -1,0 +1,125 @@
+diff a/libraries/ui/src/components/features/AppHeader/componenets/CloudStatusIcon.tsx b/libraries/ui/src/components/features/AppHeader/componenets/CloudStatusIcon.tsx	(rejected hunks)
+@@ -1,57 +1,85 @@
+ import { useSelector } from 'react-redux'
+ 
+-import { appSelectors } from '../../../../store/slices/app'
+ import { settingsSelectors } from '../../../../store/slices/settings'
+ import { homeServerUserSelectors } from '../../../../store/slices/homeServerUser'
++import { cloudUserSelectors } from '../../../../store/slices/cloudUser'
++import MenuButton from '../../../interaction/MenuButton'
+ 
+ import i18n from '../i18n'
+ 
++const STATUS_DOTS = {
++  connected: 'connected',
++  loading: 'loading',
++  not_connected: 'not-connected',
++} as const
++
+ const CloudStatusIcon = () => {
+-  const cloudStatus = useSelector(appSelectors.cloudStatus)
+-  const currentHomeServerUser = useSelector(homeServerUserSelectors.current)
++  const mediaServerStatusLoading = useSelector(homeServerUserSelectors.loading)
++  const mediaServerStatusConnected = useSelector(homeServerUserSelectors.loggedIn)
++  const currentMediaServerUser = useSelector(homeServerUserSelectors.current)
++  const cloudUserLoading = useSelector(cloudUserSelectors.loading)
++  const cloudServicesConnected = useSelector(cloudUserSelectors.loggedIn)
+   const { lang } = useSelector(settingsSelectors.current)
+ 
+-  const getStatusData = () => {
+-    // if (cloudStatus.isLoading) {
+-    //   return {
+-    //     slug: 'loading',
+-    //     icon: 'fas fa-cloud',
+-    //     title: i18n['cloud-status-icon.loading'][lang],
+-    //   }
+-    // }
+-    if (currentHomeServerUser?.designation === 'guest_account') {
+-      return {
+-        slug: 'local-only',
+-        icon: 'fas fa-cloud',
+-        miniIcon: 'fas fa-ban',
+-        title: i18n['cloud-status-icon.guest-account'][lang],
+-      }
++  const getMediaServerStatus = () => {
++    if (mediaServerStatusConnected) {
++      return STATUS_DOTS.connected
+     }
+-    if (cloudStatus.reachable === false) {
+-      return {
+-        slug: 'unreachable',
+-        icon: 'fas fa-cloud',
+-        miniIcon: 'fas fa-times',
+-        title: i18n['cloud-status-icon.unreachable'][lang],
+-      }
+-    }
+-    if (cloudStatus.reachable === true || cloudStatus.isLoading) {
+-      return {
+-        slug: 'reachable',
+-        icon: 'fas fa-cloud',
+-        miniIcon: 'fas fa-check',
+-        title: i18n['cloud-status-icon.reachable'][lang],
+-      }
++    if (mediaServerStatusLoading) {
++      return STATUS_DOTS.loading
+     }
++    return STATUS_DOTS.not_connected
+   }
+ 
+-  const status = getStatusData()
++  const getCloudStatus = () => {
++    if (cloudServicesConnected) {
++      return STATUS_DOTS.connected
++    }
++    if (cloudUserLoading) {
++      return STATUS_DOTS.loading
++    }
++    return STATUS_DOTS.not_connected
++  }
+ 
+   return (
+-    <div className="cloud-status-icon" title={status?.title} data-status={status?.slug}>
+-      {!!status?.miniIcon && <i className={`${status?.miniIcon} mini-icon`} />}
+-      <i className={status?.icon} />
+-    </div>
++    <MenuButton
++      className="cloud-status-icon"
++      solid={false}
++      size="m"
++      align={'right'}
++      icon={
++        <div className="status-dots">
++          <div
++            className="status-dot"
++            title={`${i18n['cloud-status-icon.media-server.title'][lang]}: ${i18n[`cloud-status-icon.dots.${getMediaServerStatus()}`][lang]}`}
++            data-status={getMediaServerStatus()}
++          />
++          <div
++            className="status-dot"
++            title={`${i18n['cloud-status-icon.cloud-services.title'][lang]}: ${currentMediaServerUser?.designation === 'guest_account' ? i18n['cloud-status-icon.guest-account'][lang] : i18n[`cloud-status-icon.dots.${getCloudStatus()}`][lang]}`}
++            data-status={getCloudStatus()}
++          />
++        </div>
++      }
++    >
++      <div className="status-overview">
++        <p className="title">{i18n['cloud-status-icon.title'][lang]}</p>
++        <ul className="dot-legend">
++          <li>
++            <div className="status-dot" data-status={STATUS_DOTS.connected} />
++            <span>{i18n['cloud-status-icon.dots.connected'][lang]}</span>
++          </li>
++          <li>
++            <div className="status-dot" data-status={STATUS_DOTS.loading} />
++            <span>{i18n['cloud-status-icon.dots.loading'][lang]}</span>
++          </li>
++          <li>
++            <div className="status-dot" data-status={STATUS_DOTS.not_connected} />
++            <span>{i18n['cloud-status-icon.dots.not-connected'][lang]}</span>
++          </li>
++        </ul>
++      </div>
++    </MenuButton>
+   )
+ }
+ 

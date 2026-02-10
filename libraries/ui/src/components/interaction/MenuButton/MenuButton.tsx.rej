@@ -1,0 +1,26 @@
+diff a/libraries/ui/src/components/interaction/MenuButton/MenuButton.tsx b/libraries/ui/src/components/interaction/MenuButton/MenuButton.tsx	(rejected hunks)
+@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
+ import './MenuButton.css'
+ 
+ type MenuButtonProps = {
++  className?: string,
+   icon?: ReactNode,
+   size?: 's' | 'm',
+   overrideButtonStyle?: CSSProperties,
+@@ -23,6 +24,7 @@ type MenuButtonProps = {
+  * boolean indicating whether the item is "open".
+  */
+ const MenuButton = ({
++  className,
+   icon,
+   size = 's',
+   overrideButtonStyle,
+@@ -68,7 +70,7 @@ const MenuButton = ({
+   }, [])
+ 
+   return (
+-    <div ref={ref} className={`menu-button align-${align}`} title={title}>
++    <div ref={ref} className={`menu-button align-${align} ${className ? className : ''}`} title={title}>
+       <button
+         className={`size-${size} ${solid ? 'solid': ''} ${isOpen ? 'open' : ''}`}
+         type="button"

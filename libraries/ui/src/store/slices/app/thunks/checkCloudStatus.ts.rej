@@ -1,9 +1,9 @@
 diff a/libraries/ui/src/store/slices/app/thunks/checkCloudStatus.ts b/libraries/ui/src/store/slices/app/thunks/checkCloudStatus.ts	(rejected hunks)
-@@ -24,6 +24,7 @@ const checkCloudStatus = createAsyncThunk<
+@@ -1,3 +1,7 @@
++/**
++ * FIXME this is not being used
++ */
++
+ import { createAsyncThunk } from '@reduxjs/toolkit'
  
-   if (lastCheckedAt === null || Date.now() - new Date(lastCheckedAt).getTime() <= checkInterval) {
-     const res = await authAPI<Record<string, unknown>>('/health')
-+    // FIXME I don't think the res.ok belongs here
-     if (res.ok) {
-       return { ...payload }
-     } else {
+ import ms from 'ms'

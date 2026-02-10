@@ -1,50 +1,40 @@
 diff a/libraries/ui/src/components/features/AppHeader/AppHeader.tsx b/libraries/ui/src/components/features/AppHeader/AppHeader.tsx	(rejected hunks)
-@@ -23,7 +23,6 @@ import './AppHeader.css'
- type AppHeaderProps = {
-   app?: CardinalApp,
-   logoClickTo?: string,
--  settingsClickTo?: string,
-   onSwitchAccountClick?: () => void,
-   loginButton?: ReactNode,
-   appName?: string,
-@@ -35,7 +34,6 @@ type AppHeaderProps = {
- const AppHeader = ({
-   app,
-   logoClickTo,
--  settingsClickTo,
-   onSwitchAccountClick,
-   loginButton,
-   appName,
-@@ -84,26 +82,17 @@ const AppHeader = ({
+@@ -13,6 +13,7 @@ import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ import { RouterContext } from '../../../context/router'
+ import { CardinalApp } from '../../../lib/env/cardinal'
+ 
++import LibrarySwitcher from './componenets/LibrarySwitcher'
+ import CloudStatusIcon from './componenets/CloudStatusIcon'
+ import ActivityIcon from './componenets/ActivityIcon'
+ 
+@@ -81,20 +82,23 @@ const AppHeader = ({
+         </div>
        </div>
        <div className="right">
-         <div className="icons">
--          {/* Cloud status icon */}
--          <div className="icon no-hover">
--            <CloudStatusIcon />
-+          {/* App menu icon */}
-+          <div className="icon">
-+            <AppMenu align="center" target={open_apps_in_new_tab ? '_blank' : undefined} />
-           </div>
-           {/* Activity icon */}
-           <div className="icon">
-             <ActivityIcon />
-           </div>
+-        <div className="icons">
 -          {/* App menu icon */}
 -          <div className="icon">
 -            <AppMenu align="center" target={open_apps_in_new_tab ? '_blank' : undefined} />
 -          </div>
--          {/* Settings icon */}
--          <div className="icon settings-icon">
--            {Link && settingsClickTo
--              ? <Link to={settingsClickTo} className="settings-icon-link">
--                  <i className="fas fa-cog" />
--                </Link>
--              : <div className="settings-icon-nolink"><i className="fas fa-cog" /></div>
--            }
-+          {/* Cloud status icon */}
-+          <div className="icon no-hover">
-+            <CloudStatusIcon />
++        <section>
++          <LibrarySwitcher />
++        </section>
++        <section>
+           {/* Activity icon */}
+           <div className="icon">
+             <ActivityIcon />
            </div>
-         </div>
++          {/* App menu icon */}
++          <div className="icon">
++            <AppMenu align="center" target={open_apps_in_new_tab ? '_blank' : undefined} />
++          </div>
+           {/* Cloud status icon */}
+-          <div className="icon no-hover">
++          <div className="icon">
+             <CloudStatusIcon />
+           </div>
+-        </div>
++        </section>
          {/* User menu */}
+         <div className="icon">
+           <UserMenu
