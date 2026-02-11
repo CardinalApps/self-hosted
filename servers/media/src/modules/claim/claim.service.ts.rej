@@ -1,10 +1,24 @@
 diff a/servers/media/src/modules/claim/claim.service.ts b/servers/media/src/modules/claim/claim.service.ts	(rejected hunks)
-@@ -94,7 +94,7 @@ export class ClaimService {
-     try {
-       await this.databaseService.saveOption(OPTIONS.CLAIM_ID.name, res.claimId)
-       await this.databaseService.saveOption(OPTIONS.CLAIMED_AT.name, res.claimedAt)
--      Logger.log('Successfully claimed this Media Server instance with Cardinal cloud. You should now be able to see this Media Server under your account at account.cardinalapps.io', 'Claim')
-+      Logger.log('Successfully claimed this Media Server instance with Cardinal cloud; see your claims at account.cardinalapps.io/account/claims', 'Claim')
-     } catch (err) {
-       Logger.log(err, 'Claim')
-     }
+@@ -25,13 +25,6 @@ export class ClaimService {
+     this.eventService.subscribePrivate(this, UserEvents.CREATE_OWNER, this.claimServerWithCloudIfNotClaimed.bind(this))
+   }
+ 
+-  /**
+-   * When Nest starts up.
+-   */
+-  async onModuleInit(): Promise<void> {
+-    this.claimServerWithCloudIfNotClaimed()
+-  }
+-
+   /**
+    * Propagate the local claim to Cardinal's cloud. This will allow the user to
+    * see the server in their account portal.
+@@ -67,7 +60,7 @@ export class ClaimService {
+         instanceId: instanceId as string,
+         origin: instanceId as string,
+       },
+-      JWT: owner.ssoToken,
++      JWT: options.jwt,
+     })
+       .then((res) => {
+         this.saveClaim(res)

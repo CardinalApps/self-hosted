@@ -1,103 +1,27 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -18,7 +18,6 @@ import {
-   ApiMethodNotAllowedResponse,
-   ApiExcludeEndpoint,
- } from '@nestjs/swagger'
--import { NamedCapability } from '@cardinalapps/access-control/dist/cjs'
+@@ -29,7 +29,7 @@ import { GetUserResponse } from './dtos/GetUserResponse.dto'
+ import { CurrentUser } from '../../decorators/CurrentUser.decorator'
+ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
  
- import { UserService } from './user.service'
- import { LocalUserService } from './local-user.service'
-@@ -35,19 +34,15 @@ import { GetUsersDto } from './dtos/GetUsers.dto'
+-import { getJWTFromHeaders } from '../../utils/jwt'
++import { getJWTFromHeaders, getCardinalTolkienFromHeaders } from '../../utils/jwt'
+ import { GetUsersDto } from './dtos/GetUsers.dto'
  import { SeatsService } from './seats.service'
  import { Designations } from './types'
- 
--class SecureController {
--  protected capabilities: Record<string, NamedCapability[]>
--}
--
- @Controller()
- @ApiTags('Users')
--export class UserController extends SecureController {
-+export class UserController {
-   constructor(
-     private readonly userService: UserService,
-     private readonly localUserService: LocalUserService,
-     private readonly cloudUserService: CloudUserService,
-     private readonly seatsService: SeatsService,
--  ) { super() }
-+  ) {}
- 
-   /**
-    * Returns information about the currently logged in user. Local online
-@@ -96,51 +91,51 @@ export class UserController extends SecureController {
-   }
- 
-   /**
--   * Returns the user for the given local user ID.
-+   * Returns the server owner, if there is one.
-    */
--  @Get('/users/:id')
-+  @Get('/users/owner')
-   @StandardEndpoint({
--    summary: 'Get a specific user.',
-+    summary: 'Returns the server owner, if there is one.',
-     capabilities: ['Users.Read'],
+@@ -58,6 +58,7 @@ export class UserController {
    })
--  async getUser(@Param('id') id: string): Promise<User | Record<never, never>> {
--    return await this.userService.getUserByLocalId(id)
-+  async getOwner(): Promise<Partial<User> | null> {
-+    return await this.userService.getServerOwner()
-   }
+   async getCurrentUser(@Headers() headers): Promise<GetUserResponse> {
+     const localUserJWT = getJWTFromHeaders(headers)
++    const cloudUserJWT = getCardinalTolkienFromHeaders(headers)
  
-   /**
--   * Returns all users in this server.
-+   * Returns all active users for this server.
-    */
--  @Get('/users')
-+  @Get('/users/active')
-   @StandardEndpoint({
--    summary: 'Get all users in this server.',
-+    summary: 'Get active Media Server users.',
-     capabilities: ['Users.Read'],
-   })
--  async getUsers(@Query() query: GetUsersDto): Promise<[Partial<User>[], number]> {
--    return await this.userService.query(query)
-+  async getActiveUsers(): Promise<User[]> {
-+    return await this.userService.getActiveUsers()
-   }
+     const localUser = await this.userService.getUserByLocalJWT(localUserJWT)
  
-   /**
--   * Returns the server owner, if there is one.
-+   * Returns all users in this server.
-    */
--  @Get('/users/owner')
-+  @Get('/users')
-   @StandardEndpoint({
--    summary: 'Returns the server owner, if there is one.',
-+    summary: 'Get all users in this server.',
-     capabilities: ['Users.Read'],
-   })
--  async getOwner(): Promise<Partial<User> | null> {
--    return await this.userService.getServerOwner()
-+  async getUsers(@Query() query: GetUsersDto): Promise<[Partial<User>[], number]> {
-+    return await this.userService.query(query)
-   }
+@@ -78,7 +79,7 @@ export class UserController {
  
-   /**
--   * Returns all active users for this server.
-+   * Returns the user for the given local user ID.
-    */
--  @Get('/users/active')
-+  @Get('/users/:id')
-   @StandardEndpoint({
--    summary: 'Get active Media Server users.',
-+    summary: 'Get a specific user.',
-     capabilities: ['Users.Read'],
-   })
--  async getActiveUsers(): Promise<User[]> {
--    return await this.userService.getActiveUsers()
-+  async getUser(@Param('id') id: string): Promise<User | Record<never, never>> {
-+    return await this.userService.getUserByLocalId(id)
-   }
- 
-   /**
+     // Refresh the cached user data by fetching from the auth servers
+     try {
+-      const refreshedUser = await this.cloudUserService.maybeRefreshCloudUserInDatabase(localUser.userId)
++      const refreshedUser = await this.cloudUserService.maybeRefreshCloudUserInDatabase(localUser.userId, cloudUserJWT)
+       return {
+         localUser: this.userService.cleanseUserObject(localUser),
+         cardinalUser: refreshedUser?.cachedCloudUser,

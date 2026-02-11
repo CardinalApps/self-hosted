@@ -1,10 +1,28 @@
 diff a/servers/media/src/modules/user/cloud-user.service.ts b/servers/media/src/modules/user/cloud-user.service.ts	(rejected hunks)
-@@ -71,7 +71,7 @@ export class CloudUserService {
-       throw new Error('This user cannot be used.')
+@@ -90,7 +90,7 @@ export class CloudUserService {
+         },
+       })
+     } catch (error) {
+-      Logger.error(error, 'User')
++      Logger.error(`Error when fetching cloud user: ${error}`, 'User')
+       throw new Error(error)
      }
-     if (!userObj?.confirmedEmail) {
--      throw new Error("The account's email address must be confirmed before it can be used with a Media Server.")
-+      throw new Error("This account's email address must be confirmed before it can log into a server.")
-     }
-   }
  
+@@ -133,7 +133,7 @@ export class CloudUserService {
+    * for any reason, the refresh is skipped and the app is allowed to continue
+    * operating normally.
+    */
+-  async maybeRefreshCloudUserInDatabase(userId: string, forceRefresh = false): Promise<User> {
++  async maybeRefreshCloudUserInDatabase(userId: string, cloudJWT: string, forceRefresh = false): Promise<User> {
+     const user = await this.userRepository.findOneBy({ userId: userId })
+     const cachedAt = new Date(user.cachedCloudUserAt).getTime()
+ 
+@@ -145,7 +145,7 @@ export class CloudUserService {
+     }
+ 
+     // Get a new object from the cloud
+-    const freshObject = await this.getCardinalCloudUser(user.ssoToken)
++    const freshObject = await this.getCardinalCloudUser(cloudJWT)
+ 
+     if (!freshObject) {
+       Logger.warn('Could not refresh cloud user data.', 'User')

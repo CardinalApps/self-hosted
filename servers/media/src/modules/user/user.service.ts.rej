@@ -1,10 +1,9 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -19,7 +19,7 @@ import { GetUsersDto } from './dtos/GetUsers.dto'
- import { SeatsService } from './seats.service'
- import { RBACService } from '../rbac/rbac.service'
- import { EventService } from '../event/event.service'
--import { UserEvents } from './events'
-+import { CreateOwnerEventPayload, UserEvents } from './events'
+@@ -84,7 +84,6 @@ export class UserService {
+         cardinalId: cardinalCloudUser ? cardinalCloudUser.userId : null,
+         cachedCloudUser: cardinalCloudUser ? cardinalCloudUser : null,
+         cachedCloudUserAt: cardinalCloudUser ? new Date() : null,
+-        ssoToken: cardinalCloudUser ? dto.cardinalJWT : null,
+         designation: secure?.designation || null,
+       })
  
- type CreateUserArgs = {
-   dto?: CreateUser,

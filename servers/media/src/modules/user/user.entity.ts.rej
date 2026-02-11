@@ -1,11 +1,11 @@
 diff a/servers/media/src/modules/user/user.entity.ts b/servers/media/src/modules/user/user.entity.ts	(rejected hunks)
-@@ -63,7 +63,7 @@ export class User extends BaseEntity {
-   @Column({ nullable: true })
-   activityStatusUpdatedAt?: Date
+@@ -45,9 +45,6 @@ export class User extends BaseEntity {
+   @Column({ nullable: false, default: true })
+   enabled?: boolean
  
--  @OneToMany(() => RoleAssignment, (grant) => grant.user, { onDelete: 'CASCADE' })
-+  @OneToMany(() => RoleAssignment, (assignment) => assignment.user, { onDelete: 'CASCADE' })
-   @JoinColumn()
--  grants: RoleAssignment[]
-+  roles: RoleAssignment[]
- }
+-  @Column({ nullable: true })
+-  ssoToken?: string
+-
+   /**
+    * @deprecated Replaced by Role Assignments.
+    */

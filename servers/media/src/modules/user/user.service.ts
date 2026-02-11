@@ -208,8 +208,6 @@ export class UserService {
 
   /**
    * Creates the server owner account.
-   * 
-   * @param serverName - Optionally give a server name to attach to the event.
    */
   async createServerOwner(cardinalSSOJWT, serverName?): Promise<User | null> {
     if (await this.getServerOwner()) {
@@ -221,7 +219,21 @@ export class UserService {
         dto: { cardinalJWT: cardinalSSOJWT, role: 'owner' },
       })
 
-      this.eventService.emitPrivate(UserEvents.CREATE_OWNER, serverName ? { serverName } as CreateOwnerEventPayload : undefined)
+      this.eventService.emitPrivate(
+        UserEvents.CREATE_OWNER,
+        {
+          // If the user is claiming during First Time Setup, the server name
+          // will not yet be in the database when the claim gets triggered by
+          // this event. So, passing the name here is a convenient way to get
+          // around the race condition.
+          // 
+          // You might be tempted to move this to the First Time Setup code, but
+          // the claim can happen any time later if the user finishes the First
+          // Time Setup as a guest.
+          serverName,
+          jwt: cardinalSSOJWT,
+        } as CreateOwnerEventPayload,
+      )
 
       return ownerAccount
     } catch (error) {

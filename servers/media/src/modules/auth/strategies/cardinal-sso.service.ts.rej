@@ -1,12 +1,26 @@
 diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
-@@ -128,6 +128,10 @@ export class CardinalSSOStrategy {
-     // There is no owner, claim the server
-     const newOwnerAccount = await this.userService.createServerOwner(cardinalSSOToken)
+@@ -1,4 +1,4 @@
+-import { Injectable, Logger } from '@nestjs/common'
++import { Injectable } from '@nestjs/common'
+ import { getMediaServerRole, hasCapability, MediaServerCapability, MediaServerRoleName } from '@cardinalapps/access-control/dist/cjs'
  
-+    if (!newOwnerAccount) {
-+      throw new Error('Failed to create server owner account.')
-+    }
-+
-     return await this.loginSuccess(newOwnerAccount, cardinalSSOToken)
+ import { UserService } from '../../user/user.service'
+@@ -158,16 +158,11 @@ export class CardinalSSOStrategy {
+   /**
+    * Creates the login success object.
+    */
+-  private async loginSuccess(user, cardinalSSOToken): Promise<LoginResponse> {
+-    try {
+-      await this.userService.update(user.userId, { ssoToken: cardinalSSOToken })
+-    } catch (error) {
+-      Logger.error('Could not update cached SSO token')
+-    }
++  private async loginSuccess(user: User, cloudJWT: string): Promise<LoginResponse> {
+     return {
+       JWT: await this.tokenService.createJWT(user.userId),
+       user: this.userService.cleanseUserObject(user),
+-      cloudJWT: user.ssoToken,
++      cloudJWT: cloudJWT,
+       cloudUser: user.cachedCloudUser,
+     }
    }
- 
