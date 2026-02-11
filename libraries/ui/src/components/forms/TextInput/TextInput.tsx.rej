@@ -1,34 +1,25 @@
 diff a/libraries/ui/src/components/forms/TextInput/TextInput.tsx b/libraries/ui/src/components/forms/TextInput/TextInput.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { useEffect } from 'react'
- 
- import './TextInput.css'
-+import clsx from 'clsx'
- 
- type TextInputProps = {
-   name?: string,
-@@ -9,6 +10,7 @@ type TextInputProps = {
+@@ -10,6 +10,7 @@ type TextInputProps = {
    className?: string,
    placeholder?: string,
    maxLength?: number,
-+  size?: 'm' | 'l',
++  disabled?: boolean,
+   size?: 'm' | 'l',
    onFocus?: (value) => void,
    onBlur?: (value) => void,
-   onEnter?: (value) => void,
-@@ -25,6 +27,7 @@ const TextInput = ({
+@@ -27,6 +28,7 @@ const TextInput = ({
    className,
    placeholder = '',
    maxLength,
-+  size = 'm',
++  disabled,
+   size = 'm',
    onFocus = () => {},
    onBlur = () => {},
-   onChange = () => {},
-@@ -37,7 +40,7 @@ const TextInput = ({
-     }
-   }, [])
-   return (
--    <div className={`text-input ${className}`}>
-+    <div className={clsx('text-input', className, `size-${size}`)}>
-       <input
+@@ -45,6 +47,7 @@ const TextInput = ({
          type={type}
          name={name}
+         value={value}
++        disabled={disabled}
+         placeholder={placeholder}
+         maxLength={maxLength}
+         onFocus={(e) => onFocus(e.target.value)}

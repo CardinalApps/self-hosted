@@ -1,10 +1,27 @@
 diff a/libraries/ui/src/store/apis/libraries.ts b/libraries/ui/src/store/apis/libraries.ts	(rejected hunks)
-@@ -4,7 +4,7 @@ import { CommonOrderParams, PaginationParams } from '../types/api'
+@@ -4,6 +4,7 @@ import { CommonOrderParams, PaginationParams } from '../types/api'
  import { baseHomeServerApi } from './baseHomeServerApi'
  
  export type Library = {
--  id: string,
-+  libraryId: string,
++  id: number
+   libraryId: string,
    name: string,
    paths: string[],
-   [key: string]: unknown,
+@@ -54,7 +55,7 @@ export const librariesApi = baseHomeServerApi
+ 
+       updateLibrary: builder.mutation<
+         Library,
+-        { id: string, body: Partial<Library> }
++        { id: string | number, body: Partial<Library> }
+       >({
+         query: ({ id, body }) => ({
+           url: `/library/${id}`,
+@@ -66,7 +67,7 @@ export const librariesApi = baseHomeServerApi
+ 
+       deleteLibrary: builder.mutation<
+         void,
+-        string
++        string | number
+       >({
+         query: (id) => ({
+           url: `/library/${id}`,
