@@ -1,19 +1,17 @@
 diff a/servers/media/src/modules/app/app.module.ts b/servers/media/src/modules/app/app.module.ts	(rejected hunks)
-@@ -28,7 +28,7 @@ import { RBACModule } from '../rbac/rbac.module'
- import { LibraryModule } from '../library/library.module'
- import { MusicHistoryModule } from '../music-history/music-history.module'
- import { InvitationModule } from '../invitation/invitation.module'
--import { TetherModule } from '../tether/tether.module'
-+import { ClaimModule } from '../claim/claim.module'
+@@ -49,6 +49,7 @@ import {
+   isContainerEnv,
+   getSQLiteDatabaseLocation,
+ } from '../../utils/env'
++import { QueueModule } from '../queue/queue.module'
  
- import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
- import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
-@@ -122,7 +122,7 @@ const resolvePostgresHost = () => {
+ const resolvePostgresHost = () => {
+   const setByUser = envVar('POSTGRES_HOST', false)
+@@ -122,6 +123,7 @@ const resolvePostgresHost = () => {
      LibraryModule,
      MusicHistoryModule,
      InvitationModule,
--    TetherModule,
-+    ClaimModule,
++    QueueModule,
+     ClaimModule,
      // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
      ServeStaticModule.forRoot({
-       rootPath: join(__dirname, '..', '..', '..', 'public'),
