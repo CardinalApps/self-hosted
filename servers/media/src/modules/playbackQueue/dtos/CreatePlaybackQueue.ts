@@ -1,7 +1,7 @@
 import { IsOptional, IsString } from 'class-validator'
-import { QueueType } from '../queue.entity'
+import { QueueType } from '../playbackQueue.entity'
 
-export class CreateQueueDto {
+export class CreatePlaybackQueueDto {
   @IsString()
   type: QueueType
 

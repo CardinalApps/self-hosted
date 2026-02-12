@@ -3,7 +3,7 @@ import { IsString } from 'class-validator'
 
 import { toString } from '../../../utils/transformers'
 
-export class DeleteQueueDto {
+export class DeletePlaybackQueueDto {
   @Transform(toString)
   @IsString()
   id: string

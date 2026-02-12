@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer'
 import { IsString, IsOptional, IsIn } from 'class-validator'
 
 import { Pagination } from '../../../dtos/pagination.dto'
-import { QueueType } from '../queue.entity'
+import { QueueType } from '../playbackQueue.entity'
 import { toString } from '../../../utils/transformers'
 
 enum AllowedMusicTracksOrderBy {
@@ -17,7 +17,7 @@ class QueuePagination extends Pagination {
   sort?: AllowedMusicTracksOrderBy = AllowedMusicTracksOrderBy.createdAt
 }
 
-export class QueryQueuesDto extends QueuePagination {
+export class QueryPlaybackQueuesDto extends QueuePagination {
   @Transform(toString)
   @IsOptional()
   @IsString()

@@ -13,24 +13,24 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { Queue } from './queue.entity'
-import { QueueService } from './queue.service'
+import { Queue } from './playbackQueue.entity'
+import { QueueService } from './playbackQueue.service'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
-import { GetQueueDto } from './dtos/GetQueue.dto'
-import { QueryQueuesDto } from './dtos/QueryQueues.dto'
+import { GetPlaybackQueueDto } from './dtos/GetPlaybackQueue.dto'
+import { QueryPlaybackQueuesDto } from './dtos/QueryPlaybackQueue.dto'
 
 import { EventService } from '../event/event.service'
-import { CreateQueueDto } from './dtos/CreateQueue'
-import { DeleteQueueDto } from './dtos/DeleteQueueDto'
+import { CreatePlaybackQueueDto } from './dtos/CreatePlaybackQueue'
+import { DeletePlaybackQueueDto } from './dtos/DeletePlaybackQueueDto'
 import { User } from '../user/user.entity'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 
-@Controller('/queue')
-@ApiTags('Queue')
-export class QueueController {
+@Controller('/playback-queue')
+@ApiTags('Playback Queue')
+export class PlaybackQueueController {
   constructor(
-    private readonly queueService: QueueService,
+    private readonly playbackQueueService: QueueService,
     private readonly eventService: EventService,
   ) {}
 
@@ -42,8 +42,8 @@ export class QueueController {
     summary: 'Get a queue.',
     //capabilities: ['Invitations.Read'],
   })
-  async getQueue(@Param() { id }: GetQueueDto): Promise<Queue> {
-    const queue = await this.queueService.get(id)
+  async getPlaybackQueue(@Param() { id }: GetPlaybackQueueDto): Promise<Queue> {
+    const queue = await this.playbackQueueService.get(id)
 
     if (!queue) {
       throw new NotFoundException()
@@ -60,8 +60,8 @@ export class QueueController {
     summary: 'Query queues.',
     //capabilities: ['Invitations.Read'],
   })
-  async queryQueues(@Query() query: QueryQueuesDto): Promise<[Queue[], number]> {
-    return await this.queueService.query(query)
+  async queryPlaybackQueues(@Query() query: QueryPlaybackQueuesDto): Promise<[Queue[], number]> {
+    return await this.playbackQueueService.query(query)
   }
 
   /**
@@ -72,11 +72,11 @@ export class QueueController {
     summary: 'Create a new queue.',
     //capabilities: ['Invitations.Create'],
   })
-  async createQueue(
-    @Body() createInvitationsDto: CreateQueueDto,
+  async createPlaybackQueue(
+    @Body() createInvitationsDto: CreatePlaybackQueueDto,
     @CurrentUser() user: User,
   ): Promise<Queue> {
-    const queue = await this.queueService.create(createInvitationsDto, user)
+    const queue = await this.playbackQueueService.create(createInvitationsDto, user)
     return queue
   }
 
@@ -88,16 +88,16 @@ export class QueueController {
     summary: 'Delete a queue.',
     //capabilities: ['Invitations.Delete'],
   })
-  async deleteQueue(
-    @Param() { id }: DeleteQueueDto,
+  async deletePlaybackQueue(
+    @Param() { id }: DeletePlaybackQueueDto,
     @CurrentUser() user: User,
   ): Promise<boolean> {
-    const queue = await this.queueService.get(id)
+    const queue = await this.playbackQueueService.get(id)
 
     if (queue?.user?.userId !== user?.userId) {
       throw new ForbiddenException()
     }
 
-    return await this.queueService.delete(id)
+    return await this.playbackQueueService.delete(id)
   }
 }

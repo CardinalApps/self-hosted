@@ -2,13 +2,13 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { Repository, DataSource } from 'typeorm'
 
-import { Queue } from './queue.entity'
+import { Queue } from './playbackQueue.entity'
 
 import { EventService } from '../event/event.service'
 import { User } from '../user/user.entity'
 
-import { QueryQueuesDto } from './dtos/QueryQueues.dto'
-import { CreateQueueDto } from './dtos/CreateQueue'
+import { QueryPlaybackQueuesDto } from './dtos/QueryPlaybackQueue.dto'
+import { CreatePlaybackQueueDto } from './dtos/CreatePlaybackQueue'
 
 @Injectable()
 export class QueueService {
@@ -23,7 +23,7 @@ export class QueueService {
   /**
    * Create a queue.
    */
-  async create(createQueueDto: CreateQueueDto, user: User): Promise<Queue> {
+  async create(createQueueDto: CreatePlaybackQueueDto, user: User): Promise<Queue> {
     const { type } = createQueueDto
     try {
       return await this.queueRepository.save({
@@ -58,7 +58,7 @@ export class QueueService {
   /**
    * Returns all queues according to the query.
    */
-  async query(queryInvitationsDto: QueryQueuesDto): Promise<[Queue[], number]> {
+  async query(queryInvitationsDto: QueryPlaybackQueuesDto): Promise<[Queue[], number]> {
     const { take, skip, order, sort, type } = queryInvitationsDto
 
     return await this.queueRepository.findAndCount({

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { QueueController } from './queue.controller'
-import { QueueService } from './queue.service'
+import { PlaybackQueueController } from './playbackQueue.controller'
+import { QueueService } from './playbackQueue.service'
 
-import { Queue } from './queue.entity'
+import { Queue } from './playbackQueue.entity'
 
 import { EventModule } from '../event/event.module'
 
@@ -18,6 +18,6 @@ import { EventModule } from '../event/event.module'
     QueueService,
   ],
   providers: [QueueService],
-  controllers: [QueueController],
+  controllers: [PlaybackQueueController],
 })
-export class QueueModule {}
+export class PlaybackQueueModule {}
