@@ -73,10 +73,10 @@ export class PlaybackQueueController {
     //capabilities: ['Invitations.Create'],
   })
   async createPlaybackQueue(
-    @Body() createInvitationsDto: CreatePlaybackQueueDto,
+    @Body() createPlaybackQueueDto: CreatePlaybackQueueDto,
     @CurrentUser() user: User,
   ): Promise<Queue> {
-    const queue = await this.playbackQueueService.create(createInvitationsDto, user)
+    const queue = await this.playbackQueueService.create(createPlaybackQueueDto, user)
     return queue
   }
 

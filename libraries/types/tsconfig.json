@@ -1,0 +1,14 @@
+{
+  "extends": ["../../config/typescript/library"],
+  "compilerOptions": {
+    "outDir": "dist/cjs",
+    "sourceMap": false
+  },
+  "include": [
+    "src/"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}

@@ -6,11 +6,10 @@ import {
   Generated,
 } from 'typeorm'
 
+import { QueueType, DynamicQueueName } from '@cardinalapps/types/dist/cjs/playback-queue'
+
 import { BaseEntity } from '../../entities/base.entity'
 import { User } from '../user/user.entity'
-
-export type QueueType = 'static' | 'dynamic'
-export type DynamicQueueName = 'true_shuffle'
 
 @Entity()
 export class Queue extends BaseEntity {

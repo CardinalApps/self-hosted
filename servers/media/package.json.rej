@@ -1,10 +1,10 @@
 diff a/servers/media/package.json b/servers/media/package.json	(rejected hunks)
-@@ -2,7 +2,7 @@
-   "name": "@cardinalapps/media-server",
-   "description": "Self-hosted Cardinal Media Server.",
-   "license": "CC BY-NC-ND 4.0",
--  "version": "0.4.0",
-+  "version": "0.4.1",
-   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
-   "private": true,
-   "scripts": {
+@@ -33,7 +33,7 @@
+   "dependencies": {
+     "@cardinalapps/access-control": "workspace:*",
+     "@cardinalapps/app-settings": "workspace:*",
+-    "@cardinalapps/dtos": "workspace:*",
++    "@cardinalapps/types": "workspace:*",
+     "@cardinalapps/products": "workspace:*",
+     "@cardinalapps/topology": "workspace:*",
+     "@eslint/js": "^9.21.0",

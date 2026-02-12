@@ -1,9 +1,22 @@
 diff a/apps/music-web/src/pages/ListenNow/ListenNow.tsx b/apps/music-web/src/pages/ListenNow/ListenNow.tsx	(rejected hunks)
-@@ -12,6 +12,7 @@ function ListenNow() {
-       layout={PAGE_LAYOUT.standard}
-       pageTitle={i18n['title']['en']}
-       restoreScrollPoint={false}
-+      showLibrarySwitcher={true}
+@@ -1,10 +1,9 @@
+ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+ 
+-import ActionButtons from './blocks/ActionButtons'
+-
+ import i18n from './i18n.json'
+ import './styles.css'
++import ListenNowProcedural from './ListenNowProcedural'
+ 
+ function ListenNow() {
+   return (
+@@ -16,7 +15,7 @@ function ListenNow() {
        capabilities={['MusicHistory.Read']}
      >
        <div className="listen-now">
+-        <ActionButtons />
++        <ListenNowProcedural />
+       </div>
+     </AppPage>
+   )

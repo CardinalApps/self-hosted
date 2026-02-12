@@ -1,32 +1,19 @@
 diff a/servers/media/src/modules/app/app.module.ts b/servers/media/src/modules/app/app.module.ts	(rejected hunks)
-@@ -29,6 +29,7 @@ import { LibraryModule } from '../library/library.module'
+@@ -29,7 +29,7 @@ import { LibraryModule } from '../library/library.module'
  import { MusicHistoryModule } from '../music-history/music-history.module'
  import { InvitationModule } from '../invitation/invitation.module'
  import { ClaimModule } from '../claim/claim.module'
-+import { QueueModule } from '../queue/queue.module'
+-import { QueueModule } from '../queue/queue.module'
++import { PlaybackQueueModule } from '../playback-queue/playbackQueue.module'
  
  import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
  import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
-@@ -36,6 +37,7 @@ import { AttachOriginApp } from '../../middleware/AttachOriginApp.middleware'
- import { AttachLocalUserToRequest } from '../../middleware/AttachLocalUser.middleware'
- import { AttachCloudUserToRequest } from '../../middleware/AttachCloudUser.middleware'
- import { UserActivity } from '../../middleware/UserActivity.middleware'
-+import { MaybeTriggerClaim } from '../../middleware/MaybeTriggerClaim'
- 
- //import { ExampleInterceptor } from '../../interceptors/example.interceptor'
- 
-@@ -49,7 +51,6 @@ import {
-   isContainerEnv,
-   getSQLiteDatabaseLocation,
- } from '../../utils/env'
--import { QueueModule } from '../queue/queue.module'
- 
- const resolvePostgresHost = () => {
-   const setByUser = envVar('POSTGRES_HOST', false)
-@@ -166,5 +167,6 @@ export class AppModule implements NestModule {
-     consumer.apply(AttachCloudUserToRequest).forRoutes('*')
-     consumer.apply(RevokeDisabledUserSessions).forRoutes('*')
-     consumer.apply(UserActivity).forRoutes('*')
-+    consumer.apply(MaybeTriggerClaim).forRoutes('*')
-   }
- }
+@@ -124,7 +124,7 @@ const resolvePostgresHost = () => {
+     LibraryModule,
+     MusicHistoryModule,
+     InvitationModule,
+-    QueueModule,
++    PlaybackQueueModule,
+     ClaimModule,
+     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
+     ServeStaticModule.forRoot({
