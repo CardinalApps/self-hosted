@@ -1,0 +1,10 @@
+diff a/servers/media/src/modules/playback-queue/playback-queue.entity.ts b/servers/media/src/modules/playback-queue/playback-queue.entity.ts	(rejected hunks)
+@@ -9,7 +9,7 @@ import {
+   OneToMany,
+ } from 'typeorm'
+ 
+-import { QueueType, DynamicQueueType } from '@cardinalapps/types/dist/cjs/playback-queue'
++import { QueueType, DynamicQueueType } from '@cardinalapps/types/src/playback-queue'
+ 
+ import { BaseEntity } from '../../entities/base.entity'
+ import { User } from '../user/user.entity'
