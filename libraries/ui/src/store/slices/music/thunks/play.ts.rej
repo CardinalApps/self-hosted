@@ -1,79 +1,18 @@
 diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
-@@ -2,14 +2,20 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
- import { getSetting } from '@cardinalapps/app-settings/src'
- import { SupportedLang } from '@cardinalapps/app-settings/src/types'
- import { v4 as uuid } from 'uuid'
-+import { QueueType, DynamicQueueType } from '@cardinalapps/types/src/playback-queue'
-+import { ServerQueue } from '..'
+@@ -95,12 +95,15 @@ const playMusic = createAsyncThunk<
  
- import { AppDispatch, RootState } from '../../../'
+     // Create a queue for the given queue type
+     if (queueType) {
+-      const serverQueue = await homeServerAPI<ServerQueue>('/playback-queue', 'POST', {
++      const currentLibraries = state.library.current
++      const serverQueue = await homeServerAPI<ServerQueue>('/playback-queues', 'POST', {
+         body: {
+           type: queueType,
+           dynamicType: dynamicQueueType,
++          libraries: currentLibraries.map((id) => ({ libraryId: id })),
+         },
+       })
++      console.log(serverQueue)
+       queueId = serverQueue.queueId
  
- import { PLAYBACK_STATE, STORE_KEY } from '../constants'
-+import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
- 
- export type PlayArgs = {
--  trackId: string,
-+  trackId?: string,
-   playerId?: string,
-+  queueType?: QueueType
-+  dynamicQueueType?: DynamicQueueType,
-+  queueName?: string,
- }
- 
- export type PlayReturn = {
-@@ -17,6 +23,7 @@ export type PlayReturn = {
-     trackId: string,
-     generatedPlayerId: string,
-     now: number,
-+    queueId: string,
-   }>,
-   pause: Array<{
-     playerId?: string,
-@@ -50,7 +57,7 @@ const playMusic = createAsyncThunk<
-     rejectValue: { error: string },
-   }
- >(`${STORE_KEY}/play`, async (args, thunkAPI): Promise<PlayReturn> => {
--  const { trackId, playerId } = args
-+  const { trackId, playerId, queueType, dynamicQueueType } = args
-   const state = thunkAPI.getState()
-   const lang = state.settings?.current?.lang
- 
-@@ -61,7 +68,8 @@ const playMusic = createAsyncThunk<
-     remove: [],
-   }
- 
--  if (!trackId && !playerId) {
-+  // One of these is required
-+  if (!trackId && !playerId && !queueType) {
-     console.error('Missing trackId and playerId')
-     return workToDo
-   }
-@@ -82,8 +90,27 @@ const playMusic = createAsyncThunk<
- 
-   // When no player exists, create a new one
-   if (!resolvedPlayerId) {
-+    let trackIdToPlay = trackId
-+    let queueId
-+
-+    // Create a queue for the given queue type
-+    if (queueType) {
-+      const serverQueue = await homeServerAPI<ServerQueue>('/playback-queue', 'POST', {
-+        body: {
-+          type: queueType,
-+          dynamicType: dynamicQueueType,
-+        },
-+      })
-+      queueId = serverQueue.queueId
-+
-+      if (!trackId) {
-+        trackIdToPlay = '1ed77e99-bd60-49fd-915d-553862475f1f' // fixme
-+      }
-+    }
-+
-     workToDo.create?.push({
--      trackId,
-+      trackId: trackIdToPlay,
-+      queueId,
-       generatedPlayerId: uuid(),
-       now: Date.now(),
-     })
+       if (!trackId) {

@@ -1,27 +1,10 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -29,7 +29,7 @@ import { GetUserResponse } from './dtos/GetUserResponse.dto'
- import { CurrentUser } from '../../decorators/CurrentUser.decorator'
- import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+@@ -69,6 +69,8 @@ export class UserController {
+       }
+     }
  
--import { getJWTFromHeaders } from '../../utils/jwt'
-+import { getJWTFromHeaders, getCardinalTolkienFromHeaders } from '../../utils/jwt'
- import { GetUsersDto } from './dtos/GetUsers.dto'
- import { SeatsService } from './seats.service'
- import { Designations } from './types'
-@@ -58,6 +58,7 @@ export class UserController {
-   })
-   async getCurrentUser(@Headers() headers): Promise<GetUserResponse> {
-     const localUserJWT = getJWTFromHeaders(headers)
-+    const cloudUserJWT = getCardinalTolkienFromHeaders(headers)
- 
-     const localUser = await this.userService.getUserByLocalJWT(localUserJWT)
- 
-@@ -78,7 +79,7 @@ export class UserController {
- 
-     // Refresh the cached user data by fetching from the auth servers
-     try {
--      const refreshedUser = await this.cloudUserService.maybeRefreshCloudUserInDatabase(localUser.userId)
-+      const refreshedUser = await this.cloudUserService.maybeRefreshCloudUserInDatabase(localUser.userId, cloudUserJWT)
++    // TODO return a 400 if the cloud token is missing for a cloud user
++
+     // Database cache is sufficient
+     if (!await this.cloudUserService.localUserNeedsRefresh(localUser.userId)) {
        return {
-         localUser: this.userService.cleanseUserObject(localUser),
-         cardinalUser: refreshedUser?.cachedCloudUser,

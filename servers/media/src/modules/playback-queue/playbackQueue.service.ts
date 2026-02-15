@@ -2,49 +2,55 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { Repository, DataSource } from 'typeorm'
 
-import { Queue } from './playbackQueue.entity'
+import { PlaybackQueue } from './playbackQueue.entity'
 
 import { EventService } from '../event/event.service'
 import { User } from '../user/user.entity'
 
 import { QueryPlaybackQueuesDto } from './dtos/QueryPlaybackQueue.dto'
 import { CreatePlaybackQueueDto } from './dtos/CreatePlaybackQueue'
+import { LibraryService } from '../library/library.service'
 
 @Injectable()
 export class QueueService {
   constructor(
     @InjectDataSource()
     private dataSource: DataSource,
-    @InjectRepository(Queue)
-    private queueRepository: Repository<Queue>,
+    @InjectRepository(PlaybackQueue)
+    private queueRepository: Repository<PlaybackQueue>,
     private readonly eventService: EventService,
+    private readonly libraryService: LibraryService,
   ) {}
 
   /**
    * Create a queue.
    */
-  async create(createQueueDto: CreatePlaybackQueueDto, user: User): Promise<Queue> {
-    const { type } = createQueueDto
+  async create(createQueueDto: CreatePlaybackQueueDto, user: User): Promise<PlaybackQueue> {
+    const { type, dynamicType, libraries } = createQueueDto
+    const libraryEntities = await Promise.all(libraries.map((lib) => this.libraryService.getLibrary(lib.libraryId)))
     try {
       return await this.queueRepository.save({
-        type,
         user,
+        type,
+        dynamicType,
+        libraries: libraryEntities,
       })
     } catch (error) {
-      Logger.log(error)
+      Logger.error(error)
     }
   }
 
   /**
    * Gets a single queue.
    */
-  async get(id: number | string): Promise<Queue | null> {
-    const where: Partial<Queue> = typeof id === 'number' ? { id: id } : { queueId: id }
+  async get(id: number | string): Promise<PlaybackQueue | null> {
+    const where = typeof id === 'number' ? { id: id } : { queueId: id }
 
     const queue = await this.queueRepository.find({
       where,
       relations: {
         user: true,
+        libraries: true,
       },
     })
 
@@ -58,8 +64,8 @@ export class QueueService {
   /**
    * Returns all queues according to the query.
    */
-  async query(queryInvitationsDto: QueryPlaybackQueuesDto): Promise<[Queue[], number]> {
-    const { take, skip, order, sort, type } = queryInvitationsDto
+  async query(queryPlaybackQueuesDto: QueryPlaybackQueuesDto): Promise<[PlaybackQueue[], number]> {
+    const { take, skip, order, sort, type } = queryPlaybackQueuesDto
 
     return await this.queueRepository.findAndCount({
       take,
@@ -69,6 +75,7 @@ export class QueueService {
       },
       relations: {
         user: true,
+        libraries: true,
       },
       order: {
         [sort]: order,
@@ -80,7 +87,7 @@ export class QueueService {
    * Delete a queue.
    */
   async delete(id: string | number): Promise<boolean> {
-    const where: Partial<Queue> = typeof id === 'number' ? { id: id } : { queueId: id }
+    const where = typeof id === 'number' ? { id: id } : { queueId: id }
 
     const invite = await this.queueRepository.delete(where)
 

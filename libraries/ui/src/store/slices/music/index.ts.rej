@@ -1,31 +1,13 @@
 diff a/libraries/ui/src/store/slices/music/index.ts b/libraries/ui/src/store/slices/music/index.ts	(rejected hunks)
-@@ -4,11 +4,13 @@ import { globalActions } from '../../constants/actions'
+@@ -1,10 +1,10 @@
+ import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
++import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
+ 
+ import { globalActions } from '../../constants/actions'
  import playMusic from './thunks/play'
  
  import { STORE_KEY, PLAYER, PLAYBACK_STATE } from './constants'
-+import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
+-import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
  
  export type Player = {
    id: string,
-   playerId?: string,
-   trackId: string,
-+  queueId: string,
-   state: string,
-   currentPlaybackStartedAt: number,
-   initializedAt: number,
-@@ -89,13 +97,14 @@ const audioSlice = createSlice({
-         const { create, remove, resume, pause } = payload
- 
-         // Add new players
--        for (const { trackId, generatedPlayerId, now } of create) {
-+        for (const { trackId, generatedPlayerId, now, queueId } of create) {
-           state.players[generatedPlayerId] = {
-             ...PLAYER,
-             id: generatedPlayerId,
-             initializedAt: now,
-             currentPlaybackStartedAt: now,
-             trackId,
-+            queueId,
-           }
-         }
- 

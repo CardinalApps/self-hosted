@@ -13,7 +13,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { Queue } from './playbackQueue.entity'
+import { PlaybackQueue } from './playbackQueue.entity'
 import { QueueService } from './playbackQueue.service'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
@@ -26,8 +26,8 @@ import { DeletePlaybackQueueDto } from './dtos/DeletePlaybackQueueDto'
 import { User } from '../user/user.entity'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 
-@Controller('/playback-queue')
-@ApiTags('Playback Queue')
+@Controller('/playback-queues')
+@ApiTags('Playback Queues')
 export class PlaybackQueueController {
   constructor(
     private readonly playbackQueueService: QueueService,
@@ -35,14 +35,14 @@ export class PlaybackQueueController {
   ) {}
 
   /**
-   * Get an queue.
+   * Get a queue.
    */
   @Get(':id')
   @StandardEndpoint({
     summary: 'Get a queue.',
     //capabilities: ['Invitations.Read'],
   })
-  async getPlaybackQueue(@Param() { id }: GetPlaybackQueueDto): Promise<Queue> {
+  async getPlaybackQueue(@Param() { id }: GetPlaybackQueueDto): Promise<PlaybackQueue> {
     const queue = await this.playbackQueueService.get(id)
 
     if (!queue) {
@@ -60,7 +60,7 @@ export class PlaybackQueueController {
     summary: 'Query queues.',
     //capabilities: ['Invitations.Read'],
   })
-  async queryPlaybackQueues(@Query() query: QueryPlaybackQueuesDto): Promise<[Queue[], number]> {
+  async queryPlaybackQueues(@Query() query: QueryPlaybackQueuesDto): Promise<[PlaybackQueue[], number]> {
     return await this.playbackQueueService.query(query)
   }
 
@@ -75,7 +75,7 @@ export class PlaybackQueueController {
   async createPlaybackQueue(
     @CurrentUser() user: User,
     @Body() createPlaybackQueueDto: CreatePlaybackQueueDto,
-  ): Promise<Queue> {
+  ): Promise<PlaybackQueue> {
     const queue = await this.playbackQueueService.create(createPlaybackQueueDto, user)
     return queue
   }

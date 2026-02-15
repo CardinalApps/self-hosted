@@ -4,14 +4,16 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { PlaybackQueueController } from './playbackQueue.controller'
 import { QueueService } from './playbackQueue.service'
 
-import { Queue } from './playbackQueue.entity'
+import { PlaybackQueue } from './playbackQueue.entity'
 
 import { EventModule } from '../event/event.module'
+import { LibraryModule } from '../library/library.module'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Queue]),
+    TypeOrmModule.forFeature([PlaybackQueue]),
     EventModule,
+    LibraryModule,
   ],
   exports: [
     TypeOrmModule,

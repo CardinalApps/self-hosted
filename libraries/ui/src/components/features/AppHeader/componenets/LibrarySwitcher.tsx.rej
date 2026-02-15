@@ -1,53 +1,10 @@
 diff a/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx b/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { useAppDispatch } from '../../../../hooks/useAppDispatch'
- import { useAppSelector } from '../../../../hooks/useAppSelector'
- import { useGetLibrariesQuery } from '../../../../store/apis/libraries'
-+import { layoutSelectors } from '../../../../store/slices/layout'
- import { libraryActions, librarySelectors } from '../../../../store/slices/library'
- import { settingsSelectors } from '../../../../store/slices/settings'
- import Select from '../../../forms/Select'
-@@ -11,6 +12,8 @@ const LibrarySwitcher = () => {
-   const dispatch = useAppDispatch()
-   const { lang } = useAppSelector(settingsSelectors.current)
-   const currentLibrary = useAppSelector(librarySelectors.current)
-+  const showLibrarySwitcher = useAppSelector(layoutSelectors.showLibrarySwitcher)
-+
-   const {
-     data: allLibrariesResponse,
-   } = useGetLibrariesQuery({ take: 9999, skip: 0, order: 'asc' })
-@@ -31,19 +34,21 @@ const LibrarySwitcher = () => {
-     dispatch(libraryActions.set(val))
-   }
- 
--  return (
--    <div className="library-switcher">
--      <Select
--        name="library-context"
--        selectPlaceholder={i18n['libraries.placeholder'][lang]}
--        options={libraryOptions()}
--        value={currentLibrary}
--        multi={false}
--        size="s"
--        onChange={(val) => handleSwitchLibrary(val)}
--      />
--    </div>
--  )
-+  return showLibrarySwitcher
-+    ? (
-+        <div className="library-switcher">
-+          <Select
-+            name="library-context"
-+            selectPlaceholder={i18n['libraries.placeholder'][lang]}
-+            options={libraryOptions()}
-+            value={currentLibrary}
-+            multi={false}
-+            size="s"
-+            onChange={(val) => handleSwitchLibrary(val)}
-+          />
-+        </div>
-+      )
-+    : null
- }
- 
- export default LibrarySwitcher
+@@ -42,7 +42,7 @@ const LibrarySwitcher = () => {
+             selectPlaceholder={i18n['libraries.placeholder'][lang]}
+             options={libraryOptions()}
+             value={currentLibrary}
+-            multi={false}
++            multi={true}
+             size="s"
+             onChange={(val) => handleSwitchLibrary(val)}
+           />

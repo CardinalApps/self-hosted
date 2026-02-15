@@ -1,15 +1,21 @@
 diff a/servers/media/src/modules/playback-queue/dtos/CreatePlaybackQueue.ts b/servers/media/src/modules/playback-queue/dtos/CreatePlaybackQueue.ts	(rejected hunks)
-@@ -1,5 +1,5 @@
- import { IsOptional, IsString } from 'class-validator'
--import { QueueType } from '@cardinalapps/types/dist/cjs/playback-queue'
-+import { QueueType } from '@cardinalapps/types/src/playback-queue'
+@@ -1,5 +1,6 @@
+-import { IsOptional, IsString } from 'class-validator'
+-import { QueueType } from '@cardinalapps/types/src/playback-queue'
++import { IsArray, IsOptional, IsString } from 'class-validator'
++import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
++import { Library } from '../../library/library.entity'
  
  export class CreatePlaybackQueueDto {
    @IsString()
-@@ -7,5 +7,5 @@ export class CreatePlaybackQueueDto {
+@@ -7,5 +8,9 @@ export class CreatePlaybackQueueDto {
  
    @IsString()
    @IsOptional()
--  dynamicName?: string
-+  dynamicType?: string
+-  dynamicType?: string
++  dynamicType?: DynamicQueueType
++
++  @IsArray()
++  @IsOptional()
++  libraries?: Partial<Library>[]
  }

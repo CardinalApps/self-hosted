@@ -1,0 +1,18 @@
+diff a/servers/media/src/modules/playback-queue/dtos/QueryPlaybackQueue.dto.ts b/servers/media/src/modules/playback-queue/dtos/QueryPlaybackQueue.dto.ts	(rejected hunks)
+@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer'
+ import { IsString, IsOptional, IsIn } from 'class-validator'
+ 
+ import { Pagination } from '../../../dtos/pagination.dto'
+-import { QueueType } from '@cardinalapps/types/dist/cjs/playback-queue'
++import { QueueType } from '@cardinalapps/types/src/playback-queue'
+ import { toString } from '../../../utils/transformers'
+ 
+ enum AllowedMusicTracksOrderBy {
+@@ -20,6 +20,6 @@ class QueuePagination extends Pagination {
+ export class QueryPlaybackQueuesDto extends QueuePagination {
+   @Transform(toString)
+   @IsOptional()
+-  @IsString()
++  @IsIn(['static', 'dynamic'])
+   type?: QueueType
+ }

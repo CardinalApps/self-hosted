@@ -1,0 +1,25 @@
+diff a/servers/media/src/modules/library/library.entity.ts b/servers/media/src/modules/library/library.entity.ts	(rejected hunks)
+@@ -5,11 +5,13 @@ import {
+   JoinColumn,
+   Generated,
+   PrimaryGeneratedColumn,
++  ManyToMany,
+ } from 'typeorm'
+ 
+ import { BaseEntity } from '../../entities/base.entity'
+ 
+ import { User } from '../user/user.entity'
++import { PlaybackQueue } from '../playback-queue/playbackQueue.entity'
+ 
+ @Entity()
+ export class Library extends BaseEntity {
+@@ -37,5 +39,9 @@ export class Library extends BaseEntity {
+   @JoinColumn()
+   user: User
+ 
++  @ManyToMany(() => PlaybackQueue, (playbackQueue) => playbackQueue.libraries, { onDelete: 'CASCADE' })
++  @JoinColumn()
++  playbackQueues: PlaybackQueue[]
++
+   // TODO sharedWith column or equivalent
+ }
