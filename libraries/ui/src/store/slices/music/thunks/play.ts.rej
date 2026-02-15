@@ -1,50 +1,13 @@
 diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
-@@ -43,6 +43,7 @@ export type PlayReturn = {
-  *  1. Analyze the current playback state.
-  *  2. If the track is already loaded and paused, resume it.
-  *  3. If the track is not loaded, create a new player for it.
-+ *    3.1 If a queue type was given, create the queue on the server before creating the player.
-  *  4. If at max concurrent players, remove the oldest one(s).
-  *    4.1 Save playback history before removing.
-  *  5. If at max *playing* players, pause the oldest ones.
-@@ -68,9 +69,8 @@ const playMusic = createAsyncThunk<
-     remove: [],
-   }
- 
--  // One of these is required
-   if (!trackId && !playerId && !queueType) {
--    console.error('Missing trackId and playerId')
-+    console.error('One of these is required when pressing play: trackId, playerId, or queueType')
-     return workToDo
-   }
- 
-@@ -93,7 +93,7 @@ const playMusic = createAsyncThunk<
-     let trackIdToPlay = trackId
-     let queueId
- 
--    // Create a queue for the given queue type
-+    // Maybe create a queue
-     if (queueType) {
-       const currentLibraries = state.library.current
-       const serverQueue = await homeServerAPI<ServerQueue>('/playback-queues', 'POST', {
-@@ -103,11 +103,18 @@ const playMusic = createAsyncThunk<
-           libraries: currentLibraries.map((id) => ({ libraryId: id })),
+@@ -100,7 +100,10 @@ const playMusic = createAsyncThunk<
+         body: {
+           type: queueType,
+           dynamicType: dynamicQueueType,
+-          libraries: currentLibraries.map((id) => ({ libraryId: id })),
++          ...(currentLibraries?.length
++            ? { libraries: currentLibraries.map((id) => ({ libraryId: id })) }
++            : {}
++          ),
          },
        })
--      console.log(serverQueue)
-+
-+      // Now kith (I wrote this on valentines day)
-       queueId = serverQueue.queueId
- 
-+      // Play the first item in the queue if no trackId was explicitly set
-       if (!trackId) {
--        trackIdToPlay = '1ed77e99-bd60-49fd-915d-553862475f1f' // fixme
-+        const firstItem = serverQueue?.items?.[0]
-+        if (firstItem && firstItem?.mediaType === 'musicTrack' && firstItem?.mediaId) {
-+          trackIdToPlay = firstItem?.mediaId
-+        } else {
-+          console.error('Could not start playback because the first item in the queue is either missing or not a music track.', firstItem)
-+        }
-       }
-     }
  
