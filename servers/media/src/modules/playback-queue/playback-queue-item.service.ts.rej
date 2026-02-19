@@ -1,0 +1,26 @@
+diff a/servers/media/src/modules/playback-queue/playback-queue-item.service.ts b/servers/media/src/modules/playback-queue/playback-queue-item.service.ts	(rejected hunks)
+@@ -23,12 +23,12 @@ export class QueueItemService {
+   ) {}
+ 
+   /**
+-   * Returns all queues according to the query.
++   * Returns all queue items according to the query. Items are returned in order
++   * of their position in the queue.
+    */
+   async query(id: string, queryPlaybackQueuesDto: QueryPlaybackQueueItemsDto): Promise<[PlaybackQueueItem[], number]> {
+     const { take, skip } = queryPlaybackQueuesDto
+ 
+-    // TODO order by queue order column
+     return await this.queueItemRepository.findAndCount({
+       take,
+       skip,
+@@ -37,6 +37,9 @@ export class QueueItemService {
+           queueId: id,
+         },
+       },
++      order: {
++        position: 'asc',
++      },
+     })
+   }
+ }

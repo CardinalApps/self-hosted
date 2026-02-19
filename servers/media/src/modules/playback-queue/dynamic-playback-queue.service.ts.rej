@@ -1,26 +1,15 @@
 diff a/servers/media/src/modules/playback-queue/dynamic-playback-queue.service.ts b/servers/media/src/modules/playback-queue/dynamic-playback-queue.service.ts	(rejected hunks)
-@@ -55,14 +55,21 @@ export class DynamicPlayback {
-    */
-   private async initTrueShuffleQueue(queue: PlaybackQueue): Promise<boolean> {
-     const initialBatchSize = 200
--    const randomTracks = await this.musicTrackRepository
-+
-+    const randomTracksQuery = this.musicTrackRepository
-       .createQueryBuilder('music_track')
-+      .select(['music_track.musicTrackId'])
-       .orderBy('RANDOM()')
-       .limit(initialBatchSize)
--      .getMany()
+@@ -70,11 +70,12 @@ export class DynamicPlayback {
+     }
  
--    //const libraryEntities = await Promise.all(libraries.map((lib) => this.libraryService.getLibrary(lib.libraryId)))
-+    if (queue?.libraries?.length) {
-+      randomTracksQuery.innerJoin(
-+        'music_track.file',
-+        ...this.libraryService.createJoinArgs(queue.libraries),
-+      )
-+    }
- 
-+    const randomTracks = await randomTracksQuery.getMany()
-     const queueItems: Partial<PlaybackQueueItem>[] = randomTracks.map((track) => (
+     const randomTracks = await randomTracksQuery.getMany()
+-    const queueItems: Partial<PlaybackQueueItem>[] = randomTracks.map((track) => (
++    const queueItems: Partial<PlaybackQueueItem>[] = randomTracks.map((track, index) => (
        {
          queue,
+         mediaType: 'musicTrack',
+         mediaId: track.musicTrackId,
++        position: index + 1,
+       }
+     ))
+ 

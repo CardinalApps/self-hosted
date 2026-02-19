@@ -1,0 +1,9 @@
+diff a/servers/media/src/modules/playback-queue/playback-queue-item.entity.ts b/servers/media/src/modules/playback-queue/playback-queue-item.entity.ts	(rejected hunks)
+@@ -17,4 +17,7 @@ export class PlaybackQueueItem extends BaseEntity {
+ 
+   @Column({ nullable: false })
+   mediaId: string
++
++  @Column({ nullable: false })
++  position: number
+ }
