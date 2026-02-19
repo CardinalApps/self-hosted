@@ -1,0 +1,53 @@
+diff a/libraries/ui/src/components/interaction/Queue/Queue.css b/libraries/ui/src/components/interaction/Queue/Queue.css	(rejected hunks)
+@@ -1,45 +1,10 @@
+-.tags {
+-  display: flex;
+-  flex-wrap: wrap;
+-  align-items: center;
+-  gap: 6px;
++.playback-queue[data-layout="list"] {
+ 
+-  button.tag:hover {
+-    background-color: var(--bg-5);
+-  }
+-
+-  .tag {
+-    padding: 9px 20px;
++  .queue-item {
++    margin: 0 15px;
++    padding: 5px 0;
++    border-top: 1px solid var(--border-color-3);
+     font-size: 13px;
+-    font-weight: 600;
+-    border-radius: 16px;
+-    color: var(--text-color-2);
+-    border: 1px solid var(--border-color-1);
+-    cursor: pointer;
+-    white-space: nowrap;
+-    background-color: var(--bg-3);
+-    -webkit-appearance: none;
+-
+-    &[data-color="success"] {
+-      color: white;
+-      border-color: var(--success-bg);
+-      background-color: var(--success);
+-    }
+-    &[data-color="warning"] {
+-      color: var(--warning);
+-      background-color: var(--warning-bg);
+-    }
+-    &[data-color="danger"] {
+-      color: var(--danger);
+-      background-color: var(--danger-bg);
+-    }
+-
+-    &.active {
+-      background-color: var(--bg-5);
+-    }
+-
+-    i {
+-      margin-right: 10px;
+-    }
++    color: var(--text-color-3);
+   }
+ }

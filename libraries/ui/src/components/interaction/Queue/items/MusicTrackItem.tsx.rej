@@ -1,0 +1,34 @@
+diff a/libraries/ui/src/components/interaction/Queue/items/MusicTrackItem.tsx b/libraries/ui/src/components/interaction/Queue/items/MusicTrackItem.tsx	(rejected hunks)
+@@ -4,18 +4,25 @@ import { useGetMusicTrackQuery } from '../../../../store/apis/musicTracks'
+ const MusicTrackItem = (props: {
+   musicTrackId: string,
+   position: number,
++  format: 'list' | 'interactive',
+ }) => {
+   const { data: musicTrack } = useGetMusicTrackQuery({ id: props.musicTrackId })
+ 
+   return musicTrack
+     ? (
+-        <MusicTrack
+-          trackNumber={props.position}
+-          musicTrackId={props.musicTrackId}
+-          trackTitle={musicTrack?.title}
+-          releaseTitle={musicTrack?.release?.title}
+-          canFav={false}
+-        />
++        props.format === 'interactive'
++          ? (
++            <MusicTrack
++              trackNumber={props.position}
++              musicTrackId={props.musicTrackId}
++              trackTitle={musicTrack?.title}
++              releaseTitle={musicTrack?.release?.title}
++              canFav={false}
++            />
++          )
++          : (
++            musicTrack.title
++          )
+       )
+     : null
+ }

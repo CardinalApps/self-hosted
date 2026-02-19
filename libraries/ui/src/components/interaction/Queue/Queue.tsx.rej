@@ -1,0 +1,39 @@
+diff a/libraries/ui/src/components/interaction/Queue/Queue.tsx b/libraries/ui/src/components/interaction/Queue/Queue.tsx	(rejected hunks)
+@@ -8,13 +8,17 @@ import MusicTrackItem from './items/MusicTrackItem'
+ import './Queue.css'
+ 
+ export type QueueProps = {
++  className?: string,
+   queueId?: string,
+   take?: number,
++  layout: 'list' | 'interactive',
+ }
+ 
+ const Queue = ({
++  className,
+   queueId,
+   take,
++  layout,
+ }: QueueProps) => {
+   //const { lang } = useSelector(settingsSelectors.current)
+ 
+@@ -22,15 +26,15 @@ const Queue = ({
+   const [queueItems] = queueItemsData || [[], 0]
+ 
+   return (
+-    <div className={clsx('mini-queue')}>
++    <div className={clsx(className, 'playback-queue')} data-layout={layout}>
+       {!!queueItems.length && (
+-        <ol className="mini-queue-list">
+-          {queueItems.map((item, i) => {
++        <ol className="queue-list">
++          {[...queueItems].reverse().map((item, i) => {
+             switch (item.mediaType) {
+               case 'musicTrack':
+                 return (
+                   <li className="queue-item" key={i}>
+-                    <MusicTrackItem position={++i} musicTrackId={item.mediaId} />
++                    <MusicTrackItem position={++i} musicTrackId={item.mediaId} format={layout} />
+                   </li>
+                 )
+             }

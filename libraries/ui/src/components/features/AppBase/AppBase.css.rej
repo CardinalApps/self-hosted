@@ -1,50 +1,41 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -388,7 +388,6 @@
- .sidebar-bottom {
-   width: var(--sidebar-nav-width);
-   padding: 0 0 10px 15px;
--  max-height: 20vh;
-   position: absolute;
-   bottom: 2px;
-   left: 2px;
-@@ -402,7 +401,30 @@
-   }
+@@ -402,9 +402,9 @@
  }
  
--.global-audio-player {
-+.mini-queue {
-+  padding-bottom: 10px;
-+
-+  .mini-queue-list {
-+    display: flex;
-+    flex-direction: column;
-+    gap: 5px;
-+    position: relative;
-+
-+    &:before {
-+      content: '';
-+      position: absolute;
-+      top: 0;
-+      left: 0;
-+      right: 0;
-+      bottom: 0;
-+      pointer-events: none;
-+      background-image: linear-gradient(var(--bg-2) -4%, transparent);
-+      z-index: 2;
+ .mini-queue {
+-  padding-bottom: 10px;
++  padding-bottom: 15px;
+ 
+-  .mini-queue-list {
++  .playback-queue {
+     display: flex;
+     flex-direction: column;
+     gap: 5px;
+@@ -456,7 +456,6 @@
+ 
+   .audio-player-list {
+     position: relative;
+-    min-height: 146px;
+   }
+ 
+   @media (max-width: 768px) {
+@@ -466,6 +465,10 @@
+     bottom: 15px;
+     z-index: 6000;
+     
++    .mini-queue {
++      display: none;
 +    }
-+  }
-+}
-+
-+.mini-audio-player {
++    
+     .audio-player-pagination {
+       padding: 2px 5px 2px 2px;
+       border: 1px solid var(--border-color-1);
+@@ -484,7 +487,7 @@
  
-   .audio-player-buttons {
-     width: 100%;
-@@ -454,7 +476,7 @@
+       .audio-player-pagination {
+         width: 100%;
+-        margin: 0;
++        margin-left: 0;
+       }
  
- [data-sidebar-mode="collapsed"] {
-   @media (min-width: 768px) {
--    .global-audio-player {
-+    .mini-audio-player {
- 
-       .no-collapse {
-         display: none;
+       .audio-player-pagination-icons {
