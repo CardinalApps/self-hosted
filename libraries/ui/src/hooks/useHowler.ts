@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import { Howl } from 'howler'
+import { useAppDispatch } from './useAppDispatch'
+import { useAppSelector } from './useAppSelector'
 
 import { getSetting } from '@cardinalapps/app-settings/src'
 import { SupportedLang } from '@cardinalapps/app-settings/src/types'
@@ -8,6 +9,7 @@ import { audioSelectors, audioActions, Player } from '../store/slices/music'
 import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../store/slices/music/constants'
 import { authorizedFetchHeaders, JWT_TYPE } from '../lib/auth/jwt'
 import { settingsSelectors } from '../store/slices/settings'
+import next from '../store/slices/music/thunks/next'
 
 import { HOME_SERVER_HOST } from '../../env'
 import homeServerAPI from '../lib/homeserver/homeServerAPI'
@@ -53,16 +55,16 @@ export const saveMusicHistory = (playerId, trackId) => {
  * tree, and should not be unmounted.
  */
 export default function useHowler() {
-  const dispatch = useDispatch()
-  const players = useSelector(audioSelectors.players)
-  const playerIds = useSelector(audioSelectors.playerIds)
-  const loading = useSelector(audioSelectors.loading)
-  const loadingIds = useSelector(audioSelectors.loadingIds)
-  const playing = useSelector(audioSelectors.playing)
-  const playingIds = useSelector(audioSelectors.playingIds)
-  const paused = useSelector(audioSelectors.paused)
-  const pausedIds = useSelector(audioSelectors.pausedIds)
-  const { lang, max_concurrent_audio_streams } = useSelector(settingsSelectors.current)
+  const dispatch = useAppDispatch()
+  const players = useAppSelector(audioSelectors.players)
+  const playerIds = useAppSelector(audioSelectors.playerIds)
+  const loading = useAppSelector(audioSelectors.loading)
+  const loadingIds = useAppSelector(audioSelectors.loadingIds)
+  const playing = useAppSelector(audioSelectors.playing)
+  const playingIds = useAppSelector(audioSelectors.playingIds)
+  const paused = useAppSelector(audioSelectors.paused)
+  const pausedIds = useAppSelector(audioSelectors.pausedIds)
+  const { lang, max_concurrent_audio_streams } = useAppSelector(settingsSelectors.current)
   const { defaultValue: defaultMaxConcurrentAudioStreams } = useMemo(() => getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang), [])
   const maxConcurrentAudioStreams = Number(max_concurrent_audio_streams || defaultMaxConcurrentAudioStreams)
 
@@ -95,7 +97,7 @@ export default function useHowler() {
 
     howl.on('end', () => {
       saveMusicHistory(player.id, player.trackId)
-      dispatch(audioActions.stop(player.id))
+      dispatch(next({ playerId: player.id }))
     })
 
     howl.on('stop', () => {
