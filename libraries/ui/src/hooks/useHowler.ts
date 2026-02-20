@@ -56,6 +56,8 @@ export default function useHowler() {
   const dispatch = useDispatch()
   const players = useSelector(audioSelectors.players)
   const playerIds = useSelector(audioSelectors.playerIds)
+  const loading = useSelector(audioSelectors.loading)
+  const loadingIds = useSelector(audioSelectors.loadingIds)
   const playing = useSelector(audioSelectors.playing)
   const playingIds = useSelector(audioSelectors.playingIds)
   const paused = useSelector(audioSelectors.paused)
@@ -104,8 +106,7 @@ export default function useHowler() {
   }
 
   /**
-   * Create and destroy Howls when players change. A new player is created when
-   * the user starts a new audio stream, and players are destroyed when playback ends.
+   * When there is a change in Player IDs.
    */
   useEffect(() => {
     // Look for new players and create Howls we don't have
@@ -125,27 +126,27 @@ export default function useHowler() {
   }, [playerIds])
 
   /**
-   * Look for stale cached seek in the sessionStorage.
+   * When there is a change in the currently loading tracks.
+   * 
+   * Create howls for the tracks, and overwrite the current howl if necessary.
    */
   useEffect(() => {
-    // Look for new players and create Howls we don't have
-    Object.values(players).forEach((player) => {
-      if (!hasHowl(player.id)) {
-        howls[player.id] = createHowl(player.id)
-      }
-    })
+    loading.forEach((player: Player) => {
+      const howl = getHowl(player.id)
 
-    // Look for stale Howl instances and destroy them
-    Object.keys(howls).forEach((howlPlayerId) => {
-      if (!Object.values(players).find((player) => player.id === howlPlayerId)) {
-        howls[howlPlayerId].unload()
-        delete howls[howlPlayerId]
+      if (howl) {
+        howl.unload()
+        delete howls[player.id]
       }
+
+      howls[player.id] = createHowl(player.id)
     })
-  }, [playerIds])
+  }, [loadingIds])
 
   /**
    * When there is a change in the currently playing tracks.
+   * 
+   * Propagate the playing state to the howls.
    */
   useEffect(() => {
     playing.forEach((player: Player) => {
@@ -158,6 +159,8 @@ export default function useHowler() {
 
   /**
    * When there is a change in the currently paused tracks.
+   * 
+   * Propagate the paused state to the howls.
    */
   useEffect(() => {
     paused.forEach((player: Player) => {

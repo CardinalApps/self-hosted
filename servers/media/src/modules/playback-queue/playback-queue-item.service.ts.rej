@@ -1,24 +1,128 @@
 diff a/servers/media/src/modules/playback-queue/playback-queue-item.service.ts b/servers/media/src/modules/playback-queue/playback-queue-item.service.ts	(rejected hunks)
-@@ -26,16 +26,19 @@ export class QueueItemService {
-    * Returns all queue items according to the query. Items are returned in order
-    * of their position in the queue.
-    */
--  async query(id: string, queryPlaybackQueuesDto: QueryPlaybackQueueItemsDto): Promise<[PlaybackQueueItem[], number]> {
--    const { take, skip } = queryPlaybackQueuesDto
-+  async query(id: string, queryPlaybackQueueItemsDto: QueryPlaybackQueueItemsDto): Promise<[PlaybackQueueItem[], number]> {
-+    const {
-+      take,
-+      position,
-+    } = queryPlaybackQueueItemsDto
+@@ -1,6 +1,6 @@
+ import { Injectable } from '@nestjs/common'
+ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
+-import { Repository, DataSource } from 'typeorm'
++import { Repository, DataSource, Not, In, MoreThan, LessThan } from 'typeorm'
  
-     return await this.queueItemRepository.findAndCount({
-       take,
--      skip,
+ import { PlaybackQueueItem } from './playback-queue-item.entity'
+ 
+@@ -23,26 +23,106 @@ export class QueueItemService {
+   ) {}
+ 
+   /**
+-   * Returns all queue items according to the query. Items are returned in order
+-   * of their position in the queue.
++   * Returns a slice of items in a queue. Queues are not limited to any size, so
++   * the client apps tend to want slices of queues, not always whole queues.
++   * This can handle both.
++   * 
++   * Use `currentQueueItemId` to query from a specific position in the queue.
++   * Use `leading` and `trailing` to select items before and after the
++   * `currentQueueItemId`.
++   * 
++   * If no `currentQueueItemId` is given, start from the beginning of the queue.
+    */
+-  async query(id: string, queryPlaybackQueueItemsDto: QueryPlaybackQueueItemsDto): Promise<[PlaybackQueueItem[], number]> {
++  async getQueueSlice(queueId: string, queryPlaybackQueueItemsDto: QueryPlaybackQueueItemsDto): Promise<[PlaybackQueueItem[], number]> {
+     const {
+-      take,
+-      position,
++      trailing,
++      leading,
++      currentQueueItemId,
++      includeCurrentItemInReturn,
+     } = queryPlaybackQueueItemsDto
+ 
+-    return await this.queueItemRepository.findAndCount({
+-      take,
++    const sliced: PlaybackQueueItem[] = []
++
++    // Get our starting position
++    let currentItem: PlaybackQueueItem
++
++    if (currentQueueItemId) {
++      // Use the given ID
++      currentItem = await this.queueItemRepository.findOne({
++        where: {
++          queueItemId: currentQueueItemId,
++        },
++      })
++    } else {
++      // Use the first item
++      const items = await this.queueItemRepository.find({
++        where: {
++          queue: {
++            queueId,
++          },
++        },
++        take: 1,
++        order: {
++          position: 'asc',
++        },
++      })
++      currentItem = items?.[0]
++    }
++
++    if (!currentItem) {
++      return [sliced, 0]
++    }
++
++    if (includeCurrentItemInReturn) {
++      sliced.push(currentItem)
++    }
++
++    // Get the leading queue items (next items from our current position)
++    if (leading) {
++      const next = await this.queueItemRepository.find({
++        where: {
++          queue: {
++            queueId,
++          },
++          position: MoreThan(currentItem.position),
++          queueItemId: Not(In([currentItem.queueItemId])),
++        },
++        take: leading,
++        order: {
++          position: 'asc',
++        },
++      })
++
++      sliced.push(...next)
++    }
++
++    // Get the trailing queue items (previous items from our current position)
++    if (trailing) {
++      const prev = await this.queueItemRepository.find({
++        where: {
++          queue: {
++            queueId,
++          },
++          position: LessThan(currentItem.position),
++          queueItemId: Not(In([currentItem.queueItemId])),
++        },
++        take: trailing,
++        order: {
++          position: 'desc',
++        },
++      })
++
++      sliced.unshift(...prev)
++    }
++
++    const totalInQueue = await this.queueItemRepository.count({
        where: {
          queue: {
-           queueId: id,
+-          queueId: id,
++          queueId: queueId,
          },
-+        ...(position ? { position } : {}),
+-        ...(position ? { position } : {}),
+-      },
+-      order: {
+-        position: 'asc',
        },
-       order: {
-         position: 'asc',
+     })
++
++    return [sliced, totalInQueue]
+   }
+ }

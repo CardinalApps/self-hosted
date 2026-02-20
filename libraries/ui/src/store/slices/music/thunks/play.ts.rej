@@ -1,20 +1,95 @@
 diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
-@@ -113,7 +113,7 @@ const playMusic = createAsyncThunk<
+@@ -3,7 +3,7 @@ import { getSetting } from '@cardinalapps/app-settings/src'
+ import { SupportedLang } from '@cardinalapps/app-settings/src/types'
+ import { v4 as uuid } from 'uuid'
+ import { QueueType, DynamicQueueType } from '@cardinalapps/types/src/playback-queue'
+-import { ServerQueue } from '..'
++import { QueueItem, ServerQueue } from '..'
+ 
+ import { AppDispatch, RootState } from '../../../'
+ 
+@@ -24,6 +24,7 @@ export type PlayReturn = {
+     generatedPlayerId: string,
+     now: number,
+     queue: ServerQueue,
++    currentQueueItem?: QueueItem,
+   }>,
+   pause: Array<{
+     playerId?: string,
+@@ -38,16 +39,16 @@ export type PlayReturn = {
+ }
+ 
+ /**
+- * On play:
++ * Play music. This is the general "play" button for all music playback, and it
++ * can do many different things depending on the current state of the app.
+  * 
+- *  1. Analyze the current playback state.
+- *  2. If the track is already loaded and paused, resume it.
+- *  3. If the track is not loaded, create a new player for it.
+- *    3.1 If a queue type was given, create the queue on the server before creating the player.
+- *  4. If at max concurrent players, remove the oldest one(s).
+- *    4.1 Save playback history before removing.
+- *  5. If at max *playing* players, pause the oldest ones.
+- *  6. Return the list of state updates to be performed by the reducer.
++ *  1. If the track is already loaded and paused, resume it.
++ *  2. If the track is not loaded, create a new player for it.
++ *    2.1 If a queue type was given, create the queue on the server before creating the player.
++ *  3. If at max concurrent players, remove the oldest one(s).
++ *    3.1 Save playback history before removing.
++ *  4. If at max *playing* players, pause the oldest ones.
++ *  5. Return the list of state updates to be performed by the reducer.
+  */
+ const playMusic = createAsyncThunk<
+   PlayReturn,
+@@ -91,6 +92,7 @@ const playMusic = createAsyncThunk<
+   // When no player exists, create a new one
+   if (!resolvedPlayerId) {
+     let trackIdToPlay = trackId
++    let currentQueueItem: QueueItem = null
+     let queue
+ 
+     // Maybe create a queue
+@@ -99,7 +101,7 @@ const playMusic = createAsyncThunk<
+       const serverQueue = await homeServerAPI<ServerQueue>('/playback-queues', 'POST', {
+         body: {
+           type: queueType,
+-          dynamicType: dynamicQueueType,
++          ...(dynamicQueueType ? { dynamicType: dynamicQueueType } : {}),
+           ...(currentLibraries?.length
+             ? { libraries: currentLibraries.map((id) => ({ libraryId: id })) }
+             : {}
+@@ -112,25 +114,25 @@ const playMusic = createAsyncThunk<
+ 
        // Play the first item in the queue if no trackId was explicitly set
        if (!trackId) {
-         const firstItem = serverQueue?.items?.[0]
--        if (firstItem && firstItem?.mediaType === 'musicTrack' && firstItem?.mediaId) {
-+        if (firstItem && firstItem?.mediaType === 'music_track' && firstItem?.mediaId) {
-           trackIdToPlay = firstItem?.mediaId
+-        const firstItem = serverQueue?.items?.[0]
+-        if (firstItem && firstItem?.mediaType === 'music_track' && firstItem?.mediaId) {
+-          trackIdToPlay = firstItem?.mediaId
++        currentQueueItem = serverQueue?.items?.[0]
++        if (currentQueueItem && currentQueueItem?.mediaType === 'music_track' && currentQueueItem?.mediaId) {
++          trackIdToPlay = currentQueueItem?.mediaId
          } else {
-           console.error('Could not start playback because the first item in the queue is either missing or not a music track.', firstItem)
-@@ -123,7 +123,8 @@ const playMusic = createAsyncThunk<
-       // Don't save the queue items so that they cannot be used accidentially;
-       // always use the server state instead
+-          console.error('Could not start playback because the first item in the queue is either missing or not a music track.', firstItem)
++          console.error('Could not start playback because the first item in the queue is either missing or not a music track.', currentQueueItem)
+         }
+       }
+ 
+-      // Don't save the queue items so that they cannot be used accidentially;
+-      // always use the server state instead
++      // Remove queue items; they are fundementally a server-side feature and we
++      // do not need the whole queue in the store
        if ('items' in queue) {
--        delete queue.items
-+        // TODO copy first queue item into local state, delete rest
-+        //delete queue.items
+-        // TODO copy first queue item into local state, delete rest
+-        //delete queue.items
++        delete queue.items
        }
      }
  
+     workToDo.create?.push({
+       trackId: trackIdToPlay,
+       queue,
++      currentQueueItem,
+       generatedPlayerId: uuid(),
+       now: Date.now(),
+     })

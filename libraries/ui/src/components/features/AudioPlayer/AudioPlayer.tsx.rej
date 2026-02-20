@@ -1,58 +1,39 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx	(rejected hunks)
-@@ -10,7 +10,8 @@ import Scrubber from '../../interaction/Scrubber'
- 
- import { audioSelectors, audioActions } from '../../../store/slices/music'
+@@ -12,6 +12,7 @@ import { audioSelectors, audioActions } from '../../../store/slices/music'
  import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../../store/slices/music/constants'
--import playMusic from '../../../store/slices/music/thunks/play'
-+import play from '../../../store/slices/music/thunks/play'
-+import next from '../../../store/slices/music/thunks/next'
+ import play from '../../../store/slices/music/thunks/play'
+ import next from '../../../store/slices/music/thunks/next'
++import previous from '../../../store/slices/music/thunks/previous'
  
  import { getHowl } from '../../../hooks/useHowler'
  import { useReleaseCover } from '../../../hooks/useReleaseCover'
-@@ -58,13 +59,21 @@ const AudioPlayer = ({
-   const [fadeIn, setFadeIn] = useState(false)
- 
-   const handlePlayClick = (id) => {
--    dispatch(playMusic({ trackId: id }))
-+    dispatch(play({ trackId: id }))
+@@ -67,7 +68,7 @@ const AudioPlayer = ({
    }
  
-   const handlePauseClick = () => {
-     dispatch(audioActions.pause(player.id))
+   const handlePrevClick = () => {
+-    //dispatch(playMusic({ trackId: id }))
++    dispatch(previous({ playerId: player.id }))
    }
  
-+  const handlePrevClick = () => {
-+    //dispatch(playMusic({ trackId: id }))
-+  }
-+
-+  const handleNextClick = () => {
-+    dispatch(next({ playerId: player.id }))
-+  }
-+
-   const handleStopClick = () => {
-     dispatch(audioActions.stop(player.id))
-   }
-@@ -145,6 +154,11 @@ const AudioPlayer = ({
-           }
-         </div>
-         <div className="audio-player-buttons">
-+          <Icon
-+            fa="fas fa-backward"
-+            className="audio-player-playback-button prev no-collapse"
-+            onClick={() => handlePrevClick()}
-+          />
-           {!!(musicTrackLoading || musicBlobLoading) && <Loading size="s" />}
-           {!!isPaused && !musicTrackLoading && !musicBlobLoading &&
-             <Icon
-@@ -160,6 +174,11 @@ const AudioPlayer = ({
-               onClick={() => handlePauseClick()}
-             />
-           }
-+          <Icon
-+            fa="fas fa-forward"
-+            className="audio-player-playback-button next no-collapse"
-+            onClick={() => handleNextClick()}
-+          />
-           <Icon
-             fa="fas fa-stop"
-             className="audio-player-playback-button stop no-collapse"
+   const handleNextClick = () => {
+@@ -98,7 +99,10 @@ const AudioPlayer = ({
+    * Regularly update the current playback time.
+    */
+   useEffect(() => {
+-    if (!playbackTimeInterval.current && howl) {
++    if (howl) {
++      if (playbackTimeInterval.current) {
++        clearInterval(playbackTimeInterval.current)
++      }
+       playbackTimeInterval.current = setInterval(() => {
+         const seek = howl.seek()
+         setPlaybackSeconds(seek)
+@@ -111,7 +115,7 @@ const AudioPlayer = ({
+         clearInterval(playbackTimeInterval.current)
+       }
+     }
+-  }, [playerId, howl])
++  }, [playerId, howl, player.trackId])
+ 
+   useEffect(() => {
+     const timeout = setTimeout(() => {

@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/components/interaction/Queue/Queue.tsx b/libraries/ui/src/components/interaction/Queue/Queue.tsx	(rejected hunks)
-@@ -31,7 +31,7 @@ const Queue = ({
-         <ol className="queue-list">
-           {[...queueItems].reverse().map((item, i) => {
-             switch (item.mediaType) {
--              case 'musicTrack':
-+              case 'music_track':
-                 return (
-                   <li className="queue-item" key={i}>
-                     <MusicTrackItem position={++i} musicTrackId={item.mediaId} format={layout} />
+@@ -22,7 +22,7 @@ const Queue = ({
+ }: QueueProps) => {
+   //const { lang } = useSelector(settingsSelectors.current)
+ 
+-  const { data: queueItemsData } = useGetQueueItemsQuery({ queueId, take })
++  const { data: queueItemsData } = useGetQueueItemsQuery({ queueId, leading: take })
+   const [queueItems] = queueItemsData || [[], 0]
+ 
+   return (

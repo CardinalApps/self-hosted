@@ -1,26 +1,10 @@
 diff a/servers/media/src/modules/playback-queue/playback-queue-item.entity.ts b/servers/media/src/modules/playback-queue/playback-queue-item.entity.ts	(rejected hunks)
-@@ -2,6 +2,7 @@ import {
-   Entity,
-   Column,
-   ManyToOne,
-+  Generated,
- } from 'typeorm'
- 
- import { BaseEntity } from '../../entities/base.entity'
-@@ -9,11 +10,15 @@ import { PlaybackQueue } from './playback-queue.entity'
+@@ -10,7 +10,7 @@ import { PlaybackQueue } from './playback-queue.entity'
  
  @Entity()
  export class PlaybackQueueItem extends BaseEntity {
-+  @Column()
-+  @Generated('uuid')
-+  queueItemId: string
-+
-   @ManyToOne(() => PlaybackQueue)
-   queue: PlaybackQueue
+-  @Column()
++  @Column({ unique: true })
+   @Generated('uuid')
+   queueItemId: string
  
-   @Column({ nullable: false })
--  mediaType: 'musicTrack'
-+  mediaType: 'music_track'
- 
-   @Column({ nullable: false })
-   mediaId: string

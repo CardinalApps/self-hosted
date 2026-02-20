@@ -1,10 +1,108 @@
 diff a/libraries/ui/src/store/slices/music/index.ts b/libraries/ui/src/store/slices/music/index.ts	(rejected hunks)
-@@ -8,7 +8,7 @@ import { Library } from '../../apis/libraries'
- import { STORE_KEY, PLAYER, PLAYBACK_STATE } from './constants'
+@@ -2,7 +2,9 @@ import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
+ import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
  
- export type QueueItem = {
--  mediaType: 'musicTrack',
-+  mediaType: 'music_track',
+ import { globalActions } from '../../constants/actions'
+-import playMusic from './thunks/play'
++import play from './thunks/play'
++import next from './thunks/next'
++import previous from './thunks/previous'
+ 
+ import { Library } from '../../apis/libraries'
+ import { STORE_KEY, PLAYER, PLAYBACK_STATE } from './constants'
+@@ -11,6 +13,7 @@ export type QueueItem = {
+   mediaType: 'music_track',
    mediaId: string,
    libraries: Library[],
++  queueItemId: string,
  }
+ 
+ export type ServerQueue = {
+@@ -29,6 +32,7 @@ export type Player = {
+   currentPlaybackStartedAt: number,
+   initializedAt: number,
+   currentSeconds?: number,
++  currentQueueItem?: QueueItem,
+ }
+ 
+ type InitialState = {
+@@ -61,6 +65,9 @@ const audioSlice = createSlice({
+         delete state.players[id]
+       })
+     },
++    /**
++     * When the audio stream is loaded by Howler
++     */
+     loaded: (state, action: PayloadAction<PlayerLoaded>) => {
+       const { payload } = action
+       const { playerId, maxConcurrentPlayingPlayers } = payload
+@@ -101,11 +108,14 @@ const audioSlice = createSlice({
+       .addCase(globalActions.RESET, () => {
+         return { ...initialState }
+       })
+-      .addCase(playMusic.fulfilled, (state, { payload }) => {
++      /**
++       * Play.
++       */
++      .addCase(play.fulfilled, (state, { payload }) => {
+         const { create, remove, resume, pause } = payload
+ 
+         // Add new players
+-        for (const { trackId, generatedPlayerId, now, queue } of create) {
++        for (const { trackId, generatedPlayerId, now, queue, currentQueueItem } of create) {
+           state.players[generatedPlayerId] = {
+             ...PLAYER,
+             id: generatedPlayerId,
+@@ -113,6 +123,7 @@ const audioSlice = createSlice({
+             currentPlaybackStartedAt: now,
+             trackId,
+             queue,
++            currentQueueItem,
+           }
+         }
+ 
+@@ -132,8 +143,42 @@ const audioSlice = createSlice({
+           delete state.players[playerId]
+         }
+       })
+-      .addCase(playMusic.rejected, (state, action) => {
+-        console.log('playMusic.rejected', action)
++      .addCase(play.rejected, (state, action) => {
++        console.log('play.rejected', action)
++      })
++
++      /**
++       * Next.
++       */
++      .addCase(next.fulfilled, (state, { payload }) => {
++        const { playerId, update, isEndOfQueue } = payload
++
++        if (isEndOfQueue) {
++          delete state.players[playerId]
++        } else if (update) {
++          state.players[playerId] = {
++            ...state.players[playerId],
++            ...update,
++          }
++        }
++      })
++      .addCase(next.rejected, (state, action) => {
++        console.log('music.rejected', action)
++      })
++
++      /**
++       * Previous.
++       */
++      .addCase(previous.fulfilled, (state, { payload }) => {
++        const { playerId, update } = payload
++
++        state.players[playerId] = {
++          ...state.players[playerId],
++          ...update,
++        }
++      })
++      .addCase(previous.rejected, (state, action) => {
++        console.log('previous.rejected', action)
+       })
+   },
+   selectors: {
