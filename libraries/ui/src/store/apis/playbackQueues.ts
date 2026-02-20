@@ -86,15 +86,25 @@ export const playbackQueueApi = baseHomeServerApi
       getQueueItems: builder.query<
         [QueueItem[], number],
         PaginationParams & {
+          queueId: string,
           leading?: number,
           trailing?: number,
-          queueId: string,
+          currentQueueItemId?: string,
+          includeCurrentItemInReturn?: boolean,
         }
       >({
-        query: ({ leading, trailing, queueId }) => {
+        query: ({
+          leading,
+          trailing,
+          queueId,
+          currentQueueItemId,
+          includeCurrentItemInReturn,
+        }) => {
           return queryParams(`/playback-queues/${queueId}/items`, {
             ...(leading && { leading }),
             ...(trailing && { trailing }),
+            ...(currentQueueItemId && { currentQueueItemId }),
+            ...(typeof includeCurrentItemInReturn === 'boolean' && { includeCurrentItemInReturn }),
           })
         },
         providesTags: ['PlaybackQueue.List'],

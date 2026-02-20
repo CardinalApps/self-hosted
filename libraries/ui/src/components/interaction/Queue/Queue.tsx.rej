@@ -1,10 +1,33 @@
 diff a/libraries/ui/src/components/interaction/Queue/Queue.tsx b/libraries/ui/src/components/interaction/Queue/Queue.tsx	(rejected hunks)
-@@ -22,7 +22,7 @@ const Queue = ({
- }: QueueProps) => {
-   //const { lang } = useSelector(settingsSelectors.current)
+@@ -1,11 +1,11 @@
+-//import { useSelector } from 'react-redux'
++import { useSelector } from 'react-redux'
+ import clsx from 'clsx'
  
--  const { data: queueItemsData } = useGetQueueItemsQuery({ queueId, take })
-+  const { data: queueItemsData } = useGetQueueItemsQuery({ queueId, leading: take })
+-//import { settingsSelectors } from '../../../store/slices/settings'
+ import { useGetQueueItemsQuery } from '../../../store/apis/playbackQueues'
+ import MusicTrackItem from './items/MusicTrackItem'
+ 
+ import './Queue.css'
++import { audioSelectors } from '../../../store/slices/music'
+ 
+ export type QueueProps = {
+   className?: string,
+@@ -20,9 +20,15 @@ const Queue = ({
+   take,
+   layout,
+ }: QueueProps) => {
+-  //const { lang } = useSelector(settingsSelectors.current)
++  const players = useSelector(audioSelectors.players)
++  const player = Object.values(players).find((player) => player?.queue?.queueId === queueId)
+ 
+-  const { data: queueItemsData } = useGetQueueItemsQuery({ queueId, leading: take })
++  const { data: queueItemsData } = useGetQueueItemsQuery({
++    queueId,
++    leading: take,
++    currentQueueItemId: player?.currentQueueItem?.queueItemId,
++    includeCurrentItemInReturn: false,
++  })
    const [queueItems] = queueItemsData || [[], 0]
  
    return (
