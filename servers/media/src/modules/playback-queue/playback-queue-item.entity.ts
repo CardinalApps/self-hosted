@@ -12,7 +12,7 @@ import { MusicHistory } from '../music-history/music-history.entity'
 
 @Entity()
 export class PlaybackQueueItem extends BaseEntity {
-  @Column()
+  @Column({ unique: true })
   @Generated('uuid')
   queueItemId: string
 

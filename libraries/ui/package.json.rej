@@ -1,10 +1,9 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
-@@ -16,7 +16,7 @@
-   "dependencies": {
-     "@cardinalapps/access-control": "workspace:*",
-     "@cardinalapps/app-settings": "workspace:*",
--    "@cardinalapps/dtos": "workspace:*",
-+    "@cardinalapps/types": "workspace:*",
-     "@reduxjs/toolkit": "2.6.1",
-     "@storybook/manager-api": "^8.5.8",
-     "@storybook/preview-api": "^8.5.8",
+@@ -24,6 +24,7 @@
+     "@tanstack/react-virtual": "3.11.3",
+     "clsx": "^2.1.1",
+     "date-fns": "2.30.0",
++    "embla-carousel-react": "^8.6.0",
+     "framer-motion": "12.23.22",
+     "howler": "2.2.4",
+     "leaflet": "1.9.3",
