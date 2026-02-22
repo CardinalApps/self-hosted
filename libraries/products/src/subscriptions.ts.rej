@@ -1,78 +1,10 @@
 diff a/libraries/products/src/subscriptions.ts b/libraries/products/src/subscriptions.ts	(rejected hunks)
-@@ -1,6 +1,8 @@
- export enum SubscriptionTierSlug {
-   FREE = 'free',
-   EARLY_ADOPTER = 'early_adopter',
-+  PRO = 'pro',
-+  ULTIMATE = 'ultimate',
- }
- 
- type localizedStrings = {
-@@ -16,6 +18,11 @@ export type SubscriptionTier = {
-   provides: {
-     seats: number,
-   },
-+  prices: {
-+    // Use the "Lookup Key" in Stripe for each price
-+    monthly?: string,
-+    yearly?: string,
-+  },
- }
- 
- /**
-@@ -32,7 +39,11 @@ export const SUBSCRIPTIONS = {
-     provides: {
-       seats: 3,
+@@ -37,7 +37,7 @@ export const SUBSCRIPTIONS = {
      },
-+    prices: {},
-   },
-+  /**
-+   * Now retired
-+   */
-   early_adopter: {
-     name: {
-       en: "Early Adopter",
-@@ -41,13 +52,42 @@ export const SUBSCRIPTIONS = {
+     slug: "free",
      provides: {
-       seats: 10,
+-      seats: 3,
++      seats: 5,
      },
-+    prices: {
-+      monthly: 'early_adopter',
-+    },
-+  },
-+  pro: {
-+    name: {
-+      en: "Pro",
-+    },
-+    slug: "pro",
-+    provides: {
-+      seats: 20,
-+    },
-+    prices: {
-+      monthly: 'pro_monthly',
-+      yearly: 'pro_yearly',
-+    },
-+  },
-+  ultimate: {
-+    name: {
-+      en: "Ultimate",
-+    },
-+    slug: "ultimate",
-+    provides: {
-+      seats: 50,
-+    },
-+    prices: {
-+      monthly: 'ultimate_monthly',
-+      yearly: 'ultimate_yearly',
-+    },
+     prices: {},
    },
- } as Record<SubscriptionTierSlug, SubscriptionTier>
- 
- /**
-  * Primary API for getting a subscription.
-  */
--export const getSubscription = (slug: string): SubscriptionTier | null => {
-+export const getSubscription = (slug: `${SubscriptionTierSlug}`): SubscriptionTier | null => {
-   if (slug in SUBSCRIPTIONS) {
-     return SUBSCRIPTIONS[slug as SubscriptionTierSlug]
-   } else {
