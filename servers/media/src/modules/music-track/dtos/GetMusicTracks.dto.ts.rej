@@ -1,10 +1,29 @@
 diff a/servers/media/src/modules/music-track/dtos/GetMusicTracks.dto.ts b/servers/media/src/modules/music-track/dtos/GetMusicTracks.dto.ts	(rejected hunks)
-@@ -18,7 +18,7 @@ class MusicTracksPagination extends Pagination {
-   @IsOptional()
-   @IsString()
-   @IsIn(Object.values(AllowedMusicTracksOrderBy))
--  orderBy?: AllowedMusicTracksOrderBy = AllowedMusicTracksOrderBy.trackNumber
-+  sort?: AllowedMusicTracksOrderBy = AllowedMusicTracksOrderBy.trackNumber
+@@ -1,7 +1,8 @@
+ import { Transform } from 'class-transformer'
+-import { IsBoolean, IsString, IsOptional, IsIn } from 'class-validator'
++import { IsBoolean, IsString, IsOptional, IsIn, IsArray } from 'class-validator'
+ 
+ import { Pagination } from '../../../dtos/pagination.dto'
++import { toArrayOfStrings } from '../../../utils/transformers'
+ 
+ enum AllowedMusicTracksOrderBy {
+   'createdAt' = 'createdAt',
+@@ -11,6 +12,7 @@ enum AllowedMusicTracksOrderBy {
+   'discNumber' = 'discNumber',
+   'duration' = 'duration',
+   'bitrate' = 'bitrate',
++  'playCount' = 'playCount',
  }
  
- export class GetMusicTracksDto extends MusicTracksPagination {
+ class MusicTracksPagination extends Pagination {
+@@ -36,4 +38,9 @@ export class GetMusicTracksDto extends MusicTracksPagination {
+   @IsOptional()
+   @IsBoolean()
+   artists?: boolean = true
++
++  @Transform(toArrayOfStrings)
++  @IsArray()
++  @IsOptional()
++  libraries?: string[]
+ }

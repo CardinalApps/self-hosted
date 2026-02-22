@@ -1,9 +1,10 @@
 diff a/libraries/ui/src/store/types/api.ts b/libraries/ui/src/store/types/api.ts	(rejected hunks)
-@@ -4,6 +4,6 @@ export type PaginationParams = {
+@@ -3,7 +3,7 @@ export type PaginationParams = {
+   skip?: number,
  }
  
- export type CommonSortParams = 'createdAt'
--export type CommonOrderParams = 'asc' | 'desc'
-+export type CommonOrderParams = 'ASC' | 'DESC'
+-export type CommonSortParams = 'createdAt'
++export type CommonSortParams = 'createdAt' | 'playCount'
+ export type CommonOrderParams = 'ASC' | 'DESC'
  
  export type RTKPage = [Record<string, unknown>[], number]

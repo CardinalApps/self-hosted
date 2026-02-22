@@ -1,21 +1,13 @@
 diff a/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx b/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx	(rejected hunks)
-@@ -8,9 +8,11 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+@@ -5,10 +5,10 @@ import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelea
+ import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
+ import { MusicReleaseType, useGetMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
++import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
  import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
  
  import i18n from '../i18n.json'
-+import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
+-import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
  
  function RecentlyAddedReleases() {
    const { lang } = useAppSelector(settingsSelectors.current)
-+  const libraries = useAppSelector(librarySelectors.current)
- 
-   const {
-     data,
-@@ -18,6 +20,7 @@ function RecentlyAddedReleases() {
-     orderBy: 'createdAt',
-     order: 'DESC',
-     take: 40,
-+    ...(libraries?.length ? { libraries } : {}),
-   })
- 
-   const releases = Array.isArray(data) ? data[0] : []

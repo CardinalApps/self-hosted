@@ -1,27 +1,11 @@
 diff a/servers/media/src/utils/transformers.ts b/servers/media/src/utils/transformers.ts	(rejected hunks)
-@@ -7,9 +7,9 @@ import { BadRequestException } from '@nestjs/common'
-  * 
-  * 1. Is an array or a string;
-  * 2. If it's an array, ensure that all array items are strings;
-- * 3. If it's a string, transform it into a single item array;
-- * 
-- * FIXME this should not do validation, just transformation
-+ * 3. If it's a string
-+ *    3.1. If it's a comma-separated string, split and create an array
-+ *    3.2. If it's not comma-separated, transform it into a single item array.
-  */
- export const toArrayOfStrings = ({ value }) => {
-   if (Array.isArray(value)) {
-@@ -21,7 +21,11 @@ export const toArrayOfStrings = ({ value }) => {
+@@ -21,6 +21,9 @@ export const toArrayOfStrings = ({ value }) => {
    }
  
    if (typeof value === 'string') {
--    return [value]
-+    if (value.includes(',')) {
-+      return value.split(',')
-+    } else {
-+      return [value]
++    if (!value.length) {
++      return []
 +    }
-   }
- 
-   if (!Array.isArray(value)) {
+     if (value.includes(',')) {
+       return value.split(',')
+     } else {

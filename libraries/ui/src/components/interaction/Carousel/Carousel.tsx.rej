@@ -1,10 +1,25 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.tsx b/libraries/ui/src/components/interaction/Carousel/Carousel.tsx	(rejected hunks)
-@@ -40,7 +40,7 @@ const Carousel = ({
+@@ -14,6 +14,7 @@ type CarouselProps = {
+   prev?: boolean,
+   next?: boolean,
+   initialSlide?: number,
++  axis?: 'x' | 'y',
+   itemWidth?: string | number,
+   itemsPerSlide?: number,
+   items: React.ReactNode[],
+@@ -30,6 +31,7 @@ const Carousel = ({
+   prev,
+   next,
+   initialSlide = 1,
++  axis = 'x',
+   itemWidth = '100%',
+   itemsPerSlide = 1,
+   items = [],
+@@ -39,6 +41,7 @@ const Carousel = ({
+     startIndex: initialSlide - 1,
      slidesToScroll: itemsPerSlide,
      dragFree: true,
++    axis,
    }, [WheelGesturesPlugin({
--    forceWheelAxis: 'y',
-+    forceWheelAxis: 'x',
+     forceWheelAxis: 'x',
    })])
- 
-   const goToPrev = () => emblaApi?.scrollPrev()

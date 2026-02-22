@@ -1,56 +1,19 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -598,7 +598,7 @@
-   --rowHeight: calc(70px + calc(var(--gap) * 2));
- 
-   height: 100%;
--  padding: 0 10px;
-+  padding: 0 0 0 10px;
-   display: flex;
-   flex-wrap: wrap;
-   align-content: flex-start;
-@@ -611,8 +611,6 @@
-     .procedural-layout-block-inner {
-       height: 100%;
-       margin: 0 calc(var(--gap));
--      border-radius: 22px;
--      overflow: hidden;
-     }
- 
-     .procedural-layout-block-title {
-@@ -722,5 +720,36 @@
-       width: 66.6666%;
-       height: calc(6 * var(--rowHeight));
+@@ -744,12 +744,16 @@
+               left: 0;
+               top: 0;
+               bottom: 0;
+-              background: linear-gradient(90deg, var(--bg-2) 20%, transparent 40%);
++              background: linear-gradient(90deg, var(--bg-2) 0%, transparent 20%);
+               z-index: 2;
+             }
+           }
+         }
+       }
      }
 +
-+    &.flush {
-+
-+      .procedural-layout-block-inner {
-+        margin-right: 0;
-+
-+        .carousel {
-+
-+          .carousel-header {
-+            padding-right: 15px;
-+          }
-+
-+          .embla__viewport {
-+            margin-left: -20px;
-+            padding-left: 20px;
-+            position: relative;
-+            
-+            &:before {
-+              content: '';
-+              width: 20px;
-+              position: absolute;
-+              left: 0;
-+              top: 0;
-+              bottom: 0;
-+              background: linear-gradient(90deg, var(--bg-2) 20%, transparent 40%);
-+              z-index: 2;
-+            }
-+          }
-+        }
-+      }
++    .card {
++      height: 100%;
 +    }
    }
  }

@@ -1,24 +1,75 @@
 diff a/servers/media/src/modules/music-track/music-track.service.ts b/servers/media/src/modules/music-track/music-track.service.ts	(rejected hunks)
-@@ -87,4 +87,22 @@ export class MusicTrackService {
-       return await this.musicTrackRepository.save(initial)
-     }
-   }
+@@ -9,16 +9,21 @@ import { File } from '../indexing/entities/file.entity'
+ import { EventService } from '../event/event.service'
+ 
+ import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
++import { LibraryService } from '../library/library.service'
+ 
+ @Injectable()
+ export class MusicTrackService {
+   constructor(
+     @InjectDataSource()
+     private dataSource: DataSource,
 +
-+  /**
-+   * Returns recently added music releases.
-+   */
-+  // async getRecentlyAddedReleases(): Promise<[, number]> {
-+  //   return await this.musicTrackRepository.find({
-+  //     take,
-+  //     skip,
-+  //     relations: {
-+  //       release: release ? { thumbnails: true } : false,
-+  //       artists: artists,
-+  //       metadata: metadata,
-+  //     },
-+  //     order: {
-+  //       [sort]: order,
-+  //     },
-+  //   })
-+  // }
- }
+     @InjectRepository(MusicTrack)
+     private musicTrackRepository: Repository<MusicTrack>,
++
+     @InjectRepository(MusicTrackMetadata)
+     private musicTrackMetadataRepository: Repository<MusicTrackMetadata>,
++
++    private readonly libraryService: LibraryService,
+     private readonly eventService: EventService,
+   ) {}
+ 
+@@ -54,23 +59,37 @@ export class MusicTrackService {
+     return musicTrack[0]
+   }
+ 
+-  /**
+-   * Returns all tracks according to the query.
+-   */
+   async query(getMusicTracksDto: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
+-    const { take, skip, order, sort, metadata, release, artists } = getMusicTracksDto
+-    return await this.musicTrackRepository.findAndCount({
++    const {
+       take,
+       skip,
+-      relations: {
+-        release: release ? { thumbnails: true } : false,
+-        artists: artists,
+-        metadata: metadata,
+-      },
+-      order: {
+-        [sort]: order,
+-      },
+-    })
++      order,
++      sort,
++      metadata,
++      release,
++      artists,
++      libraries,
++    } = getMusicTracksDto
++
++    const qb = this.musicTrackRepository.createQueryBuilder('musicTrack')
++
++    if (release) qb.leftJoinAndSelect('musicTrack.release', 'release')
++    if (release) qb.leftJoinAndSelect('release.thumbnails', 'thumbnails')
++    if (artists) qb.leftJoinAndSelect('musicTrack.artists', 'artists')
++    if (metadata) qb.leftJoinAndSelect('musicTrack.metadata', 'metadata')
++
++    // When filtering by library, join files
++    if (libraries && libraries.length) {
++      const libraryEntities = await this.libraryService.getLibraries(libraries)
++      qb.innerJoin('musicTrack.file', ...this.libraryService.createJoinArgs(libraryEntities))
++    }
++
++    qb
++      .orderBy(`musicTrack.${sort}`, order)
++      .take(take)
++      .skip(skip)
++
++    return await qb.getManyAndCount()
+   }
+ 
+   /**

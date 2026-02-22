@@ -1,9 +1,9 @@
 diff a/apps/music-web/src/pages/Tracks/Tracks.tsx b/apps/music-web/src/pages/Tracks/Tracks.tsx	(rejected hunks)
-@@ -19,6 +19,7 @@ function TracksPage() {
-       layout={PAGE_LAYOUT.virtual}
+@@ -20,6 +20,7 @@ function TracksPage() {
        pageTitle={i18n['music-tracks.title']['en']}
        restoreScrollPoint={false}
-+      capabilities={['MusicTracks.Read']}
+       capabilities={['MusicTracks.Read']}
++      showLibrarySwitcher={true}
        toolbar={(
          <Toolbar
            name={TOOLBAR_NAME}
