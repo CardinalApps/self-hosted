@@ -1,25 +1,97 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.tsx b/libraries/ui/src/components/interaction/Carousel/Carousel.tsx	(rejected hunks)
-@@ -14,6 +14,7 @@ type CarouselProps = {
+@@ -13,8 +13,10 @@ type CarouselProps = {
+   title?: string,
    prev?: boolean,
    next?: boolean,
++  gap?: string,
    initialSlide?: number,
-+  axis?: 'x' | 'y',
+   axis?: 'x' | 'y',
++  dragFree?: boolean,
    itemWidth?: string | number,
    itemsPerSlide?: number,
    items: React.ReactNode[],
-@@ -30,6 +31,7 @@ const Carousel = ({
+@@ -30,8 +32,10 @@ const Carousel = ({
+   title,
    prev,
    next,
++  gap = '0px',
    initialSlide = 1,
-+  axis = 'x',
+   axis = 'x',
++  dragFree = true,
    itemWidth = '100%',
    itemsPerSlide = 1,
    items = [],
-@@ -39,6 +41,7 @@ const Carousel = ({
+@@ -40,7 +44,7 @@ const Carousel = ({
+     loop: false,
      startIndex: initialSlide - 1,
      slidesToScroll: itemsPerSlide,
-     dragFree: true,
-+    axis,
+-    dragFree: true,
++    dragFree,
+     axis,
    }, [WheelGesturesPlugin({
      forceWheelAxis: 'x',
-   })])
+@@ -57,35 +61,38 @@ const Carousel = ({
+         height,
+         // @ts-expect-error this works
+         '--slide-size': itemWidth,
++        '--slide-spacing': gap,
+       }}
+     >
+-      <header className="carousel-header">
+-        {title && (
+-          <div className="carousel-title">
+-            {title}
+-          </div>
+-        )}
+-        <div className="carousel-controls">
+-          <div className="carousel-pagination">
+-            {prev && (
+-              <Button
+-                className="embla__prev"
+-                onClick={goToPrev}
+-                icon="fas fa-angle-left"
+-                circleIcon
+-              />
+-            )}
+-            {next && (
+-              <Button
+-                className="embla__next"
+-                onClick={goToNext}
+-                icon="fas fa-angle-right"
+-                circleIcon
+-              />
++      {(title || prev || next ) && (
++          <header className="carousel-header">
++            {title && (
++              <div className="carousel-title">
++                {title}
++              </div>
+             )}
+-          </div>
+-        </div>
+-      </header>
++            <div className="carousel-controls">
++              <div className="carousel-pagination">
++                {prev && (
++                  <Button
++                    className="embla__prev"
++                    onClick={goToPrev}
++                    icon="fas fa-angle-left"
++                    circleIcon
++                  />
++                )}
++                {next && (
++                  <Button
++                    className="embla__next"
++                    onClick={goToNext}
++                    icon="fas fa-angle-right"
++                    circleIcon
++                  />
++                )}
++              </div>
++            </div>
++          </header>
++      )}
+       <div
+         ref={emblaRef}
+         className="embla__viewport"

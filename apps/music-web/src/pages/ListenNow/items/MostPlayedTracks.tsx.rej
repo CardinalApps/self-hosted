@@ -1,0 +1,64 @@
+diff a/apps/music-web/src/pages/ListenNow/items/MostPlayedTracks.tsx b/apps/music-web/src/pages/ListenNow/items/MostPlayedTracks.tsx	(rejected hunks)
+@@ -7,6 +7,7 @@ import { MusicTrackType, useGetMusicTracksQuery } from '@cardinalapps/ui/src/sto
+ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+ import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
+ import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
++import chunk from '@cardinalapps/ui/src/lib/array/chunk'
+ 
+ import i18n from '../i18n.json'
+ 
+@@ -19,11 +20,12 @@ function MostPlayedTracks() {
+   } = useGetMusicTracksQuery({
+     sort: 'createdAt',
+     order: 'DESC',
+-    take: 40,
++    take: 24,
+     ...(libraries?.length ? { libraries } : {}),
+   })
+ 
+   const musicTracks = Array.isArray(data) ? data[0] : []
++  const grouped = chunk(musicTracks, 3)
+ 
+   return (
+     <Card
+@@ -34,19 +36,28 @@ function MostPlayedTracks() {
+       }
+     >
+       <Carousel
+-        axis='y'
+-        itemsPerSlide={3}
+-        items={musicTracks.map((musicTrack: MusicTrackType, i) => {
++        itemsPerSlide={1}
++        dragFree={false}
++        gap="10px"
++        items={grouped.map((groups, i) => {
+           return (
+-            <MusicTrack
+-              key={i}
+-              musicTrackId={musicTrack?.musicTrackId}
+-              trackTitle={musicTrack?.title}
+-              releaseId={musicTrack?.release?.id}
+-              releaseTitle={musicTrack?.release?.title}
+-              trackNumber={musicTrack.trackNumber}
+-              artistName={musicTrack?.artists?.[0]?.name}
+-            />
++            <div key={i}>
++              {
++                groups.map((musicTrack: MusicTrackType, i) => {
++                  return (
++                    <MusicTrack
++                      key={i}
++                      musicTrackId={musicTrack?.musicTrackId}
++                      trackTitle={musicTrack?.title}
++                      releaseId={musicTrack?.release?.id}
++                      releaseTitle={musicTrack?.release?.title}
++                      trackNumber={musicTrack.trackNumber}
++                      artistName={musicTrack?.artists?.[0]?.name}
++                    />
++                  )
++                })
++              }
++            </div>
+           )
+         })}
+       />

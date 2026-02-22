@@ -1,14 +1,20 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.css b/libraries/ui/src/components/interaction/Carousel/Carousel.css	(rejected hunks)
-@@ -9,9 +9,9 @@
+@@ -21,15 +21,18 @@
+ 
+   .embla__viewport {
+     overflow: hidden;
++    user-select: none;
    }
  
-   .carousel-title {
--    font-size: 20px;
--    font-weight: 700;
--    color: var(--text-color-3);
-+    font-size: 18px;
-+    font-weight: 600;
-+    color: var(--text-color-2);
+   .embla__container {
+     display: flex;
+     touch-action: pan-y pinch-zoom;
++    margin-left: calc(var(--slide-spacing) * -1);
    }
  
-   .carousel-pagination {
+   .embla__slide {
+     flex: 0 0 var(--slide-size);
+     min-width: 0;
++    padding-left: var(--slide-spacing);
+   }
+ }

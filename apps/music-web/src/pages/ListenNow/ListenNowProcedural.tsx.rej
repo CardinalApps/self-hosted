@@ -1,25 +1,10 @@
 diff a/apps/music-web/src/pages/ListenNow/ListenNowProcedural.tsx b/apps/music-web/src/pages/ListenNow/ListenNowProcedural.tsx	(rejected hunks)
-@@ -4,6 +4,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Procedural'
- import TrueShuffle from './items/TrueShuffle'
- import RecentlyAddedReleases from './items/RecentlyAddedReleases'
-+import MostPlayedTracks from './items/MostPlayedTracks'
- 
- import i18n from './i18n.json'
- 
-@@ -37,6 +38,15 @@ function ListenNowProcedural() {
-         <TrueShuffle />
+@@ -43,7 +43,7 @@ function ListenNowProcedural() {
+        * Most listened tracks.
+        */
+       }
+-      <ProceduralLayout.Block size='6x3'>
++      <ProceduralLayout.Block size='6x4'>
+         <MostPlayedTracks />
        </ProceduralLayout.Block>
  
-+      {
-+      /**
-+       * Most listened tracks.
-+       */
-+      }
-+      <ProceduralLayout.Block size='6x3'>
-+        <MostPlayedTracks />
-+      </ProceduralLayout.Block>
-+
-       {
-       /**
-        * Recently added releases carousel.
