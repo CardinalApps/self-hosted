@@ -1,12 +1,8 @@
 import { useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import clsx from 'clsx'
-import { useAppDispatch } from '../../../hooks/useAppDispatch'
 
 import Icon from '../../typography/Icon'
-import { randomHexColor } from '../../../lib/color/randomHexColor'
-import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
-import { useAppSelector } from '../../../hooks/useAppSelector'
 
 import { getAnimationSVG } from './icons'
 
