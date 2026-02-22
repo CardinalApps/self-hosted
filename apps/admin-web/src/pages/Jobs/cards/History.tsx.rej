@@ -1,10 +1,18 @@
 diff a/apps/admin-web/src/pages/Jobs/cards/History.tsx b/apps/admin-web/src/pages/Jobs/cards/History.tsx	(rejected hunks)
-@@ -132,7 +132,7 @@ function History() {
+@@ -39,14 +39,14 @@ function History() {
+   const {
+     data: activeJobsResponse,
+     refetch: refetchActiveJobs,
+-  } = useGetJobsQuery({ take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'asc' })
++  } = useGetJobsQuery({ take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'ASC' })
+   const [activeJobs] = activeJobsResponse || []
  
-   return (
-     <CardGrid.Card
--      size="xl"
-+      size="l"
-       className={'jobReports'}
-       header={<H5 className={'title'}>{i18n['job-reports.title'][lang]}</H5>}
-     >
+   const {
+     data: jobReportsResponse,
+     isLoading: jobReportsLoading,
+     refetch: refetchJobReports,
+-  } = useGetJobsQuery({ take, skip: 0, status: ['canceled', 'completed', 'errored'], order: 'desc' })
++  } = useGetJobsQuery({ take, skip: 0, status: ['canceled', 'completed', 'errored'], order: 'DESC' })
+   const [jobReports, totalJobReports] = jobReportsResponse || []
+ 
+   const [fetchJobTasks, fetchJobTasksResult] = useLazyGetJobTasksQuery()

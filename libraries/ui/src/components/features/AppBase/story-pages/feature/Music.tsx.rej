@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/story-pages/feature/Music.tsx b/libraries/ui/src/components/features/AppBase/story-pages/feature/Music.tsx	(rejected hunks)
-@@ -26,7 +26,7 @@ function MusicPage() {
-           return (
-             <MusicTrack
-               key={i}
--              musicTrackId={musicTrack?.id}
-+              musicTrackId={musicTrack?.musicTrackId}
-               trackTitle={musicTrack?.title}
-               releaseId={musicTrack?.release?.id}
-               releaseTitle={musicTrack?.release?.title}
+@@ -13,7 +13,7 @@ function MusicPage() {
+     isLoading: musicTracksLoading,
+     error: musicTracksError = {},
+     // refetch: refretchMusicTracks,
+-  } = useGetMusicTracksQuery({ take: 12, skip: 0, order: 'asc' })
++  } = useGetMusicTracksQuery({ take: 12, skip: 0, order: 'ASC' })
+   const [musicTracks = []] = musicTracksResponse || []
+ 
+   return (

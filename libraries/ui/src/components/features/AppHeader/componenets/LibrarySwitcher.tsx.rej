@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx b/libraries/ui/src/components/features/AppHeader/componenets/LibrarySwitcher.tsx	(rejected hunks)
-@@ -42,7 +42,7 @@ const LibrarySwitcher = () => {
-             selectPlaceholder={i18n['libraries.placeholder'][lang]}
-             options={libraryOptions()}
-             value={currentLibrary}
--            multi={false}
-+            multi={true}
-             size="s"
-             onChange={(val) => handleSwitchLibrary(val)}
-           />
+@@ -16,7 +16,7 @@ const LibrarySwitcher = () => {
+ 
+   const {
+     data: allLibrariesResponse,
+-  } = useGetLibrariesQuery({ take: 9999, skip: 0, order: 'asc' })
++  } = useGetLibrariesQuery({ take: 9999, skip: 0, order: 'ASC' })
+   const allLibraries = allLibrariesResponse
+ 
+   const libraryOptions = (): Record<string, string>[] => {

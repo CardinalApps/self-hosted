@@ -1,19 +1,10 @@
 diff a/apps/admin-web/src/pages/Jobs/cards/Active.tsx b/apps/admin-web/src/pages/Jobs/cards/Active.tsx	(rejected hunks)
-@@ -60,7 +60,7 @@ function ActiveJobs() {
+@@ -27,7 +27,7 @@ function ActiveJobs() {
+     data: activeJobsResponse,
+     isLoading: activeJobsLoading,
+     refetch: refetchActiveJobs,
+-  } = useGetJobsQuery({ take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'asc' })
++  } = useGetJobsQuery({ take: 9999, skip: 0, status: ['preparing', 'paused', 'running', 'in_queue'], order: 'ASC' })
+   const [activeJobs] = activeJobsResponse || []
  
-   return (
-     <CardGrid.Card
--      size="l"
-+      size="xl"
-       header={<H5 className={'title'}>{i18n['active-jobs.title'][lang]}</H5>}
-       footer={i18n['active-jobs.active-jobs-automatic-notice'][lang]}
-       className={'jobQueue'}
-@@ -76,7 +76,7 @@ function ActiveJobs() {
-             />
-           )
-         })
--        : i18n['active-jobs.no-active-jobs'][lang]
-+        : <p className="card-empty-text">{i18n['active-jobs.no-active-jobs'][lang]}</p>
-       }
-     </CardGrid.Card>
-   )
+   /**
