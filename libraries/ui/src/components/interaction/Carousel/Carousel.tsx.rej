@@ -1,57 +1,42 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.tsx b/libraries/ui/src/components/interaction/Carousel/Carousel.tsx	(rejected hunks)
-@@ -3,14 +3,18 @@ import useEmblaCarousel from 'embla-carousel-react'
+@@ -1,6 +1,7 @@
+-import type { PropsWithChildren } from 'react'
++import { type PropsWithChildren } from 'react'
+ import useEmblaCarousel from 'embla-carousel-react'
  import Button from '../Button'
++import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
  
  import './Carousel.css'
-+import clsx from 'clsx'
- 
- type CarouselProps = {
-+  className?: string,
-   width?: string | number,
-   height?: string | number,
-   title?: string,
-   prev?: boolean,
-   next?: boolean,
-   initialSlide?: number,
-+  itemWidth?: string | number,
-+  itemsPerSlide?: number,
-   items: React.ReactNode[],
+ import clsx from 'clsx'
+@@ -19,7 +20,7 @@ type CarouselProps = {
  }
  
-@@ -18,17 +22,22 @@ type CarouselProps = {
-  * Run of the mill pagination.
+ /**
+- * Run of the mill pagination.
++ * Carousel component.
   */
  const Carousel = ({
-+  className,
-   width = '100%',
-   height,
-   title,
-   prev,
-   next,
-   initialSlide = 1,
-+  itemWidth = '100%',
-+  itemsPerSlide = 1,
-   items = [],
- }: PropsWithChildren<CarouselProps>) => {
-   const [emblaRef, emblaApi] = useEmblaCarousel({
-     loop: false,
+   className,
+@@ -38,7 +39,9 @@ const Carousel = ({
      startIndex: initialSlide - 1,
-+    slidesToScroll: itemsPerSlide,
-+    dragFree: true,
-   })
+     slidesToScroll: itemsPerSlide,
+     dragFree: true,
+-  })
++  }, [WheelGesturesPlugin({
++    forceWheelAxis: 'y',
++  })])
  
    const goToPrev = () => emblaApi?.scrollPrev()
-@@ -36,10 +45,12 @@ const Carousel = ({
- 
-   return (
-     <div
--      className="carousel embla"
-+      className={clsx("carousel", "embla", className)}
-       style={{
-         width,
-         height,
-+        // @ts-expect-error this works
-+        '--slide-size': itemWidth,
-       }}
-     >
-       <header className="carousel-header">
+   const goToNext = () => emblaApi?.scrollNext()
+@@ -85,9 +88,9 @@ const Carousel = ({
+         className="embla__viewport"
+       >
+         <div className="embla__container">
+-          {items.map((item) => {
++          {items.map((item, i) => {
+             return (
+-              <div className="embla__slide">
++              <div className="embla__slide" key={i}>
+                 {item}
+               </div>
+             )

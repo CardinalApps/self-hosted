@@ -1,9 +1,9 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
-@@ -24,6 +24,7 @@
-     "@tanstack/react-virtual": "3.11.3",
+@@ -25,6 +25,7 @@
      "clsx": "^2.1.1",
      "date-fns": "2.30.0",
-+    "embla-carousel-react": "^8.6.0",
+     "embla-carousel-react": "^8.6.0",
++    "embla-carousel-wheel-gestures": "^8.1.0",
      "framer-motion": "12.23.22",
      "howler": "2.2.4",
      "leaflet": "1.9.3",
