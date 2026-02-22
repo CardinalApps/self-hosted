@@ -1,34 +1,63 @@
 diff a/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx b/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx	(rejected hunks)
-@@ -1,19 +1,30 @@
+@@ -1,8 +1,11 @@
  import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
  import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
-+import { useGetNewMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
+-import { useGetNewMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
++import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
  
++import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
++import { MusicReleaseType, useGetMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
  import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
++import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
  
  import i18n from '../i18n.json'
  
--function ActionButtons() {
-+function RecentlyAddedReleases() {
-   const { lang } = useAppSelector(settingsSelectors.current)
+@@ -11,18 +14,43 @@ function RecentlyAddedReleases() {
  
-+  const {
-+    data,
-+  } = useGetNewMusicReleasesQuery({})
-+
-+  const releases = data || []
-+
-+  console.log(releases)
-+
+   const {
+     data,
+-  } = useGetNewMusicReleasesQuery({})
++  } = useGetMusicReleasesQuery({
++    orderBy: 'createdAt',
++    order: 'DESC',
++    take: 40,
++  })
+ 
+-  const releases = data || []
+-
+-  console.log(releases)
++  const releases = Array.isArray(data) ? data[0] : []
+ 
    return (
      <Carousel
        title={i18n['recently-added-releases.title'][lang]}
-+      next={true}
-+      prev={true}
-       items={[]}
+       next={true}
+       prev={true}
+-      items={[]}
++      itemWidth={'240px'}
++      itemsPerSlide={2}
++      items={releases.map((musicRelease: MusicReleaseType) => {
++        return (
++          <MusicRelease
++            key={`item-${musicRelease?.musicReleaseId}`}
++            tracks={musicRelease?.tracks as MusicTrackType[] || []}
++            releaseId={musicRelease?.id}
++            releaseTitle={musicRelease?.title}
++            artistName={musicRelease?.artist?.name}
++            //releaseYear={musicRelease.year}
++            releaseLink={getAppUrl('release', {
++              params: {
++                ':id': musicRelease?.musicReleaseId?.toString() || '',
++              },
++            })}
++            artistLink={getAppUrl('artist', {
++              params: {
++                ':id': musicRelease?.artist?.musicArtistId?.toString() || '',
++              },
++            })}
++          />
++        )
++      })}
      />
    )
  }
- 
--export default ActionButtons
-+export default RecentlyAddedReleases

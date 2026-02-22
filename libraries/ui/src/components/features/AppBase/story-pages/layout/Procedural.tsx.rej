@@ -1,17 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/story-pages/layout/Procedural.tsx b/libraries/ui/src/components/features/AppBase/story-pages/layout/Procedural.tsx	(rejected hunks)
-@@ -15,11 +15,14 @@ function ProceduralPage() {
-     })
-   })
-   return (
--    <AppPage layout={PAGE_LAYOUT.procedural} pageTitle="Layout: procedural">
-+    <AppPage layout={PAGE_LAYOUT.procedural}>
-       <ProceduralLayout
-         name='sandbox'
-         className='procedural-layout-demo'
-       >
-+        <ProceduralLayout.Title>
-+          Layout: Procedural
-+        </ProceduralLayout.Title>
-         {example()}
-         <ProceduralLayout.Block size="8x4" style={{ backgroundColor: 'var(--bg-4)', padding: 20 }}>
-           8x4
+@@ -8,7 +8,7 @@ function ProceduralPage() {
+     return [1, 2, 3, 4, 5, 6].map((row) => {
+       const size = `${col}x${row}` as ProceduralBlockSize
+       return (
+-        <ProceduralLayout.Block size={size} style={{ backgroundColor: 'var(--bg-4)', padding: 20 }} key={size}>
++        <ProceduralLayout.Block size={size} style={{ backgroundColor: 'var(--bg-4)', padding: 20, borderRadius: 22 }} key={size}>
+           {size}
+         </ProceduralLayout.Block>
+       )

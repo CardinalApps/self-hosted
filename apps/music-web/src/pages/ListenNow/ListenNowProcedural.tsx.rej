@@ -1,22 +1,21 @@
 diff a/apps/music-web/src/pages/ListenNow/ListenNowProcedural.tsx b/apps/music-web/src/pages/ListenNow/ListenNowProcedural.tsx	(rejected hunks)
-@@ -3,6 +3,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- 
- import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Procedural'
- import TrueShuffle from './items/TrueShuffle'
-+import RecentlyAddedReleases from './items/RecentlyAddedReleases'
- 
- import i18n from './i18n.json'
- 
-@@ -24,6 +25,12 @@ function ListenNowProcedural() {
+@@ -22,14 +22,17 @@ function ListenNowProcedural() {
+       <ProceduralLayout.Title>
+         {i18n['title'][lang]}
+       </ProceduralLayout.Title>
++
        <ProceduralLayout.Block size='12x1'>
          <TrueShuffle />
        </ProceduralLayout.Block>
-+      <ProceduralLayout.Block size='12x3'>
-+        <RecentlyAddedReleases />
-+      </ProceduralLayout.Block>
-+      <ProceduralLayout.Block size='12x3'>
-+        <TrueShuffle />
-+      </ProceduralLayout.Block>
+-      <ProceduralLayout.Block size='12x3'>
++
++      <ProceduralLayout.Block size='12x4' flush>
+         <RecentlyAddedReleases />
+       </ProceduralLayout.Block>
++
+       <ProceduralLayout.Block size='12x3'>
+-        <TrueShuffle />
++        next block
+       </ProceduralLayout.Block>
      </ProceduralLayout>
    )
- }

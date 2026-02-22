@@ -1,103 +1,57 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.tsx b/libraries/ui/src/components/interaction/Carousel/Carousel.tsx	(rejected hunks)
-@@ -1,37 +1,88 @@
- import type { PropsWithChildren } from 'react'
- import useEmblaCarousel from 'embla-carousel-react'
-+import Button from '../Button'
+@@ -3,14 +3,18 @@ import useEmblaCarousel from 'embla-carousel-react'
+ import Button from '../Button'
  
  import './Carousel.css'
++import clsx from 'clsx'
  
  type CarouselProps = {
--  initialSlide: number,
-+  width?: string | number,
-+  height?: string | number,
-+  title?: string,
-+  prev?: boolean,
-+  next?: boolean,
-+  initialSlide?: number,
-+  items: React.ReactNode[],
++  className?: string,
+   width?: string | number,
+   height?: string | number,
+   title?: string,
+   prev?: boolean,
+   next?: boolean,
+   initialSlide?: number,
++  itemWidth?: string | number,
++  itemsPerSlide?: number,
+   items: React.ReactNode[],
  }
  
- /**
+@@ -18,17 +22,22 @@ type CarouselProps = {
   * Run of the mill pagination.
   */
  const Carousel = ({
--  initialSlide,
-+  width = '100%',
-+  height,
-+  title,
-+  prev,
-+  next,
-+  initialSlide = 1,
-+  items = [],
++  className,
+   width = '100%',
+   height,
+   title,
+   prev,
+   next,
+   initialSlide = 1,
++  itemWidth = '100%',
++  itemsPerSlide = 1,
+   items = [],
  }: PropsWithChildren<CarouselProps>) => {
--  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false })
--
--  console.log(initialSlide)
-+  const [emblaRef, emblaApi] = useEmblaCarousel({
-+    loop: false,
-+    startIndex: initialSlide - 1,
-+  })
+   const [emblaRef, emblaApi] = useEmblaCarousel({
+     loop: false,
+     startIndex: initialSlide - 1,
++    slidesToScroll: itemsPerSlide,
++    dragFree: true,
+   })
  
    const goToPrev = () => emblaApi?.scrollPrev()
-   const goToNext = () => emblaApi?.scrollNext()
+@@ -36,10 +45,12 @@ const Carousel = ({
  
    return (
--    <div className="embla">
--      <div className="embla__viewport" ref={emblaRef}>
-+    <div
-+      className="carousel embla"
-+      style={{
-+        width,
-+        height,
-+      }}
-+    >
-+      <header className="carousel-header">
-+        {title && (
-+          <div className="carousel-title">
-+            {title}
-+          </div>
-+        )}
-+        <div className="carousel-controls">
-+          <div className="carousel-pagination">
-+            {prev && (
-+              <Button
-+                className="embla__prev"
-+                onClick={goToPrev}
-+                icon="fas fa-angle-left"
-+                circleIcon
-+              />
-+            )}
-+            {next && (
-+              <Button
-+                className="embla__next"
-+                onClick={goToNext}
-+                icon="fas fa-angle-right"
-+                circleIcon
-+              />
-+            )}
-+          </div>
-+        </div>
-+      </header>
-+      <div
-+        ref={emblaRef}
-+        className="embla__viewport"
-+      >
-         <div className="embla__container">
--          <div className="embla__slide">Slide 1</div>
--          <div className="embla__slide">Slide 2</div>
--          <div className="embla__slide">Slide 3</div>
-+          {items.map((item) => {
-+            return (
-+              <div className="embla__slide">
-+                {item}
-+              </div>
-+            )
-+          })}
-         </div>
-       </div>
--
--      <button className="embla__prev" onClick={goToPrev}>Scroll to prev</button>
--      <button className="embla__next" onClick={goToNext}>Scroll to next</button>
-     </div>
-   )
- }
+     <div
+-      className="carousel embla"
++      className={clsx("carousel", "embla", className)}
+       style={{
+         width,
+         height,
++        // @ts-expect-error this works
++        '--slide-size': itemWidth,
+       }}
+     >
+       <header className="carousel-header">

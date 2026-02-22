@@ -70,19 +70,6 @@ export class MusicReleaseController {
   }
 
   /**
-   * Get the users music releases.
-   */
-  @Get('/music/releases/new')
-  @StandardEndpoint({
-    summary: 'Get new music releases.',
-    capabilities: ['MusicReleases.Read'],
-  })
-  // FIXME new dto
-  async getNewMusicReleases(@Query() query: GetMusicReleasesDto): Promise<[MusicRelease[], number]> {
-    return await this.musicReleaseService.query(query)
-  }
-
-  /**
    * Returns the blob data of a release cover. Supports numeric row ID and musicReleaseId col.
    */
   @Get('/music/releases/:id/cover')

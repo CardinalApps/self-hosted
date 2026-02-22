@@ -1,7 +1,7 @@
 diff a/apps/music-web/src/pages/ListenNow/styles.css b/apps/music-web/src/pages/ListenNow/styles.css	(rejected hunks)
-@@ -1,4 +1,4 @@
--.listenNow {
-+.listen-now {
+@@ -1,4 +1,5 @@
+ .listen-now {
    height: 100%;
    position: relative;
++  overflow-x: hidden;
  }

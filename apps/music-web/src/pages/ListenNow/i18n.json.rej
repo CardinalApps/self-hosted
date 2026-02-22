@@ -1,10 +1,9 @@
 diff a/apps/music-web/src/pages/ListenNow/i18n.json b/apps/music-web/src/pages/ListenNow/i18n.json	(rejected hunks)
-@@ -4,5 +4,8 @@
-   },
-   "action-buttons.true-shuffle": {
+@@ -6,6 +6,6 @@
      "en": "Shuffle Library"
-+  },
-+  "recently-added-releases.title": {
-+    "en": "Recently Added"
+   },
+   "recently-added-releases.title": {
+-    "en": "Recently Added"
++    "en": "Recently Added Releases"
    }
  }

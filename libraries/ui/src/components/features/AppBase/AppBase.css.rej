@@ -1,41 +1,56 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -402,9 +402,9 @@
- }
+@@ -598,7 +598,7 @@
+   --rowHeight: calc(70px + calc(var(--gap) * 2));
  
- .mini-queue {
--  padding-bottom: 10px;
-+  padding-bottom: 15px;
+   height: 100%;
+-  padding: 0 10px;
++  padding: 0 0 0 10px;
+   display: flex;
+   flex-wrap: wrap;
+   align-content: flex-start;
+@@ -611,8 +611,6 @@
+     .procedural-layout-block-inner {
+       height: 100%;
+       margin: 0 calc(var(--gap));
+-      border-radius: 22px;
+-      overflow: hidden;
+     }
  
--  .mini-queue-list {
-+  .playback-queue {
-     display: flex;
-     flex-direction: column;
-     gap: 5px;
-@@ -456,7 +456,6 @@
- 
-   .audio-player-list {
-     position: relative;
--    min-height: 146px;
-   }
- 
-   @media (max-width: 768px) {
-@@ -466,6 +465,10 @@
-     bottom: 15px;
-     z-index: 6000;
-     
-+    .mini-queue {
-+      display: none;
+     .procedural-layout-block-title {
+@@ -722,5 +720,36 @@
+       width: 66.6666%;
+       height: calc(6 * var(--rowHeight));
+     }
++
++    &.flush {
++
++      .procedural-layout-block-inner {
++        margin-right: 0;
++
++        .carousel {
++
++          .carousel-header {
++            padding-right: 15px;
++          }
++
++          .embla__viewport {
++            margin-left: -20px;
++            padding-left: 20px;
++            position: relative;
++            
++            &:before {
++              content: '';
++              width: 20px;
++              position: absolute;
++              left: 0;
++              top: 0;
++              bottom: 0;
++              background: linear-gradient(90deg, var(--bg-2) 20%, transparent 40%);
++              z-index: 2;
++            }
++          }
++        }
++      }
 +    }
-+    
-     .audio-player-pagination {
-       padding: 2px 5px 2px 2px;
-       border: 1px solid var(--border-color-1);
-@@ -484,7 +487,7 @@
- 
-       .audio-player-pagination {
-         width: 100%;
--        margin: 0;
-+        margin-left: 0;
-       }
- 
-       .audio-player-pagination-icons {
+   }
+ }

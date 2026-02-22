@@ -1,42 +1,16 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Procedural.tsx b/libraries/ui/src/components/features/AppBase/layouts/Procedural.tsx	(rejected hunks)
-@@ -1,9 +1,14 @@
--import { CSSProperties, PropsWithChildren } from 'react'
-+import { CSSProperties, PropsWithChildren, useEffect, useRef } from 'react'
- import clsx from 'clsx'
- 
-+import useScrolledToBottom from '../../../../hooks/useScrolledToBottom'
-+import H2 from '../../../typography/H2'
-+import useScrollPointRestoration from '../../../../hooks/useScrollPointRestoration'
-+
- export type ProceduralProps = {
-   name: string,
-   className?: string | string[],
-+  onLoadMore?: () => void
+@@ -69,12 +69,13 @@ export type ProceduralBlockSize =
+ export type ProceduralBlockProps = {
+   size: ProceduralBlockSize,
+   style?: CSSProperties,
++  flush?: boolean,
  }
  
- /**
-@@ -13,9 +18,23 @@ export type ProceduralProps = {
- function ProceduralLayout({
-   className,
-   children,
-+  onLoadMore,
- }: PropsWithChildren<ProceduralProps>) {
-+  useScrollPointRestoration('.procedural-layout')
-+  const layoutRef = useRef(null)
-+  const [atBottom] = useScrolledToBottom(layoutRef, 500)
-+
-+  useEffect(() => {
-+    if (atBottom) {
-+      onLoadMore?.()
-+    }
-+  }, [atBottom])
-+
+ ProceduralLayout.Block = (props: PropsWithChildren<ProceduralBlockProps>) => {
    return (
--    <div className={clsx('procedural-layout', className)}>
-+    <div
-+      ref={layoutRef}
-+      className={clsx('procedural-layout', className)}
-+    >
-       {children}
-     </div>
-   )
+     <div
+-      className="procedural-layout-block"
++      className={clsx("procedural-layout-block", props.flush && 'flush')}
+       data-size={props.size}
+     >
+       <div className="procedural-layout-block-inner" style={props.style}>

@@ -1,9 +1,9 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -129,7 +129,6 @@ function AppBase({
-     <AppHeader
-       app={app}
-       logoClickTo={routes.ROOT}
--      settingsClickTo={routes.SETTINGS}
-       onSwitchAccountClick={() => navigate(routes.LOGIN)}
-       appName={name}
-       loginButton={ssoButton}
+@@ -205,6 +205,7 @@ function AppBase({
+         type: 'danger',
+         title: i18n['health.network-error.title'][lang],
+         body: i18n['health.network-error.body'][lang].replace('{error}', latestHealthResponse?.response ? `<p>${latestHealthResponse?.response}</p>` : ''),
++        ttl: 5000,
+       }))
+     }
+   }, [health])
