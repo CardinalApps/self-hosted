@@ -27,7 +27,7 @@ type CloudUserSliceState = {
 }
 
 const initialState: CloudUserSliceState = {
-  loggedIn: false,
+  loggedIn: null,
   loading: false,
   fetchStatus: null,
   updateUserDefinedSettingsIsLoading: false,
