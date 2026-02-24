@@ -82,7 +82,7 @@ export const CloudRoles: Record<`${CloudRoleName}`, Role<CloudCapabilityAssignme
     assignable: true,
     revocable: true,
     maxUsers: null,
-    name: CloudRoleName.ADMINISTRATIOR,
+    name: CloudRoleName.USER,
     capabilities: [
       'CurrentUser.*',
       'CurrentUserSessions.*',
