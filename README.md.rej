@@ -1,86 +1,19 @@
 diff a/README.md b/README.md	(rejected hunks)
-@@ -9,7 +9,7 @@ See [Quick Start](/docs/quick-start.md) for instructions on how to run this code
- 
- ### Packages
- 
--After completing Quick Start, these apps will be running on these ports:
-+These are the packages in this monorepo.
- 
- | Package            | Directory    | Dev Port        | Description                                                                          |
- |--------------------|--------------|-----------------|--------------------------------------------------------------------------------------|
-@@ -30,30 +30,64 @@ After completing Quick Start, these apps will be running on these ports:
- 
- ## About This Repository
- 
--The purpose of this repository is to make the source code for Cardinal's
--self-hosted apps available to users for inspect.
-+The purpose of this repository is to publish the source code for Cardinal's
-+self-hosted applications for users to inspect, and for developers to
-+use when building their own applications that use Cardinal's APIs.
- 
--This is however not the repository where work actively happens. This repository
-+This is not the repository where work actively happens. This repository
- is a read-only clone of Cardinal's main (private) repository, but with only the
- self-hosted packages included.
+@@ -66,7 +66,7 @@ self-hosted packages included.
  
  <details>
-- <summary>About the commit history</summary>
-- The original commits from the main repo cannot be preserved because they contain references to files that don't exist in this clone. So, the Cardinal CI bot generates new commits with only the changes for the files in this repository.
-+  <summary>How do I use this repository as someone that wants to build an app that uses Cardinal's APIs?</summary>
-+  <p>If your app uses a <strong>self-hosted</strong> Cardinal API:</p>
-+  <ol>
-+    <li>First, read the <a href="https://help.cardinalapps.io/guides/developers">Developer Guide</a> on the the Help Site.</li>
-+    <li>Next, install the beta Media Server release from Docker Hub and develop your app against that API. You probably don't actually need to use this repository.</li>
-+    <li>While developing your app, you can use this repository if you want to develop against <code>latest</code> instead of beta. Just follow the Quick Start to get it running locally, then have your app connect to the development environment.</li>
-+  </ol>
-+  <p>If your app uses a Cardinal <strong>cloud service</strong> API:</p>
-+  <ol>
-+    <li>Third party apps are not allowed to use Cardinal's cloud. Sorry, nothing personal just not ready for it yet, but working on it.</li>
-+  </ol>
+   <summary>Can I use this to verify the integrity of the public builds?</summary>
+-  <p>Like the other CI things, this is out of scope of this page. But in short, the Media Server binary that you can build with this repository will exactly match the one that is shipped in the public Docker builds.</p>
++  <p>Like other CI things, this is out of scope of this page. But in short, the Media Server binary that you can build with this repository will exactly match the one that is shipped in the public Docker builds.</p>
+   <p>You can create stable and beta images as well, but the build timestamp in yours will not match the one in the official release.</p>
  </details>
  
+@@ -78,7 +78,7 @@ self-hosted packages included.
  <details>
-- <summary>How do I build the apps?</summary>
-- Official builds are distributed by Cardinal Apps Inc. and are available on <a href="https://hub.docker.com/r/cardinalapps/media-server">Docker Hub</a>. Building these images is a multi-stage process that is handled by Cardinal's CI. All of the build scripts are available in this repository, but the orchestration is not.
-+  <summary>About the commit history</summary>
-+  <p>The original commits from the main repository are not preserved when code is copied to this repository because they contain references to files that don't exist in this repository. So, the Cardinal CI bot will create new commits that contain changes for only the files that are published to the self-hosted repository.</p>
-+  <p>Unfortuntely, this process results in losing the original commit messages. The commits in this repository are also less granular, containing everything from the last merge to main upstream in a single commit.</p>
- </details>
- 
- <details>
-- <summary>Contributing</summary>
-- We are not currently taking code contributions from the general public. You may still create an issue to report a bug or make a feature request. You can also join <a href="https://discord.gg/WWXngggPp4">Docker Hub</a> to share your opinion.
-+  <summary>How do I build the apps?</summary>
-+  <p>The official builds that are on <a href="https://hub.docker.com/r/cardinalapps/media-server">Docker Hub</a> are built and published by Cardinal's CI. You can build and use local Docker images using this repository, but doing so is out of scope of this page and there is no orchestration available for it beyond running the pnpm commands yourself one by one.</p>
-+  <p>Running self-built containers is not offically supported, and the upstream repository may change at any time in ways that break self-build setups.</p>
-+</details>
-+
-+<details>
-+  <summary>Can I use this to verify the integrity of the public builds?</summary>
-+  <p>Like the other CI things, this is out of scope of this page. But in short, the Media Server binary that you can build with this repository will exactly match the one that is shipped in the public Docker builds.</p>
-+  <p>You can create stable and beta images as well, but the build timestamp in yours will not match the one in the official release.</p>
-+</details>
-+
-+<details>
-+  <summary>Was this made with AI?</summary>
-+  <p>No. This is, for better or for worse, all written by a human. Vive la révolution!</p>
-+</details>
-+
-+<details>
-+  <summary>Contributing</summary>
-+  <ul>
-+    <li><strong>Feature Suggestions:</strong> Create an issue here on GitHub or create a post on the forums.</li>
-+    <li><strong>Bug Reports:</strong> Create an issue here on GitHub or create a post on the forums.</li>
-+    <li><strong>Code Contributions:</strong> The project is still young and code contributions from the general public are closed for the time being. If you particularly like this project and feel like you would be a valuable code contributor then come say hello in the forums anyway.</li>
-+  </ul>
- </details>
- 
- ## License
- 
--[CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
-+[Elastic License 2.0 (ELv2)](/LICENSE)
-+
-+See also: faircode.io
- 
--Copyright Cardinal Apps Inc. 2021 - 2025, all rights reserved.
-+Copyright Cardinal Apps Inc. 2023 - 2025, all rights reserved.
+   <summary>Contributing</summary>
+   <ul>
+-    <li><strong>Feature Suggestions:</strong> Create an issue here on GitHub or create a post on the forums.</li>
++    <li><strong>Suggestions:</strong> Create an issue here on GitHub or create a post on the forums.</li>
+     <li><strong>Bug Reports:</strong> Create an issue here on GitHub or create a post on the forums.</li>
+     <li><strong>Code Contributions:</strong> The project is still young and code contributions from the general public are closed for the time being. If you particularly like this project and feel like you would be a valuable code contributor then come say hello in the forums anyway.</li>
+   </ul>
