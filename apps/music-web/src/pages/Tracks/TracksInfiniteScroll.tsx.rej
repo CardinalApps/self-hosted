@@ -1,25 +1,9 @@
 diff a/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx b/apps/music-web/src/pages/Tracks/TracksInfiniteScroll.tsx	(rejected hunks)
-@@ -10,6 +10,7 @@ import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
- import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
- import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
- import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
-+import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
- 
- const ITEM_WIDTH = '100%'
- const ITEM_HEIGHT = 61
-@@ -23,6 +24,7 @@ function TracksInfiniteScroll({
-   virtualViewName,
-   toolbarName,
- }: TracksInfiniteScrollProps) {
-+  const libraries = useAppSelector(librarySelectors.current)
-   const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
-   const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
-   const [initialRow] = useState(virtualViewValues?.start || 1)
-@@ -46,6 +48,7 @@ function TracksInfiniteScroll({
-     {
-       sort: toolbarValues?.sort as TracksSortParams,
-       order: toolbarValues?.order as CommonOrderParams,
-+      ...(libraries?.length ? { libraries } : {}),
-     },
-     { initialPageParam },
-   )
+@@ -72,6 +72,7 @@ function TracksInfiniteScroll({
+       itemHeight={ITEM_HEIGHT}
+       itemWidth={ITEM_WIDTH}
+       data={data}
++      gap={5}
+       getItem={getItem}
+       isSuccess={isSuccess}
+       isLoading={isLoading}

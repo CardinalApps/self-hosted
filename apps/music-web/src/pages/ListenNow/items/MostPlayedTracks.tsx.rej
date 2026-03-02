@@ -1,64 +1,77 @@
 diff a/apps/music-web/src/pages/ListenNow/items/MostPlayedTracks.tsx b/apps/music-web/src/pages/ListenNow/items/MostPlayedTracks.tsx	(rejected hunks)
-@@ -7,6 +7,7 @@ import { MusicTrackType, useGetMusicTracksQuery } from '@cardinalapps/ui/src/sto
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
- import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
- import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
-+import chunk from '@cardinalapps/ui/src/lib/array/chunk'
+@@ -1,3 +1,4 @@
++import React from 'react'
+ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+ import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
+ import Card from '@cardinalapps/ui/src/components/layout/Card'
+@@ -10,28 +11,41 @@ import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+ import chunk from '@cardinalapps/ui/src/lib/array/chunk'
  
  import i18n from '../i18n.json'
++import { useState } from 'react'
  
-@@ -19,11 +20,12 @@ function MostPlayedTracks() {
+ function MostPlayedTracks() {
++  const [pagination, setPagination] = useState<React.ReactNode>()
++  const [prevBtn, setPrevBtn] = useState<React.ReactNode>()
++  const [nextBtn, setNextBtn] = useState<React.ReactNode>()
+   const { lang } = useAppSelector(settingsSelectors.current)
+   const libraries = useAppSelector(librarySelectors.current)
+ 
+   const {
+     data,
    } = useGetMusicTracksQuery({
-     sort: 'createdAt',
+-    sort: 'createdAt',
++    sort: 'playCount',
      order: 'DESC',
--    take: 40,
-+    take: 24,
+-    take: 24,
++    take: 40,
      ...(libraries?.length ? { libraries } : {}),
    })
  
    const musicTracks = Array.isArray(data) ? data[0] : []
-+  const grouped = chunk(musicTracks, 3)
+-  const grouped = chunk(musicTracks, 3)
++  const grouped = chunk(musicTracks, 4)
++
++  console.log(musicTracks)
  
    return (
      <Card
-@@ -34,19 +36,28 @@ function MostPlayedTracks() {
+       header={
+         <>
+           <H5>{i18n['most-played-tracks.title'][lang]}</H5>
++          {!!pagination && pagination}
++        </>
++      }
++      headerRight={
++        <>
++          {!!prevBtn && prevBtn}
++          {!!nextBtn && nextBtn}
+         </>
        }
      >
-       <Carousel
--        axis='y'
--        itemsPerSlide={3}
--        items={musicTracks.map((musicTrack: MusicTrackType, i) => {
-+        itemsPerSlide={1}
-+        dragFree={false}
-+        gap="10px"
-+        items={grouped.map((groups, i) => {
+@@ -39,6 +53,12 @@ function MostPlayedTracks() {
+         itemsPerSlide={1}
+         dragFree={false}
+         gap="10px"
++        maxPages={grouped.length}
++        onChange={(state) => {
++          setPagination(state.pagination())
++          setPrevBtn(state.prevBtn())
++          setNextBtn(state.nextBtn())
++        }}
+         items={grouped.map((groups, i) => {
            return (
--            <MusicTrack
--              key={i}
--              musicTrackId={musicTrack?.musicTrackId}
--              trackTitle={musicTrack?.title}
--              releaseId={musicTrack?.release?.id}
--              releaseTitle={musicTrack?.release?.title}
--              trackNumber={musicTrack.trackNumber}
--              artistName={musicTrack?.artists?.[0]?.name}
--            />
-+            <div key={i}>
-+              {
-+                groups.map((musicTrack: MusicTrackType, i) => {
-+                  return (
-+                    <MusicTrack
-+                      key={i}
-+                      musicTrackId={musicTrack?.musicTrackId}
-+                      trackTitle={musicTrack?.title}
-+                      releaseId={musicTrack?.release?.id}
-+                      releaseTitle={musicTrack?.release?.title}
-+                      trackNumber={musicTrack.trackNumber}
-+                      artistName={musicTrack?.artists?.[0]?.name}
-+                    />
-+                  )
-+                })
-+              }
-+            </div>
-           )
-         })}
-       />
+             <div key={i}>
+@@ -47,11 +67,11 @@ function MostPlayedTracks() {
+                   return (
+                     <MusicTrack
+                       key={i}
++                      plays={musicTrack.playCount}
+                       musicTrackId={musicTrack?.musicTrackId}
+                       trackTitle={musicTrack?.title}
+                       releaseId={musicTrack?.release?.id}
+                       releaseTitle={musicTrack?.release?.title}
+-                      trackNumber={musicTrack.trackNumber}
+                       artistName={musicTrack?.artists?.[0]?.name}
+                     />
+                   )

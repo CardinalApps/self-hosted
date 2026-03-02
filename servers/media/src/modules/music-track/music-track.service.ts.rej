@@ -1,75 +1,44 @@
 diff a/servers/media/src/modules/music-track/music-track.service.ts b/servers/media/src/modules/music-track/music-track.service.ts	(rejected hunks)
-@@ -9,16 +9,21 @@ import { File } from '../indexing/entities/file.entity'
- import { EventService } from '../event/event.service'
+@@ -10,6 +10,7 @@ import { EventService } from '../event/event.service'
  
  import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
-+import { LibraryService } from '../library/library.service'
+ import { LibraryService } from '../library/library.service'
++import { MusicHistory } from '../music-history/music-history.entity'
  
  @Injectable()
  export class MusicTrackService {
-   constructor(
-     @InjectDataSource()
-     private dataSource: DataSource,
-+
-     @InjectRepository(MusicTrack)
-     private musicTrackRepository: Repository<MusicTrack>,
-+
-     @InjectRepository(MusicTrackMetadata)
-     private musicTrackMetadataRepository: Repository<MusicTrackMetadata>,
-+
-+    private readonly libraryService: LibraryService,
-     private readonly eventService: EventService,
-   ) {}
+@@ -84,12 +85,33 @@ export class MusicTrackService {
+       qb.innerJoin('musicTrack.file', ...this.libraryService.createJoinArgs(libraryEntities))
+     }
  
-@@ -54,23 +59,37 @@ export class MusicTrackService {
-     return musicTrack[0]
-   }
++    // Calculate play count
++    qb.addSelect((subQuery) =>
++      subQuery
++        .select('COUNT(history.id)', 'count')
++        .from(MusicHistory, 'history')
++        .where('history.trackId = musicTrack.id'),
++      'musicTrack_playCount')
++
+     qb
+       .orderBy(`musicTrack.${sort}`, order)
+       .take(take)
+       .skip(skip)
  
--  /**
--   * Returns all tracks according to the query.
--   */
-   async query(getMusicTracksDto: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
--    const { take, skip, order, sort, metadata, release, artists } = getMusicTracksDto
--    return await this.musicTrackRepository.findAndCount({
-+    const {
-       take,
-       skip,
--      relations: {
--        release: release ? { thumbnails: true } : false,
--        artists: artists,
--        metadata: metadata,
--      },
--      order: {
--        [sort]: order,
--      },
--    })
-+      order,
-+      sort,
-+      metadata,
-+      release,
-+      artists,
-+      libraries,
-+    } = getMusicTracksDto
-+
-+    const qb = this.musicTrackRepository.createQueryBuilder('musicTrack')
-+
-+    if (release) qb.leftJoinAndSelect('musicTrack.release', 'release')
-+    if (release) qb.leftJoinAndSelect('release.thumbnails', 'thumbnails')
-+    if (artists) qb.leftJoinAndSelect('musicTrack.artists', 'artists')
-+    if (metadata) qb.leftJoinAndSelect('musicTrack.metadata', 'metadata')
-+
-+    // When filtering by library, join files
-+    if (libraries && libraries.length) {
-+      const libraryEntities = await this.libraryService.getLibraries(libraries)
-+      qb.innerJoin('musicTrack.file', ...this.libraryService.createJoinArgs(libraryEntities))
+-    return await qb.getManyAndCount()
++    if (sort === 'playCount') {
++      qb.orderBy('musicTrack_playCount', order)
 +    }
 +
-+    qb
-+      .orderBy(`musicTrack.${sort}`, order)
-+      .take(take)
-+      .skip(skip)
++    // playCount requires manual mapping
++    const withRaw = await qb.getRawAndEntities()
++    const result = withRaw.entities.map((track, index) => {
++      return {
++        ...track,
++        playCount: parseInt(withRaw.raw[index]?.musicTrack_playCount, 10) || 0,
++      }
++    })
 +
-+    return await qb.getManyAndCount()
++    return [result, withRaw.entities.length]
    }
  
    /**

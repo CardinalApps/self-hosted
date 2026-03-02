@@ -1,48 +1,9 @@
 diff a/libraries/ui/src/store/apis/musicTracks.ts b/libraries/ui/src/store/apis/musicTracks.ts	(rejected hunks)
-@@ -40,6 +40,7 @@ export const musicTracksApi = baseHomeServerApi
-           order?: CommonOrderParams,
-           release?: boolean,
-           metadata?: boolean
-+          libraries?: string[],
-         },
-         PaginationParams
-       >({
-@@ -53,7 +54,7 @@ export const musicTracksApi = baseHomeServerApi
-           getPreviousPageParam,
-         },
-         query({ queryArg, pageParam }) {
--          const { release, metadata, sort, order } = queryArg
-+          const { release, metadata, sort, order, libraries } = queryArg
-           const { take, skip } = pageParam
-           return queryParams('/music/tracks', {
-             ...(typeof skip !== 'undefined' && { skip }),
-@@ -62,6 +63,7 @@ export const musicTracksApi = baseHomeServerApi
-             ...(order && { order }),
-             ...(release && { release }),
-             ...(metadata && { metadata }),
-+            ...(libraries && { libraries }),
-           })
-         },
-       }),
-@@ -75,10 +77,11 @@ export const musicTracksApi = baseHomeServerApi
-           sort?: TracksSortParams,
-           order?: CommonOrderParams,
-           release?: boolean,
--          metadata?: boolean
-+          metadata?: boolean,
-+          libraries?: string[],
-         }
-       >({
--        query: ({ take, skip, release, metadata, sort, order }) => {
-+        query: ({ take, skip, release, metadata, sort, order, libraries }) => {
-           return queryParams('/music/tracks', {
-             ...(typeof skip !== 'undefined' && { skip }),
-             ...(take && { take }),
-@@ -86,6 +89,7 @@ export const musicTracksApi = baseHomeServerApi
-             ...(order && { order }),
-             ...(release && { release }),
-             ...(metadata && { metadata }),
-+            ...(libraries && { libraries }),
-           })
-         },
-       }),
+@@ -10,6 +10,7 @@ export type MusicTrackType = {
+   title: string,
+   trackNumber: number,
+   discNumber: number,
++  playCount: number,
+   release: {
+     title: string,
+     musicReleaseId: string,

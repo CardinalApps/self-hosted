@@ -1,97 +1,135 @@
 diff a/libraries/ui/src/components/interaction/Carousel/Carousel.tsx b/libraries/ui/src/components/interaction/Carousel/Carousel.tsx	(rejected hunks)
-@@ -13,8 +13,10 @@ type CarouselProps = {
+@@ -1,4 +1,4 @@
+-import { type PropsWithChildren } from 'react'
++import { useEffect, type PropsWithChildren } from 'react'
+ import useEmblaCarousel from 'embla-carousel-react'
+ import Button from '../Button'
+ import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
+@@ -6,6 +6,12 @@ import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
+ import './Carousel.css'
+ import clsx from 'clsx'
+ 
++type CarouselState = {
++  pagination: () => React.ReactNode,
++  prevBtn: () => React.ReactNode,
++  nextBtn: () => React.ReactNode,
++}
++
+ type CarouselProps = {
+   className?: string,
+   width?: string | number,
+@@ -13,6 +19,7 @@ type CarouselProps = {
    title?: string,
    prev?: boolean,
    next?: boolean,
-+  gap?: string,
++  maxPages?: number,
+   gap?: string,
    initialSlide?: number,
    axis?: 'x' | 'y',
-+  dragFree?: boolean,
+@@ -20,6 +27,7 @@ type CarouselProps = {
    itemWidth?: string | number,
    itemsPerSlide?: number,
    items: React.ReactNode[],
-@@ -30,8 +32,10 @@ const Carousel = ({
++  onChange?: (state: CarouselState) => void,
+ }
+ 
+ /**
+@@ -32,6 +40,7 @@ const Carousel = ({
    title,
    prev,
    next,
-+  gap = '0px',
++  maxPages,
+   gap = '0px',
    initialSlide = 1,
    axis = 'x',
-+  dragFree = true,
+@@ -39,6 +48,7 @@ const Carousel = ({
    itemWidth = '100%',
    itemsPerSlide = 1,
    items = [],
-@@ -40,7 +44,7 @@ const Carousel = ({
++  onChange = () => {},
+ }: PropsWithChildren<CarouselProps>) => {
+   const [emblaRef, emblaApi] = useEmblaCarousel({
      loop: false,
-     startIndex: initialSlide - 1,
-     slidesToScroll: itemsPerSlide,
--    dragFree: true,
-+    dragFree,
-     axis,
-   }, [WheelGesturesPlugin({
+@@ -50,8 +60,48 @@ const Carousel = ({
      forceWheelAxis: 'x',
-@@ -57,35 +61,38 @@ const Carousel = ({
+   })])
+ 
+-  const goToPrev = () => emblaApi?.scrollPrev()
+-  const goToNext = () => emblaApi?.scrollNext()
++  const goToPrev = () => {
++    emblaApi?.scrollPrev()
++  }
++  const goToNext = () => {
++    emblaApi?.scrollNext()
++  }
++
++  const prevBtn = () => (
++    <Button
++      className="embla__prev"
++      onClick={goToPrev}
++      icon="fas fa-angle-left"
++      circleIcon
++    />
++  )
++
++  const nextBtn = () => (
++    <Button
++      className="embla__next"
++      onClick={goToNext}
++      icon="fas fa-angle-right"
++      circleIcon
++    />
++  )
++
++  const pagination = () => (
++    <div className="carousel-pagination">{emblaApi?.selectedScrollSnap() + 1} / {maxPages}</div>
++  )
++
++  useEffect(() => {
++    const update: CarouselState = {
++      pagination,
++      prevBtn,
++      nextBtn,
++    }
++    if (emblaApi) {
++      emblaApi.on('select', () => {
++        onChange(update)
++      })
++    }
++    onChange?.(update)
++  }, [emblaApi, maxPages])
+ 
+   return (
+     <div
+@@ -59,7 +109,7 @@ const Carousel = ({
+       style={{
+         width,
          height,
-         // @ts-expect-error this works
+-        // @ts-expect-error this works
++        // @ts-expect-error this actually works
          '--slide-size': itemWidth,
-+        '--slide-spacing': gap,
+         '--slide-spacing': gap,
        }}
-     >
--      <header className="carousel-header">
--        {title && (
--          <div className="carousel-title">
--            {title}
--          </div>
--        )}
--        <div className="carousel-controls">
--          <div className="carousel-pagination">
--            {prev && (
--              <Button
--                className="embla__prev"
--                onClick={goToPrev}
--                icon="fas fa-angle-left"
--                circleIcon
--              />
--            )}
--            {next && (
--              <Button
--                className="embla__next"
--                onClick={goToNext}
--                icon="fas fa-angle-right"
--                circleIcon
--              />
-+      {(title || prev || next ) && (
-+          <header className="carousel-header">
-+            {title && (
-+              <div className="carousel-title">
-+                {title}
-+              </div>
-             )}
--          </div>
--        </div>
--      </header>
-+            <div className="carousel-controls">
-+              <div className="carousel-pagination">
-+                {prev && (
-+                  <Button
-+                    className="embla__prev"
-+                    onClick={goToPrev}
-+                    icon="fas fa-angle-left"
-+                    circleIcon
-+                  />
-+                )}
-+                {next && (
-+                  <Button
-+                    className="embla__next"
-+                    onClick={goToNext}
-+                    icon="fas fa-angle-right"
-+                    circleIcon
-+                  />
-+                )}
-+              </div>
-+            </div>
-+          </header>
-+      )}
-       <div
-         ref={emblaRef}
-         className="embla__viewport"
+@@ -74,20 +124,10 @@ const Carousel = ({
+             <div className="carousel-controls">
+               <div className="carousel-pagination">
+                 {prev && (
+-                  <Button
+-                    className="embla__prev"
+-                    onClick={goToPrev}
+-                    icon="fas fa-angle-left"
+-                    circleIcon
+-                  />
++                  prevBtn()
+                 )}
+                 {next && (
+-                  <Button
+-                    className="embla__next"
+-                    onClick={goToNext}
+-                    icon="fas fa-angle-right"
+-                    circleIcon
+-                  />
++                  nextBtn()
+                 )}
+               </div>
+             </div>

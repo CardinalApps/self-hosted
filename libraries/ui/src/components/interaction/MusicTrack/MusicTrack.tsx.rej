@@ -1,32 +1,56 @@
 diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.tsx	(rejected hunks)
-@@ -25,6 +25,7 @@ type MusicTrackProps = {
-   duration?: string,
-   plays?: number,
-   hasArtwork?: boolean,
-+  canFav?: boolean,
- }
+@@ -4,15 +4,18 @@ import { useSelector } from 'react-redux'
+ import Icon from '../../typography/Icon'
+ import MusicPlaybackButton from '../MusicPlaybackButton'
  
- const MusicTrack = ({
-@@ -39,6 +40,7 @@ const MusicTrack = ({
-   duration,
-   plays,
-   hasArtwork = true,
-+  canFav = true,
+-//import { settingsSelectors } from '../../../store/slices/settings'
++import { settingsSelectors } from '../../../store/slices/settings'
+ import { audioSelectors } from '../../../store/slices/music'
+ import playMusic from '../../../store/slices/music/thunks/play'
+ import { RouterContext } from '../../../context/router'
+-
+-import './MusicTrack.css'
+ import { useReleaseCover } from '../../../hooks/useReleaseCover'
+ import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ 
++import i18n from './i18n'
++
++import './MusicTrack.css'
++import { pluralize } from '../../../lib/formatting/text'
++
+ type MusicTrackProps = {
+   musicTrackId?: string,
+   trackNumber?: number,
+@@ -44,7 +47,7 @@ const MusicTrack = ({
  }: PropsWithChildren<MusicTrackProps>) => {
    const dispatch = useAppDispatch()
    const { Link } = useContext(RouterContext)
-@@ -91,9 +93,11 @@ const MusicTrack = ({
+-  //const { lang } = useSelector(settingsSelectors.current)
++  const { lang } = useSelector(settingsSelectors.current)
+   const playing = useSelector(audioSelectors.playing)
+   const artwork = useReleaseCover(hasArtwork ? releaseId : null)
+ 
+@@ -82,6 +85,7 @@ const MusicTrack = ({
+             }
+             {!!artistName &&
+               <p className="music-release-artist">
++                <span className="sep">—</span>
+                 {Link && artistLink
+                   ? <Link to={artistLink}>{artistName}</Link>
+                   : artistName
+@@ -92,7 +96,14 @@ const MusicTrack = ({
+         }
        </div>
        {!!duration && <p className="col music-track-duration">{duration}</p>}
-       {!!plays && <p className="col music-track-plays"><span>{plays}</span></p>}
--      <div className="col music-track-favorite">
--        <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />
--      </div>
-+      {!!canFav &&
-+        <div className="col music-track-favorite">
-+          <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />
-+        </div>
-+      }
-       {!!artwork &&
-         <div className="col music-track-artwork">
-           <img src={artwork} />
+-      {!!plays && <p className="col music-track-plays"><span>{plays}</span></p>}
++      {typeof plays !== 'undefined' && (
++        <p
++          className="col music-track-plays"
++          title={pluralize(plays, i18n['playcount.title.singular'][lang], i18n['playcount.title.plural'][lang]).replace('{num}', plays)}
++        >
++          <span>{plays}</span>
++        </p>
++      )}
+       {!!canFav &&
+         <div className="col music-track-favorite">
+           <Icon fa="fas fa-star" hoverType="icon" onClick={() => console.log('fav')} />

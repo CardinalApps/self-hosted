@@ -1,30 +1,122 @@
 diff a/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.css b/libraries/ui/src/components/interaction/MusicTrack/MusicTrack.css	(rejected hunks)
-@@ -48,6 +48,7 @@
+@@ -1,6 +1,7 @@
+ .music-track {
+   width: 100%;
+-  margin-bottom: 6px;
++  max-height: 55px;
++  margin-bottom: 10px;
+   padding: 0 10px;
+   display: flex;
+   border-radius: var(--border-radius);
+@@ -11,7 +12,7 @@
+   }
+ 
+   .col {
+-    padding: 10px 8px;
++    padding: 8px 8px;
+     display: flex;
+     align-items: center;
+     justify-content: flex-start;
+@@ -20,23 +21,25 @@
+   }
+ 
+   .music-track-info {
+-    display: block;
+     min-width: 0;
++    padding-bottom: 6px;
++    justify-content: space-between;
++    flex-direction: column;
++    align-items: flex-start;
+     flex-grow: 1;
+ 
+     .music-track-title {
+-      margin-bottom: 2px;
+-      justify-content: flex-start;
+-      overflow: hidden;
++      width: 100%;
++      display: block;
+       text-overflow: ellipsis;
+       white-space: nowrap;
++      overflow: hidden;
+     }
+ 
+     .music-release {
+       width: auto;
+-      display: flex;
+-      flex-wrap: nowrap;
+-      align-items: center;
++      display: grid;
++      grid-template-columns: auto minmax(10px, 1fr);
+       font-weight: 400;
+       font-size: 13px;
+ 
+@@ -47,23 +50,21 @@
+         }
        }
  
++      .sep {
++        margin: 0 7px 0 0;
++        color: var(--text-color-4);
++        position: relative;
++        top: 1px;
++      }
++
        .music-release-title {
-+        padding-right: 5px;
+-        padding-right: 5px;
++        padding-right: 7px;
          overflow: hidden;
          text-overflow: ellipsis;
          white-space: nowrap;
-@@ -61,7 +62,6 @@
+-
+-        &:after {
+-          content: '—';
+-          margin: 0 0 0 5px;
+-          position: relative;
+-          top: 1px;
+-        }
        }
  
        .music-release-artist {
--        padding-left: 5px;
-         display: flex;
-         flex-shrink: 0;
+-        display: flex;
+-        flex-shrink: 0;
          overflow: hidden;
-@@ -71,6 +71,12 @@
-     }
-   }
+         text-overflow: ellipsis;
+         white-space: nowrap;
+@@ -79,6 +80,7 @@
  
-+  .music-track-number {
-+    min-width: 37px;
-+    text-align: center;
-+    justify-content: center;
-+  }
-+
    .music-track-play-pause {
      width: 52px;
++    flex-shrink: 0;
      justify-content: center;
+   }
+ 
+@@ -87,11 +89,16 @@
+   }
+ 
+   .music-track-plays {
+-    font-size: 14px;
+ 
+     span {
+-      padding: 4px 6px;
+-      border-radius: 8px;
++      padding: 0 4px;
++      min-width: 20px;
++      height: 20px;
++      display: flex;
++      align-items: center;
++      justify-content: center;
++      font-size: 12px;
++      border-radius: 5px;
+       text-align: center;
+       background-color: var(--bg-5);
+     }
+@@ -119,9 +126,5 @@
+       box-shadow: var(--box-shadow-1);
+       border-radius: 3px;
+     }
+-
+-    @media (max-width: 768px) {
+-      padding: 2px;
+-    }
+   }
+ }

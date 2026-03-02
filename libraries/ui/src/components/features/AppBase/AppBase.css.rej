@@ -1,19 +1,10 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -744,12 +744,16 @@
-               left: 0;
-               top: 0;
-               bottom: 0;
--              background: linear-gradient(90deg, var(--bg-2) 20%, transparent 40%);
-+              background: linear-gradient(90deg, var(--bg-2) 0%, transparent 20%);
-               z-index: 2;
-             }
-           }
-         }
-       }
-     }
-+
-+    .card {
-+      height: 100%;
-+    }
-   }
- }
+@@ -595,7 +595,7 @@
+ .procedural-layout {
+   --numCols: 12;
+   --gap: 10px;
+-  --rowHeight: calc(70px + calc(var(--gap) * 2));
++  --rowHeight: calc(80px + calc(var(--gap) * 2));
+ 
+   height: 100%;
+   padding: 0 0 0 10px;

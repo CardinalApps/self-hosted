@@ -1,13 +1,10 @@
 diff a/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx b/apps/music-web/src/pages/ListenNow/items/RecentlyAddedReleases.tsx	(rejected hunks)
-@@ -5,10 +5,10 @@ import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelea
- import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
- import { MusicReleaseType, useGetMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
- import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
-+import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
- import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
- 
- import i18n from '../i18n.json'
--import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
- 
- function RecentlyAddedReleases() {
-   const { lang } = useAppSelector(settingsSelectors.current)
+@@ -30,7 +30,7 @@ function RecentlyAddedReleases() {
+       title={i18n['recently-added-releases.title'][lang]}
+       next={true}
+       prev={true}
+-      itemWidth={'240px'}
++      itemWidth={'220px'}
+       itemsPerSlide={2}
+       items={releases.map((musicRelease: MusicReleaseType) => {
+         return (
