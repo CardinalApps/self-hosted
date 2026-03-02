@@ -1,20 +1,10 @@
 diff a/README.md b/README.md	(rejected hunks)
-@@ -78,8 +78,8 @@ self-hosted packages included.
- <details>
+@@ -79,7 +79,7 @@ self-hosted packages included.
    <summary>Contributing</summary>
    <ul>
--    <li><strong>Suggestions:</strong> Create an issue here on GitHub or create a post on the forums.</li>
--    <li><strong>Bug Reports:</strong> Create an issue here on GitHub or create a post on the forums.</li>
-+    <li><strong>Suggestions:</strong> Create a GitHub issue or create a post on the forums.</li>
-+    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums.</li>
+     <li><strong>Suggestions:</strong> Create a GitHub issue or create a post on the forums.</li>
+-    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums.</li>
++    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the [Contact page](https://cardinalapps.io/contact).</li>
      <li><strong>Code Contributions:</strong> The project is still young and code contributions from the general public are closed for the time being. If you particularly like this project and feel like you would be a valuable code contributor then come say hello in the forums anyway.</li>
    </ul>
  </details>
-@@ -88,6 +88,6 @@ self-hosted packages included.
- 
- [Elastic License 2.0 (ELv2)](/LICENSE)
- 
--See also: faircode.io
-+See also: [faircode.io](https://faircode.io)
- 
- Copyright Cardinal Apps Inc. 2023 - 2025, all rights reserved.
