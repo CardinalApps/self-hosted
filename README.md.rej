@@ -1,10 +1,18 @@
 diff a/README.md b/README.md	(rejected hunks)
-@@ -79,7 +79,7 @@ self-hosted packages included.
-   <summary>Contributing</summary>
-   <ul>
-     <li><strong>Suggestions:</strong> Create a GitHub issue or create a post on the forums.</li>
--    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the [Contact page](https://cardinalapps.io/contact).</li>
-+    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the <a href="https://cardinalapps.io/contact">Contact page</a>.</li>
-     <li><strong>Code Contributions:</strong> The project is still young and code contributions from the general public are closed for the time being. If you particularly like this project and feel like you would be a valuable code contributor then come say hello in the forums anyway.</li>
-   </ul>
+@@ -40,16 +40,11 @@ self-hosted packages included.
+ 
+ <details>
+   <summary>How do I use this repository as someone that wants to build an app that uses Cardinal's APIs?</summary>
+-  <p>If your app uses a <strong>self-hosted</strong> Cardinal API:</p>
+   <ol>
+     <li>First, read the <a href="https://help.cardinalapps.io/guides/developers">Developer Guide</a> on the the Help Site.</li>
+     <li>Next, install the beta Media Server release from Docker Hub and develop your app against that API. You probably don't actually need to use this repository.</li>
+     <li>While developing your app, you can use this repository if you want to develop against <code>latest</code> instead of beta. Just follow the Quick Start to get it running locally, then have your app connect to the development environment.</li>
+   </ol>
+-  <p>If your app uses a Cardinal <strong>cloud service</strong> API:</p>
+-  <ol>
+-    <li>Third party apps are not allowed to use Cardinal's cloud. Sorry, nothing personal just not ready for it yet, but working on it.</li>
+-  </ol>
  </details>
+ 
+ <details>
