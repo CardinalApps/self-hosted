@@ -3,8 +3,8 @@ diff a/README.md b/README.md	(rejected hunks)
    <summary>Contributing</summary>
    <ul>
      <li><strong>Suggestions:</strong> Create a GitHub issue or create a post on the forums.</li>
--    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums.</li>
-+    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the [Contact page](https://cardinalapps.io/contact).</li>
+-    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the [Contact page](https://cardinalapps.io/contact).</li>
++    <li><strong>Bug Reports:</strong> Create a GitHub issue or create a post on the forums. For a serious vulnerability, please disclose responsibly using the email on the <a href="https://cardinalapps.io/contact">Contact page</a>.</li>
      <li><strong>Code Contributions:</strong> The project is still young and code contributions from the general public are closed for the time being. If you particularly like this project and feel like you would be a valuable code contributor then come say hello in the forums anyway.</li>
    </ul>
  </details>
