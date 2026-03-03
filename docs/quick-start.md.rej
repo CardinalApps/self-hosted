@@ -1,52 +1,9 @@
 diff a/docs/quick-start.md b/docs/quick-start.md	(rejected hunks)
-@@ -1,36 +1,30 @@
- # Quick Start
- 
--This workspace is built with pnpm and Turborepo.
-+This monorepo is built with pnpm and Turborepo.
- 
--## 1. Environment
-+## 1. Set up your computer
- 
--Your machine will need:
-+Before beginning, your machine will need:
- 
--1. Node.js >=18.17.0
-+1. Node.js >= 18.17.0
- 2. Docker
-+3. pnpm
-+    1. Install it by running `npm i -g pnpm@10` after installing Node.js
- 
--## 2. Install packages
-+## 2. Install the monorepo dependencies
- 
-   ```bash
--  # Install pnpm on your machine
--  $ npm i -g pnpm@10
-+  # In the monorepo root
-+  pnpm i
- 
--  # Install all dependencies in the monorepo root
--  $ pnpm i
--
--  # Start the development databases
--  $ cd /compose/databases
--  $ docker compose up -d
-+  # Then start the development databases
-+  cd /compose/databases
-+  docker compose up -d
+@@ -28,3 +28,7 @@ Before beginning, your machine will need:
+   # Back in the monorepo root, start all apps in development mode
+   pnpm dev
    ```
- 
- ## 3. Run the development apps
- 
-   ```bash
--  # Back in the monorepo root, start all apps
--  $ pnpm dev
--
--  # You can also use this command if you want to start
--  # everything, but without the media server (so that
--  # you can start it in VS Code instead)
--  $ pnpm dev:woms
-+  # Back in the monorepo root, start all apps in development mode
-+  pnpm dev
-   ```
++
++  Some apps may require environment variables. Those apps will have a
++  `.env.template` file that you can copy, and the app runtime should tell you
++  which variables are missing.
