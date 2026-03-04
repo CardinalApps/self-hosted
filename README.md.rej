@@ -1,62 +1,27 @@
 diff a/README.md b/README.md	(rejected hunks)
-@@ -22,15 +22,14 @@ These are the packages in this monorepo.
- |--------------------|--------------|-----------------|--------------------------------------------------------------------------------------|
- | `admin-web`        | `/apps`      | `3090`          | [Cardinal Media Server Admin](https://cardinalapps.io/cardinal-media-server) web app |
- | `cinema-web`       | `/apps`      | `3096`          | [Cardinal Cinema](https://cardinalapps.io/cardinal-cinema) web app                   |
--| `help-web`         | `/apps`      | `3074`          | [Cardinal Help app](https://help.cardinalapps.io) web app                            |
- | `music-web`        | `/apps`      | `3094`          | [Cardinal Music](https://cardinalapps.io/cardinal-music) web app                     |
- | `photos-web`       | `/apps`      | `3092`          | [Cardinal Photos](https://cardinalapps.io/cardinal-photos) web app                   |
- | `eslint`           | `/config`    | -               | ESLint configurations                                                                |
- | `typescript`       | `/config`    | -               | TypeScript configurations                                                            |
- | `access-control`   | `/libraries` | -               | Access Control (RBAC) core                                                           |
- | `app-settings`     | `/libraries` | -               | App settings and utils                                                               |
--| `products`         | `/libraries` | -               | Information about Cardinal's products                                                |
--| `topology`         | `/libraries` | -               | Infrastructure topology information for networking                                   |
-+| `products`         | `/libraries` | -               | Data about Cardinal's products                                                       |
-+| `topology`         | `/libraries` | -               | Infrastructure topology                                                              |
- | `types`            | `/libraries` | -               | Not used                                                                             |
- | `ui`               | `/libraries` | `3099`          | React UI & component library with Storybook                                          |
- | `media`            | `/servers`   | `3080`, `24800` | Monolithic [Media Server](https://cardinalapps.io/cardinal-media-server)             |
-@@ -49,7 +48,7 @@ self-hosted packages included.
-   <summary>How do I use this repository as someone that wants to build an app that uses Cardinal's APIs?</summary>
-   <ol>
-     <li>First, read the <a href="https://help.cardinalapps.io/guides/developers">Developer Guide</a> on the the Help Site.</li>
--    <li>Next, install the **beta** Media Server from Docker Hub and develop your app against that API. You probably don't actually need to use this repository.</li>
-+    <li>Next, install the <strong>beta</strong> Media Server from Docker Hub and develop your app against that API. You probably don't actually need to use this repository.</li>
-     <li>While developing your app, you can use this repository if you want to develop against <code>latest</code> instead of beta. Just follow the Quick Start to get it running locally, then have your app connect to the development environment.</li>
-   </ol>
- </details>
-@@ -57,20 +56,20 @@ self-hosted packages included.
- <details>
-   <summary>About the commit history</summary>
-   <p>The original commits from the main repository are not preserved when code is copied to this repository because they contain references to files that don't exist in this repository. So, the Cardinal CI bot will create new commits that contain changes for only the files that are published to the self-hosted repository.</p>
--  <p>Unfortuntely, this process results in losing the original commit messages. The commits in this repository are also less granular, with each commit each containing everything from the last merge to main upstream.</p>
--  <p>I recognize the issues that this will create for contributors. I've included a copy of the CI job that publishes this code at <code>publish-oss.yaml</code> in case anyone wants to improve on it.</p>
-+  <p>Unfortuntely, I am but a mere git mortal so this process results in losing the original commit messages. The commits in this repository are also less granular, with each commit each containing everything from the last merge to main upstream.</p>
-+  <p>I recognize the issues that this will create for prospective contributors. I've included a copy of the CI job that publishes this code at <code>publish-oss.yaml</code> in case anyone wants to improve on it.</p>
- </details>
- 
+@@ -63,14 +63,14 @@ self-hosted packages included.
  <details>
    <summary>How do I build the apps?</summary>
--  <p>The official builds that are on <a href="https://hub.docker.com/r/cardinalapps/media-server">Docker Hub</a> are built and published by Cardinal's CI. While you can definitely build and use Docker images using this repository, doing so is out of scope of this page and there is no orchestration available for it beyond running the pnpm commands yourself one by one.</p>
-+  <p>The official builds that are on <a href="https://hub.docker.com/r/cardinalapps/media-server">Docker Hub</a> are built and published by Cardinal's CI. While you can definitely build and use Docker images using this repository, doing so is out of scope of this repository and there is no orchestration available for it beyond running the pnpm commands yourself one by one.</p>
-   <p>Running self-built containers is not offically supported, and the upstream repository may change at any time in ways that break self-build setups.</p>
+   <p>The official builds that are on <a href="https://hub.docker.com/r/cardinalapps/media-server">Docker Hub</a> are built and published by Cardinal's CI. While you can definitely build and use Docker images using this repository, doing so is out of scope of this repository and there is no orchestration available for it beyond running the pnpm commands yourself one by one.</p>
+-  <p>Running self-built containers is not offically supported, and the upstream repository may change at any time in ways that break self-build setups.</p>
++  <p>Running self-built containers is not offically supported, and this repository may change at any time in ways that break self-build setups.</p>
  </details>
  
  <details>
    <summary>Can I use this to verify the integrity of the public builds?</summary>
    <p>Sort of? The Media Server binary that you can build with this repository will exactly match the one that is shipped in the public Docker builds.</p>
--  <p>But, like other CI things, this is out of scope of this page.</p>
-+  <p>But, like other CI things, this is out of scope of this repository.</p>
-   <p>I am open to ideas on how to go about doing this sort of thing.</p>
+   <p>But, like other CI things, this is out of scope of this repository.</p>
+-  <p>I am open to ideas on how to go about doing this sort of thing.</p>
++  <p>I am open to ideas on how to do this sort of thing.</p>
  </details>
  
-@@ -84,7 +83,7 @@ self-hosted packages included.
+ <details>
+@@ -83,7 +83,7 @@ self-hosted packages included.
    <ul>
      <li><strong>Suggestions:</strong> Create a post on the forums or create a GitHub issue.</li>
      <li><strong>Bug Reports:</strong> Create a post on the forums or create a GitHub issue. For a serious vulnerability, please disclose responsibly using the email on the <a href="https://cardinalapps.io/contact">Contact page</a>.</li>
--    <li><strong>Code Contributions:</strong> If your code contribution is tiny then you can open a PR here for review if you are ok with me merging it upstream instead of directly into this repo (and you get credit on the website and in app). If you particularly like this project and want to contribute more then come say hello in the forums.</li>
-+    <li><strong>Code Contributions:</strong> If your code contribution is tiny then you can open a PR here for review if you are ok with me merging it upstream instead of directly into this repo (you will get credit on the website and in app). If you particularly like this project and want to contribute more then come say hello in the forums.</li>
+-    <li><strong>Code Contributions:</strong> If your code contribution is tiny then you can open a PR here for review if you are ok with me merging it upstream instead of directly into this repo (you will get credit on the website and in app). If you particularly like this project and want to contribute more then come say hello in the forums.</li>
++    <li><strong>Code Contributions:</strong> If your code contribution is small then you can open a PR here for review if you are ok with me merging it upstream instead of merging into this repo (you will still get credit in app and in this README). If you particularly like this project and want to contribute more then come say hello in the forums.</li>
    </ul>
  </details>
  
