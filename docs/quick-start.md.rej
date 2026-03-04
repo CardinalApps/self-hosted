@@ -1,9 +1,10 @@
 diff a/docs/quick-start.md b/docs/quick-start.md	(rejected hunks)
-@@ -28,3 +28,7 @@ Before beginning, your machine will need:
-   # Back in the monorepo root, start all apps in development mode
-   pnpm dev
+@@ -18,7 +18,7 @@ Before beginning, your machine will need:
+   pnpm i
+ 
+   # Then start the development databases
+-  cd /compose/databases
++  cd compose/databases/
+   docker compose up -d
    ```
-+
-+  Some apps may require environment variables. Those apps will have a
-+  `.env.template` file that you can copy, and the app runtime should tell you
-+  which variables are missing.
+ 
