@@ -1,11 +1,10 @@
 diff a/servers/media/src/modules/job/job-queue.service.ts b/servers/media/src/modules/job/job-queue.service.ts	(rejected hunks)
-@@ -45,7 +45,8 @@ export class JobQueueService implements QueueService {
-    * When Nest starts up.
-    */
-   async onModuleInit(): Promise<void> {
--    setTimeout(() => this.resumeRunningJobs(), ms('3 seconds'))
-+    // Disabling this until it can be configured by the user
-+    //setTimeout(() => this.resumeRunningJobs(), ms('3 seconds'))
-   }
+@@ -1,7 +1,7 @@
+ import { ModuleRef } from '@nestjs/core'
+ import { Injectable, Logger } from '@nestjs/common'
+ import * as Queue from 'better-queue'
+-import * as ms from 'ms'
++//import * as ms from 'ms'
  
-   /**
+ import { Job } from './job.entity'
+ 
