@@ -1,19 +1,11 @@
 diff a/servers/media/src/modules/job/job-queue.service.ts b/servers/media/src/modules/job/job-queue.service.ts	(rejected hunks)
-@@ -77,7 +77,7 @@ export class JobQueueService implements QueueService {
-     const [jobsInRunningState, numJobsInRunningState] = await this.jobService.getJobs({
-       status: [JobStatus.RUNNING],
-       getJobsDto: {
--        order: 'asc',
-+        order: 'ASC',
-       },
-     })
+@@ -45,7 +45,8 @@ export class JobQueueService implements QueueService {
+    * When Nest starts up.
+    */
+   async onModuleInit(): Promise<void> {
+-    setTimeout(() => this.resumeRunningJobs(), ms('3 seconds'))
++    // Disabling this until it can be configured by the user
++    //setTimeout(() => this.resumeRunningJobs(), ms('3 seconds'))
+   }
  
-@@ -97,7 +97,7 @@ export class JobQueueService implements QueueService {
-     const [queuedJobsInDatabase] = await this.jobService.getJobs({
-       status: [JobStatus.IN_QUEUE],
-       getJobsDto: {
--        order: 'asc',
-+        order: 'ASC',
-       },
-     })
- 
+   /**
