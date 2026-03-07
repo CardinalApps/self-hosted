@@ -1,31 +1,28 @@
 diff a/libraries/ui/src/Welcome.mdx b/libraries/ui/src/Welcome.mdx	(rejected hunks)
-@@ -20,7 +20,7 @@ Storybook is configured with Redux to enable all app features.
+@@ -26,19 +26,21 @@ All React components fall into one of five categories:
  
- ## Types of Components
- 
--All React components fall into one of four categories:
-+All React components fall into one of five categories:
- 
- ### Feature Components
- 
-@@ -28,6 +28,11 @@ Feature components implement complex features and are designed to plug-and-play
+ Feature components implement complex features and are designed to plug-and-play
  with all Cardinal apps. They combine multiple other components, RTK slices, RTK
- APIs, handle logic and state, and perform network requests.
+-APIs, handle logic and state, and perform network requests.
++APIs, handle logic and state, and perform network requests. This Storybook app
++is registed as an app in the Cardinal App Registry (in dev env only), so you can
++log into it and and the servers will accept authenticated requests from it.
  
-+### Form Components
-+
-+Form components are used as fields in forms. They can also be wrapped in the
-+`<form>` component.
-+
+ ### Form Components
+ 
+ Form components are used as fields in forms. They can also be wrapped in the
+-`<form>` component.
++`<Form>` component.
+ 
  ### Interaction Components
  
  Interaction components are for the parts of the UI that the user interacts with.
-@@ -37,7 +42,7 @@ components.
+-These components are designed to harmonize the feel of the apps. They are not
+-are as multifaceted as Feature components, but also not as basic as Layout
+-components.
++These components are designed to harmonize the feel of the apps and they
++implement most of the UX. They are not are as multifaceted as Feature
++components, but also not as basic as Layout components.
  
  ### Layout Components
  
--Layout components exist solely for presentational purposes, and are used to
-+Layout components exist solely for page purposes, and are used to
- scaffold the interface. They don't handle events or logic.
- 
- ### Typography Components

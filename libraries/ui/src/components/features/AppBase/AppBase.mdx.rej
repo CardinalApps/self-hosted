@@ -1,0 +1,24 @@
+diff a/libraries/ui/src/components/features/AppBase/AppBase.mdx b/libraries/ui/src/components/features/AppBase/AppBase.mdx	(rejected hunks)
+@@ -67,8 +67,8 @@ Time Setup that are available here.
+ 
+ The private part of the component tree is available only to users that bear a
+ valid auth token for a Media Server user. Authenticated users only have access to
+-the private pages, not the public pages too. As such, if you want a page to be
+-available publicly and privately, it must be added to both parts of the tree,
++the private pages, not the public pages too. So, if you want a page to be
++available publicly and privately, it must be added to both parts of the tree
+ like the Login page is.
+ 
+ #### `<AppScaffold />`
+@@ -78,9 +78,6 @@ is responsible for rendering the layout on the page. The different layouts are
+ documented within the Vanilla App story after logging in (only works in local
+ dev environment).
+ 
+-#### `<Page />`
+-
+-Used by the client app to define pages within the app. Allows for changing the
+-app layout on the fly with the `layout` prop.
+-
++#### `<AppPage />`
+ 
++Used by the client app to create pages within the app.

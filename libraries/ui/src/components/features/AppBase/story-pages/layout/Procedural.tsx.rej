@@ -1,10 +1,22 @@
 diff a/libraries/ui/src/components/features/AppBase/story-pages/layout/Procedural.tsx b/libraries/ui/src/components/features/AppBase/story-pages/layout/Procedural.tsx	(rejected hunks)
-@@ -8,7 +8,7 @@ function ProceduralPage() {
-     return [1, 2, 3, 4, 5, 6].map((row) => {
-       const size = `${col}x${row}` as ProceduralBlockSize
+@@ -10,6 +10,7 @@ function ProceduralPage() {
        return (
--        <ProceduralLayout.Block size={size} style={{ backgroundColor: 'var(--bg-4)', padding: 20 }} key={size}>
-+        <ProceduralLayout.Block size={size} style={{ backgroundColor: 'var(--bg-4)', padding: 20, borderRadius: 22 }} key={size}>
+         <ProceduralLayout.Block size={size} style={{ backgroundColor: 'var(--bg-4)', padding: 20, borderRadius: 22 }} key={size}>
            {size}
++          {size === '12x1' && <p>The procedural layout is used to create a ridgid non-virtualized infinite scroll.</p>}
          </ProceduralLayout.Block>
        )
+     })
+@@ -24,10 +25,10 @@ function ProceduralPage() {
+           Layout: Procedural
+         </ProceduralLayout.Title>
+         {example()}
+-        <ProceduralLayout.Block size="8x4" style={{ backgroundColor: 'var(--bg-4)', padding: 20 }}>
++        <ProceduralLayout.Block size="8x4" style={{ backgroundColor: 'var(--bg-4)', padding: 20, borderRadius: 22 }}>
+           8x4
+         </ProceduralLayout.Block>
+-        <ProceduralLayout.Block size="4x4" style={{ backgroundColor: 'var(--bg-4)', padding: 20 }}>
++        <ProceduralLayout.Block size="4x4" style={{ backgroundColor: 'var(--bg-4)', padding: 20, borderRadius: 22 }}>
+           4x4
+         </ProceduralLayout.Block>
+       </ProceduralLayout>
