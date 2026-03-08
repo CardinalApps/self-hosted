@@ -1,31 +1,11 @@
 diff a/servers/media/src/modules/user/user.entity.ts b/servers/media/src/modules/user/user.entity.ts	(rejected hunks)
-@@ -3,7 +3,10 @@ import {
-   Column,
-   OneToMany,
-   JoinColumn,
-+  BeforeInsert,
-+  BeforeUpdate,
- } from 'typeorm'
-+import * as bcrypt from 'bcrypt'
- 
- import { SubscriptionTierSlug } from '@cardinalapps/products/dist/cjs/subscriptions'
- 
-@@ -63,4 +66,18 @@ export class User extends BaseEntity {
-   @OneToMany(() => RoleAssignment, (assignment) => assignment.user, { onDelete: 'CASCADE' })
-   @JoinColumn()
-   roles: RoleAssignment[]
-+
-+  @Column({ nullable: true })
-+  username?: string
-+
-+  @Column({ nullable: true, select: false })
-+  password?: string
-+
-+  @BeforeInsert()
-+  @BeforeUpdate()
-+  async hashPassword(): Promise<void> {
-+    if (this.password) {
-+      this.password = await bcrypt.hash(this.password, 10)
-+    }
-+  }
- }
+@@ -76,7 +76,8 @@ export class User extends BaseEntity {
+   @BeforeInsert()
+   @BeforeUpdate()
+   async hashPassword(): Promise<void> {
+-    if (this.password) {
++    // Allow empty string
++    if (typeof this.password === 'string') {
+       this.password = await bcrypt.hash(this.password, 10)
+     }
+   }

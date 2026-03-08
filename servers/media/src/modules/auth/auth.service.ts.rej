@@ -1,54 +1,28 @@
 diff a/servers/media/src/modules/auth/auth.service.ts b/servers/media/src/modules/auth/auth.service.ts	(rejected hunks)
-@@ -9,6 +9,8 @@ import { CardinalApp } from '../../utils/apps'
- 
- type LoginOptions = {
-   localUserId?: string,
-+  localUsername?: string,
-+  localPassword?: string,
-   ssoJWT?: string,
-   app: CardinalApp,
- }
-@@ -30,22 +32,36 @@ export class AuthService {
+@@ -28,6 +28,8 @@ export class AuthService {
+    * 
+    * This currently only supports Cardinal cloud accounts and a single shared
+    * Guest Account.
++   * 
++   * Note: Logging in with an empty string password is supported.
+    */
    async login(options: LoginOptions): Promise<LoginResponse> {
      const {
-       localUserId,
-+      localUsername,
-+      localPassword,
-       ssoJWT,
+@@ -38,7 +40,7 @@ export class AuthService {
        app,
      } = options
  
--    if (!localUserId && !ssoJWT) {
--      throw new Error('Either a local user ID or a SSO token is required to log in')
--    }
--
--    // Logging in with only a local user ID
--    if (localUserId && !ssoJWT) {
--      return await this.localAuthStrategy.login(localUserId, app)
-+    if (!localUserId && !ssoJWT && (!localUsername && !localPassword)) {
-+      throw new Error('One of the following login methods is required: SSO token, local username and password, or the Guest Account ID')
+-    if (!localUserId && !ssoJWT && (!localUsername && !localPassword)) {
++    if (!localUserId && !ssoJWT && !localUsername) {
+       throw new Error('One of the following login methods is required: SSO token, local username and password, or the Guest Account ID')
      }
  
-     // Logging in with a cloud account
-     if (ssoJWT) {
-       return await this.cardinalSSOStrategy.login(localUserId, ssoJWT, app)
+@@ -48,7 +50,7 @@ export class AuthService {
      }
-+
-+    // Logging in with a local username and password
-+    if (localUsername && localPassword) {
-+      return await this.localAuthStrategy.login({
-+        app,
-+        localUsername,
-+        localPassword,
-+      })
-+    }
-+
-+    // Logging in with only a local user ID
-+    if (localUserId) {
-+      return await this.localAuthStrategy.login({
-+        app,
-+        localUserId,
-+      })
-+    }
-   }
- }
+ 
+     // Logging in with a local username and password
+-    if (localUsername && localPassword) {
++    if (localUsername) {
+       return await this.localAuthStrategy.login({
+         app,
+         localUsername,

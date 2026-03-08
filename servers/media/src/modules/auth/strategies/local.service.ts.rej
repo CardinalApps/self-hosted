@@ -1,24 +1,10 @@
 diff a/servers/media/src/modules/auth/strategies/local.service.ts b/servers/media/src/modules/auth/strategies/local.service.ts	(rejected hunks)
-@@ -86,21 +86,7 @@ export class LocalAuthStrategy {
+@@ -33,7 +33,7 @@ export class LocalAuthStrategy {
+       return await this.loginWithUserId(app, localUserId)
+     }
  
-     this.throwIfFailedLoginRBAC(user, app)
- 
--
--
--
--    const localUserId = null
--
--
--
--
--
--
--    if (user.cardinalId) {
--      throw new Error('Cannot log into a cloud account without a SSO JWT')
--    }
--
--    const JWT = await this.tokenService.createJWT(localUserId)
-+    const JWT = await this.tokenService.createJWT(user.userId)
- 
-     Logger.log(`Local user ${user.userId} logged in`, 'Auth')
- 
+-    if (localUsername && localPassword) {
++    if (localUsername) {
+       return await this.loginWithUsernameAndPassword(app, localUsername, localPassword)
+     }
+   }

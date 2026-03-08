@@ -1,36 +1,10 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -1,6 +1,7 @@
- import { Injectable, Logger } from '@nestjs/common'
- import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
- import { DataSource, IsNull, Not, Repository } from 'typeorm'
-+import * as bcrypt from 'bcrypt'
- import * as ms from 'ms'
- 
- import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
-@@ -79,13 +80,16 @@ export class UserService {
-     await queryRunner.startTransaction()
- 
-     try {
--      const createdUser = await queryRunner.manager.save(User, {
-+      const newUserInstance = this.userRepository.create({
-         userId: uuid(),
-         cardinalId: cardinalCloudUser ? cardinalCloudUser.userId : null,
-         cachedCloudUser: cardinalCloudUser ? cardinalCloudUser : null,
+@@ -87,7 +87,7 @@ export class UserService {
          cachedCloudUserAt: cardinalCloudUser ? new Date() : null,
          designation: secure?.designation || null,
-+        username: dto.username || null,
-+        ...(dto.password ? { password: dto.password } : {}),
+         username: dto.username || null,
+-        ...(dto.password ? { password: dto.password } : {}),
++        password: dto.password,
        })
-+      const createdUser = await queryRunner.manager.save(newUserInstance)
+       const createdUser = await queryRunner.manager.save(newUserInstance)
  
-       const roleAssignments = dto?.role
-         ? await this.rbacService.assignRole(dto.role, [createdUser], queryRunner)
-@@ -383,7 +387,7 @@ export class UserService {
-       .where('user.username = :username', { username })
-       .getOne()
- 
--    return !!user
-+    return await bcrypt.compare(password, user.password)
-   }
- 
-   /**
