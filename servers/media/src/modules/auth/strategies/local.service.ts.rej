@@ -1,89 +1,24 @@
 diff a/servers/media/src/modules/auth/strategies/local.service.ts b/servers/media/src/modules/auth/strategies/local.service.ts	(rejected hunks)
-@@ -14,10 +14,6 @@ import { APP_LOGIN_CAPABILITY } from '../types'
- /**
-  * Log into a local account. A local acocunt is one whose identity provider is
-  * this server, not the Cardinal cloud.
-- * 
-- * At this time, the only supported local account is the Guest Account, and it
-- * does not use any authentication. So, all the user needs to log into the Guest
-- * Account is its ID.
-  */
- @Injectable()
- export class LocalAuthStrategy {
-@@ -26,7 +22,26 @@ export class LocalAuthStrategy {
-     private readonly tokenService: TokenService,
-   ) {}
- 
--  async login(localUserId: string, app: CardinalApp): Promise<LoginResponse> {
-+  async login(args: { localUserId?: string, app: CardinalApp, localUsername?: string, localPassword?: string }): Promise<LoginResponse> {
-+    const {
-+      localUserId,
-+      app,
-+      localUsername,
-+      localPassword,
-+    } = args
-+    if (localUserId) {
-+      return await this.loginWithUserId(app, localUserId)
-+    }
-+
-+    if (localUsername && localPassword) {
-+      return await this.loginWithUsernameAndPassword(app, localUsername, localPassword)
-+    }
-+  }
-+
-+  /**
-+   * If a local user ID is given, it must be the guest account.
-+   */
-+  async loginWithUserId(app: CardinalApp, localUserId: string): Promise<LoginResponse> {
-     const user = await this.userService.getUserByLocalId(localUserId)
+@@ -86,21 +86,7 @@ export class LocalAuthStrategy {
  
      this.throwIfFailedLoginRBAC(user, app)
-@@ -45,6 +60,48 @@ export class LocalAuthStrategy {
  
-     const JWT = await this.tokenService.createJWT(localUserId)
+-
+-
+-
+-    const localUserId = null
+-
+-
+-
+-
+-
+-
+-    if (user.cardinalId) {
+-      throw new Error('Cannot log into a cloud account without a SSO JWT')
+-    }
+-
+-    const JWT = await this.tokenService.createJWT(localUserId)
++    const JWT = await this.tokenService.createJWT(user.userId)
  
-+    Logger.log(`Guest account logged in`, 'Auth')
-+
-+    return {
-+      JWT,
-+      user: this.userService.cleanseUserObject(user),
-+    }
-+  }
-+
-+  /**
-+   * Try to log in with a local username and password.
-+   */
-+  async loginWithUsernameAndPassword(app: CardinalApp, username: string, password: string): Promise<LoginResponse> {
-+    const user = await this.userService.getUserByLocalUsername(username)
-+
-+    if (!user) {
-+      throw new Error('Invalid username')
-+    }
-+
-+    const passwordIsValid = await this.userService.verifyPassword(username, password)
-+
-+    if (!passwordIsValid) {
-+      throw new Error('Invalid password')
-+    }
-+
-+    this.throwIfFailedLoginRBAC(user, app)
-+
-+
-+
-+
-+    const localUserId = null
-+
-+
-+
-+
-+
-+
-+    if (user.cardinalId) {
-+      throw new Error('Cannot log into a cloud account without a SSO JWT')
-+    }
-+
-+    const JWT = await this.tokenService.createJWT(localUserId)
-+
      Logger.log(`Local user ${user.userId} logged in`, 'Auth')
  
-     return {

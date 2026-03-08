@@ -1,40 +1,10 @@
 diff a/libraries/ui/src/components/layout/Drawer/Drawer.tsx b/libraries/ui/src/components/layout/Drawer/Drawer.tsx	(rejected hunks)
-@@ -4,11 +4,13 @@ import type { PropsWithChildren, ReactNode } from 'react'
- import { createPortal } from 'react-dom'
+@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom'
  import { motion } from 'framer-motion'
  import { useAppDispatch } from '../../../hooks/useAppDispatch'
-+import { useAppSelector } from '../../../hooks/useAppSelector'
+ import { useAppSelector } from '../../../hooks/useAppSelector'
++import HasCapabilities from '../HasCapabilities'
++import { MediaServerCapability } from '@cardinalapps/access-control/src'
  
  import H3 from '../../typography/H3'
  import Loading from '../Loading'
- 
- import { drawerActions } from '../../../store/slices/drawer'
-+import { modalSelectors } from '../../../store/slices/modal'
- 
- import Card from '../Card'
- 
-@@ -34,10 +36,13 @@ const Drawer = ({
-   children,
- }: PropsWithChildren<DrawerProps>) => {
-   const dispatch = useAppDispatch()
-+  const modalIsOpen = useAppSelector(modalSelectors.isOpen)
- 
-   const handleClose = () => {
--    dispatch(drawerActions.close())
--    onClose?.()
-+    if (!modalIsOpen) {
-+      dispatch(drawerActions.close())
-+      onClose?.()
-+    }
-   }
- 
-   /**
-@@ -61,7 +66,7 @@ const Drawer = ({
-     }
-     document.addEventListener('keydown', onEsc)
-     return () => document.removeEventListener('keydown', onEsc)
--  }, [])
-+  }, [modalIsOpen])
- 
-   return (
-     createPortal(

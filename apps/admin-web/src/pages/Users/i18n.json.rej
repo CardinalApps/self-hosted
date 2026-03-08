@@ -1,57 +1,24 @@
 diff a/apps/admin-web/src/pages/Users/i18n.json b/apps/admin-web/src/pages/Users/i18n.json	(rejected hunks)
-@@ -113,11 +113,23 @@
-   "users.invite.sent-invite-to-user": {
-     "en": "Invitation sent."
+@@ -231,7 +231,7 @@
+     "en": "Disable User"
    },
--  "users.server.capacity": {
--    "en": "Capacity"
-+  "users.server.cloud-capacity": {
-+    "en": "Cloud Users"
+   "users.settings.actions.disable.confirm.desc": {
+-    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. The user's seat will become available for another user to use."
++    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. If the user has a cloud account, their seat will become available for another user to use."
    },
--  "users.server.capacity.seats": {
--    "en": "Used {used} of {total} seats."
-+  "users.server.local-capacity": {
-+    "en": "Local Users"
-+  },
-+  "users.server.capacity.cloud": {
-+    "en": "Used {used} of {total} cloud seats."
-+  },
-+  "users.server.capacity.local.singular": {
-+    "en": "{total} local user."
-+  },
-+  "users.server.capacity.local.plural": {
-+    "en": "{total} local users."
-+  },
-+  "users.server.capacity.create": {
-+    "en": "Create User"
+   "users.settings.actions.enable.confirm.title": {
+     "en": "Enable User"
+@@ -260,7 +260,13 @@
+   "create-user.password": {
+     "en": "Password"
    },
-   "users.table.title": {
-     "en": "All users"
-@@ -131,6 +143,9 @@
-   "users.table.header.name": {
-     "en": "Account"
-   },
-+  "users.table.header.type": {
-+    "en": "Type"
++  "create-user.role": {
++    "en": "Roles"
 +  },
-   "users.table.header.role": {
-     "en": "Roles"
-   },
-@@ -235,5 +250,17 @@
-   },
-   "users.roles.count": {
-     "en": "{num} roles"
+   "create-user.submit": {
+     "en": "Create User"
 +  },
-+  "create-user.title": {
-+    "en": "Create Local User"
-+  },
-+  "create-user.username": {
-+    "en": "Username"
-+  },
-+  "create-user.password": {
-+    "en": "Password"
-+  },
-+  "create-user.submit": {
-+    "en": "Create User"
++  "create-user.submit.success": {
++    "en": "New user created"
    }
  }

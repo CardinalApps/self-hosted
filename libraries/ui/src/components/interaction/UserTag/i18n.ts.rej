@@ -1,0 +1,11 @@
+diff a/libraries/ui/src/components/interaction/UserTag/i18n.ts b/libraries/ui/src/components/interaction/UserTag/i18n.ts	(rejected hunks)
+@@ -7,6 +7,9 @@ const i18n: StringList = {
+   "users.table.cloud-user.fallback-name": {
+     "en": "Cardinal User",
+   },
++  "users.table.local-user.fallback-name": {
++    "en": "Local User",
++  },
+ }
+ 
+ export default i18n

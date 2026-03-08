@@ -1,32 +1,30 @@
 diff a/libraries/ui/src/components/interaction/UserTag/UserTag.tsx b/libraries/ui/src/components/interaction/UserTag/UserTag.tsx	(rejected hunks)
-@@ -10,7 +10,7 @@ type UserProps = {
-   user?: UserType,
-   showName?: boolean,
-   showAvatar?: boolean,
--  avatarSize?: AvatarSize,
-+  size?: AvatarSize,
- }
- 
- /**
-@@ -20,17 +20,17 @@ const UserTag = ({
-   user,
-   showName = true,
-   showAvatar = true,
--  avatarSize = 'l',
-+  size = 'm',
- }: UserProps) => {
-   const { lang } = useAppSelector(settingsSelectors.current)
-   return (
--    <div className="user">
-+    <div className={`user size-${size}`}>
+@@ -28,6 +28,15 @@ const UserTag = ({
        {showAvatar && user?.designation === 'guest_account' &&
--        <Avatar size={avatarSize} type="guest" className={'avatar'} />
-+        <Avatar size={size} type="guest" className={'avatar'} />
+         <Avatar size={size} type="guest" className={'avatar'} />
        }
++      {showAvatar && user?.designation !== 'guest_account' && !user.cardinalId && user?.username &&
++        <Avatar
++          size={size}
++          className={'avatar'}
++          initials={user.username.substring(0, 2).toUpperCase()}
++          color={'var(--accent-color)'}
++          type="color"
++        />
++      }
        {showAvatar && user?.designation !== 'guest_account' && user?.cachedCloudUser?.avatar &&
          <Avatar
--          size={avatarSize}
-+          size={size}
-           className={'avatar'}
-           image={user?.cachedCloudUser?.avatar?.image}
-           initials={user?.cachedCloudUser?.avatar?.initials}
+           size={size}
+@@ -43,7 +52,11 @@ const UserTag = ({
+       )}
+       {!!showName && user?.designation !== 'guest_account' && (
+         <p className="user-name">
+-          {user?.cachedCloudUser?.publicName || i18n['users.table.cloud-user.fallback-name'][lang]}
++          {
++            user?.cardinalId
++              ? user?.cachedCloudUser?.publicName || i18n['users.table.cloud-user.fallback-name'][lang]
++              : user?.username || i18n['users.table.cloud-user.fallback-name'][lang]
++          }
+         </p>
+       )}
+     </div>

@@ -1,21 +1,36 @@
 diff a/servers/media/src/modules/user/user.service.ts b/servers/media/src/modules/user/user.service.ts	(rejected hunks)
-@@ -359,6 +373,19 @@ export class UserService {
-     return guestAccount.enabled
+@@ -1,6 +1,7 @@
+ import { Injectable, Logger } from '@nestjs/common'
+ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+ import { DataSource, IsNull, Not, Repository } from 'typeorm'
++import * as bcrypt from 'bcrypt'
+ import * as ms from 'ms'
+ 
+ import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/products/dist/cjs/subscriptions'
+@@ -79,13 +80,16 @@ export class UserService {
+     await queryRunner.startTransaction()
+ 
+     try {
+-      const createdUser = await queryRunner.manager.save(User, {
++      const newUserInstance = this.userRepository.create({
+         userId: uuid(),
+         cardinalId: cardinalCloudUser ? cardinalCloudUser.userId : null,
+         cachedCloudUser: cardinalCloudUser ? cardinalCloudUser : null,
+         cachedCloudUserAt: cardinalCloudUser ? new Date() : null,
+         designation: secure?.designation || null,
++        username: dto.username || null,
++        ...(dto.password ? { password: dto.password } : {}),
+       })
++      const createdUser = await queryRunner.manager.save(newUserInstance)
+ 
+       const roleAssignments = dto?.role
+         ? await this.rbacService.assignRole(dto.role, [createdUser], queryRunner)
+@@ -383,7 +387,7 @@ export class UserService {
+       .where('user.username = :username', { username })
+       .getOne()
+ 
+-    return !!user
++    return await bcrypt.compare(password, user.password)
    }
  
-+  /**
-+   * Checks if the given password is correct.
-+   */
-+  async verifyPassword(username: string, password: string): Promise<boolean> {
-+    const user = await this.userRepository
-+      .createQueryBuilder('user')
-+      .addSelect('user.password')
-+      .where('user.username = :username', { username })
-+      .getOne()
-+
-+    return !!user
-+  }
-+
    /**
-    * Returns all users according to the query.
-    */

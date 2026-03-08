@@ -1,10 +1,51 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -69,6 +69,8 @@ export class UserController {
-       }
-     }
+@@ -15,7 +15,6 @@ import {
+ } from '@nestjs/common'
+ import {
+   ApiTags,
+-  ApiMethodNotAllowedResponse,
+   ApiExcludeEndpoint,
+ } from '@nestjs/swagger'
  
-+    // TODO return a 400 if the cloud token is missing for a cloud user
-+
-     // Database cache is sufficient
-     if (!await this.cloudUserService.localUserNeedsRefresh(localUser.userId)) {
-       return {
+@@ -142,35 +141,21 @@ export class UserController {
+   }
+ 
+   /**
+-   * Creates a local user. Local users can be one of two types: `offline` or
+-   * `online`.
++   * Creates user in the Media Server. These users are stored in the Media
++   * Server's database, so technically they are all "local" users, but there is
++   * a further distinction that is outlined on:
+    * 
+-   * *`online`* - A local user account with a linked Cardinal account is called an
+-   * `online` user. There can only be 1 online user per Media Server, and
+-   * that is the server owner.
++   * https://help.cardinalapps.io/guides/cardinal-media-server/accounts
+    * 
+-   * *`offline`* - A local user account without a linked Cardinal account is
+-   * called an `offline` user. The only offline account is the nameless &
+-   * passwordless one that comes included with the Media Server, called "Offline
+-   * Account".
++   * Cloud accounts are not created here - instead the are created by the auth
++   * service as a SSO login side effect.
+    */
+   @Post('/users')
+   @StandardEndpoint({
+     summary: 'Create a new local Media Server user.',
+     capabilities: ['Users.Create'],
+   })
+-  @ApiMethodNotAllowedResponse({ description: 'The server will refuse to create more than 1 `online` account and will refuse to create `offline` accounts.' })
+   async createLocalUser(@Body() createUserDto: CreateUser): Promise<User> {
+-    // TODO offline accounts feature
+-    if (!createUserDto?.cardinalJWT) {
+-      throw new MethodNotAllowedException('Cannot create additional offline account. Use the included Offline Account instead.')
+-    }
+-
+-    // Check if this server has already been claimed by a Cardinal account
+-    if (await this.userService.getServerOwner()) {
+-      throw new MethodNotAllowedException('Cannot create new online account because this server has already been claimed by a Cardinal account.')
+-    }
+-
+     return await this.userService.createUser({ dto: createUserDto })
+   }
+ 

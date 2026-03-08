@@ -1,14 +1,26 @@
 diff a/libraries/ui/src/components/forms/Select/Select.tsx b/libraries/ui/src/components/forms/Select/Select.tsx	(rejected hunks)
-@@ -168,7 +168,11 @@ const Select = ({
-       // Only 1 is selected
-       if (selected.length === 1) {
-         const firstSelected = optionsAsArray(options).find((opt) => opt.value === selected[0])
--        return `${selectedPrefix}${firstSelected?.sentenceCase || firstSelected?.label}`
-+        if (firstSelected) {
-+          return `${selectedPrefix}${firstSelected?.sentenceCase || firstSelected?.label}`
-+        } else {
-+          return `${selectedPrefix}`
-+        }
-       }
-       // Multiple are selected
-       else {
+@@ -230,6 +230,7 @@ const Select = ({
+ 
+         return allowedBySearchQuery
+           ? <button
++              type="button"
+               className={clsx('option', isSelected && 'selected')}
+               key={item?.value}
+               value={item?.value}
+@@ -341,7 +342,7 @@ const Select = ({
+               <input
+                 ref={searchRef}
+                 className="upper"
+-                name="query"
++                name="_select-search-query"
+                 type="text"
+                 placeholder={searchPlaceholder ? searchPlaceholder : i18n['custom-select.search'][lang]}
+                 autoComplete="off"
+@@ -379,6 +380,7 @@ const Select = ({
+             {filteredOptions(options)}
+           </motion.div>
+         )}
++        <input type="hidden" name={name} value={selected || ''} />
+       </div>
+     </>
+   )

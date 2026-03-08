@@ -1,26 +1,10 @@
 diff a/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts b/servers/media/src/modules/auth/strategies/cardinal-sso.service.ts	(rejected hunks)
-@@ -1,4 +1,4 @@
--import { Injectable, Logger } from '@nestjs/common'
-+import { Injectable } from '@nestjs/common'
- import { getMediaServerRole, hasCapability, MediaServerCapability, MediaServerRoleName } from '@cardinalapps/access-control/dist/cjs'
+@@ -82,7 +82,7 @@ export class CardinalSSOStrategy {
+      * 
+      * If this server requires users to be invited to join, validate the invitation.
+      */
+-    // TODO set this to true once invitations are working
++    // TODO set this to true once invitations are ready
+     const requiresInvitation = false
+     let allowToJoin = false
  
- import { UserService } from '../../user/user.service'
-@@ -158,16 +158,11 @@ export class CardinalSSOStrategy {
-   /**
-    * Creates the login success object.
-    */
--  private async loginSuccess(user, cardinalSSOToken): Promise<LoginResponse> {
--    try {
--      await this.userService.update(user.userId, { ssoToken: cardinalSSOToken })
--    } catch (error) {
--      Logger.error('Could not update cached SSO token')
--    }
-+  private async loginSuccess(user: User, cloudJWT: string): Promise<LoginResponse> {
-     return {
-       JWT: await this.tokenService.createJWT(user.userId),
-       user: this.userService.cleanseUserObject(user),
--      cloudJWT: user.ssoToken,
-+      cloudJWT: cloudJWT,
-       cloudUser: user.cachedCloudUser,
-     }
-   }

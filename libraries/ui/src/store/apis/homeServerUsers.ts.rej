@@ -1,15 +1,39 @@
 diff a/libraries/ui/src/store/apis/homeServerUsers.ts b/libraries/ui/src/store/apis/homeServerUsers.ts	(rejected hunks)
-@@ -49,11 +49,11 @@ export const usersApi = baseHomeServerApi
-       }),
- 
-       /**
--       * Create a user.
-+       * Update a user.
-        */
-       updateUser: builder.mutation({
-         query: ({ id, body }) => ({
--          url: `/user/${id}`,
-+          url: `/users/${id}`,
-           method: 'PATCH',
-           body,
+@@ -30,9 +30,11 @@ export const usersApi = baseHomeServerApi
+           roles?: boolean,
+         }
+       >({
+-        query: ({ roles }) => {
++        query: ({ roles, take, skip }) => {
+           return queryParams('/users', {
+             ...(roles ? { roles } : {}),
++            ...(take ? { take } : {}),
++            ...(skip ? { skip } : {}),
+           })
+         },
+         providesTags: ['Users.List'],
+@@ -59,6 +61,18 @@ export const usersApi = baseHomeServerApi
          }),
+         invalidatesTags: ['Users.List', 'Licensing.Seats'],
+       }),
++
++      /**
++       * Update a user.
++       */
++      createUser: builder.mutation({
++        query: ({ body }) => ({
++          url: `/users`,
++          method: 'POST',
++          body,
++        }),
++        invalidatesTags: ['Users.List'],
++      }),
+     }),
+   })
+ 
+@@ -66,4 +80,5 @@ export const {
+   useGetUsersQuery,
+   useGetServerOwnerQuery,
+   useUpdateUserMutation,
++  useCreateUserMutation,
+ } = usersApi

@@ -17,8 +17,6 @@ import { modalSelectors } from '../../../store/slices/modal'
 import Card from '../Card'
 
 import './Drawer.css'
-import HasCapabilities from '../HasCapabilities'
-import { MediaServerCapability } from '@cardinalapps/access-control/src'
 
 type DrawerProps = {
   width?: number,

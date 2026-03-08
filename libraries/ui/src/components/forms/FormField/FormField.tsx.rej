@@ -1,0 +1,34 @@
+diff a/libraries/ui/src/components/forms/FormField/FormField.tsx b/libraries/ui/src/components/forms/FormField/FormField.tsx	(rejected hunks)
+@@ -6,6 +6,7 @@ import './FormField.css'
+ type FormFieldProps = {
+   label?: string,
+   labelFor?: string,
++  labelAsSpan?: boolean,
+   subText?: string,
+   error?: string,
+   className?: string,
+@@ -15,6 +16,7 @@ type FormFieldProps = {
+ const FormField = ({
+   label,
+   labelFor,
++  labelAsSpan,
+   subText,
+   error,
+   className,
+@@ -24,9 +26,13 @@ const FormField = ({
+   return (
+     <div className={clsx(`form-field`, className, `${error ? 'error' : ''}`)} style={style}>
+       {label && (
+-        <label className="form-field-label" htmlFor={labelFor}>
+-          {label}
+-        </label>
++        labelAsSpan
++          ? <span className="form-field-label">
++              {label}
++            </span>
++          : <label className="form-field-label" htmlFor={labelFor}>
++              {label}
++            </label>
+       )}
+       {error && (
+         <p className="form-field-error">
