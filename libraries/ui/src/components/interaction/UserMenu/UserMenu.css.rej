@@ -1,14 +1,70 @@
 diff a/libraries/ui/src/components/interaction/UserMenu/UserMenu.css b/libraries/ui/src/components/interaction/UserMenu/UserMenu.css	(rejected hunks)
-@@ -240,6 +240,12 @@
+@@ -21,26 +21,14 @@
+     }
+   }
  
-     .switch-away {
+-  &.open.logged-out {
+-
+-    .user-dropdown-under {
+-      top: 6px;
+-      left: -210px;
+-      right: 0;
+-      bottom: -234px;
+-      border-radius: 40px;
+-      box-shadow: var(--box-shadow-2);
+-    }
+-  }
+-
+-  &.open.logged-in {
++  &.open {
  
-+      .sep {
-+        font-size: 14px;
-+        font-weight: 400;
-+        margin: 0 5px;
-+      }
+     .user-dropdown-under {
+       max-height: 90vh;
+       top: 6px;
+       left: -340px;
+       right: 0;
+-      bottom: -466px;
++      bottom: -415px;
+       overflow: hidden;
+       border-radius: 40px;
+       box-shadow: var(--box-shadow-2);
+@@ -49,6 +37,13 @@
+         left: -310px;
+       }
+     }
 +
-       button {
-         padding: 0;
-         margin: 0;
++    &.cloud-user-logged-in {
++
++      .user-dropdown-under {
++        bottom: -460px;
++      }
++    }
+   }
+ 
+   .user-dropdown-section-title {
+@@ -319,7 +314,7 @@
+ 
+     .login-with-cardinal-button {
+       width: 100%;
+-      min-height: 40px;
++      min-height: 50px;
+       justify-content: center;
+       background: var(--bg-2);
+       font-family: var(--font-family);
+@@ -417,7 +412,6 @@
+     }
+     
+     .links {
+-      padding-top: 20px;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+@@ -441,7 +435,7 @@
+         color: var(--text-color-3);
+ 
+         &:hover {
+-          text-decoration: underline;
++          color: var(--accent-color)
+         }
+       }
+ 

@@ -1,12 +1,287 @@
 diff a/libraries/ui/src/components/interaction/UserMenu/UserMenu.tsx b/libraries/ui/src/components/interaction/UserMenu/UserMenu.tsx	(rejected hunks)
-@@ -149,6 +149,10 @@ const UserMenu = ({
+@@ -1,12 +1,12 @@
+ import { useState, useEffect, useContext } from 'react'
+ import type { PropsWithChildren, ReactNode } from 'react'
++import clsx from 'clsx'
+ import { useSelector } from 'react-redux'
+ import { AnimatePresence, motion } from 'framer-motion'
+ import H3 from '../../typography/H3'
+ import { getSetting } from '@cardinalapps/app-settings/src'
+ // import ms from 'ms'
+ 
+-import Avatar from '../../layout/Avatar'
+ import Button from '../Button'
+ 
+ import { settingsSelectors } from '../../../store/slices/settings'
+@@ -15,14 +15,15 @@ import { RouterContext } from '../../../context/router'
+ import { cloudUserSelectors } from '../../../store/slices/cloudUser'
+ import { appSelectors } from '../../../store/slices/app'
+ import { useAppDispatch } from '../../../hooks/useAppDispatch'
+-
+-import i18n from './i18n'
+-
++import set from '../../../store/slices/settings/thunks/set'
++import UserTag from '../UserTag'
++import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
+ import { routes } from '../../features/AppBase/routes'
+ import Select from '../../forms/Select'
+ 
++import i18n from './i18n'
++
+ import './UserMenu.css'
+-import set from '../../../store/slices/settings/thunks/set'
+ 
+ type UserMenuProps = {
+   onSwitchAccountClick?: () => void,
+@@ -41,8 +42,8 @@ const UserMenu = ({
+ }: PropsWithChildren<UserMenuProps>) => {
+   const dispatch = useAppDispatch()
+   const app = useSelector(appSelectors.app)
+-  const loggedIn = useSelector(cloudUserSelectors.loggedIn)
+-  const currentUser = useSelector(cloudUserSelectors.current)
++  const currentHomeServerUser = useSelector(homeServerUserSelectors.current)
++  const currentCloudUser = useSelector(cloudUserSelectors.current)
+   const { lang, theme } = useSelector(settingsSelectors.current)
+   const [menuIsOpen, setMenuIsOpen] = useState(false)
+   const { navigate } = useContext(RouterContext)
+@@ -106,12 +107,9 @@ const UserMenu = ({
+   }, [])
+ 
+   return (
+-    <div className={`user-menu ${menuIsOpen ? 'open' : ''} ${loggedIn ? 'logged-in' : 'logged-out'}`}>
++    <div className={clsx(`user-menu`, menuIsOpen && 'open', currentHomeServerUser?.cardinalId && 'cloud-user-logged-in')}>
+       <button className="avatar-btn" onClick={() => setMenuIsOpen(!menuIsOpen)}>
+-        {loggedIn
+-          ? <Avatar {...currentUser.avatar} />
+-          : <Avatar type="guest" />
+-        }
++        <UserTag user={currentHomeServerUser} showName={false} size="m" />
+       </button>
+       <div className="user-dropdown-under">
+         <div className="user-dropdown-inner">
+@@ -123,28 +121,32 @@ const UserMenu = ({
+                     animate={{ opacity: 1, y: 0, transition: { type: "spring", delay: 0.15 } }}
+                     className="user-dropdown-greeting"
+                   >
+-                    {
++                    <div className="user-meta">
++                      <p className="public-name">
++                        {currentHomeServerUser?.cardinalId
++                          ? currentCloudUser?.publicName || i18n['user-menu.logged-in.public-name.fallback']['en']
++                          : currentHomeServerUser?.username || i18n['user-menu.logged-in.public-name.fallback']['en']
++                        }
++                      </p>
++                      <div>
++                        {/* <span
++                          className="member-days"
++                          title={i18n['user-menu.member-days.tooltip']['en'].replace('{date}', new Date(currentUser?.createdAt).toDateString())}
++                        >
++                          {memberDays()}
++                        </span> */}
++                        <span
++                          className="subscription"
++                          // title={memberDays()}
++                        >
++                          <i className="fas fa-trophy" />
++                          {i18n[`user-menu.subscription.${currentCloudUser.subscription}`]?.['en'] || i18n[`user-menu.subscription.free`]?.['en']}
++                        </span>
++                      </div>
++                    </div>
++                    {/* {
+                       loggedIn
+-                        ? <div className="user-meta">
+-                            <p className="public-name">
+-                              {currentUser?.publicName || i18n['user-menu.logged-in.public-name.fallback']['en']}
+-                            </p>
+-                            <div>
+-                              {/* <span
+-                                className="member-days"
+-                                title={i18n['user-menu.member-days.tooltip']['en'].replace('{date}', new Date(currentUser?.createdAt).toDateString())}
+-                              >
+-                                {memberDays()}
+-                              </span> */}
+-                              <span
+-                                className="subscription"
+-                                // title={memberDays()}
+-                              >
+-                                <i className="fas fa-trophy" />
+-                                {i18n[`user-menu.subscription.${currentUser.subscription}`]?.['en']}
+-                              </span>
+-                            </div>
+-                          </div>
++                        ? 
+                         : <div className="user-meta">
                              <p className="public-name">{i18n['user-menu.logged-out.public-name']['en']}</p>
                              <p className="switch-away">
-                               <button type="button" onClick={handleSwitchAccountClick}>{i18n['user-menu.switch-account']['en']}</button>
-+                              <span className="sep">/</span>
-+                              <button onClick={() => navigate(routes.SETTINGS)}>
-+                                {i18n['user-menu.app-settings']['en']}
-+                              </button>
+@@ -155,42 +157,47 @@ const UserMenu = ({
+                               </button>
                              </p>
                            </div>
-                     }
+-                    }
++                    } */}
+                   </motion.div>
+                   <motion.div
+                     initial={{ opacity: 0, y: -8 }}
+                     animate={{ opacity: 1, y: 0, transition: { type: "spring", delay: 0.30 } }}
+                   >
+                     <nav className={`user-dropdown-menu`}>
+-                      {loggedIn
+-                        ? <div className="logged-in-items">
+-                          {
+-                            // Media server
+-                          }
+-                            <H3 className="user-dropdown-section-title">{i18n['user-menu.quick-settings']['en']}</H3>
+-                            <div className="user-menu-quick-settings">
+-                              <Select
+-                                size="s"
+-                                name={themeField.slug}
+-                                options={themeField.options as Record<string, string>}
+-                                value={theme as string}
+-                                multi={false}
+-                                min={1}
+-                                onChange={(val) => dispatch(set({
+-                                  settings: {
+-                                    [themeField.slug]: val,
+-                                  },
+-                                  app: app,
+-                                }))}
+-                              />
+-                            </div>
+-                            <H3 className="user-dropdown-section-title">{i18n['user-menu.media-server']['en']}</H3>
+-                            <ul className="user-dropdown-button-group">
++                      <div className="logged-in-items">
++                        {
++                          // Media server
++                        }
++                          <H3 className="user-dropdown-section-title">{i18n['user-menu.quick-settings']['en']}</H3>
++                          <div className="user-menu-quick-settings">
++                            <Select
++                              size="s"
++                              name={themeField.slug}
++                              options={themeField.options as Record<string, string>}
++                              value={theme as string}
++                              multi={false}
++                              min={1}
++                              onChange={(val) => dispatch(set({
++                                settings: {
++                                  [themeField.slug]: val,
++                                },
++                                app: app,
++                              }))}
++                            />
++                          </div>
++                          <H3 className="user-dropdown-section-title">{i18n['user-menu.media-server']['en']}</H3>
++                          <div className="user-dropdown-button-group">
++                            <ul>
+                               <li>
+                                 <Button onClick={() => navigate(routes.SETTINGS)} icon="fas fa-cog">
+                                   {i18n['user-menu.app-settings']['en']}
+                                 </Button>
+                               </li>
++                              <li>
++                                <Button href="https://help.cardinalapps.io" target="_blank" icon="fas fa-info-circle">
++                                  {i18n['user-menu.help']['en']}
++                                </Button>
++                              </li>
+                               <li>
+                                 <Button onClick={handleSwitchAccountClick} icon="fas fa-users">
+                                   {i18n['user-menu.switch-account']['en']}
+@@ -202,41 +209,55 @@ const UserMenu = ({
+                                 </Button>
+                               </li>
+                             </ul>
+-                            {
+-                              // Cloud
+-                            }
+-                            <H3 className="user-dropdown-section-title">{i18n['user-menu.cloud']['en']}</H3>
+-                            <ul className="user-dropdown-button-group">
+-                              <li>
+-                                <Button href="https://account.cardinalapps.io" target="_blank" icon="fas fa-user-circle">
+-                                  {i18n['user-menu.my-account']['en']}
+-                                </Button>
+-                              </li>
+-                              <li>
+-                                <Button href="https://help.cardinalapps.io" target="_blank" icon="fas fa-info-circle">
+-                                  {i18n['user-menu.help']['en']}
+-                                </Button>
+-                              </li>
+-                              <li>
+-                                <Button href="https://status.cardinalapps.io" target="_blank" icon="fas fa-cloud">
+-                                  {i18n['user-menu.status']['en']}
+-                                </Button>
+-                              </li>
+-                            </ul>
+-                            <div className="links">
+-                              {/* <span>
+-                                <i className="fas fa-comments" />
+-                                <a href="https://forums.cardinalapps.io" target="_blank">
+-                                  {i18n['user-menu.forums']['en']}
+-                                </a>
+-                              </span> */}
+-                              <span>
+-                                <a href="https://cardinalapps.io" target="_blank">
+-                                  {i18n['user-menu.website']['en']}
+-                                </a>
+-                              </span>
+-                            </div>
+                           </div>
++                          {
++                            // Cloud
++                          }
++                          <H3 className="user-dropdown-section-title">{i18n['user-menu.cloud']['en']}</H3>
++                          {currentHomeServerUser?.cardinalId
++                            ? (
++                              <div className="user-dropdown-button-group">
++                                <ul >
++                                  <li>
++                                    <Button href="https://account.cardinalapps.io" target="_blank" icon="fas fa-user-circle">
++                                      {i18n['user-menu.my-account']['en']}
++                                    </Button>
++                                  </li>
++                                  <li>
++                                    <Button href="https://status.cardinalapps.io" target="_blank" icon="fas fa-cloud">
++                                      {i18n['user-menu.status']['en']}
++                                    </Button>
++                                  </li>
++                                  <li>
++                                    <Button href="https://cardinal.discourse.group" target="_blank" icon="fas fa-comments">
++                                      {i18n['user-menu.forums']['en']}
++                                    </Button>
++                                  </li>
++                                </ul>
++                              </div>
++                            )
++                            : (
++                              <div className="user-dropdown-button-group">
++                                {!!loginButton && loginButton}
++                              </div>
++                            )
++                          }
++                          <div className="links">
++                            {/* <span>
++                              <i className="fas fa-comments" />
++                              <a href="https://forums.cardinalapps.io" target="_blank">
++                                {i18n['user-menu.forums']['en']}
++                              </a>
++                            </span> */}
++                            <span>
++                              <a href="https://cardinalapps.io" target="_blank">
++                                {i18n['user-menu.website']['en']}
++                              </a>
++                            </span>
++                          </div>
++                        </div>
++                      {/* {loggedIn
++                        ? 
+                         : <div className="logged-out-items">
+                             <ul>
+                               <li className="accent">
+@@ -252,7 +273,7 @@ const UserMenu = ({
+                               </li>
+                             </ul>
+                           </div>
+-                      }
++                      } */}
+                     </nav>
+                   </motion.div>
+                 </>

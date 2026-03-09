@@ -1,36 +1,32 @@
 diff a/libraries/ui/src/components/interaction/UserMenu/i18n.ts b/libraries/ui/src/components/interaction/UserMenu/i18n.ts	(rejected hunks)
-@@ -5,10 +5,16 @@ const i18n: StringList = {
-     "en": "Logout",
+@@ -29,7 +29,7 @@ const i18n: StringList = {
+     "en": "Media Server",
    },
-   "user-menu.switch-account": {
--    "en": "Switch Accounts",
-+    "en": "Switch User",
-+  },
-+  "user-menu.app-settings": {
-+    "en": "App Settings",
+   "user-menu.cloud": {
+-    "en": "Cloud",
++    "en": "Cardinal Cloud",
    },
-   "user-menu.help": {
--    "en": "Help",
-+    "en": "Docs",
-+  },
-+  "user-menu.status": {
-+    "en": "Status",
-   },
-   "user-menu.create-account-c2a": {
-     "en": "Create free account",
-@@ -16,6 +22,15 @@ const i18n: StringList = {
-   "user-menu.then": {
-     "en": "Then",
-   },
-+  "user-menu.quick-settings": {
-+    "en": "Quick Settings",
-+  },
-+  "user-menu.media-server": {
-+    "en": "Media Server",
-+  },
-+  "user-menu.cloud": {
-+    "en": "Cloud",
-+  },
    "user-menu.my-account": {
      "en": "My Account",
+@@ -44,11 +44,20 @@ const i18n: StringList = {
+     "en": "Subscription",
+   },
+   "user-menu.subscription.free": {
+-    "en": "Free tier",
++    "en": "Free",
+   },
+   "user-menu.subscription.early_adopter": {
+     "en": "Early Adopter",
+   },
++  "user-menu.subscription.starter": {
++    "en": "Starter",
++  },
++  "user-menu.subscription.pro": {
++    "en": "Pro",
++  },
++  "user-menu.subscription.ultimate": {
++    "en": "Ultimate",
++  },
+   "user-menu.member-days.tooltip": {
+     "en": "Created on {date}",
    },

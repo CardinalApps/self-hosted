@@ -169,11 +169,6 @@ const ALL_CINEMA_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> 
   'Movies.*',
   'TVEpisodes.*',
 ]
-const READONLY_CROSS_APP_FEATURES: CapabilityAssignments<MediaServerCapability> = [
-  'Libraries.Read',
-  'Indexing.Read',
-  'Jobs.Read',
-]
 
 /**
  * Master list of all roles and their capabilities.
