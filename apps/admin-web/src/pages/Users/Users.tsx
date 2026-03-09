@@ -199,8 +199,6 @@ function Users() {
     }
   }, [users])
 
-  console.log(users)
-
   return (
     <AppPage
       className="users-page"
