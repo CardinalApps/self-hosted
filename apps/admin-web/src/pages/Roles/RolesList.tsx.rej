@@ -1,17 +1,58 @@
 diff a/apps/admin-web/src/pages/Roles/RolesList.tsx b/apps/admin-web/src/pages/Roles/RolesList.tsx	(rejected hunks)
-@@ -1,5 +1,5 @@
- import { useEffect, useState, useMemo } from 'react'
--import { ACi18n, MediaServerRoleNames, getMediaServerRole, Role, MediaServerRoles, MediaServerRoleName } from '@cardinalapps/access-control/src'
-+import { ACi18n, MediaServerRoleNames, getMediaServerRole, Role, MediaServerRoles, MediaServerRoleName, MediaServerCapabilityAssignment } from '@cardinalapps/access-control/src'
+@@ -150,6 +150,20 @@ function RolesList() {
+   }, [deleteRoleAssignmentsResult.isSuccess])
  
- import H5 from '@cardinalapps/ui/src/components/typography/H5'
- import List from '@cardinalapps/ui/src/components/interaction/List'
-@@ -29,7 +29,7 @@ function RolesList() {
-   const dispatch = useAppDispatch()
-   const { lang } = useAppSelector(settingsSelectors.current)
-   const [drawerRoleSlug, setDrawerRoleSlug] = useState<MediaServerRoleNames>()
--  const drawerRole: Role = getMediaServerRole(drawerRoleSlug)
-+  const drawerRole: Role<MediaServerCapabilityAssignment> = getMediaServerRole(drawerRoleSlug)
-   const userCanAddRole = useHasCapability('RoleAssignments.Create')
-   const userCanDeleteRole = useHasCapability('RoleAssignments.Delete')
- 
+   const MemoizedAddRemove = useMemo(() => {
++    const getName = (user) => {
++      return user?.designation === 'guest_account'
++        ? i18n['roles.drawer.user-list.guest'][lang]
++        : user?.cardinalId
++          ? user?.cachedCloudUser?.publicName || 'Cardinal User'
++          : user?.username
++    }
++    const getAvatar = (user) => {
++      return user?.designation === 'guest_account'
++        ? { type: 'guest' }
++        : user?.cachedCloudUser?.avatar
++          ? { ...user?.cachedCloudUser?.avatar }
++          : { initials: user?.username?.substring(0, 2).toUpperCase(), type: 'color', color: 'var(--accent-color)' }
++    }
+     return (
+       <AddRemove
+         name="role-assignments"
+@@ -157,31 +171,19 @@ function RolesList() {
+         initialSelectedItems={
+           usersWithRole(drawerRoleSlug)
+             .map((user) => ({
+-              name: user?.designation === 'guest_account'
+-                ? i18n['roles.drawer.user-list.guest'][lang]
+-                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
++              name: getName(user),
+               value: user?.userId,
+               canDelete: userCanDeleteRole ? user?.designation !== 'guest_account' : false,
+-              avatar: user?.designation === 'guest_account'
+-                ? { type: 'guest' }
+-                : user?.cachedCloudUser?.avatar
+-                  ? { ...user?.cachedCloudUser?.avatar }
+-                  : undefined,
++              avatar: getAvatar(user),
+             }))
+         }
+         initialAvailableItems={
+           usersWithoutRole(drawerRoleSlug)
+             .map((user) => ({
+-              name: user?.designation === 'guest_account'
+-                ? i18n['roles.drawer.user-list.guest'][lang]
+-                :  user?.cachedCloudUser?.publicName || 'Cardinal User',
++              name: getName(user),
+               value: user?.userId,
+               canAdd: userCanAddRole,
+-              avatar: user?.designation === 'guest_account'
+-              ? { type: 'guest' }
+-              : user?.cachedCloudUser?.avatar
+-                ? { ...user?.cachedCloudUser?.avatar }
+-                : undefined,
++              avatar: getAvatar(user),
+             }))
+         }
+       />
