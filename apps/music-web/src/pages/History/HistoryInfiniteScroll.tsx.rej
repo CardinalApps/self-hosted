@@ -1,10 +1,17 @@
 diff a/apps/music-web/src/pages/History/HistoryInfiniteScroll.tsx b/apps/music-web/src/pages/History/HistoryInfiniteScroll.tsx	(rejected hunks)
-@@ -63,7 +63,7 @@ function MusicHistoryInfiniteScroll({
-         <div className="progress-bar" style={{ width: `${historyEntry.progress * 100}%` }}></div>
+@@ -58,9 +58,14 @@ function MusicHistoryInfiniteScroll({
+   )
+ 
+   const getItem = (historyEntry: MusicHistoryEntryType) => {
++    // FIXME
++    if (!historyEntry) {
++      console.warn('No entry?', historyEntry)
++      return null
++    }
+     return (
+       <div className="music-history-entry">
+-        <div className="progress-bar" style={{ width: `${historyEntry.progress * 100}%` }}></div>
++        <div className="progress-bar" style={{ width: `${(historyEntry?.progress || 0) * 100}%` }}></div>
          <div className="cols">
            <div>{Math.round(historyEntry?.progress * 100)}%</div>
--          <div>{<UserTag user={historyEntry.user} avatarSize='xs' showName={false} />}</div>
-+          <div>{<UserTag user={historyEntry.user} size='xs' showName={false} />}</div>
-           <div><Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link></div>
-           <div className="date">
-             <time title={formatDate(historyEntry?.createdAt)}>
+           <div>{<UserTag user={historyEntry.user} size='xs' showName={false} />}</div>
