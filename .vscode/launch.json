@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Media Server (SQLite)",
+      "command": "cd ./servers/media && pnpm dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Media Server (PostgreSQL)",
+      "command": "cd ./servers/media && pnpm dev:pg",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Media Server tests",
+      "command": "cd ./servers/media && pnpm test",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Auth Server",
+      "command": "cd ./servers/auth && pnpm dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Status App",
+      "command": "cd ./apps/status-web && pnpm dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Test File",
+      "command": "cd ./libraries/access-control && pnpm test --runInBand",
+      "request": "launch",
+      "type": "node-terminal",
+    },
+    {
+      "name": "Test Auth Server",
+      "command": "cd ./servers/auth && pnpm test",
+      "request": "launch",
+      "type": "node-terminal",
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+.app-header {
+  width: 100%;
+  padding: 6px 12px 6px 20px;
+  border-bottom: 1px solid var(--border-color-3);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 100;
+  transition: box-shadow 400ms;
+
+  > div {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    margin-right: 14px;
+  }
+
+  .logo-type {
+    width: 290px;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .search {
+    flex-grow: 1;
+  }
+
+  .title {
+    margin-bottom: 0;
+    margin-right: 30px;
+    font-size: 22px;
+    cursor: default;
+    user-select: none;
+  }
+
+  .left {
+    flex-grow: 1;
+  }
+
+  .right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+
+    > section {
+      display: flex;
+      gap: 5px
+    }
+  }
+
+  .cloud-status-icon {
+    position: relative;
+    top: 1px;
+
+    .status-dots {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 100%;
+      border: 1px solid var(--border-color-2);
+      position: relative;
+      overflow: hidden;
+      z-index: 5;
+
+      &[data-status="connected"] {
+        background-color: var(--border-color-1);
+      }
+
+      &[data-status="loading"] {
+        background-color: none;
+        border-style: dashed;
+        border-width: 2px;
+      }
+
+      &[data-status="not-connected"] {
+        background-color: none;
+      }
+    }
+
+    .status-overview {
+      width: 260px;
+      padding: 15px 20px 10px 20px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--box-shadow-2);
+      border: 1px solid var(--border-color-1);
+      background-color: var(--bg-1);
+      z-index: 1000;
+
+      .title {
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--text-color-1);
+        text-transform: uppercase;
+      }
+
+      .dot-legend {
+
+        .status-dot {
+          width: 12px;
+          height: 12px;
+        }
+
+        li {
+          padding-left: 10px;
+          margin-bottom: 8px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          span {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-color-2);
+          }
+        }
+      }
+    }
+  }
+
+  .currently-active {
+    width: 260px;
+    padding: 15px 20px 10px 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--box-shadow-2);
+    border: 1px solid var(--border-color-1);
+    background-color: var(--bg-1);
+    z-index: 1000;
+
+    .title {
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-color-1);
+      text-transform: uppercase;
+    }
+
+    .no-activity {
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .activity {
+      margin-bottom: 5px;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+
+      a {
+        margin: 0 -10px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 8px;
+        color: var(--text-color-1);
+
+        &:hover {
+          background-color: var(--bg-3);
+        }
+      }
+
+      .name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .status {
+        font-size: 13px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    height: auto;
+    margin-left: 0;
+    margin-right: 0;
+
+    .title {
+      display: none;
+    }
+
+    .left {
+      flex-grow: 1;
+    }
+
+    .logo {
+      margin-right: 10px;
+      position: static;
+
+      svg {
+        transform: scale(0.8);
+      }
+    }
+
+    .logo-type {
+      width: auto;
+    }
+
+    .right {
+      
+    }
+
+    .icons {
+      
+      .icon {
+        width: 38px;
+      }
+    }
+  }
+
+  .webApps {
+    margin: 0 10px;
+    padding: 5px;
+    display: flex;
+    gap: 10px;
+
+    .app {
+      
+      svg {
+        box-shadow: var(--box-shadow-1);
+      }
+    }
+  }
+}
+
+[data-layout="standard.full"] {
+  .app-header {
+    box-shadow: var(--box-shadow-1);
+  }
+}
+
+@keyframes iconPulse {
+	0% {
+		opacity: 1;
+	}
+
+	75% {
+		opacity: 1;
+	}
+
+	90% {
+		opacity: 0.6;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}

@@ -1,0 +1,45 @@
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  button.tag:hover {
+    background-color: var(--bg-5);
+  }
+
+  .tag {
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 16px;
+    color: var(--text-color-2);
+    border: 1px solid var(--border-color-1);
+    cursor: pointer;
+    white-space: nowrap;
+    background-color: var(--bg-3);
+    -webkit-appearance: none;
+
+    &[data-color="success"] {
+      color: white;
+      border-color: var(--success-bg);
+      background-color: var(--success);
+    }
+    &[data-color="warning"] {
+      color: var(--warning);
+      background-color: var(--warning-bg);
+    }
+    &[data-color="danger"] {
+      color: var(--danger);
+      background-color: var(--danger-bg);
+    }
+
+    &.active {
+      background-color: var(--bg-5);
+    }
+
+    i {
+      margin-right: 10px;
+    }
+  }
+}

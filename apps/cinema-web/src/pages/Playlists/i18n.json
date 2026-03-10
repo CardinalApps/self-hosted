@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Playlists"
+  },
+  "no-playlists-card-title": {
+    "en": "No movies & TV"
+  },
+  "no-playlists-card-message": {
+    "en": "After importing your music, you'll be able to organize it into playlists."
+  },
+  "no-playlists-button": {
+    "en": "Import music"
+  }
+}

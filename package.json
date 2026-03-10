@@ -1,0 +1,46 @@
+{
+  "name": "@cardinalapps/monorepo",
+  "description": "Monorepo for Cardinal's apps.",
+  "license": "Elastic License 2.0 (ELv2)",
+  "version": "2.0.0",
+  "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev --ui=tui --concurrency=25",
+    "dev:wos": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/media-server",
+    "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
+    "dev:woas": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server",
+    "lint": "turbo run lint --continue -- --max-warnings 0",
+    "typecheck": "turbo run typecheck --continue",
+    "build": "turbo run build",
+    "build:media-server:bin": "turbo run build && pnpm --dir servers/media bundle && pnpm --dir servers/media build:bin",
+    "build:media-server:image": "pnpm build:media-server:bin && docker build -f Dockerfile.media-server -t cardinalapps/media-server:stable .",
+    "build:cms:image": "docker build -f ./servers/cms/Dockerfile -t cardinalapps/cms:latest .",
+    "build:auth-server:image": "docker build -f Dockerfile.auth-server -t cardinalapps/auth-server:latest .",
+    "build:status:image": "docker build -f Dockerfile.status-app -t cardinalapps/status:latest .",
+    "build:website:image": "docker build -f Dockerfile.website -t cardinalapps/website:latest .",
+    "serve": "turbo run serve",
+    "test": "turbo run test --force --concurrency=1"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.2",
+    "typescript": "5.9.3"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core",
+      "@parcel/watcher",
+      "@strapi/strapi",
+      "better-sqlite3",
+      "core-js",
+      "core-js-pure",
+      "esbuild",
+      "sharp"
+    ]
+  }
+}

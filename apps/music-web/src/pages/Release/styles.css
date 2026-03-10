@@ -1,0 +1,93 @@
+.music-release-page {
+  
+  .release-page-cols {
+    display: flex;
+    gap: calc(var(--gutter) * 2);
+
+    .release-left-col {
+
+      .release-artwork {
+        margin-bottom: var(--gutter);
+      }
+
+      .release-artists {
+        margin-bottom: var(--gutter);
+      }
+
+      .release-genres {
+        margin-bottom: var(--gutter);
+      }
+    }
+
+    .release-right-col {
+      flex-grow: 1;
+    }
+
+    @media screen and (max-width: 1200px) {
+      gap: 0;
+      flex-direction: column;
+
+      .release-left-col {
+        width: 100%;
+        justify-content: center;
+
+        .release-artwork {
+          display: flex;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .release-meta {
+    width: 100%;
+    margin-bottom: calc(var(--gutter) * 2);
+
+    .release-name {
+      font-size: 24px;
+    }
+
+    .meta-section-title {
+      margin-bottom: 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-color-4);
+    }
+
+    .release-meta-list {
+      width: 100%;
+
+      .item-list-item-name {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        strong {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .release-disc-number {
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  .release-disc-tracks {
+    margin-bottom: var(--gutter);
+  }
+
+  .music-release {
+    width: 100%;
+
+    .music-release-art {
+      height: 300px;
+    }
+  }
+
+  .music-release-track-list {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,29 @@
+.progress-bar-box {
+  width: 100%;
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg-5);
+
+    .current-progress {
+      max-width: 100%;
+      height: 100%;
+      z-index: 2;
+      border-radius: 10px;
+      background-color: var(--accent-color);
+      transition: width 200ms;
+    }
+  }
+
+  .current-progress-count {
+    width: 100%;
+    text-align: right;
+    padding: 5px 15px;
+    font-weight: 800;
+    font-size: 13px;
+  }
+}

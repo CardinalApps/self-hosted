@@ -1,0 +1,33 @@
+# Create an .env file next to this docker-compose with the contents from ../../env.template
+
+services:
+  cardinal-media-server-beta-postgres:
+    image: cardinalapps/media-server:beta
+    container_name: cardinal-media-server-beta-postgres
+    ports:
+      - 24903:24900
+    environment:
+      - CARDINAL_POSTGRES=true
+    volumes:
+      - cardinal-media-server-beta-postgres-data:/config
+      - ${MUSIC_PATH}:/music
+      - ${PHOTOS_PATH}:/photos
+    depends_on:
+      - cardinal-media-server-beta-postgres-db
+    links:
+      - cardinal-media-server-beta-postgres-db
+    restart: unless-stopped
+  cardinal-media-server-beta-postgres-db:
+    image: postgres:16.3
+    container_name: cardinal-media-server-beta-postgres-db
+    restart: always
+    environment:
+      - POSTGRES_USER=cardinal
+      - POSTGRES_PASSWORD=cardinal
+    ports:
+      - 24911:5432
+    volumes:
+      - cardinal-media-server-beta-postgres-db-data:/var/lib/postgresql/data
+volumes:
+  cardinal-media-server-beta-postgres-data:
+  cardinal-media-server-beta-postgres-db-data:

@@ -1,0 +1,13 @@
+.playback-queue[data-layout="list"] {
+
+  .queue-item {
+    margin: 0 15px;
+    padding: 5px 0;
+    border-top: 1px solid var(--border-color-3);
+    font-size: 13px;
+    color: var(--text-color-3);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}

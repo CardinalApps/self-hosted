@@ -1,0 +1,191 @@
+{
+  "title": {
+    "en": "Indexing"
+  },
+  "files": {
+    "en": "files"
+  },
+  "controls.title": {
+    "en": "Indexer"
+  },
+  "stop-run.title-attr": {
+    "en": "Stop the current indexing run"
+  },
+  "status.title.begin": {
+    "en": "Start Indexing"
+  },
+  "status.title.pause": {
+    "en": "Pause Indexing"
+  },
+  "status.title.resume": {
+    "en": "Resume Indexing"
+  },
+  "status.current-status": {
+    "en": "Status"
+  },
+  "status.elapsed": {
+    "en": "Time elapsed"
+  },
+  "status.total-files-found": {
+    "en": "Found"
+  },
+  "status.total-files-indexed": {
+    "en": "Indexed"
+  },
+  "status.total-files-skipped": {
+    "en": "No change"
+  },
+  "status.total-files-errored": {
+    "en": "Errored"
+  },
+  "status.total-files-deindexed": {
+    "en": "Files Deindexed"
+  },
+  "status.elapsed.time": {
+    "en": "{time}"
+  },
+  "status.overall-progress.title": {
+    "en": "This Run"
+  },
+  "status.media-progress.title": {
+    "en": "Progress"
+  },
+  "status.progress.music": {
+    "en": "Music"
+  },
+  "status.progress.photos": {
+    "en": "Photos"
+  },
+  "status.progress.movies": {
+    "en": "Movies"
+  },
+  "options.index-music": {
+    "en": "Index music"
+  },
+  "options.index-photos": {
+    "en": "Index photos"
+  },
+  "options.index-movies": {
+    "en": "Index movies"
+  },
+  "options.index-tv": {
+    "en": "Index TV"
+  },
+  "status.progress.tv": {
+    "en": "TV"
+  },
+  "counts.title": {
+    "en": "Files"
+  },
+  "counts.songs": {
+    "en": "Music"
+  },
+  "counts.photos": {
+    "en": "Photos"
+  },
+  "counts.movies": {
+    "en": "Movies"
+  },
+  "counts.tv": {
+    "en": "TV"
+  },
+  "dirs.title": {
+    "en": "Folders"
+  },
+  "dirs.tooltip-docker": {
+    "en": "Folders are set in your docker-compose.yaml file."
+  },
+  "dirs.music": {
+    "en": "Music"
+  },
+  "dirs.photos": {
+    "en": "Photos"
+  },
+  "dirs.movies": {
+    "en": "Movies"
+  },
+  "dirs.tv": {
+    "en": "TV"
+  },
+  "dirs.no-dir": {
+    "en": "Not set"
+  },
+  "state.idle": {
+    "en": "Idle"
+  },
+  "state.indexing": {
+    "en": "Indexing"
+  },
+  "state.ago": {
+    "en": "ago"
+  },
+  "state.paused": {
+    "en": "Paused"
+  },
+  "state.completed": {
+    "en": "Done"
+  },
+  "state.completed.no-files-found": {
+    "en": "No files found"
+  },
+  "run.history.title": {
+    "en": "History"
+  },
+  "run.history.show-empty-runs": {
+    "en": "Include empty runs"
+  },
+  "run.history.load-more": {
+    "en": "Load More"
+  },
+  "run.file-count.0": {
+    "en": "No change"
+  },
+  "run.file-count.added": {
+    "en": "+{num}"
+  },
+  "run.status.success": {
+    "en": "Completed"
+  },
+  "run.error.cannot-start": {
+    "en": "Couldn't start the indexing run"
+  },
+  "run.error.general-error": {
+    "en": "That didn't work"
+  },
+  "run.status.stopped-by-user": {
+    "en": "Stopped"
+  },
+  "run.status.not-started": {
+    "en": "-"
+  },
+  "run.total-files-found": {
+    "en": "Files Found"
+  },
+  "run.total-files-added": {
+    "en": "Files Added"
+  },
+  "run.total-files-updated": {
+    "en": "Files Updated"
+  },
+  "run.total-files-skipped": {
+    "en": "Files Skipped"
+  },
+  "run.total-files-errored": {
+    "en": "Files Errored"
+  },
+  "data.media-reset.button": {
+    "en": "Deindex Media"
+  },
+  "data.media-reset.confirm-title": {
+    "en": "Deindex Media"
+  },
+  "data.confirm-media-reset": {
+    "en": "<p>Deindexing your media files will remove your photos, music, movies, and TV from your Media Server. Features that require media, like photo albums and playlists, will be reset.</p><p>Your Media Server will become unresponsive while this process runs (it can take a while).</p>"
+  },
+  "data.media-reset.success-toast.title": {
+    "en": "Media successfully dexindexed."
+  },
+  "run.history.no-change": {
+    "en": "No change"
+  }
+}

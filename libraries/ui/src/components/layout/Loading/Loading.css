@@ -1,0 +1,38 @@
+.loading-indicator {
+
+  &.inline {
+    display: inline-flex;
+  }
+
+  &.size-xs {
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &.size-s {
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &.size-m {
+
+    svg {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  &.size-l {
+
+    svg {
+      width: 52px;
+      height: 52px;
+    }
+  }
+}

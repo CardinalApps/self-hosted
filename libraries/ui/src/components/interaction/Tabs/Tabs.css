@@ -1,0 +1,31 @@
+.tabs {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color-1);
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .tab {
+    border-right: 1px solid var(--border-color-1);
+    background-color: var(--bg-3);
+
+    &:last-of-type {
+      border-right: none;
+    }
+
+    &.active {
+      background-color: var(--bg-2);
+    }
+
+    button {
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--font-family);
+      color: var(--text-color-2);
+      border: none;
+      cursor: pointer;
+      background: none;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@cardinalapps/typescript-config",
+  "description": "Shared TypeScript configs.",
+  "license": "Elastic License 2.0 (ELv2)",
+  "version": "0.1.0",
+  "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.json",
+    "./express": "./express.json",
+    "./library": "./library.json",
+    "./nest": "./nest.json",
+    "./vite": "./vite.json"
+  }
+}

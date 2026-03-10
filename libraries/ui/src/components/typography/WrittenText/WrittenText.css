@@ -1,0 +1,140 @@
+.written-text {
+
+  >*:last-child {
+    margin-bottom: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 20px;
+    color: var(--text-color-1);
+    font-family: var(--font-family);
+    line-height: 1.1em;
+    border: none;
+  }
+
+  h1 {
+    font-size: 40px;
+    font-weight: 900;
+  }
+
+  h2 {
+    font-size: 34px;
+    font-weight: 900;
+  }
+
+  h3 {
+    font-size: 28px;
+    font-weight: 900;
+  }
+
+  h4 {
+    font-size: 24px;
+    font-weight: 900;
+  }
+
+  h5 {
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  h6 {
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  p {
+    margin-bottom: 20px;
+    color: var(--text-color-1);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5em;
+
+    /* &:first-of-type {
+      margin-bottom: 20px;
+    } */
+  }
+
+  ul, ol {
+    padding-left: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    color: var(--text-color-1);
+
+    li {
+
+      ol, ul {
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+        &:last-of-type { margin-bottom: 5px; }
+        &:first-of-type { margin-bottom: 5px; }
+      }
+    }
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  li {
+    padding-left: 5px;
+    margin-bottom: 5px;
+    font-family: var(--font-family);
+    line-height: 1.4em;
+    font-weight: 400;
+    font-size: 16px;
+    
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--accent-color);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  img {
+    width: 100%;
+    padding: 0 10% 20px 10%;
+  }
+
+  code {
+    margin-bottom: 20px;
+    padding: 20px 22px;
+    font-family: monospace;
+    font-size: 13px;
+    display: block;
+    border-radius: var(--border-radius);
+    background: var(--bg-3);
+  }
+
+  pre {
+
+    code {
+      text-wrap: wrap;
+    }
+  }
+
+  p, li {
+
+    code {
+      padding: 3px 8px;
+      font-family: monospace;
+      font-size: 13px;
+      display: inline;
+    }
+  }
+
+  .arrow-link {
+    margin-bottom: 20px;
+  }
+}

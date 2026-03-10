@@ -1,0 +1,71 @@
+{
+  "showing-photos": {
+    "en": "Showing {current} of {total} photos"
+  },
+  "total-photos": {
+    "en": "{total} photos"
+  },
+  "num-photos-in-range": {
+    "en": "{num} photo taken on {date}"
+  },
+  "num-photos-in-range-plural": {
+    "en": "{num} photos taken on {date}"
+  },
+  "missing-image": {
+    "en": "<p>Thumbnail not<br />ready yet</p>"
+  },
+  "timeline.today": {
+    "en": "Today"
+  },
+  "timeline.yesterday": {
+    "en": "Yesterday"
+  },
+  "timeline.earlier-this-week": {
+    "en": "Earlier this week"
+  },
+  "timeline.last-week": {
+    "en": "Last week"
+  },
+  "timeline.earlier-this-month": {
+    "en": "Earlier this month"
+  },
+  "timeline.last-month": {
+    "en": "Last month"
+  },
+  "timeline.two-months-ago": {
+    "en": "Two months ago"
+  },
+  "timeline.three-months-ago": {
+    "en": "Three months ago"
+  },
+  "timeline.four-months-ago": {
+    "en": "Four months ago"
+  },
+  "timeline.five-months-ago": {
+    "en": "Five months ago"
+  },
+  "timeline.six-months-ago": {
+    "en": "Six months ago"
+  },
+  "timeline.earlier-this-year": {
+    "en": "Earlier this year"
+  },
+  "timeline.last-year": {
+    "en": "Last year"
+  },
+  "timeline.two-years-ago": {
+    "en": "Two years ago"
+  },
+  "timeline.three-years-ago": {
+    "en": "Three years ago"
+  },
+  "timeline.four-years-ago": {
+    "en": "Four years ago"
+  },
+  "timeline.five-years-ago": {
+    "en": "Five years ago"
+  },
+  "timeline.a-while-ago": {
+    "en": "A while ago"
+  }
+}

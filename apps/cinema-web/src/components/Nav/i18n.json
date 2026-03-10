@@ -1,0 +1,23 @@
+{
+  "nav.watch-now": {
+    "en": "Watch Now"
+  },
+  "nav.movies": {
+    "en": "Movies"
+  },
+  "nav.tv": {
+    "en": "TV"
+  },
+  "nav.channels": {
+    "en": "Channels"
+  },
+  "nav.playlists": {
+    "en": "Playlists"
+  },
+  "nav.history": {
+    "en": "History"
+  },
+  "nav.libraries": {
+    "en": "Libraries"
+  }
+}

@@ -1,0 +1,7 @@
+npm-debug.log
+.dockerignore
+.git
+.gitignore
+
+// Not sure if needed for pkg
+//node_modules

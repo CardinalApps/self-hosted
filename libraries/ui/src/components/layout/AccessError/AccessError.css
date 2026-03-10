@@ -1,0 +1,30 @@
+.access-error, .component-error {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .error-information {
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .error-name {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: monospace;
+  }
+
+  .error-message {
+    font-size: 14px;
+    font-weight: 400;
+    font-family: monospace;
+
+    p {
+      margin-bottom: 10px;
+    }
+  }
+}

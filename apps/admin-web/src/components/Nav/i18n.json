@@ -1,0 +1,20 @@
+{
+  "nav.overview": {
+    "en": "Overview"
+  },
+  "nav.users": {
+    "en": "Users"
+  },
+  "nav.roles": {
+    "en": "Roles"
+  },
+  "nav.indexing": {
+    "en": "Indexing"
+  },
+  "nav.jobs": {
+    "en": "Jobs"
+  },
+  "nav.libraries": {
+    "en": "Libraries"
+  }
+}

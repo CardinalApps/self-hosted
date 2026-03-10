@@ -1,0 +1,83 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Feature/AppBase" />
+
+# `<AppBase />`
+
+## Overview
+
+The `<AppBase />` component serves as the foundation for all Cardinal web apps
+that connect to a [Cardinal Media Server](https://cardinalapps.io/cardinal-media-server). The component allows for each app like
+Cardinal Photos or Music to easily implement the same UI as other Cardinal apps,
+and it handles various client app systems like:
+
+    - Login
+    - Routing
+    - Layouts
+    - Toasts
+    - Middleware
+    - Server-side events
+    - Media Server health checks
+    - Custom context menu
+    - Dev tools
+    - Error handling
+    - ...and other patterns shared across all apps
+
+The apps that use the `<AppBase />` are:
+
+    - Cardinal Media Server Dashboard
+    - Cardinal Photos
+    - Cardinal Music
+    - Cardinal Cinema
+
+The cloud apps like the one at
+[account.cardinalapps.io](https://account.cardinalapps.io) do not use the
+`<AppBase />` because they do not connect to a local Media Server.
+
+## Architecture
+
+The `<AppBase />` component provides a number of props for handling everything
+that a Cardinal client app needs to get initialized and connected to a Media
+Server securely.
+
+The main purpose of the `<AppBase />` is to eliminate code duplication between
+Cardinal apps. Refer to the diagram below for the complete `<AppBase> />` tree.
+
+<a href="/images/AppBase.png" target="_blank">
+  <img src={'/images/AppBase.png'} width="200px" alt="AppBase diagram" />
+</a>
+
+## Components
+
+The `<AppBase />` is made of various componenets.
+
+#### `<AppLoading />`
+
+Loading screen at the app level. Handles situations where no Media Server is reachable.
+
+#### `<AppPublic />`
+
+The component tree is divided into two main sections: public and private. The
+public part of the tree is available to visitors that do not have an
+authentication token for a Media Server user. Generally, only the Login
+page is available to these visitors, but there are other things like the First
+Time Setup that are available here.
+
+#### `<AppPrivate />`
+
+The private part of the component tree is available only to users that bear a
+valid auth token for a Media Server user. Authenticated users only have access to
+the private pages, not the public pages too. So, if you want a page to be
+available publicly and privately, it must be added to both parts of the tree
+like the Login page is.
+
+#### `<AppScaffold />`
+
+Within the private part of the app exists the `<AppScaffold />`. This component
+is responsible for rendering the layout on the page. The different layouts are
+documented within the Vanilla App story after logging in (only works in local
+dev environment).
+
+#### `<AppPage />`
+
+Used by the client app to create pages within the app.

@@ -1,0 +1,170 @@
+{
+  "title": {
+    "en": "Jobs"
+  },
+  "ago": {
+    "en": "ago"
+  },
+  "active-jobs.title": {
+    "en": "Job Queue"
+  },
+  "job-reports.title": {
+    "en": "History"
+  },
+  "job-reports.no-active-jobs": {
+    "en": "<p>No jobs have been completed yet.</p>"
+  },
+  "job.general-docs": {
+    "en": "How jobs work"
+  },
+  "active-jobs.no-active-jobs": {
+    "en": "No active jobs."
+  },
+  "active-jobs.active-jobs-automatic-notice": {
+    "en": "Jobs run automatically when needed."
+  },
+  "job.photo_thumbnails.name": {
+    "en": "Photo thumbnails"
+  },
+  "job.photo_variations.name": {
+    "en": "Photo variations"
+  },
+  "job.album_art_thumbnails.name": {
+    "en": "Album art thumbnails"
+  },
+  "start-new-job": {
+    "en": "Start a new job"
+  },
+  "no-configurations": {
+    "en": "This job doesn't have any configurable parameters."
+  },
+  "job.button.start": {
+    "en": "Start job"
+  },
+  "job.button.pause": {
+    "en": "Pause"
+  },
+  "job.button.resume": {
+    "en": "Resume"
+  },
+  "job.button.cancel": {
+    "en": "Cancel"
+  },
+  "job.button.view-details": {
+    "en": "Details"
+  },
+  "job.button.configure": {
+    "en": "Configure"
+  },
+  "job.docs": {
+    "en": "Docs"
+  },
+  "job.started-at": {
+    "en": "Started {time} ago"
+  },
+  "job.completed-at": {
+    "en": "Completed {time} ago"
+  },
+  "job.configure.title": {
+    "en": "Configure this job"
+  },
+  "job.photo_thumbnails.title": {
+    "en": "Photo thumbnails"
+  },
+  "job.photo_thumbnails.desc": {
+    "en": "<p>Creates thumbnails of your photos in various sizes.</p>"
+  },
+  "job.photo_variations.title": {
+    "en": "Photo variations"
+  },
+  "job.photo_variations.desc": {
+    "en": "<p>Creates full-sized variations (copies) of some of your photos to improve device support and loading speeds.</p>"
+  },
+  "job.album_art_thumbnails.title": {
+    "en": "Album art thumbnails"
+  },
+  "job.album_art_thumbnails.desc": {
+    "en": "<p>Creates thumbnails of your album artwork in various sizes.</p>"
+  },
+  "active-job": {
+    "en": "Active job"
+  },
+  "pending-job": {
+    "en": "Pending job"
+  },
+  "jobs.error.could-not-create": {
+    "en": "Couldn't start the new job."
+  },
+  "jobs.error.could-not-update": {
+    "en": "Couldn't update the job."
+  },
+  "jobs.error.could-not-fetch-active-jobs": {
+    "en": "Couldn't load active jobs."
+  },
+  "jobs.error.could-not-fetch-job-history": {
+    "en": "Couldn't load job history."
+  },
+  "job.status.in_queue": {
+    "en": "In queue"
+  },
+  "job.status.preparing": {
+    "en": "Preparing"
+  },
+  "job.status.running": {
+    "en": "Running"
+  },
+  "job.status.paused": {
+    "en": "Paused"
+  },
+  "job.status.canceled": {
+    "en": "Canceled"
+  },
+  "job.status.completed": {
+    "en": "Complete"
+  },
+  "job.status.errored": {
+    "en": "Errored"
+  },
+  "job.details.title": {
+    "en": "Job Details"
+  },
+  "job.details.copy-to-clipboard": {
+    "en": "Copy to clipboard"
+  },
+  "job.details.metadata.id": {
+    "en": "Job ID"
+  },
+  "job.details.metadata.type": {
+    "en": "Type"
+  },
+  "job.details.metadata.started-at": {
+    "en": "Started at"
+  },
+  "job.details.metadata.status": {
+    "en": "Status"
+  },
+  "job.details.tasks.title": {
+    "en": "Tasks"
+  },
+  "job.details.tasks.count": {
+    "en": "{num} tasks"
+  },
+  "job.details.tasks.id": {
+    "en": "ID"
+  },
+  "job.details.tasks.type": {
+    "en": "Type"
+  },
+  "job.details.tasks.status": {
+    "en": "Status"
+  },
+  "job.details.tasks.no-tasks-created": {
+    "en": "Something went wrong with this job and no tasks were created."
+  },
+  "job.details.tasks.no-tasks-needed": {
+    "en": "The job ran successfully and did not need to create any tasks."
+  },
+  "job.history.load-more": {
+    "en": "Load More"
+  }
+}

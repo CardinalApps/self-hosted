@@ -1,0 +1,30 @@
+.jobStatus {
+  padding: 8px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background-color: var(--bg-3);
+
+  .label {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1em;
+  }
+
+  i {
+    font-size: 14px;
+  }
+
+  > div {
+    width: 20px;
+    height: 16px;
+    position: relative;
+    top: -2px;
+
+    svg {
+      position: absolute;
+    }
+  }
+}

@@ -1,0 +1,7 @@
+.card.card-access-error {
+
+  .card-content {
+    align-items: center;
+    display: flex;
+  }
+}

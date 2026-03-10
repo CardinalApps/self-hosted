@@ -1,0 +1,17 @@
+{
+  "music-tracks.title": {
+    "en": "Music Tracks"
+  },
+  "music-tracks.order-by.title": {
+    "en": "Title"
+  },
+  "music-tracks.order-by.track-num": {
+    "en": "Track Number"
+  },
+  "music-tracks.order-by.duration": {
+    "en": "Duration"
+  },
+  "music-tracks.order-by.bitrate": {
+    "en": "Bitrate"
+  }
+}

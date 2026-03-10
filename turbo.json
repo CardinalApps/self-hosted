@@ -1,0 +1,47 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "stream",
+  "globalEnv": ["TZ", "npm_package_version"],
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["build/**", "dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "serve": {
+      "dependsOn": ["^serve"]
+    },
+    "@cardinalapps/auth-server#dev": {
+      "dependsOn": [
+        "@cardinalapps/access-control#build",
+        "@cardinalapps/products#build"
+      ],
+      "cache": false
+    },
+    "@cardinalapps/media-server#dev": {
+      "dependsOn": [
+        "@cardinalapps/access-control#build",
+        "@cardinalapps/app-settings#build",
+        "@cardinalapps/types#build",
+        "@cardinalapps/products#build",
+        "@cardinalapps/topology#build"
+      ],
+      "cache": false
+    }
+  }
+}

@@ -1,0 +1,348 @@
+.media {
+
+  section {
+    margin-bottom: 40px;
+  }
+}
+
+.indexing {
+  display: flex;
+  gap: var(--gutter);
+  flex-wrap: wrap;
+
+  @media (max-width: 1200px) {
+    flex-wrap: wrap;
+
+    .card {
+      flex: 1 0 100% !important;
+    }
+  }
+
+  .progressBar {
+    width: 100%;
+
+    p {
+      margin-bottom: 3px;
+      font-weight: 600;
+    }
+  }
+
+  .importerCard {
+    display: flex;
+    flex: 1 0 100% !important;
+    gap: 40px;
+
+    > div {
+      width: 100%;
+    }
+
+    .buttonBox {
+      position: relative;
+
+      button {
+        outline: none;
+        border: none;
+        background: none;
+      }
+    }
+
+    .importerButton {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+
+      .buttonCol {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .importStatus {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+
+          span {
+            padding: 8px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            background: var(--bg-2);
+          }
+        }
+      }
+    }
+
+    .controlLabel {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .runSettingsCol {
+      width: 100%;
+      padding: 10px 30px;
+      display: flex;
+      flex-direction: column !important;
+      flex-shrink: 0;
+
+      @media (max-width: 768px) {
+        padding: 10px;
+      }
+    }
+
+    .progressCol {
+      width: 100%;
+      padding: 10px 30px;
+      flex-direction: column !important;
+      flex-shrink: 1;
+
+      @media (max-width: 768px) {
+        padding: 10px;
+      }
+    }
+
+    .progressItems {
+      width: 100%;
+      margin-bottom: 30px;
+      gap: 8px;
+      display: flex;
+      align-items: center;
+
+      @media (max-width: 768px) {
+        flex-wrap: wrap;
+      }
+
+      p {
+        padding: 8px 12px;
+        white-space: nowrap;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color-1);
+        background-color: var(--bg-2);
+
+        strong {
+          margin-right: 5px;
+
+          &:after {
+            content: ':';
+          }
+        }
+      }
+    }
+
+    .info {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color-1);
+      background-color: var(--bg-2);
+
+      .title {
+        width: 100%;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .indexingRow {
+        width: 100%;
+        display: flex;
+        font-size: 15px;
+        justify-content: space-between;
+        align-items: center;
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+
+        span {
+          padding: 3px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+        }
+
+        strong {
+          width: 100px;
+          padding: 4px 0;
+          display: inline-flex;
+          align-items: center;
+          font-weight: 500;
+          font-size: 14px;
+          flex-grow: 1;
+        }
+      }
+    }
+  }
+
+  .stopRun {
+    margin-left: 10px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    border-radius: 100%;
+    color: var(--text-color-1);
+    background: none;
+
+    i {
+      font-size: 18px;
+
+      &:hover {
+        color: var(--accent-color);
+      }
+    }
+  }
+
+  .importCompletedIcon {
+    margin-left: 10px;
+    color: var(--success);
+    font-size: 18px;
+  }
+}
+
+.importButton {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  border-radius: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-color-1);
+  box-shadow: var(--box-shadow-3);
+  background: var(--bg-3);
+  transition: all 100ms;
+  z-index: 10;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 50%;
+    opacity: 0.10;
+    background: var(--bg-4);
+    z-index: 2;
+  }
+
+  &:active {
+    transform: scale(0.991);
+    box-shadow: var(--box-shadow-1);
+
+    &:before {
+      opacity: 0.17;
+    }
+  }
+
+  &.running {
+
+    i:before {
+      color: var(--accent-color);
+      opacity: 1;
+      text-shadow: 0 0 10px var(--accent-color);
+    }
+
+    ~.spinny {
+      opacity: 0.35;
+    }
+  }
+
+  &.paused {
+
+    i:before {
+      color: var(--accent-color);
+      opacity: 0.6;
+      text-shadow: 0 0 10px var(--accent-color);
+    }
+
+    ~.spinny {
+      opacity: 0;
+    }
+  }
+
+  i:before {
+    font-size: 48px;
+    opacity: 0.55;
+    position: relative;
+    transition: all 800ms;
+    z-index: 3;
+  }
+}
+
+.spinny {
+  width: 124px;
+  height: 124px;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: 2px;
+  bottom: 2px;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 800ms;
+
+  svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.indexing-history {
+  
+  .output {
+    width: 100%;
+    min-height: 400px;
+    position: relative;
+    border-radius: var(--border-radius);
+    background-color: var(--bg-2);
+  }
+
+  .loadMore {
+    padding: 30px 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .list-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .counts {
+    display: flex;
+    gap: 10px;
+    
+    button {
+      margin: 5px 0;
+    }
+  }
+
+  .status {
+    font-weight: 400;
+    font-size: 13px;
+    white-space: nowrap;
+
+    i {
+      font-size: 15px;
+      position: relative;
+      top: 1px;
+    }
+
+    span {
+      margin: 8px;
+    }
+  }
+}
+
+.fileList {
+  list-style: decimal;
+  padding: 0 10px;
+  word-break: break-word;
+
+  li {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+}

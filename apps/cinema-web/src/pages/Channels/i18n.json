@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Channels"
+  },
+  "no-movies-tv-card-title": {
+    "en": "No TV"
+  },
+  "no-movies-tv-card-message": {
+    "en": "Create and manage TV channels once you've imported your media."
+  },
+  "no-movies-tv-button": {
+    "en": "Import movies & TV"
+  }
+}

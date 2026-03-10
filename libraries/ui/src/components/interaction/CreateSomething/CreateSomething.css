@@ -1,0 +1,66 @@
+.create-something {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  
+  input[type="text"] {
+    font-size: 16px;
+    font-weight: 400;
+    background-color: var(--bg-1);
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  .create-something-button {
+    width: 70px;
+    height: 70px;
+    border: none;
+    border-radius: 100%;
+    display: flex;
+    flex: 0 0 70px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--box-shadow-1);
+    background-color: var(--accent-color);
+    transition: transform 80ms;
+
+    &:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .icon {
+      color: white;
+      font-size: 16px;
+    }
+  }
+
+  form {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  label {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 0 0;
+
+    @media (max-width: 768px) {
+      flex: 1 0;
+    }
+  }
+
+  .create-something-text-label {
+    width: 100%;
+    margin: 0 0 2px 5px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  button[type="submit"] {
+    height: 40px;
+  }
+}

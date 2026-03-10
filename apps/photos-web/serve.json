@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/photos/**", "destination": "/photos/index.html" }
+  ]
+}

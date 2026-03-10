@@ -1,0 +1,48 @@
+.fauxbox {
+
+  &.checked {
+
+    .box {
+
+      i {
+        display: flex;
+      }
+    }
+  }
+
+  input[type="checkbox"] {
+    position: fixed;
+    bottom: -99999px;
+    right: -99999px;
+    opacity: 0;
+    z-index: -999999;
+
+    &:focus {
+      outline: none;
+      
+      + .box {
+        border-color: var(--accent-color);
+      }
+    }
+  }
+
+  .box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-color-2);
+    border-radius: 3px;
+    background: var(--bg-4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    --webkit-appearance: none;
+
+    i {
+      display: none;
+      font-size: 12px;
+      pointer-events: none;
+      color: var(--text-color-3);
+    }
+  }
+}

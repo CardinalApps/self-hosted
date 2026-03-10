@@ -1,0 +1,58 @@
+[data-theme="light"] {
+  background-color: var(--bg-2);
+
+  /* Backgrounds */
+  --bg-1: #fff;
+  --bg-2: #f9f9f9;
+  --bg-3: #f0f0f0;
+  --bg-4: #e6e6e6;
+  --bg-5: #dddddd;
+
+  /* Foregrounds */
+  --text-color-1: #403f3f;
+  --text-color-2: #535353;
+  --text-color-3: #626262;
+  --text-color-4: #797979;
+  --text-color-5: #9d9d9d;
+
+  /* Inputs */
+  --input-bg: #f1f1f1;
+  --input-search-focus-bg: #333333;
+
+  /* Borders */
+  --border-color-1: #dedede;
+  --border-color-2: #afafaf;
+  --border-color-3: #e7e7e7;
+  --border-color-focus: #bbbbbb;
+
+  /* Buttons */
+  --button-bg: #ffffff;
+  --button-bg-solid: #ebebeb;
+  --button-bg-hover: #e2e2e2;
+
+  /* Shadows */
+  --box-shadow-1: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 24%) 0px 1px 2px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
+  --box-shadow-2: 0px 1px 20px -12px rgb(168 168 168);
+  --box-shadow-3: rgb(0 0 0 / 20%) 0px 3px 4px 0px, rgb(0 0 0 / 24%) 0px 1px 0px 0px, rgb(0 0 0 / 12%) 0px 1px 4px 0px;
+  --box-shadow-4: rgb(0 0 0 / 20%) 0px 1px 3px 1px, rgb(0 0 0 / 24%) 0px 2px 2px 0px, rgb(0 0 0 / 12%) 0px 2px 2px 1px;
+
+  /* Alerts */
+  --info: #1857c4;
+  --success: #3aaf39;
+  --warning: #ffdc00;
+  --danger: #d24848;
+  --info-bg: #1882c4;
+  --success-bg: #43be43;
+  --warning-bg: #efbe34;
+  --danger-bg: #a53737;
+
+  /* Scrollbar */
+  --scrollbar-color: rgb(212, 212, 212);
+
+  .glass {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(9.4px);
+    -webkit-backdrop-filter: blur(9.4px);
+  }
+}

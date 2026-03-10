@@ -1,0 +1,239 @@
+.custom-select {
+  position: relative;
+
+  &.size-m {
+    .typing-area .upper {
+      height: 38px;
+      font-size: 14px;
+      padding: 7px 45px 7px 14px;
+    }
+
+    .options .option {
+      padding: 10px 30px 10px 10px;
+      font-size: 14px;
+    }
+  }
+
+  &.size-s {
+    .typing-area .upper {
+      height: auto;
+      font-size: 13px;
+      padding: 7px 45px 7px 14px;
+    }
+
+    .options .option {
+      padding: 10px 30px 10px 10px;
+      font-size: 14px;
+    }
+  }
+
+  .custom-select-label {
+    margin-bottom: 10px; 
+    color: var(--text-color-2);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .label-icon {
+    margin-right: 12px;
+    color: var(--text-color-2);
+  }
+  
+  .typing-area {
+    width: 100%;
+    display: flex;
+    position: relative;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color-1);
+    font-family: var(--font-family);
+    background: var(--input-bg);
+
+    &.no-border {
+      border: none;
+    }
+
+    .upper {
+      width: 100%;
+      height: 46px;
+      padding: 10px 50px 10px 20px;
+      display: flex;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      background-color: transparent;
+
+      &:active {
+
+        &+.icon {
+          transform: translateY(-50%) scale(0.94);
+        }
+      }
+    }
+
+    .selected {
+      cursor: pointer;
+      user-select: none;
+
+      span {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .icon-button {
+    padding: 0;
+    border: none;
+    pointer-events: all;
+    
+    i {
+      position: static;
+      transform: none;
+    }
+  }
+
+  .icon, .icon-button {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    color: var(--text-color-2);
+    font-size: 12px;
+    pointer-events: none;
+    transition: transform 200ms;
+    transform: translateY(-50%) scale(1);
+  }
+
+  .down-icon {
+    right: 18px;
+  }
+
+  .erase-icon {
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .num-selected {
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: calc(50% - 12px);
+    right: 10px;
+    user-select: none;
+    font: 700 12px var(--font-family);
+    border-radius: 100px;
+    background-color: var(--bg-5);
+  }
+
+  .options {
+    width: 100%;
+    max-height: 300px;
+    margin-top: 8px;
+    padding: 8px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color-3);
+    box-shadow: var(--box-shadow-2);
+    overflow-y: auto;
+    background-color: var(--bg-1);
+    z-index: 5;
+
+    .option {
+      width: 100%;
+      margin-bottom: 5px;
+      padding: 12px 40px 12px 20px;
+      border: none;
+      font: 500 15px var(--font-family);
+      color: var(--text-color-1);
+      text-align: left;
+      position: relative;
+      border-radius: var(--border-radius-s);
+      cursor: pointer;
+      background-color: var(--bg-1);
+      -webkit-appearance: none;
+
+      &:hover {
+        background-color: var(--bg-3);
+      }
+
+      &.selected {
+        background-color: var(--bg-3);
+
+        i {
+          margin-top: -8px;
+          position: absolute;
+          font-size: 15px;
+          top: 50%;
+          right: 15px;
+          color: var(--accent-color);
+        }
+      }
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+
+    .no-options {
+      width: 100%;
+      min-height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-color-4);
+    }
+  }
+}
+
+.custom-select.layout-underline {
+
+  &.size-s {
+    .down-icon {
+      right: 5px;
+    }
+
+    .erase-icon {
+      right: 5px;
+    }
+
+    .search-icon {
+      right: 2px;
+    }
+  }
+
+  .typing-area {
+    color: var(--text-color-2);
+  }
+
+  .icon-button {
+    /* right: 2px; */
+    background: none !important;
+  }
+  
+  .typing-area {
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    border-bottom: 2px solid var(--border-color-1);
+
+    .selected {
+
+      &.upper {
+        padding-left: 2px;
+      }
+    }
+  }
+}

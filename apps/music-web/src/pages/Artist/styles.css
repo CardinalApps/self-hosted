@@ -1,0 +1,11 @@
+.music-artist-page {
+
+  .music-artist-releases {
+    
+    .release-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--gutter);
+    }
+  }
+}

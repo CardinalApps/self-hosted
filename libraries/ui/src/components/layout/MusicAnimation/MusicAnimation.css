@@ -1,0 +1,77 @@
+.playing-music-animation {
+  position: relative;
+  display: flex;
+  border-radius: 100%;
+  justify-content: space-between;
+  cursor: pointer;
+  border: none;
+  background: none;
+  -webkit-appearance: none;
+
+  &[data-size="s"] {
+    width: 30px;
+    height: 30px;
+    padding: 9px;
+  }
+
+  &[data-size="m"] {
+    width: 40px;
+    height: 40px;
+    padding: 12px;
+
+    .bar {
+      width: 4px;
+    }
+  }
+
+  &.anim {
+
+    .bar {
+      animation: musicBarBounce 1.5s ease infinite;
+    }
+  }
+
+  &:hover {
+    background-color: var(--bg-4);
+  }
+
+  .bar {
+    content: '';
+    width: 3px;
+    height: 100%;
+    border-radius: 3px;
+    background-color: var(--accent-color);
+    transform-origin: bottom;
+    transform: scaleY(0.1);
+  }
+
+  .bar-2 {
+    animation-delay: -0.3s !important;
+  }
+
+  .bar-3 {
+    animation-delay: -1.1s !important;
+  }
+}
+
+@keyframes musicBarBounce {
+  0% {
+    transform: scaleY(0.3);
+  }
+
+  25% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(0.6);
+  }
+
+  75% {
+    transform: scaleY(1);
+  }
+
+  100% {
+    transform: scaleY(0.3);
+  }
+}

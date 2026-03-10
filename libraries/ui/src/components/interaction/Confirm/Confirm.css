@@ -1,0 +1,45 @@
+.confirmation-dialogue {
+  min-width: 400px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .confirmation-text {
+    padding: 20px 0 0;
+
+    input {
+      width: 100%;
+    }
+
+    .confirmation-text-title {
+      margin-bottom: 15px;
+      font-size: 15px;
+      font-weight: 800;
+
+      i {
+        margin-right: 5px;
+        color: var(--text-color-1);
+        font-size: 14px;
+      }
+
+      code {
+        padding: 4px;
+        font-weight: 500;
+        font-size: 13px;
+        user-select: all;
+        cursor: default;
+        border-radius: var(--border-radius);
+        background-color: var(--bg-4);
+      }
+    }
+  }
+}
+
+.confirmation-dialogue-controls {
+  width: 100%;
+  padding-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}

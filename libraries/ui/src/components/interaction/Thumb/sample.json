@@ -1,0 +1,240 @@
+[
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/3d.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 1350,
+        "width": 2400
+      }
+    },
+    "public": "/sample/images/original/3d.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/3d.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/birb.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 2411,
+        "width": 4286
+      }
+    },
+    "public": "/sample/images/original/birb.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/birb.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/blur.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 660,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/blur.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/blur.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/book.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 480,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/book.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/book.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/car.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 3500,
+        "width": 2321
+      }
+    },
+    "public": "/sample/images/original/car.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/car.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/face.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 960,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/face.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/face.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/guitar.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 1600,
+        "width": 2400
+      }
+    },
+    "public": "/sample/images/original/guitar.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/guitar.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/jellyfish.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 1280,
+        "width": 1920
+      }
+    },
+    "public": "/sample/images/original/jellyfish.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/jellyfish.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/lamp.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 360,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/lamp.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/lamp.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/light.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 427,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/light.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/light.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/plant.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 1280,
+        "width": 1920
+      }
+    },
+    "public": "/sample/images/original/plant.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/plant.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/stonehenge.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 427,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/stonehenge.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/stonehenge.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/swirl.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 1280,
+        "width": 1920
+      }
+    },
+    "public": "/sample/images/original/swirl.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/swirl.jpg"
+    }
+  },
+  {
+    "filePath": "/Users/brian/Projects/Cardinal/cardinal-monorepo/packages/lib-design-system/public/sample/images/original/waves.jpg",
+    "exif": {
+      "startMarker": {
+        "offset": 0
+      },
+      "tags": {},
+      "imageSize": {
+        "height": 960,
+        "width": 640
+      }
+    },
+    "public": "/sample/images/original/waves.jpg",
+    "thumbs": {
+      "small": "/sample/images/thumbs/waves.jpg"
+    }
+  }
+]

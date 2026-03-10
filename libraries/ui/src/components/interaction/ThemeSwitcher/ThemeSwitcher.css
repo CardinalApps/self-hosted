@@ -1,0 +1,21 @@
+.theme-switcher {
+
+  &.dark {
+    
+    i {
+      color: var(--text-color-1);
+    }
+  }
+
+  &.light {
+    
+    i {
+      color: var(--text-color-1);
+    }
+  }
+
+  i {
+    font-size: 18px;
+    cursor: pointer;
+  }
+}

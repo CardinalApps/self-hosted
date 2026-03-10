@@ -1,0 +1,38 @@
+.album {
+  height: 100%;
+  position: relative;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .title {
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    margin-bottom: 0;
+  }
+}
+
+.photoList {
+  height: 100%;
+}
+
+.infinitePhotos {
+  height: 100%;
+  position: relative;
+  margin-left: -20px;
+}
+
+.virtualList {
+  //margin-left: -30px;
+}

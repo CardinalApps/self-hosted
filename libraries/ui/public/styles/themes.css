@@ -1,0 +1,49 @@
+/* Defaults for all themes */
+[data-theme] {
+  /* Typography */
+  --font-family: 'Heebo', 'Helvetica', 'Arial', sans-serif;
+  
+  /* Spacing & Sizes */
+  --gutter: 20px;
+  --border-radius: 8px;
+  --border-radius-s: 12px;
+  --border-radius-m: 20px;
+
+  /* Colors */
+  --accent-color: #cc4c43;
+
+  /* Timing */
+  --transition-speed-fast: 140ms;
+  --transition-speed-med: 225ms;
+  --transition-speed-slow: 400ms;
+
+  /* Easing */
+  --easing-bounce: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3em;
+  color: var(--text-color-1);
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: none;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: var(--scrollbar-color);
+  }
+
+  input {
+    font-family: inherit;
+  }
+
+  button {
+    font-family: var(--font-family);
+  }
+}

@@ -1,0 +1,23 @@
+# We cannot use Alpine because Alpine uses musl instead of glibc, and we need
+# glibc because the binary is built on a glibc system.
+FROM node:18
+
+ARG BUILD_TAG
+ENV BUILD_TAG ${BUILD_TAG}
+
+# TODO development env
+ENV NODE_ENV production
+
+ENV CARDINAL_CONTAINER true
+
+# TODO use port 24800 in development env
+ENV CARDINAL_HOME_SERVER_PORT 24900
+
+ARG RELEASE_CHANNEL
+ENV RELEASE_CHANNEL ${RELEASE_CHANNEL}
+
+WORKDIR /home/node
+
+COPY --chown=root:root /servers/media/bin/prod/@cardinalapps ./bin
+
+CMD ["./bin/media-server"]
