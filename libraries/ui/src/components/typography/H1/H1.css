@@ -1,0 +1,9 @@
+.h1 {
+  margin-bottom: 25px;
+  color: var(--text-color-1);
+  font: 900 40px/1.1em var(--font-family);
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
+}

@@ -1,0 +1,72 @@
+.app-icon {
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 100%;
+  
+  i {
+    font-size: 18px;
+    color: var(--text-color-2);
+  }
+
+  &[data-hover-type="icon"] {
+
+    &:hover {
+
+      i {
+        color: var(--accent-color);
+      }
+    }
+  }
+
+  &[data-hover-type="background"] {
+
+    &:hover {
+      background-color: var(--bg-5);
+    }
+  }
+}
+
+.button-icon {
+  padding: 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  -webkit-appearance: none;
+
+  /* &:hover {
+    background-color: var(--bg-5);
+  } */
+}
+
+.href-icon {
+  cursor: pointer;
+  border: none;
+  background: none;
+  -webkit-appearance: none;
+
+  /* For focus outline */
+  &:after {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    right: -7px;
+    bottom: -7px;
+    border-radius: 4px;
+    z-index: -1;
+  }
+}
+
+.span-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 18px;
+    color: var(--text-color-2);
+  }
+}

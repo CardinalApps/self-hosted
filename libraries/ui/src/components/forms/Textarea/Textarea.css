@@ -1,0 +1,23 @@
+.textarea {
+  width: 100%;
+  position: relative;
+  display: inline-flex;
+
+  textarea {
+    width: 400px;
+    height: 200px;
+    padding: 15px;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.4em;
+    color: var(--text-color-1);
+    resize: both;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color-1);
+    background-color: var(--bg-4);
+
+    &:focus {
+      outline: 1px solid var(--border-color-focus);
+    }
+  }
+}

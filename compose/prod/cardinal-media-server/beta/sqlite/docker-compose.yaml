@@ -1,0 +1,15 @@
+# Create an .env file next to this docker-compose with the contents from ../../env.template
+
+services:
+  cardinal-media-server-beta-sqlite:
+    image: cardinalapps/media-server:beta
+    container_name: cardinal-media-server-beta-sqlite
+    ports:
+      - 24902:24900
+    volumes:
+      - cardinal-media-server-beta-sqlite-data:/config
+      - ${MUSIC_PATH}:/music
+      - ${PHOTOS_PATH}:/photos
+    restart: unless-stopped
+volumes:
+  cardinal-media-server-beta-sqlite-data:

@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Libraries"
+  },
+  "no-movies-tv-card-title": {
+    "en": "No movies & TV"
+  },
+  "no-movies-tv-card-message": {
+    "en": "After importing your movies & TV, you'll be able to organize it into libraries."
+  },
+  "no-movies-tv-button": {
+    "en": "Import movies & TV"
+  }
+}

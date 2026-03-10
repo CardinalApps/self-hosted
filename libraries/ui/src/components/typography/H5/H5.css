@@ -1,0 +1,9 @@
+.h5 {
+  margin-bottom: 12px;
+  color: var(--text-color-1);
+  font: 900 20px/1.1em var(--font-family);
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
+}

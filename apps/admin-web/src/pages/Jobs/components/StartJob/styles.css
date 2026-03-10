@@ -1,0 +1,63 @@
+.startJob {
+  padding-bottom: 50px;
+}
+
+.newJobCard {
+  height: 100%;
+  max-width: 600px;
+}
+
+.newJobLabel {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.jobControls {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .link {
+    font-weight: 600;
+    color: var(--accent-color);
+    line-height: 1em;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    i {
+      font-size: 8px;
+      margin-left: 5px;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+
+  .col {
+    width: calc(50% - 7px);
+  }
+
+  @media (max-width: 1000px) {
+    flex-direction: column;
+
+    .col {
+      width: 100%;
+    }
+  }
+}

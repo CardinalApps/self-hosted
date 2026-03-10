@@ -1,0 +1,40 @@
+.music-playback-button {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+
+  &:hover {
+    background-color: var(--bg-4);
+  }
+
+  &.solid {
+    background-color: var(--bg-4);
+  }
+
+  &.size-m {
+    width: 45px;
+    height: 45px;
+
+    button {
+      width: 45px;
+      height: 45px;
+
+      i {
+        font-size: 18px;
+      }
+    }
+  }
+
+  i {
+    font-size: 16px;
+  }
+
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+  }
+}

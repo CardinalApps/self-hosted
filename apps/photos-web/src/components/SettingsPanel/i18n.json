@@ -1,0 +1,26 @@
+{
+  "libraries.tab.name": {
+    "en": "Music Libraries"
+  },
+  "libraries.list.title": {
+    "en": "My libraries"
+  },
+  "libraries.list.none": {
+    "en": "No mapped libraries."
+  },
+  "libraries.create.title": {
+    "en": "Create music library"
+  },
+  "libraries.create.name.title": {
+    "en": "Name your library"
+  },
+  "libraries.create.desc": {
+    "en": "Map your system folders to Cardinal Music libraries."
+  },
+  "libraries.create.submit": {
+    "en": "Create library"
+  },
+  "libraries.create.dirs.title": {
+    "en": "Map a directory"
+  }
+}

@@ -1,0 +1,52 @@
+.app-menu {
+  width: 230px;
+  padding: 20px 20px 14px 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  box-shadow: var(--box-shadow-2);
+  border: 1px solid var(--border-color-1);
+  background-color: var(--bg-1);
+  z-index: 1000;
+
+  .web-apps {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    > div {
+      padding: 0 2px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .app-name {
+      padding-top: 2px;
+      font-weight: 800;
+      font-size: 13px;
+      text-align: center;
+      color: var(--text-color-1);
+    }
+
+    svg {
+      transition: all 150ms;
+      transform: scale(1);
+    }
+
+    a {
+      width: 100%;
+      padding: 10px 2px 5px 2px;
+      display: block;
+      text-align: center;
+    }
+
+    a:hover {
+      border-radius: 16px;
+      background-color: var(--bg-3);
+    }
+  }
+}

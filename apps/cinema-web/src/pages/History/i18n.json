@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Watch History"
+  },
+  "no-movies-tv-card-title": {
+    "en": "No history"
+  },
+  "no-movies-tv-card-message": {
+    "en": "You haven't watched any movies or TV yet."
+  },
+  "no-movies-tv-button": {
+    "en": "Import movies & TV"
+  }
+}

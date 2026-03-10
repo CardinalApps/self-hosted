@@ -1,0 +1,131 @@
+.alert {
+  width: 100%;
+  padding: 16px 20px 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: var(--border-radius);
+
+  &.success {
+    color: white;
+    background: var(--success-bg);
+
+    p {
+      color: white;
+    }
+
+    button {
+      color: white;
+      border: 1px solid white;
+
+      &:hover {
+        color: white;
+        background: var(--success) !important;
+      }
+    }
+  }
+
+  &.warning {
+    color: black;
+    background: var(--warning-bg);
+
+    p {
+      color: black;
+    }
+
+    button {
+      color: black;
+      border: 1px solid black;
+
+      &:hover {
+        color: black;
+        background: var(--warning) !important;
+      }
+    }
+  }
+
+  &.error {
+    color: white;
+    background: var(--danger-bg);
+
+    p {
+      color: white;
+    }
+
+    button {
+      color: white;
+      border: 1px solid white;
+
+      &:hover {
+        color: white;
+        background: var(--danger) !important;
+      }
+    }
+  }
+
+  &.info {
+    color: white;
+    background: var(--info-bg);
+
+    button {
+      color: white;
+      border: 1px solid white;
+
+      &:hover {
+        color: white;
+        background: var(--danger) !important;
+      }
+    }
+  }
+
+  i {
+    margin-right: 15px;
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    flex-grow: 1;
+    line-height: 1.4em;
+    margin-bottom: 0 !important;
+  }
+
+  button {
+    outline: none;
+    margin-left: 12px;
+  }
+
+  .alert-controls-col {
+
+    button {
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .alert {
+    flex-wrap: wrap;
+
+    i {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+    }
+
+    p {
+      padding-left: 32px;
+    }
+
+    .alert-controls-col {
+      width: 100%;
+      text-align: right;
+
+      button {
+        margin-top: 20px;
+      }
+    }
+  }   
+}

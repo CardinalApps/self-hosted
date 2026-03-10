@@ -1,0 +1,297 @@
+.virtual-list {
+  margin-left: -10px;
+  padding-left: 30px;
+  position: relative;
+  padding-top: 82px;
+
+  > div[role="rowgroup"] {
+    overflow: visible !important;
+  }
+
+  @media (max-width: 768px) {
+    padding-top: 100px;
+    padding-left: 0 !important;
+  }
+}
+
+.row {
+  
+}
+
+.sizer, .sizer > div {
+  
+  &:focus, &:active, &:focus-visible {
+    outline: none !important;
+    border: none !important;
+  }
+}
+
+.rowInner {
+  height: 100%;
+  padding: 40px 60px 20px 20px;
+  display: flex;
+  gap: 10px;
+
+  &.noDatesInThisRow {
+    padding-top: 10px;
+  }
+
+  .dateRangeStart:first-of-type {
+    padding-left: 0;
+
+    .day {
+      padding-left: 0;
+    }
+  }
+
+  .thumbBox:last-of-type {
+
+    .day {
+      overflow: hidden;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--gutter);
+  }
+}
+
+.thumbBox {
+  position: relative;
+  flex-shrink: 1;
+  min-width: 0;
+
+  > div {
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    max-width: calc(50% - 20px);
+  }
+}
+
+.day {
+  max-width: 100%;
+  position: absolute;
+  top: -30px;
+  left: 0;
+  white-space: nowrap;
+  font-weight: 800;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+  &.noTruncate {
+    overflow: visible;
+  }
+
+  .numInRange {
+    padding: 1px 6px;
+    margin-left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 5px;
+    position: relative;
+    top: -2px;
+    background-color: var(--bg-4);
+  }
+}
+
+.dateRangeStart {
+  padding-left: 10px;
+
+  .day {
+    padding-left: 10px;
+  }
+}
+
+.isFirstInLargeGroup {
+
+  .day {
+    overflow: visible;
+  }
+}
+
+.peekMetadata {
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 0 1px #000;
+  white-space: nowrap;
+}
+
+.totalPhotos {
+  margin-left: 15px;
+  padding: 5px 10px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.timeBar {
+  width: 54px;
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+
+  &:hover {
+
+    .over {
+      opacity: 1;
+    }
+  }
+
+  .over {
+    opacity: 0;
+    transition: opacity 350ms;
+  }
+
+  .timeBarInner {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+  }
+
+  .bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-2);
+    transition: background-color 350ms;
+  }
+
+  .currentLocation {
+    width: 52px;
+    height: 24px;
+    padding-left: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    right: 15px;
+    top: 3px;
+    user-select: none;
+    border-radius: 8px 18px 18px 8px;
+    box-shadow: var(--box-shadow-1);
+    background-color: var(--bg-1);
+    z-index: 2;
+  }
+
+  .year {
+    padding-right: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1em;
+    position: absolute;
+    right: 3px;
+    cursor: default;
+
+    &:after {
+      content: '';
+      width: 8px;
+      height: 2px;
+      position: absolute;
+      top: calc(50% - 2px);
+      right: 0;
+      border-radius: 4px;
+      background-color: var(--text-color-5);
+    }
+  }
+}
+
+.missingImage {
+  height: 100%;
+  position: relative;
+
+  > div {
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.missingImageMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100000;
+  pointer-events: none;
+
+  i {
+    font-size: 24px;
+  }
+
+  p {
+    padding-top: 5px;
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text-color-3);
+  }
+}
+
+.toolbarRow {
+  height: 82px;
+  margin-left: 20px;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  transform: translateX(0);
+  pointer-events: none;
+
+  .toolbarMotion {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+  }
+
+  > div {
+    pointer-events: all;
+  }
+
+  &.scrolled {
+    box-shadow: var(--box-shadow-2);
+  }
+
+  // Desktop animations
+  @media (min-width: 768px) {
+    .shift {
+      box-shadow: var(--box-shadow-2);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding-left: 15px;
+  }
+}

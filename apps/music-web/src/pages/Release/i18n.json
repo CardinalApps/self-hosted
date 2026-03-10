@@ -1,0 +1,23 @@
+{
+  "music-release.title": {
+    "en": "Music Release"
+  },
+  "music-release.meta.artists": {
+    "en": "Artists"
+  },
+  "music-release.meta.artists.none": {
+    "en": "No artists"
+  },
+  "music-release.meta.meta": {
+    "en": "Metadata"
+  },
+  "music-release.meta.tracks": {
+    "en": "Tracks"
+  },
+  "music-release.meta.discs": {
+    "en": "Discs"
+  },
+  "music-release.disc-number": {
+    "en": "Disc {num}"
+  }
+}

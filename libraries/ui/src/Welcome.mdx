@@ -1,0 +1,58 @@
+import { Meta } from '@storybook/blocks'
+
+<Meta title="Welcome" />
+
+# Cardinal Component Library
+
+This component library is shared by all Cardinal web apps. It contains:
+
+- React components
+- React hooks
+- RTK slices
+- RTK APIs
+- Thunks
+- Themes (CSS)
+- Utilities
+
+The components are opinionated and designed specifically for Cardinal apps. Many
+of the components will connect to the development Media Server if it is running.
+Storybook is configured with Redux to enable all app features.
+
+## Types of Components
+
+All React components fall into one of five categories:
+
+### Feature Components
+
+Feature components implement complex features and are designed to plug-and-play
+with all Cardinal apps. They combine multiple other components, RTK slices, RTK
+APIs, handle logic and state, and perform network requests. This Storybook app
+is registed as an app in the Cardinal App Registry (in dev env only), so you can
+log into it and and the servers will accept authenticated requests from it.
+
+### Form Components
+
+Form components are used as fields in forms. They can also be wrapped in the
+`<Form>` component.
+
+### Interaction Components
+
+Interaction components are for the parts of the UI that the user interacts with.
+These components are designed to harmonize the feel of the apps and they
+implement most of the UX. They are not are as multifaceted as Feature
+components, but also not as basic as Layout components.
+
+### Layout Components
+
+Layout components exist solely for page purposes, and are used to
+scaffold the interface. They don't handle events or logic.
+
+### Typography Components
+
+Typography components are used to render all text.
+
+## Themes
+
+The preview window in Storybook has been customized to support Cardinal themes,
+and the active theme can be set using the `Theme` dropdown.
+ 

@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Movies"
+  },
+  "no-history-card-title": {
+    "en": "No history"
+  },
+  "no-history-card-message": {
+    "en": "You haven't listened to any music yet."
+  },
+  "no-history-button": {
+    "en": "Import music"
+  }
+}

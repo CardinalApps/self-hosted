@@ -1,0 +1,29 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .pagination-page {
+    width: 30px;
+    height: 30px;
+    margin: 0 3px;
+    border: none;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-color-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 100%;
+    background-color: var(--bg-3);
+
+    &:hover {
+      background-color: var(--bg-3);
+    }
+
+    &.active {
+      background-color: var(--accent-color) !important;
+    }
+  }
+}

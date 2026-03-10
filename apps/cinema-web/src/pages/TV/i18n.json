@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "TV"
+  },
+  "no-movies-tv-card-title": {
+    "en": "No TV"
+  },
+  "no-movies-tv-card-message": {
+    "en": "After importing your TV shows, you'll be able to watch them here."
+  },
+  "no-movies-tv-button": {
+    "en": "Import movies & TV"
+  }
+}

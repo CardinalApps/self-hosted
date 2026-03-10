@@ -1,0 +1,20 @@
+{
+  "title": {
+    "en": "Photo Album"
+  },
+  "delete-album.button": {
+    "en": "Delete album"
+  },
+  "delete-album.error": {
+    "en": "Could not delete photo album."
+  },
+  "no-content-message.title": {
+    "en": "Empty album"
+  },
+  "no-content-message.desc": {
+    "en": "You can add photos to this album through the photo archive."
+  },
+  "no-content-message.button": {
+    "en": "Go to archive"
+  }
+}

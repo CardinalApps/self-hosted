@@ -1,0 +1,37 @@
+.noContentMessage {
+  width: 260px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+
+  i {
+    width: 60px;
+    height: 60px;
+    font-size: 26px;
+    border-radius: 100%;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-3);
+  }
+
+  p {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.6em;
+    color: var(--text-color-2);
+
+    a, a:link, a:visited {
+      color: var(--accent-color);
+    }
+  }
+
+  footer {
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+    justify-content: flex-start !important;
+  }
+}

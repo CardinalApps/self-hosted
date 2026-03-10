@@ -1,0 +1,35 @@
+{
+  "advanced.tab.name": {
+    "en": "Advanced"
+  },
+  "data.media-reset.title": {
+    "en": "Deindex media"
+  },
+  "data.media-reset.desc": {
+    "en": "Deindex your media files."
+  },
+  "updates.tab.name": {
+    "en": "Updates"
+  },
+  "reporting.tab.name": {
+    "en": "Telemetry"
+  },
+  "telemetry.history.title": {
+    "en": "History"
+  },
+  "data.factory-reset.title": {
+    "en": "Factory reset"
+  },
+  "data.factory-reset.desc": {
+    "en": "Fully reset your Cardinal Media Server."
+  },
+  "data.factory-reset.button": {
+    "en": "Factory reset"
+  },
+  "data.factory-reset.confirm-title": {
+    "en": "Factory reset"
+  },
+  "data.confirm-factory-reset": {
+    "en": "<p>For Media Servers installed with Docker Compose, <a href='https://help.cardinalapps.io/guides/cardinal-media-server/uninstall' target='_blank'>reinstalling with Docker Compose</a> is recommended instead of using this built-in utility.</p><p>A factory reset will deindex your media, remove any other data, and return your Media Server to its initial state. Your cloud account will be unlinked from this Media Server.</p><p>Your Media Server will become unresponsive while this process runs (it can take a while).</p>"
+  }
+}

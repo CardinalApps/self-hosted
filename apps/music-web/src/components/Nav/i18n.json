@@ -1,0 +1,23 @@
+{
+  "nav.listen-now": {
+    "en": "Listen Now"
+  },
+  "nav.artists": {
+    "en": "Artists"
+  },
+  "nav.releases": {
+    "en": "Releases"
+  },
+  "nav.tracks": {
+    "en": "Tracks"
+  },
+  "nav.playlists": {
+    "en": "Playlists"
+  },
+  "nav.libraries": {
+    "en": "Libraries"
+  },
+  "nav.history": {
+    "en": "History"
+  }
+}

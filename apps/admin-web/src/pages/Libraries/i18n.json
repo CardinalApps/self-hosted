@@ -1,0 +1,95 @@
+{
+  "title": {
+    "en": "Libraries"
+  },
+  "libraries.list.title": {
+    "en": "My libraries"
+  },
+  "libraries.list.none": {
+    "en": "No libraries"
+  },
+  "libraries.create.title": {
+    "en": "Create library"
+  },
+  "libraries.create.name.title": {
+    "en": "Map directory to library"
+  },
+  "libraries.create.name.placeholder": {
+    "en": "Name"
+  },
+  "libraries.create.desc": {
+    "en": "Map your system folders to libraries."
+  },
+  "libraries.create.submit": {
+    "en": "Create library"
+  },
+  "libraries.create.dirs.title": {
+    "en": "Select a directory"
+  },
+  "libraries.table.header.name": {
+    "en": "Name"
+  },
+  "libraries.table.header.path": {
+    "en": "Paths"
+  },
+  "libraries.table.header.access": {
+    "en": "Access"
+  },
+  "libraries.table.options-button": {
+    "en": "Configure"
+  },
+  "libraries.drawer.title": {
+    "en": "Configure library"
+  },
+  "libraries.edit.name": {
+    "en": "Name"
+  },
+  "libraries.edit.paths": {
+    "en": "Paths"
+  },
+  "libraries.edit.add-path": {
+    "en": "Add path"
+  },
+  "libraries.edit.": {
+    "en": "Add path"
+  },
+  "libraries.no-paths": {
+    "en": "No paths."
+  },
+  "libraries.edit.users": {
+    "en": "Access"
+  },
+  "libraries.edit.users.guest-has-access": {
+    "en": "Guest account has access"
+  },
+  "libraries.edit.users.user-has-access": {
+    "en": "{user} has access"
+  },
+  "libraries.edit.users.no-public-name": {
+    "en": "(No public name) has access"
+  },
+  "libraries.edit.save": {
+    "en": "Save"
+  },
+  "libraries.edit.delete": {
+    "en": "Delete Library"
+  },
+  "libraries.edit.confirm-delete.title": {
+    "en": "Delete library"
+  },
+  "libraries.edit.confirm-delete.message": {
+    "en": "Are you sure you want to delete the library \"{{library}}\"?"
+  },
+  "libraries.table.user-count.none": {
+    "en": "Not shared with anyone."
+  },
+  "libraries.table.user-count.singular": {
+    "en": "Shared with 1 user."
+  },
+  "libraries.table.user-count.plural": {
+    "en": "Not shared with {n} users."
+  },
+  "libraries.table.empty-message": {
+    "en": "Select directories, then give your first library a name."
+  }
+}

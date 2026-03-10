@@ -1,0 +1,51 @@
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .user-avatar {
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  &.size-xs {
+    gap: 8px;
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+  }
+  &.size-s {
+    gap: 8px;
+    .user-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
+  &.size-m {
+    gap: 10px;
+    .user-name {
+      font-size: 17px;
+      font-weight: 500;
+    }
+  }
+  &.size-l {
+    gap: 12px;
+    .user-name {
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+  &.size-xl {
+    gap: 14px;
+    .user-name {
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+}

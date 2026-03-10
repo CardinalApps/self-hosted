@@ -1,0 +1,15 @@
+.daterange {
+
+  .date-field {
+    width: 100%;
+    margin-bottom: 20px;
+
+    input[type="date"] {
+      width: 100%;
+    }
+  }
+
+  .date-in-words {
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "default-name": {
+    "en": "Unnamed Album"
+  },
+  "num-photos.singular": {
+    "en": "{count} item"
+  },
+  "num-photos.plural": {
+    "en": "{count} items"
+  }
+}

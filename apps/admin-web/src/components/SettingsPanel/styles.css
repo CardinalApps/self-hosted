@@ -1,0 +1,13 @@
+.manuallyCheckForUpdates {
+  padding-top: 15px;
+  display: flex;
+  gap: 20px;
+
+  .results {
+    padding-top: 10px;
+  }
+}
+
+.advancedOption {
+  width: 100%;
+}

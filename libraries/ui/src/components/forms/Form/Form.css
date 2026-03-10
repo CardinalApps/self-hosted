@@ -1,0 +1,18 @@
+.form {
+
+  .form-field {
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-description {
+    margin-bottom: 25px;
+  }
+
+  .form-controls {
+    display: flex;
+    gap: 10px;
+  }
+}

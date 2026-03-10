@@ -1,0 +1,47 @@
+#root {
+  height: 100vh;
+}
+
+#photos-app {
+  --sidebar-nav-width: 250px;
+  --sidebar-nav-gutter: 40px;
+  --header-height: 72px;
+
+  &.sidebarCollapsed {
+    --sidebar-nav-width: 66px;
+  }
+}
+
+.theme-switcher.light {
+  transform: rotateY(180deg);
+}
+
+.section-title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  i {
+    font-size: 17px;
+    margin-right: 10px;
+    position: relative;
+    top: -1px;
+    color: var(--accent-color);
+  }
+}
+
+form {
+  width: 100%;
+
+  .form-field {
+    width: 100%;
+  }
+}
+
+.context-menu-right-click-surface {
+  height: 100%;
+}
+
+.base-context-menu-layer {
+  height: 100%;
+}

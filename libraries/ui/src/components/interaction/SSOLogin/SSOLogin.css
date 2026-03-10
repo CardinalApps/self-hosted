@@ -1,0 +1,59 @@
+.login-with-cardinal-button {
+  width: 100%;
+  min-height: 55px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-color-1);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  color: var(--text-color-2);
+  background-color: var(--bg-2);
+
+  &:visited {
+    color: var(--text-color-3);
+  }
+
+  &:hover {
+    background-color: var(--bg-3);
+  }
+
+  &.loading {
+
+    .loading-indicator {
+      
+      svg {
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    span {
+      transform: translateY(300%)
+    }
+  }
+
+  .loading-indicator {
+    
+    svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -300%);
+      transition: transform 200ms;
+    }
+  }
+
+  svg {
+    margin-right: 8px;
+  }
+
+  span {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 200ms;
+  }
+}

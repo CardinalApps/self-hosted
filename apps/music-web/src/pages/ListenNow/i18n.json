@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Listen Now"
+  },
+  "action-buttons.true-shuffle": {
+    "en": "True Shuffle"
+  },
+  "most-played-tracks.title": {
+    "en": "Most Played Tracks"
+  },
+  "recently-added-releases.title": {
+    "en": "Recently Added Releases"
+  }
+}

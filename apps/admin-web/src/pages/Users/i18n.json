@@ -1,0 +1,272 @@
+{
+  "users.title": {
+    "en": "Users"
+  },
+  "users.server.title": {
+    "en": "Server"
+  },
+  "users.server.unclaimed-warning": {
+    "en": "Unclaimed Server"
+  },
+  "users.server.unclaimed-warning.desc": {
+    "en": "Sign in with a Cardinal account to claim this server and access Cardinal's cloud services."
+  },
+  "users.new-users": {
+    "en": "New Users"
+  },
+  "users.new-users.toggle-allow": {
+    "en": "Allow new users to sign up"
+  },
+  "users.invite-user": {
+    "en": "User Invitations"
+  },
+  "users.new-users.invite-links.create": {
+    "en": "Create link"
+  },
+  "users.invite-links.manage-button": {
+    "en": "Invite User"
+  },
+  "users.invite-links.manage-title": {
+    "en": "Invite New User"
+  },
+  "users.invite-links.active": {
+    "en": "Active until {date}"
+  },
+  "users.invite-links.expired": {
+    "en": "Expired"
+  },
+  "users.invite.user.none": {
+    "en": "No user invitations."
+  },
+  "users.invite.link.none": {
+    "en": "No invitation links."
+  },
+  "users.invite.link.code": {
+    "en": "Code"
+  },
+  "users.invite.link.cloud-link": {
+    "en": "Link"
+  },
+  "users.invite.link.created-at-by": {
+    "en": "Created {ago}"
+  },
+  "users.invite-links.search.placeholder": {
+    "en": "Search for a Cardinal user"
+  },
+  "users.invite-links.search.notice": {
+    "en": "Only returns users whose search visibility is set to Public."
+  },
+  "users.invite-links.tabs.by-username": {
+    "en": "Invite a Cardinal User"
+  },
+  "users.invite-links.tabs.by-link": {
+    "en": "Invite Using a Link"
+  },
+  "users.invite.confirm.title": {
+    "en": "Invite New User"
+  },
+  "users.invite.confirm.desc": {
+    "en": "You are about to invite {name} to your server. Only invite users that you trust."
+  },
+  "users.invite.link.generate": {
+    "en": "Generate link"
+  },
+  "users.invite.link.create.notice": {
+    "en": "Create a link that people can use to join your Media Server with their Cardinal Account."
+  },
+  "users.invite.link.create.expiration": {
+    "en": "Expiration"
+  },
+  "users.invite.list.expiration": {
+    "en": "Expiration"
+  },
+  "users.invite.expires-in": {
+    "en": "Expires in"
+  },
+  "users.invite.expired": {
+    "en": "Expired"
+  },
+  "users.invite.expires-at": {
+    "en": "Expires at"
+  },
+  "users.invite-links.history.title": {
+    "en": "History"
+  },
+  "users.invite.no-active-links": {
+    "en": "No active invitations."
+  },
+  "users.invite.some-active-links.singular": {
+    "en": "1 active invitation."
+  },
+  "users.invite.some-active-links.plural": {
+    "en": "{num} active invitations."
+  },
+  "users.invite.confirm-delete.title": {
+    "en": "Confirm Delete"
+  },
+  "users.invite.confirm-delete.desc": {
+    "en": "Users will no longer be able to join using this link, and it cannot be restored."
+  },
+  "users.invite.confirm-delete-for-user.desc": {
+    "en": "The invitation email that was sent to {username} cannot be unsent, but the link within it will no longer work. You will not be able to reactivate it."
+  },
+  "users.invite.sent-invite-to-user": {
+    "en": "Invitation sent."
+  },
+  "users.server.cloud-capacity": {
+    "en": "Cloud Users"
+  },
+  "users.server.local-capacity": {
+    "en": "Local Users"
+  },
+  "users.server.capacity.cloud": {
+    "en": "Used {used} of {total} cloud seats."
+  },
+  "users.server.capacity.local.singular": {
+    "en": "{total} local user."
+  },
+  "users.server.capacity.local.plural": {
+    "en": "{total} local users."
+  },
+  "users.server.capacity.create": {
+    "en": "Create User"
+  },
+  "users.table.title": {
+    "en": "All users"
+  },
+  "users.table.empty": {
+    "en": "No users"
+  },
+  "users.table.current-user-icon-title": {
+    "en": "This is you"
+  },
+  "users.table.header.name": {
+    "en": "Account"
+  },
+  "users.table.header.type": {
+    "en": "Type"
+  },
+  "users.table.header.role": {
+    "en": "Roles"
+  },
+  "users.table.header.status": {
+    "en": "Status"
+  },
+  "users.table.header.last-seen": {
+    "en": "Last Seen"
+  },
+  "users.guest.enabled": {
+    "en": "Enabled"
+  },
+  "users.guest.disabled": {
+    "en": "Disabled"
+  },
+  "users.table.controls.settings": {
+    "en": "Manage"
+  },
+  "users.settings.drawer-title": {
+    "en": "Manage User"
+  },
+  "users.settings.info": {
+    "en": "Info"
+  },
+  "users.settings.info.id": {
+    "en": "ID"
+  },
+  "users.settings.info.enabled": {
+    "en": "Enabled"
+  },
+  "users.settings.info.type": {
+    "en": "Type"
+  },
+  "users.settings.info.type.local": {
+    "en": "Local Account"
+  },
+  "users.settings.info.type.cloud": {
+    "en": "Cloud Account"
+  },
+  "users.settings.info.enabled.yes": {
+    "en": "Yes"
+  },
+  "users.settings.info.enabled.no": {
+    "en": "No"
+  },
+  "users.settings.info.last-seen": {
+    "en": "Last seen"
+  },
+  "users.settings.roles": {
+    "en": "Roles"
+  },
+  "users.settings.actions": {
+    "en": "Actions"
+  },
+  "users.settings.actions.disable": {
+    "en": "Disable this user"
+  },
+  "users.settings.actions.enable": {
+    "en": "Enable this user"
+  },
+  "users.settings.actions.cloud-portal-link": {
+    "en": "Manage your Cardinal cloud account online"
+  },
+  "users.settings.actions.remove": {
+    "en": "Remove this user"
+  },
+  "users.settings.alert.guest-account-info": {
+    "en": "The guest account is a special account that can be shared by everyone anonymously. It does not use a seat."
+  },
+  "users.settings.actions.remove.disabled-for-guest": {
+    "en": "The Guest Account cannot be removed."
+  },
+  "users.settings.actions.remove.disabled-for-owner": {
+    "en": "The owner account can only be removed by performing a Factory Reset."
+  },
+  "users.settings.actions.disable.disabled-for-server-owner": {
+    "en": "The owner account cannot be disabled."
+  },
+  "users.settings.actions.disable.disabled-for-own-user": {
+    "en": "You cannot disable your current user."
+  },
+  "users.settings.actions.disable.confirm.title": {
+    "en": "Disable User"
+  },
+  "users.settings.actions.disable.confirm.desc": {
+    "en": "Disabled users are not allowed to log in, and all active sessions for this user will be terminated immediately. If the user has a cloud account, their seat will become available for another user to use."
+  },
+  "users.settings.actions.enable.confirm.title": {
+    "en": "Enable User"
+  },
+  "users.settings.actions.enable.confirm.desc": {
+    "en": "This user will be allowed to log in."
+  },
+  "users.updated.success": {
+    "en": "User updated"
+  },
+  "users.updated.enabled.success": {
+    "en": "User has been enabled."
+  },
+  "users.updated.disabled.success": {
+    "en": "User has been disabled."
+  },
+  "users.roles.count": {
+    "en": "{num} roles"
+  },
+  "create-user.title": {
+    "en": "Create Local User"
+  },
+  "create-user.username": {
+    "en": "Username"
+  },
+  "create-user.password": {
+    "en": "Password"
+  },
+  "create-user.role": {
+    "en": "Roles"
+  },
+  "create-user.submit": {
+    "en": "Create User"
+  },
+  "create-user.submit.success": {
+    "en": "New user created"
+  }
+}

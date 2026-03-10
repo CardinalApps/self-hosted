@@ -1,0 +1,54 @@
+.music-artist {
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid var(--border-color-1);
+  border-radius: 12px;
+  background-color: var(--bg-1);
+  overflow: hidden;
+
+  header {
+    padding: 17px;
+  }
+
+  footer {
+    padding: 17px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .artist-link {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    color: var(--text-color-2);
+    transition: box-shadow 150ms;
+
+    &:hover {
+      box-shadow: var(--box-shadow-2);
+    }
+  }
+
+  .artist-name {
+    font-size: 18px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .artist-image {
+    height: 170px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+  }
+
+  .artist-stat {
+    padding: 3px 6px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    background-color: var(--bg-4);
+  }
+}

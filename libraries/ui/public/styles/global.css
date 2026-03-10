@@ -1,0 +1,60 @@
+.arrow-link {
+  display: inline-block;
+
+  &:after {
+    content: '➜';
+    color: var(--accent-color);
+    position: relative;
+    right: 0;
+    transition: all 300ms;
+  }
+
+  &:hover {
+    
+    a {
+      text-decoration: underline;
+    }
+
+    &:after {
+      color: var(--accent-color);
+      text-decoration: none !important;
+      right: -5px;
+    }
+  }
+
+  a {
+    margin-right: 5px;
+    font-weight: 700;
+    transition: all 500ms;
+    color: var(--accent-color);
+  }
+}
+
+.spin {
+  transform: rotate(-360deg);
+  transition: transform 0.3s;
+
+  &:active {
+    transform: rotate(0deg);
+    transition: 0s;
+  }
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.success-color {
+  color: var(--success);
+  i { color: var(--success); }
+}
+
+.warning-color {
+  color: var(--warning);
+  i { color: var(--warning); }
+}
+
+.danger-color {
+  color: var(--danger);
+  i { color: var(--danger); }
+}

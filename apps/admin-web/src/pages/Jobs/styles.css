@@ -1,0 +1,123 @@
+.jobTags {
+  margin-bottom: 30px;
+  padding: 10px 0 20px;
+  display: flex;
+  gap: 10px;
+
+  .jobTag {
+    padding: 11px 18px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-2);
+    font-family: var(--font-family);
+    cursor: pointer;
+    user-select: none;
+    border: 2px dashed var(--bg-5);
+    background-color: var(--bg-3);
+
+    &:hover {
+      background-color: var(--bg-1);
+    }
+
+    i {
+      margin-right: 7px;
+      color: var(--text-color-4);
+      font-size: 17px;
+    }
+
+    span {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1em;
+    }
+
+    &.configuring {
+      background-color: var(--bg-1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 !important;
+    flex-wrap: wrap;
+  }
+}
+
+.jobQueue {
+  margin-bottom: 60px;
+
+  @media (max-width: 768px) {
+    > div {
+      padding: 0 !important;
+    }
+  }
+}
+
+.jobReport {
+
+  .controls {
+    width: auto;
+    padding-top: 0;
+  }
+
+  .title {
+    margin-bottom: 0;
+    width: auto;
+  }
+}
+
+.jobReports {
+
+  .loadMore {
+    padding: 30px 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    > div {
+      padding: 0 !important;
+    }
+  }
+}
+
+.job-details {
+  
+  header {
+    margin-bottom: 15px;
+    display: flex;
+  }
+
+  pre {
+    font-size: 11px;
+    text-wrap: wrap;
+  }
+
+  .jobMetadata {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    li {
+      width: 100%;
+      margin-bottom: 5px;
+
+      strong {
+        width: 90px;
+        display: inline-block;
+      }
+    }
+  }
+
+  .jobTasksTableHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .count {
+      font-weight: 500;
+    }
+  }
+}

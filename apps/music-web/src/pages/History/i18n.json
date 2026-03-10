@@ -1,0 +1,11 @@
+{
+  "music-history.title": {
+    "en": "Playback History"
+  },
+  "music-history.empty.title": {
+    "en": "Playback History"
+  },
+  "music-history.empty.message": {
+    "en": "Your server's music playback history will appear here."
+  }
+}

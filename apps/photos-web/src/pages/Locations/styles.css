@@ -1,0 +1,26 @@
+.locations {
+  height: 100%;
+  position: relative;
+}
+
+.photoCard {
+  width: calc(100% + 80px);
+  margin-left: -80px;
+  position: relative;
+  overflow-y: hidden;
+
+  header {
+    height: 280px;
+    background-position: center center;
+    background-size: cover;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-left: 0;
+    
+    > div {
+      padding: 0 !important;
+    }
+  }
+}

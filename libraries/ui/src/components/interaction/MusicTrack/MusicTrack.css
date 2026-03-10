@@ -1,0 +1,130 @@
+.music-track {
+  width: 100%;
+  max-height: 55px;
+  margin-bottom: 10px;
+  padding: 0 10px;
+  display: flex;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-3);
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .col {
+    padding: 8px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .music-track-info {
+    min-width: 0;
+    padding-bottom: 6px;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+
+    .music-track-title {
+      width: 100%;
+      display: block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .music-release {
+      width: auto;
+      display: grid;
+      grid-template-columns: auto minmax(10px, 1fr);
+      font-weight: 400;
+      font-size: 13px;
+
+      a {
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .sep {
+        margin: 0 7px 0 0;
+        color: var(--text-color-4);
+        position: relative;
+        top: 1px;
+      }
+
+      .music-release-title {
+        padding-right: 7px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .music-release-artist {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .music-track-number {
+    min-width: 37px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .music-track-play-pause {
+    width: 52px;
+    flex-shrink: 0;
+    justify-content: center;
+  }
+
+  .music-track-duration {
+    font-size: 14px;
+  }
+
+  .music-track-plays {
+
+    span {
+      padding: 0 4px;
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border-radius: 5px;
+      text-align: center;
+      background-color: var(--bg-5);
+    }
+  }
+
+  .music-track-favorite {
+    padding-left: 3px;
+    padding-right: 3px;
+
+    i {
+      color: var(--text-color-5);
+    }
+  }
+
+  .music-track-artwork {
+    width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    img {
+      max-width: 100%;
+      max-height: 60px;
+      box-shadow: var(--box-shadow-1);
+      border-radius: 3px;
+    }
+  }
+}

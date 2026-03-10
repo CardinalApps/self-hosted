@@ -1,0 +1,19 @@
+.appRoot {
+  overflow: hidden;
+}
+
+.overlayLayer {
+  position: relative;
+  z-index: 1000;
+}
+
+.toastShower {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+}
+
+.settingsPanelMotion {
+  height: 100%;
+}

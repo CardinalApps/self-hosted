@@ -1,0 +1,42 @@
+.libraries {
+
+  .create {
+    margin-bottom: 25px;
+  }
+
+  .name {
+    
+  }
+
+  .paths {
+    padding: 4px;
+    border-radius: 6px;
+    font: 12px monospace;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: var(--bg-4);
+
+    span {
+      max-width: 100%;
+      user-select: all;
+    }
+  }
+
+  .librariesTable {
+
+    td {
+      vertical-align: middle;
+    }
+
+    .controls {
+      text-align: right;
+    }
+
+    .user-avatars {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+  }
+}

@@ -1,0 +1,155 @@
+.audio-player {
+  border: 1px solid var(--border-color-3);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-1);
+  opacity: 0;
+  transition: opacity 150ms;
+
+  &.fade-in {
+    opacity: 1;
+  }
+
+  .metadata {
+
+    .audio-player-track-artists {
+
+      span:after {
+        content: ', ';
+      }
+
+      span:last-of-type:after {
+        content: '';
+      }
+    }
+  }
+
+  .scrubber-row {
+    width: 100%;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    .scrubber-time {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-color-2);
+      display: flex;
+      gap: 3px;
+    }
+  }
+}
+
+.audio-player[data-size="mini"] {
+  padding: 12px 13px;
+
+  .metadata {
+    padding-bottom: 8px;
+
+    p {
+      width: 100%;
+      height: 20px;
+      margin-bottom: 1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .audio-player-track-title {
+      font-weight: 800;
+    }
+  }
+
+  .controls {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    button {
+      width: 34px;
+      height: 34px;
+    }
+
+    .audio-player-buttons {
+      display: flex;
+      align-items: center;
+
+      .loading-indicator {
+        width: 34px;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+
+  .release-image {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    border: 1px solid var(--border-color-1);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--box-shadow-2);
+    background-color: var(--bg-4);
+
+    i {
+      font-size: 13px;
+      color: var(--text-color-4);
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: var(--box-shadow-2);
+    transition: opacity 300ms;
+
+    .metadata {
+      width: calc(100% - 130px);
+      order: 1;
+      flex-grow: 1;
+    }
+    
+    .controls {
+      width: 130px;
+      order: 2;
+      justify-content: flex-end;
+
+      .release-image {
+        order: 2;
+      }
+
+      .audio-player-buttons {
+        width: auto;
+        order: 1;
+      }
+    }
+
+    .scrubber-row {
+      order: 3;
+      width: 100%;
+      padding-top: 0;
+
+      .scrubber-handle-drag {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+[data-mobile-nav-open="true"] {
+  @media (max-width: 768px) {
+    .audio-player {
+      opacity: 0;
+    }
+  }
+}

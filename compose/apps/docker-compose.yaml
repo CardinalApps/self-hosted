@@ -1,0 +1,32 @@
+services:
+  auth-server:
+    container_name: cardinal-auth-server
+    env_file:
+      - ../../servers/auth/.env
+    image: cardinalapps/auth-server:latest
+    restart: always
+    network_mode: host
+
+  website:
+    container_name: cardinal-website
+    environment:
+      - MODE=prod
+    image: cardinalapps/website:latest
+    restart: always
+    network_mode: host
+
+  status:
+    container_name: cardinal-status
+    env_file:
+      - ../../apps/status-web/.env
+    image: cardinalapps/status:latest
+    restart: always
+    network_mode: host
+
+  cms:
+    container_name: cardinal-cms
+    image: cardinalapps/cms:latest
+    restart: unless-stopped
+    env_file:
+      - ../../servers/cms/.env
+    network_mode: host

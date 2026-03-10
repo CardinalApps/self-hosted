@@ -1,0 +1,9 @@
+.h2 {
+  margin-bottom: 20px;
+  color: var(--text-color-1);
+  font: 900 34px/1.1em var(--font-family);
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+}

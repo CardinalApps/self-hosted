@@ -1,0 +1,31 @@
+.number-input {
+
+  &.size-m {
+
+  }
+
+  &.size-s {
+    
+    input {
+      min-width: auto;
+      font-size: 13px;
+      padding: 7px 14px;
+    }
+  }
+
+  input {
+    min-width: 80px;
+    padding: 12px 16px;
+    color: var(--text-color-1);
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid var(--border-color-1);
+    border-radius: var(--border-radius);
+    background: var(--input-bg);
+
+    &:focus {
+      border-color: var(--border-color-focus);
+      outline: none;
+    }
+  }
+}

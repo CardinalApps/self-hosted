@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "All Photos"
+  },
+  "no-photos-card-title": {
+    "en": "No Photos"
+  },
+  "no-photos-card-message": {
+    "en": "Get started by importing your photos with your Cardinal Media Server."
+  },
+  "no-photos-button": {
+    "en": "Import photos"
+  }
+}

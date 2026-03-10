@@ -1,0 +1,14 @@
+{
+  "title": {
+    "en": "Watch Now"
+  },
+  "no-movies-tv-card-title": {
+    "en": "No movies & TV"
+  },
+  "no-movies-tv-card-message": {
+    "en": "Get started by importing your movies & TV with your Cardinal Media Server."
+  },
+  "no-movies-tv-button": {
+    "en": "Import movies & TV"
+  }
+}

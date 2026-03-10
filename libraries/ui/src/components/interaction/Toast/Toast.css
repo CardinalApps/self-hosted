@@ -1,0 +1,154 @@
+.toast {
+  width: 400px;
+  padding: 20px 20px 20px 20px;
+  display: flex;
+  gap: 15px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--box-shadow-2);
+  border: 1px solid var(--border-color-3);
+  background-color: var(--bg-1);
+  transition: opacity 600ms;
+
+  &.fade-out {
+    opacity: 0;
+  }
+
+  &.has-body {
+
+    .toast-status-icon {
+      padding-top: 1px;
+      align-items: flex-start;  
+    }
+
+    .toast-content {
+      display: flex;
+      flex: 1;
+      align-items: flex-start;
+    }
+  }
+
+  &[data-type="success"] {
+    .toast-status-icon i {
+      color: var(--success-bg);
+    }
+  }
+
+  &[data-type="warning"] {
+    .toast-status-icon i {
+      color: var(--warning-bg);
+    }
+  }
+
+  &[data-type="danger"] {
+    .toast-status-icon i {
+      color: var(--danger-bg);
+    }
+  }
+
+  .toast-content {
+    padding: 0;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .toast-status-icon {
+    display: flex;
+    align-items: center;
+
+    i {
+      font-size: 16px;
+    }
+  }
+
+  .toast-title {
+    width: 100%;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+  }
+
+  .toast-body {
+    padding-top: 5px;
+    color: var(--text-color-4);
+    font-size: 14px;
+
+    p {
+      margin-bottom: 7px;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+
+    a {
+      color: var(--accent-color);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .toast-close {
+    width: 24px;
+    height: 24px;
+    color: var(--text-color-3);
+    cursor: pointer;
+
+    i {
+      font-size: 14px;
+    }
+  }
+
+  .toast-controls {
+    width: 100%;
+    padding-top: 15px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .links {
+    a {
+      margin-right: 15px;
+    }
+  }
+}
+
+.toaster {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100000000;
+  
+  .single-toast {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+
+    /* &:nth-of-type(1) {
+      display: flex;
+    }
+
+    &:nth-of-type(2) {
+      display: flex;
+      transform: translateY(-15px) scale(0.9);
+    }
+
+    &:nth-of-type(3) {
+      display: flex;
+      transform: translateY(-30px) scale(0.8);
+    } */
+  }
+
+  .toaster-controls {
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}

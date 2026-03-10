@@ -1,0 +1,20 @@
+{
+  "title": {
+    "en": "Photo Albums"
+  },
+  "no-albums-card-title": {
+    "en": "No photo albums"
+  },
+  "no-albums-card-message": {
+    "en": "Hit the big plus button to create a new album."
+  },
+  "no-albums-button": {
+    "en": "Import photos"
+  },
+  "create-album.name": {
+    "en": "Name your new photo album"
+  },
+  "create-album.error": {
+    "en": "Could not create photo album."
+  }
+}

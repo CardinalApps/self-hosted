@@ -1,0 +1,9 @@
+.p {
+  margin-bottom: 20px;
+  color: var(--text-color-1);
+  font: 400 16px var(--font-family);
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+}

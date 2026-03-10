@@ -1,0 +1,92 @@
+{
+  "title": {
+    "en": "Overview"
+  },
+  "reload-button.title": {
+    "en": "Reload"
+  },
+  "active-users.title": {
+    "en": "Active Users"
+  },
+  "apps.title": {
+    "en": "Apps"
+  },
+  "server.title": {
+    "en": "Media Server"
+  },
+  "active-users.none": {
+    "en": "No active users"
+  },
+  "active-users.guest-account": {
+    "en": "Guest account"
+  },
+  "active-users.less-than-a-minute-ago": {
+    "en": "Active now"
+  },
+  "active-users.ago": {
+    "en": "ago"
+  },
+  "app.name.admin": {
+    "en": "Admin"
+  },
+  "app.name.music": {
+    "en": "Music"
+  },
+  "app.name.photos": {
+    "en": "Photos"
+  },
+  "app.name.cinema": {
+    "en": "Cinema"
+  },
+  "app.title.admin": {
+    "en": "Open the Admin web app"
+  },
+  "app.title.music": {
+    "en": "Open the Music web app"
+  },
+  "app.title.photos": {
+    "en": "Open the Photos web app"
+  },
+  "app.title.cinema": {
+    "en": "Open the Cinema web app"
+  },
+  "server.check-for-updates": {
+    "en": "Check for updates"
+  },
+  "server.version": {
+    "en": "Version"
+  },
+  "server.instance-id": {
+    "en": "Instance ID"
+  },
+  "server.server-name": {
+    "en": "Server Name"
+  },
+  "server.build": {
+    "en": "Build"
+  },
+  "server.build.untagged": {
+    "en": "Untagged"
+  },
+  "server.subscription": {
+    "en": "Subscription"
+  },
+  "server.release-channel": {
+    "en": "Release Channel"
+  },
+  "server.update-is-available": {
+    "en": "Update Available"
+  },
+  "server.update-is-available.links": {
+    "en": "<p>Cardinal Media Server v{version} is available.</p><p><a href='https://cardinalapps.io/release-notes/cardinal-media-server/v{version}' target='_blank'>Release notes</a> / <a href='https://help.cardinalapps.io/guides/cardinal-media-server/update' target='_blank'>How to update</a></p>"
+  },
+  "server.no-update-available.title": {
+    "en": "No updates available"
+  },
+  "server.no-update-available.body": {
+    "en": "You are already using the latest version."
+  },
+  "server.no-updates-on-dev": {
+    "en": "Updates are not available on the development release channel."
+  }
+}

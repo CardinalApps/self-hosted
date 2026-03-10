@@ -1,0 +1,101 @@
+{
+  "welcome.title": {
+    "en": "Glad you could make it."
+  },
+  "welcome.subtitle": {
+    "en": "Let's get your Cardinal Media Server set up."
+  },
+  "welcome.start-button": {
+    "en": "Start"
+  },
+  "theme.title": {
+    "en": "Choose a Theme"
+  },
+  "theme.name.light": {
+    "en": "Light"
+  },
+  "theme.name.dark": {
+    "en": "Dark"
+  },
+  "progress.sep": {
+    "en": "of"
+  },
+  "continue": {
+    "en": "Continue"
+  },
+  "next": {
+    "en": "Next"
+  },
+  "prev": {
+    "en": "Back"
+  },
+  "server-name.title": {
+    "en": "Name your Media Server"
+  },
+  "server-name.p1": {
+    "en": "Your server's name will be seen by the people you share it with."
+  },
+  "server-name.p2": {
+    "en": "You can change it later."
+  },
+  "usage-data.title": {
+    "en": "Share Usage Data"
+  },
+  "usage-data.message-p1": {
+    "en": "You can allow Cardinal Apps Inc. to collect anonymous data about how your apps are used. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more <i class=\"fas fa-external-link-alt\"></i></a>."
+  },
+  "usage-data.message-p2": {
+    "en": "Cardinal Apps Inc. adheres to a strict <a href=\"https://cardinalapps.io/privacy-policy\" target=\"_blank\">Privacy Policy <i class=\"fas fa-external-link-alt\"></i></a> that protects your data."
+  },
+  "usage-data.read-more-link": {
+    "en": "More information"
+  },
+  "usage-data.agree": {
+    "en": "Enable anonymous telemetry"
+  },
+  "usage-data.next": {
+    "en": "Continue"
+  },
+  "privacy.title": {
+    "en": "Privacy & Terms"
+  },
+  "privacy.message-p1": {
+    "en": "By continuing, you are stating that you have read and understand the <a href='https://cardinalapps.io/terms-and-conditions' target='_blank'>Terms & Conditions <i class='fas fa-external-link-alt'></i></a> and the <a href='https://cardinalapps.io/privacy-policy' target='_blank'>Privacy Policy <i class='fas fa-external-link-alt'></i></a>."
+  },
+  "privacy.next": {
+    "en": "I understand & agree"
+  },
+  "login.title": {
+    "en": "Claim this Server"
+  },
+  "login.overview": {
+    "en": "<p class='message'>Cardinal accounts are free to create, and using one will allow you to use Cardinal's cloud services in your apps. You can claim this Media Server at any time by logging in with your cloud account.</p><p class='message'>You can skip this and sign in later. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/accounts' target='_blank'>Read more about how accounts work. <i class='fas fa-external-link-alt'></i></a></p>"
+  },
+  "login.logged-in-as": {
+    "en": "This server will be claimed by {name} when setup is complete"
+  },
+  "login.no-public-name-set": {
+    "en": "a Cardinal user that has not set a public name"
+  },
+  "help.title": {
+    "en": "Community & Support"
+  },
+  "help.message-p1": {
+    "en": "You are invited to join the <a href='https://cardinal.discourse.group' target='_blank'>Community Forums <i class='fas fa-external-link-alt'></i></a>, a place where you can have open discussions with other Cardinal users."
+  },
+  "help.message-p2": {
+    "en": "Official docs, tutorials, guides, and FAQ are available on the <a href='https://help.cardinalapps.io' target='_blank'>help site <i class='fas fa-external-link-alt'></i></a>."
+  },
+  "help.next": {
+    "en": "Cool"
+  },
+  "finish.title": {
+    "en": "All Done"
+  },
+  "finish.message-p1": {
+    "en": "Enjoy the apps. Your feedback is appreciated."
+  },
+  "finish.next": {
+    "en": "Finish"
+  }
+}
