@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/dtos",
   "description": "Data Transfer Objects used by Cardinal API providers and consumers.",
-  "license": "CC BY-NC-ND 4.0",
+  "license": "Elastic License 2.0 (ELv2)",
   "version": "0.1.25",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,

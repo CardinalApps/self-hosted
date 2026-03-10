@@ -1,4 +1,4 @@
-diff a/libraries/topology/package.json b/libraries/topology/package.json	(rejected hunks)
+diff a/libraries/topology/package.cjs.json b/libraries/topology/package.cjs.json	(rejected hunks)
 @@ -1,7 +1,7 @@
  {
    "name": "@cardinalapps/topology",

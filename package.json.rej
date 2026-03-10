@@ -1,9 +1,11 @@
 diff a/package.json b/package.json	(rejected hunks)
-@@ -7,6 +7,7 @@
+@@ -1,7 +1,7 @@
+ {
+   "name": "@cardinalapps/monorepo",
+-  "description": "This package.json is used for both the OSS and the private monorepos.",
+-  "license": "CC BY-NC-ND 4.0",
++  "description": "Monorepo for Cardinal's apps.",
++  "license": "Elastic License 2.0 (ELv2)",
+   "version": "2.0.0",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
    "private": true,
-   "scripts": {
-     "dev": "turbo run dev --ui=tui --concurrency=25",
-+    "dev:wos": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/media-server",
-     "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
-     "dev:woas": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server",
-     "lint": "turbo run lint --continue -- --max-warnings 0",

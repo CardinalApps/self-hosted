@@ -1,9 +1,10 @@
 diff a/libraries/ui/package.json b/libraries/ui/package.json	(rejected hunks)
-@@ -25,6 +25,7 @@
-     "clsx": "^2.1.1",
-     "date-fns": "2.30.0",
-     "embla-carousel-react": "^8.6.0",
-+    "embla-carousel-wheel-gestures": "^8.1.0",
-     "framer-motion": "12.23.22",
-     "howler": "2.2.4",
-     "leaflet": "1.9.3",
+@@ -1,7 +1,7 @@
+ {
+   "name": "@cardinalapps/ui",
+   "description": "Shared React components and other utilities.",
+-  "license": "CC BY-NC-ND 4.0",
++  "license": "Elastic License 2.0 (ELv2)",
+   "version": "2.0.0",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "private": true,

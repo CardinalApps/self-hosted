@@ -1,0 +1,10 @@
+diff a/config/eslint/package.json b/config/eslint/package.json	(rejected hunks)
+@@ -1,7 +1,7 @@
+ {
+   "name": "@cardinalapps/eslint-config",
+   "description": "Shared eslint rules for linting and formatting.",
+-  "license": "CC BY-NC-ND 4.0",
++  "license": "Elastic License 2.0 (ELv2)",
+   "version": "0.1.0",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "type": "module",

@@ -1,14 +1,10 @@
 diff a/config/typescript/package.json b/config/typescript/package.json	(rejected hunks)
-@@ -8,9 +8,9 @@
-   "type": "module",
-   "exports": {
-     "./base": "./base.json",
-+    "./express": "./express.json",
-     "./library": "./library.json",
--    "./react-csr": "./react-csr.json",
--    "./server-nest": "./server-nest.json",
--    "./server-express": "./server-express.json"
-+    "./nest": "./nest.json",
-+    "./vite": "./vite.json"
-   }
- }
+@@ -1,7 +1,7 @@
+ {
+   "name": "@cardinalapps/typescript-config",
+   "description": "Shared TypeScript configs.",
+-  "license": "CC BY-NC-ND 4.0",
++  "license": "Elastic License 2.0 (ELv2)",
+   "version": "0.1.0",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "private": true,

@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/types",
   "description": "General types.",
-  "license": "CC BY-NC-ND 4.0",
+  "license": "Elastic License 2.0 (ELv2)",
   "version": "0.2.0",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,

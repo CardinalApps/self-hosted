@@ -1,10 +1,10 @@
-diff a/libraries/access-control/package.json b/libraries/access-control/package.json	(rejected hunks)
+diff a/libraries/access-control/package.cjs.json b/libraries/access-control/package.cjs.json	(rejected hunks)
 @@ -1,7 +1,7 @@
  {
    "name": "@cardinalapps/access-control",
    "description": "Access control layer for Cardinal apps.",
 -  "license": "CC BY-NC-ND 4.0",
 +  "license": "Elastic License 2.0 (ELv2)",
-   "version": "0.1.1",
+   "version": "0.1.0",
    "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
    "private": true,

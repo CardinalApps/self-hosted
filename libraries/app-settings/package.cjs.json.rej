@@ -1,4 +1,4 @@
-diff a/libraries/app-settings/package.json b/libraries/app-settings/package.json	(rejected hunks)
+diff a/libraries/app-settings/package.cjs.json b/libraries/app-settings/package.cjs.json	(rejected hunks)
 @@ -1,7 +1,7 @@
  {
    "name": "@cardinalapps/app-settings",

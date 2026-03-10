@@ -1,10 +1,10 @@
 diff a/apps/photos-web/package.json b/apps/photos-web/package.json	(rejected hunks)
-@@ -17,7 +17,7 @@
-   "dependencies": {
-     "@cardinalapps/access-control": "workspace:*",
-     "@cardinalapps/app-settings": "workspace:*",
--    "@cardinalapps/dtos": "workspace:*",
-+    "@cardinalapps/types": "workspace:*",
-     "@cardinalapps/products": "workspace:*",
-     "@cardinalapps/ui": "workspace:*",
-     "@reduxjs/toolkit": "2.6.1",
+@@ -1,7 +1,7 @@
+ {
+   "name": "@cardinalapps/photos-web",
+   "description": "Cardinal Photos web app.",
+-  "license": "CC BY-NC-ND 4.0",
++  "license": "Elastic License 2.0 (ELv2)",
+   "version": "0.3.0",
+   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+   "homepage": "/photos",
