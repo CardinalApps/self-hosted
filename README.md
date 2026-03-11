@@ -66,7 +66,7 @@ These are the packages in this monorepo.
 
 <details>
   <summary>Why so few commits?</summary>
-  <p>This repository was created in March 2026. Prior to that, this project was closed source. The first commit in this repo is a squashed commit containing all the work since the beginning.</p>
+  <p>This repository was created in March 2026. Prior to that, this project was closed source. The second commit in this repo is a squashed commit containing all the work since the beginning.</p>
 </details>
 
 <details>
@@ -74,7 +74,7 @@ These are the packages in this monorepo.
   <ul>
     <li><strong>Suggestions:</strong> Create a post on the forums or create a GitHub issue.</li>
     <li><strong>Bug Reports:</strong> Create a GitHub issue. For a serious vulnerability, please disclose responsibly using the email on the <a href="https://cardinalapps.io/contact">Contact page</a>.</li>
-    <li><strong>Code Contributions:</strong> Public contributions are currently closed. If you particularly like this project then come say hello in the forums.</li>
+    <li><strong>Code Contributions:</strong> Public contributions are currently closed. If you particularly like this project then come say hello in the <a href="https://cardinal.discourse.group">Forums</a>.</li>
   </ul>
 </details>
 

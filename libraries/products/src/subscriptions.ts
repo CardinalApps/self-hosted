@@ -38,7 +38,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "free",
     provides: {
-      seats: 5,
+      seats: 2,
     },
     prices: {},
   },
@@ -63,7 +63,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "starter",
     provides: {
-      seats: 10,
+      seats: 5,
     },
     prices: {
       monthly: 'starter_monthly',
