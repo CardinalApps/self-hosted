@@ -1,13 +1,15 @@
 diff a/libraries/ui/public/styles/themes/Light.css b/libraries/ui/public/styles/themes/Light.css	(rejected hunks)
-@@ -37,9 +37,11 @@
-   --box-shadow-4: rgb(0 0 0 / 20%) 0px 1px 3px 1px, rgb(0 0 0 / 24%) 0px 2px 2px 0px, rgb(0 0 0 / 12%) 0px 2px 2px 1px;
+@@ -50,9 +50,10 @@
+   --scrollbar-color: rgb(212, 212, 212);
  
-   /* Alerts */
-+  --info: #1857c4;
-   --success: #3aaf39;
-   --warning: #ffdc00;
-   --danger: #d24848;
-+  --info-bg: #1882c4;
-   --success-bg: #43be43;
-   --warning-bg: #efbe34;
-   --danger-bg: #a53737;
+   .glass {
+-    background: rgba(255, 255, 255, 0.08);
++    background: rgba(255, 255, 255, 0.2);
+     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+-    backdrop-filter: blur(9.4px);
+-    -webkit-backdrop-filter: blur(9.4px);
++    backdrop-filter: blur(5px);
++    -webkit-backdrop-filter: blur(5px);
++    border: 1px solid rgba(255, 255, 255, 0.3);
+   }
+ }
