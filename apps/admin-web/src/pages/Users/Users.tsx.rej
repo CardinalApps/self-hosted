@@ -1,126 +1,16 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -1,5 +1,6 @@
- import { useEffect, useState } from 'react'
- import { useSelector } from 'react-redux'
-+import { ACi18n } from '@cardinalapps/access-control/src'
+@@ -146,11 +146,12 @@ function Users() {
+       return []
+     }
  
- import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
- import Table from '@cardinalapps/ui/src/components/interaction/Table'
-@@ -16,6 +17,7 @@ import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/t
- import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
- import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
- import H5 from '@cardinalapps/ui/src/components/typography/H5'
-+import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
- 
- import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
- import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
-@@ -24,8 +26,8 @@ import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUs
- 
- import ManageInvitationsDrawer from './ManageInvitationsDrawer'
- import UserManagementDrawer from './UserManagementDrawer'
-+import CreateUserDrawer from './CreateUserDrawer'
- 
--import { ACi18n } from '@cardinalapps/access-control/src'
- import i18n from './i18n.json'
- import './styles.css'
- 
-@@ -33,8 +35,10 @@ function Users() {
-   const { lang } = useSelector(settingsSelectors.current)
-   const currentUser = useSelector(homeServerUserSelectors.current)
-   const canUserCreateInvitiations = useHasCapability('Invitations.Create')
-+  const canUserCreateUsers = useHasCapability('Users.Create')
-   const [configuringUser, setConfiguringUser] = useState<UserType>()
-   const [showManageInvitationsDrawer, setShowManageInvitationsDrawer] = useState<boolean>(false)
-+  const [showCreateUserDrawer, setShowCreateUserDrawer] = useState<boolean>(false)
- 
-   const serverOwnerRes = useGetActiveUsersQuery({})
-   const serverOwner = serverOwnerRes.data?.[0]
-@@ -49,6 +53,8 @@ function Users() {
-   const activeInvitationsRes = useGetInvitationsQuery({ isExpired: false })
-   const activeIntiations = activeInvitationsRes?.data?.[0] || []
- 
-+  const totalLocalUsers = users.filter((user) => !user.cardinalId).length
 +
-   const nameCol = (user: UserType) => {
-     return (
-       <Table.Col key="username">
-@@ -145,6 +164,7 @@ function Users() {
-         return [
-           nameCol(user),
-           enabledStatusCol(user),
-+          typeCol(user),
-           roleCol(user),
-           lastSeenCol(user?.activityStatusUpdatedAt),
-           controlsCol(user),
-@@ -188,21 +208,48 @@ function Users() {
-         )}
-         {
-         /*
--         * Number of used seats card. 
-+         * Number of used cloud seats card.
-          */
-         }
-         <CardGrid.Card
-           size="xs"
-           icon={<Icon fa="fas fa-users" />}
--          header={<H5>{i18n['users.server.capacity'][lang]}</H5>}
-+          header={<H5>{i18n['users.server.cloud-capacity'][lang]}</H5>}
-         >
-           {
--            i18n['users.server.capacity.seats'][lang]
-+            i18n['users.server.capacity.cloud'][lang]
-               .replace('{used}', !isNaN(licensingSeats?.used) ? licensingSeats.used : 'Unknown')
-               .replace('{total}', licensingSeats?.total || 'Unknown')
-           }
-         </CardGrid.Card>
-         {
-+        /*
-+         * Number of local users card.
-+         */
-+        }
-+        <CardGrid.Card
-+          size="xs"
-+          icon={<Icon fa="fas fa-user-friends" />}
-+          header={<H5>{i18n['users.server.local-capacity'][lang]}</H5>}
-+          footer={(
-+            <>
-+              <Button
-+                onClick={() => setShowCreateUserDrawer(true)}
-+                type="button"
-+                disabled={!canUserCreateUsers}
-+              >
-+                {i18n['users.server.capacity.create'][lang]}
-+              </Button>
-+            </>
-+          )}
-+        >
-+          {pluralize(
-+            totalLocalUsers,
-+            i18n['users.server.capacity.local.singular'][lang].replace('{total}', totalLocalUsers),
-+            i18n['users.server.capacity.local.plural'][lang].replace('{total}', totalLocalUsers),
-+          )}
-+        </CardGrid.Card>
-+        {
-         /*
-          * User invitations card.
-          */
-@@ -252,6 +299,7 @@ function Users() {
-         header={[
-           i18n['users.table.header.name'][lang],
-           i18n['users.table.header.status'][lang],
-+          i18n['users.table.header.type'][lang],
-           i18n['users.table.header.role'][lang],
-           i18n['users.table.header.last-seen'][lang],
-           null,
-@@ -264,6 +312,11 @@ function Users() {
-           onClose={() => setShowManageInvitationsDrawer(false)}
-         />
-       )}
-+      {!!showCreateUserDrawer && (
-+        <CreateUserDrawer
-+          onClose={() => setShowCreateUserDrawer(false)}
-+        />
-+      )}
-       {!!configuringUser && (
-         <UserManagementDrawer
-           user={configuringUser}
+     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
+     const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
+     const otherUsers = users
+-      .filter((user: UserType) => user.userId !== guestAccount.userId)
+-      .filter((user: UserType) => user.userId !== ownerAccount.userId)
++      .filter((user: UserType) => user.userId !== guestAccount?.userId)
++      .filter((user: UserType) => user.userId !== ownerAccount?.userId)
+ 
+     const ordered = [
+       ownerAccount,
