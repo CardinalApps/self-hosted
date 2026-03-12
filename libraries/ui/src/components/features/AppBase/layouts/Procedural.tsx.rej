@@ -1,55 +1,35 @@
 diff a/libraries/ui/src/components/features/AppBase/layouts/Procedural.tsx b/libraries/ui/src/components/features/AppBase/layouts/Procedural.tsx	(rejected hunks)
-@@ -4,10 +4,18 @@ import clsx from 'clsx'
- import useScrolledToBottom from '../../../../hooks/useScrolledToBottom'
- import H2 from '../../../typography/H2'
- import useScrollPointRestoration from '../../../../hooks/useScrollPointRestoration'
-+import Card from '../../../layout/Card'
-+import Icon from '../../../typography/Icon'
-+
-+import i18n from '../i18n'
-+import H5 from '../../../typography/H5'
- 
+@@ -13,6 +13,7 @@ import H5 from '../../../typography/H5'
  export type ProceduralProps = {
    name: string,
    className?: string | string[],
-+  hasContent?: boolean,
-+  emptyTitle?: boolean,
-+  emptyMessage?: boolean,
-   onLoadMore?: () => void
- }
- 
-@@ -18,6 +26,9 @@ export type ProceduralProps = {
++  isReady?: boolean,
+   hasContent?: boolean,
+   emptyTitle?: boolean,
+   emptyMessage?: boolean,
+@@ -26,6 +27,7 @@ export type ProceduralProps = {
  function ProceduralLayout({
    className,
    children,
-+  hasContent = false,
-+  emptyTitle,
-+  emptyMessage,
-   onLoadMore,
- }: PropsWithChildren<ProceduralProps>) {
-   useScrollPointRestoration('.procedural-layout')
-@@ -30,6 +41,24 @@ function ProceduralLayout({
++  isReady = false,
+   hasContent = false,
+   emptyTitle,
+   emptyMessage,
+@@ -41,7 +43,7 @@ function ProceduralLayout({
      }
    }, [atBottom])
  
-+  if (!hasContent) {
-+    return (
-+      <div className="procedural-empty">
-+        <Card
-+          border={0}
-+          shadow={1}
-+          bg={1}
-+          header={<Icon fa="fas fa-info-circle" hoverType={null} />}
-+        >
-+          <>
-+            <H5>{emptyTitle || i18n['procedural.empty.title']['en']}</H5>
-+            <p dangerouslySetInnerHTML={{ __html: emptyMessage || i18n['procedural.empty.desc']['en'] }} />
-+          </>
-+        </Card>
-+      </div>
-+    )
-+  }
-+
-   return (
+-  if (!hasContent) {
++  if (isReady && !hasContent) {
+     return (
+       <div className="procedural-empty">
+         <Card
+@@ -59,7 +61,7 @@ function ProceduralLayout({
+     )
+   }
+ 
+-  return (
++  return hasContent && isReady && (
      <div
        ref={layoutRef}
+       className={clsx('procedural-layout', className)}
