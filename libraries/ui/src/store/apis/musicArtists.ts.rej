@@ -1,17 +1,25 @@
 diff a/libraries/ui/src/store/apis/musicArtists.ts b/libraries/ui/src/store/apis/musicArtists.ts	(rejected hunks)
-@@ -1,5 +1,5 @@
- import queryParams from '../../lib/net/queryParams'
--import { baseApi } from './base'
-+import { baseHomeServerApi } from './baseHomeServerApi'
- 
- import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
- import { CommonOrderParams, CommonSortParams, PaginationParams } from '../types/api'
-@@ -13,7 +13,7 @@ export type MusicArtistType = {
-   [key: string]: unknown,
- }
- 
--export const musicArtistsApi = baseApi
-+export const musicArtistsApi = baseHomeServerApi
-   .enhanceEndpoints({
-     addTagTypes: ['list', 'MusicArtists'],
-   })
+@@ -27,6 +27,7 @@ export const musicArtistsApi = baseHomeServerApi
+         {
+           sort?: ArtistsSortParams,
+           order?: CommonOrderParams,
++          libraries?: string[],
+         },
+         PaginationParams
+       >({
+@@ -40,13 +41,14 @@ export const musicArtistsApi = baseHomeServerApi
+           getPreviousPageParam,
+         },
+         query({ queryArg, pageParam }) {
+-          const { sort, order } = queryArg
++          const { sort, order, libraries } = queryArg
+           const { take, skip } = pageParam
+           return queryParams('/music/artists', {
+             ...(typeof skip !== 'undefined' && { skip }),
+             ...(take && { take }),
+             ...(sort && { sort }),
+             ...(order && { order }),
++            ...(libraries && { libraries }),
+             releases: true,
+             tracks: true,
+           })

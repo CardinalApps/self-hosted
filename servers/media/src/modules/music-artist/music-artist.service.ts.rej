@@ -1,28 +1,64 @@
 diff a/servers/media/src/modules/music-artist/music-artist.service.ts b/servers/media/src/modules/music-artist/music-artist.service.ts	(rejected hunks)
-@@ -8,7 +8,7 @@ import { MusicArtistMetadata } from './music-artist-metadata.entity'
- import { EventService } from '../event/event.service'
+@@ -9,6 +9,7 @@ import { EventService } from '../event/event.service'
  
  import { GetMusicArtistsDto } from './dtos/GetMusicArtists.dto'
--import { sortableString } from '../../utils/string'
-+import { sortableString, isNumeric } from '../../utils/string'
+ import { sortableString, isNumeric } from '../../utils/string'
++import { LibraryService } from '../library/library.service'
  
  @Injectable()
  export class MusicArtistService {
-@@ -37,11 +37,13 @@ export class MusicArtistService {
-   /**
-    * Gets a single music artist.
+@@ -19,6 +20,7 @@ export class MusicArtistService {
+     private musicArtistRepository: Repository<MusicArtist>,
+     @InjectRepository(MusicArtistMetadata)
+     private musicArtistMetadataRepository: Repository<MusicArtistMetadata>,
++    private readonly libraryService: LibraryService,
+     private readonly eventService: EventService,
+   ) {}
+ 
+@@ -80,19 +82,35 @@ export class MusicArtistService {
+    * Returns all artists according to the query.
     */
--  async get(id: number, relations = {}): Promise<MusicArtist | null> {
-+  async get(id: number | string, relations = {}): Promise<MusicArtist | null> {
-+    const where = isNumeric(id)
-+      ? { id: id as number }
-+      : { musicArtistId: id as string }
-+
-     const musicArtist = await this.musicArtistRepository.find({
--      where: {
--        id: id,
+   async query(getMusicArtistsDto: GetMusicArtistsDto): Promise<[MusicArtist[], number]> {
+-    const { take, skip, order, orderBy, tracks, releases, metadata } = getMusicArtistsDto
+-    return await this.musicArtistRepository.findAndCount({
++    const {
+       take,
+       skip,
+-      relations: {
+-        tracks: tracks,
+-        releases: releases,
+-        metadata: metadata,
 -      },
-+      where,
-       relations: {
-         ...relations,
-       },
+-      order: {
+-        [orderBy]: order,
+-      },
+-    })
++      order,
++      orderBy,
++      tracks,
++      releases,
++      metadata,
++      libraries,
++    } = getMusicArtistsDto
++
++    const qb = this.musicArtistRepository.createQueryBuilder('musicArtist')
++
++    if (metadata) qb.leftJoinAndSelect('musicArtist.metadata', 'metadata')
++    if (releases) qb.leftJoinAndSelect('musicArtist.releases', 'releases')
++    if (tracks) qb.leftJoinAndSelect('musicArtist.tracks', 'tracks')
++
++    // When filtering by library, join files
++    if (libraries && libraries.length) {
++      const libraryEntities = await this.libraryService.getLibraries(libraries)
++      qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
++    }
++
++    qb
++      .orderBy(`musicArtist.${orderBy}`, order)
++      .take(take)
++      .skip(skip)
++
++    return qb.getManyAndCount()
+   }
+ 
+   /**

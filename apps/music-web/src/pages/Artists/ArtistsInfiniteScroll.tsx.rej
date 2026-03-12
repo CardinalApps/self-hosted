@@ -1,10 +1,25 @@
 diff a/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx b/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx	(rejected hunks)
-@@ -62,7 +62,7 @@ function ReleasesInfiniteScroll({
-         image={'/music/images/placeholder.jpg'}
-         numReleases={musicArtist?.releases?.length || 0}
-         numTracks={musicArtist?.tracks?.length || 0}
--        link={getAppUrl('admin', 'indexing', {
-+        link={getAppUrl('artist', {
-           params: {
-             ':id': musicArtist?.musicArtistId?.toString() || '',
-           },
+@@ -11,6 +11,7 @@ import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScr
+ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
+ import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
+ import MusicArtist from '@cardinalapps/ui/src/components/interaction/MusicArtist'
++import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
+ 
+ const ITEM_WIDTH = 320
+ const ITEM_HEIGHT = 285
+@@ -24,6 +25,7 @@ function ReleasesInfiniteScroll({
+   virtualViewName,
+   toolbarName,
+ }: TracksInfiniteScrollProps) {
++  const libraries = useAppSelector(librarySelectors.current)
+   const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
+   const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
+   const [initialRow] = useState(virtualViewValues?.start || 1)
+@@ -47,6 +49,7 @@ function ReleasesInfiniteScroll({
+     {
+       sort: toolbarValues?.sort as ArtistsSortParams,
+       order: toolbarValues?.order as CommonOrderParams,
++      ...(libraries?.length ? { libraries } : {}),
+     },
+     {
+       initialPageParam,

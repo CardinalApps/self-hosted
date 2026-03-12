@@ -1,9 +1,9 @@
 diff a/apps/music-web/src/pages/Artists/Artists.tsx b/apps/music-web/src/pages/Artists/Artists.tsx	(rejected hunks)
-@@ -19,6 +19,7 @@ function ArtistsPage() {
-       layout={PAGE_LAYOUT.virtual}
+@@ -20,6 +20,7 @@ function ArtistsPage() {
        pageTitle={i18n['music-artists.title']['en']}
        restoreScrollPoint={false}
-+      capabilities={['MusicArtists.Read']}
+       capabilities={['MusicArtists.Read']}
++      showLibrarySwitcher={true}
        toolbar={(
          <Toolbar
            name={TOOLBAR_NAME}
