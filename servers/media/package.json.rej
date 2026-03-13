@@ -1,10 +1,10 @@
 diff a/servers/media/package.json b/servers/media/package.json	(rejected hunks)
-@@ -1,7 +1,7 @@
- {
+@@ -2,7 +2,7 @@
    "name": "@cardinalapps/media-server",
    "description": "Self-hosted Cardinal Media Server.",
--  "license": "CC BY-NC-ND 4.0",
-+  "license": "Elastic License 2.0 (ELv2)",
-   "version": "0.5.0",
+   "license": "Elastic License 2.0 (ELv2)",
+-  "version": "0.5.0",
++  "version": "0.5.1",
    "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
    "private": true,
+   "scripts": {
