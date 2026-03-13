@@ -5,11 +5,24 @@ import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/l
 import TrueShuffle from './items/TrueShuffle'
 import RecentlyAddedReleases from './items/RecentlyAddedReleases'
 import MostPlayedTracks from './items/MostPlayedTracks'
+import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
 import i18n from './i18n.json'
 
 function ListenNowProcedural() {
   const { lang } = useAppSelector(settingsSelectors.current)
+
+  /**
+   * We need at least 1 track to show this page.
+   */
+  const {
+    data,
+    isSuccess,
+  } = useGetMusicTracksQuery({
+    take: 1,
+  })
+
+  const musicTracks = Array.isArray(data) ? data[0] : []
 
   const listenNowLoadMore = () => {
     console.log('load more')
@@ -19,6 +32,8 @@ function ListenNowProcedural() {
     <ProceduralLayout
       name={'music-listen-now'}
       onLoadMore={listenNowLoadMore}
+      isReady={isSuccess}
+      hasContent={!!musicTracks.length}
     >
       {
       /**

@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsString, IsOptional, IsIn } from 'class-validator'
+import { IsBoolean, IsString, IsOptional, IsIn, IsArray } from 'class-validator'
 
 import { Pagination } from '../../../dtos/pagination.dto'
+import { toArrayOfStrings } from '../../../utils/transformers'
 
 enum AllowedMusicReleasesOrderBy {
   'createdAt' = 'createdAt',
@@ -33,4 +34,9 @@ export class GetMusicArtistsDto extends MusicArtistsPagination {
   @IsOptional()
   @IsBoolean()
   releases?: boolean = false
+
+  @Transform(toArrayOfStrings)
+  @IsArray()
+  @IsOptional()
+  libraries?: string[]
 }

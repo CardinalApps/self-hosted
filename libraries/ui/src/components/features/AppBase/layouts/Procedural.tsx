@@ -4,10 +4,19 @@ import clsx from 'clsx'
 import useScrolledToBottom from '../../../../hooks/useScrolledToBottom'
 import H2 from '../../../typography/H2'
 import useScrollPointRestoration from '../../../../hooks/useScrollPointRestoration'
+import Card from '../../../layout/Card'
+import Icon from '../../../typography/Icon'
+
+import i18n from '../i18n'
+import H5 from '../../../typography/H5'
 
 export type ProceduralProps = {
   name: string,
   className?: string | string[],
+  isReady?: boolean,
+  hasContent?: boolean,
+  emptyTitle?: boolean,
+  emptyMessage?: boolean,
   onLoadMore?: () => void
 }
 
@@ -18,6 +27,10 @@ export type ProceduralProps = {
 function ProceduralLayout({
   className,
   children,
+  isReady = false,
+  hasContent = false,
+  emptyTitle,
+  emptyMessage,
   onLoadMore,
 }: PropsWithChildren<ProceduralProps>) {
   useScrollPointRestoration('.procedural-layout')
@@ -30,7 +43,25 @@ function ProceduralLayout({
     }
   }, [atBottom])
 
-  return (
+  if (isReady && !hasContent) {
+    return (
+      <div className="procedural-empty">
+        <Card
+          border={0}
+          shadow={1}
+          bg={1}
+          header={<Icon fa="fas fa-info-circle" hoverType={null} />}
+        >
+          <>
+            <H5>{emptyTitle || i18n['procedural.empty.title']['en']}</H5>
+            <p dangerouslySetInnerHTML={{ __html: emptyMessage || i18n['procedural.empty.desc']['en'] }} />
+          </>
+        </Card>
+      </div>
+    )
+  }
+
+  return hasContent && isReady && (
     <div
       ref={layoutRef}
       className={clsx('procedural-layout', className)}

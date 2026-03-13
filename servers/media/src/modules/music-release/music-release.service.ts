@@ -142,20 +142,20 @@ export class MusicReleaseService {
       metadata,
       libraries,
     } = getMusicReleasesDto
+    const hasLibraries = libraries && libraries.length
 
     const qb = this.musicReleaseRepository.createQueryBuilder('musicRelease')
 
     if (artists) qb.leftJoinAndSelect('musicRelease.artist', 'artist')
     if (artists) qb.leftJoinAndSelect('musicRelease.artists', 'artists')
     if (genres) qb.leftJoinAndSelect('musicRelease.genres', 'genres')
-    if (tracks) qb.leftJoinAndSelect('musicRelease.tracks', 'tracks')
+    if (tracks || hasLibraries) qb.leftJoinAndSelect('musicRelease.tracks', 'tracks')
     if (thumbnails) qb.leftJoinAndSelect('musicRelease.thumbnails', 'thumbnails')
     if (metadata) qb.leftJoinAndSelect('musicRelease.metadata', 'metadata')
 
     // When filtering by library, join tracks and files
     if (libraries && libraries.length) {
       const libraryEntities = await this.libraryService.getLibraries(libraries)
-      qb.leftJoinAndSelect('musicRelease.tracks', 'tracks')
       qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
     }
 

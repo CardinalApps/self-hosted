@@ -12,6 +12,7 @@ import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
+import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
 
 const ITEM_WIDTH = 220
 const ITEM_HEIGHT = 275
@@ -25,6 +26,7 @@ function ReleasesInfiniteScroll({
   virtualViewName,
   toolbarName,
 }: TracksInfiniteScrollProps) {
+  const libraries = useAppSelector(librarySelectors.current)
   const { [toolbarName]: toolbarValues } = useAppSelector(layoutSelectors.toolbarValues)
   const { [virtualViewName]: virtualViewValues } = useAppSelector(layoutSelectors.virtualViews)
   const [initialRow] = useState(virtualViewValues?.start || 1)
@@ -48,6 +50,7 @@ function ReleasesInfiniteScroll({
     {
       sort: toolbarValues?.sort as ReleasesSortParams,
       order: toolbarValues?.order as CommonOrderParams,
+      ...(libraries?.length ? { libraries } : {}),
     },
     {
       initialPageParam,

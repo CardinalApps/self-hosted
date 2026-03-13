@@ -25,9 +25,12 @@ const UserTag = ({
   const { lang } = useAppSelector(settingsSelectors.current)
   return (
     <div className={`user size-${size}`}>
+      {/* Guest */}
       {showAvatar && user?.designation === 'guest_account' &&
         <Avatar size={size} type="guest" className={'avatar'} />
       }
+
+      {/* Local user with only a username */}
       {showAvatar && user?.designation !== 'guest_account' && !user.cardinalId && user?.username &&
         <Avatar
           size={size}
@@ -37,6 +40,8 @@ const UserTag = ({
           type="color"
         />
       }
+
+      {/* Cloud user with a cloud avatar */}
       {showAvatar && user?.designation !== 'guest_account' && user?.cachedCloudUser?.avatar &&
         <Avatar
           size={size}
@@ -47,9 +52,13 @@ const UserTag = ({
           type={user?.cachedCloudUser?.avatar?.type}
         />
       }
+
+      {/* Name for Guest */}
       {!!showName && user?.designation === 'guest_account' && (
         <p className="user-name">{i18n['user.guest'][lang]}</p>
       )}
+
+      {/* Name for other accounts */}
       {!!showName && user?.designation !== 'guest_account' && (
         <p className="user-name">
           {

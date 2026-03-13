@@ -20,6 +20,7 @@ function ArtistsPage() {
       pageTitle={i18n['music-artists.title']['en']}
       restoreScrollPoint={false}
       capabilities={['MusicArtists.Read']}
+      showLibrarySwitcher={true}
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}

@@ -146,11 +146,12 @@ function Users() {
       return []
     }
 
+
     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
     const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
     const otherUsers = users
-      .filter((user: UserType) => user.userId !== guestAccount.userId)
-      .filter((user: UserType) => user.userId !== ownerAccount.userId)
+      .filter((user: UserType) => user.userId !== guestAccount?.userId)
+      .filter((user: UserType) => user.userId !== ownerAccount?.userId)
 
     const ordered = [
       ownerAccount,

@@ -377,15 +377,3 @@
     opacity: 1;
   }
 }
-
-@keyframes inniePop {
-  0% {
-    transform: scale(100%);
-  }
-  10% {
-    transform: scale(97%);
-  }
-  100% {
-    transform: scale(100%);
-  }
-}

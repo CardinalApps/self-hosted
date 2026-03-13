@@ -166,8 +166,8 @@ function VirtualLayout({
     }
 
     const offset = 0
-    const nextPageTrigger = leadingPageParams.skip - offset
-    const prevPageTrigger = trailingPageParams.skip + offset
+    const nextPageTrigger = Math.floor((leadingPageParams.skip - offset) / itemsPerRow)
+    const prevPageTrigger = Math.floor((trailingPageParams.skip + offset) / itemsPerRow)
 
     if (
       lastItem.index > nextPageTrigger

@@ -76,6 +76,12 @@ const i18n: StringList = {
   "virtual.empty.button": {
     "en": "Go to file indexing",
   },
+  "procedural.empty.title": {
+    "en": "No Media",
+  },
+  "procedural.empty.desc": {
+    "en": "<p>Add media to this page by indexing your photos, music, and movie & TV files.</p>",
+  },
 }
 
 export default i18n

@@ -20,6 +20,7 @@ function ReleasesPage() {
       pageTitle={i18n['music-releases.title']['en']}
       restoreScrollPoint={false}
       capabilities={['MusicReleases.Read']}
+      showLibrarySwitcher={true}
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}

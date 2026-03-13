@@ -51,6 +51,7 @@ export const musicReleasesApi = baseHomeServerApi
         {
           sort?: ReleasesSortParams,
           order?: CommonOrderParams,
+          libraries?: string[],
         },
         PaginationParams
       >({
@@ -64,13 +65,14 @@ export const musicReleasesApi = baseHomeServerApi
           getPreviousPageParam,
         },
         query({ queryArg, pageParam }) {
-          const { sort, order } = queryArg
+          const { sort, order, libraries } = queryArg
           const { take, skip } = pageParam
           return queryParams('/music/releases', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
             ...(sort && { sort }),
             ...(order && { order }),
+            ...(libraries && { libraries }),
             thumbnails: true,
             metadata: true,
             tracks: true,
@@ -108,6 +110,9 @@ export const musicReleasesApi = baseHomeServerApi
         },
       }),
 
+      /**
+       * Get one.
+       */
       getMusicRelease: builder.query<
         MusicReleaseType,
         { id: string }

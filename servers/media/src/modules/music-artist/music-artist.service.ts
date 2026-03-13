@@ -9,6 +9,7 @@ import { EventService } from '../event/event.service'
 
 import { GetMusicArtistsDto } from './dtos/GetMusicArtists.dto'
 import { sortableString, isNumeric } from '../../utils/string'
+import { LibraryService } from '../library/library.service'
 
 @Injectable()
 export class MusicArtistService {
@@ -19,6 +20,7 @@ export class MusicArtistService {
     private musicArtistRepository: Repository<MusicArtist>,
     @InjectRepository(MusicArtistMetadata)
     private musicArtistMetadataRepository: Repository<MusicArtistMetadata>,
+    private readonly libraryService: LibraryService,
     private readonly eventService: EventService,
   ) {}
 
@@ -80,19 +82,35 @@ export class MusicArtistService {
    * Returns all artists according to the query.
    */
   async query(getMusicArtistsDto: GetMusicArtistsDto): Promise<[MusicArtist[], number]> {
-    const { take, skip, order, orderBy, tracks, releases, metadata } = getMusicArtistsDto
-    return await this.musicArtistRepository.findAndCount({
+    const {
       take,
       skip,
-      relations: {
-        tracks: tracks,
-        releases: releases,
-        metadata: metadata,
-      },
-      order: {
-        [orderBy]: order,
-      },
-    })
+      order,
+      orderBy,
+      tracks,
+      releases,
+      metadata,
+      libraries,
+    } = getMusicArtistsDto
+
+    const qb = this.musicArtistRepository.createQueryBuilder('musicArtist')
+
+    if (metadata) qb.leftJoinAndSelect('musicArtist.metadata', 'metadata')
+    if (releases) qb.leftJoinAndSelect('musicArtist.releases', 'releases')
+    if (tracks) qb.leftJoinAndSelect('musicArtist.tracks', 'tracks')
+
+    // When filtering by library, join files
+    if (libraries && libraries.length) {
+      const libraryEntities = await this.libraryService.getLibraries(libraries)
+      qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
+    }
+
+    qb
+      .orderBy(`musicArtist.${orderBy}`, order)
+      .take(take)
+      .skip(skip)
+
+    return qb.getManyAndCount()
   }
 
   /**

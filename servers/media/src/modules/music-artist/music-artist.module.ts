@@ -8,11 +8,13 @@ import { MusicArtist } from './music-artist.entity'
 import { MusicArtistMetadata } from './music-artist-metadata.entity'
 
 import { EventModule } from '../event/event.module'
+import { LibraryModule } from '../library/library.module'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MusicArtist, MusicArtistMetadata]),
     EventModule,
+    LibraryModule,
   ],
   exports: [
     TypeOrmModule,

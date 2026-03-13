@@ -27,6 +27,7 @@ export const musicArtistsApi = baseHomeServerApi
         {
           sort?: ArtistsSortParams,
           order?: CommonOrderParams,
+          libraries?: string[],
         },
         PaginationParams
       >({
@@ -40,13 +41,14 @@ export const musicArtistsApi = baseHomeServerApi
           getPreviousPageParam,
         },
         query({ queryArg, pageParam }) {
-          const { sort, order } = queryArg
+          const { sort, order, libraries } = queryArg
           const { take, skip } = pageParam
           return queryParams('/music/artists', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
             ...(sort && { sort }),
             ...(order && { order }),
+            ...(libraries && { libraries }),
             releases: true,
             tracks: true,
           })
@@ -78,6 +80,10 @@ export const musicArtistsApi = baseHomeServerApi
           })
         },
       }),
+
+      /**
+       * Get one.
+       */
       getMusicArtist: builder.query<
         MusicArtistType,
         { id: string }
