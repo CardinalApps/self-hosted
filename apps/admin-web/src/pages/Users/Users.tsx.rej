@@ -1,16 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -146,11 +146,12 @@ function Users() {
-       return []
-     }
- 
-+
-     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
-     const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
-     const otherUsers = users
--      .filter((user: UserType) => user.userId !== guestAccount.userId)
--      .filter((user: UserType) => user.userId !== ownerAccount.userId)
-+      .filter((user: UserType) => user.userId !== guestAccount?.userId)
-+      .filter((user: UserType) => user.userId !== ownerAccount?.userId)
- 
-     const ordered = [
-       ownerAccount,
+@@ -125,7 +125,7 @@ function Users() {
+               {formatTimeAgo(lastSeen)}
+             </span>
+             )
+-          : null
++          : i18n['users.settings.info.last-seen.never'][lang]
+         }
+       </Table.Col>
+     )

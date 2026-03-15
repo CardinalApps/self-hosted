@@ -1,77 +1,72 @@
 diff a/servers/media/src/modules/user/user.controller.ts b/servers/media/src/modules/user/user.controller.ts	(rejected hunks)
-@@ -31,7 +31,6 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+@@ -9,7 +9,6 @@ import {
+   Query,
+   Patch,
+   UnauthorizedException,
+-  ForbiddenException,
+   InternalServerErrorException,
+   Logger,
+ } from '@nestjs/common'
+@@ -19,7 +18,6 @@ import {
+ } from '@nestjs/swagger'
+ 
+ import { UserService } from './user.service'
+-import { LocalUserService } from './local-user.service'
+ import { CloudUserService } from './cloud-user.service'
+ import { User } from './user.entity'
+ import { CreateUser } from './dtos/CreateUser.dto'
+@@ -30,16 +28,15 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+ 
  import { getJWTFromHeaders, getCardinalTolkienFromHeaders } from '../../utils/jwt'
  import { GetUsersDto } from './dtos/GetUsers.dto'
- import { SeatsService } from './seats.service'
--import { Designations } from './types'
+-import { SeatsService } from './seats.service'
++import { UpdateUserService } from './update-user.service'
  
  @Controller()
  @ApiTags('Users')
-@@ -174,10 +196,7 @@ export class UserController {
-   }
+ export class UserController {
+   constructor(
+     private readonly userService: UserService,
+-    private readonly localUserService: LocalUserService,
++    private readonly updateUserService: UpdateUserService,
+     private readonly cloudUserService: CloudUserService,
+-    private readonly seatsService: SeatsService,
+   ) {}
  
    /**
--   * TODO split this into two separate endpoints, one for updating your own
--   * user, and one for updating other users. The endpoint for yourself should
--   * require CurrentUser.Update and the one for other users should require
--   * Users.Update.
-+   * Update any user.
-    */
-   @Patch('/users/:id')
-   @StandardEndpoint({
-@@ -189,41 +208,26 @@ export class UserController {
+@@ -208,26 +205,16 @@ export class UserController {
      @Body() updateUserDto: UpdateUserDto,
      @CurrentUser() currentUser: User,
    ): Promise<User> {
--    const usersThatCanUseThisEndpoint = []
+-    // Special case: prevent disabling your own user
+-    if (id === currentUser.userId && updateUserDto.enabled === false) {
+-      throw new UnauthorizedException('You cannot disable yourself.')
+-    }
 -
-     // Special case: prevent disabling your own user
-     if (id === currentUser.userId && updateUserDto.enabled === false) {
--      throw new UnauthorizedException('You cannot disable your current user.')
-+      throw new UnauthorizedException('You cannot disable yourself.')
-     }
- 
--    // Server owner can update anyone
--    const serverOwner = await this.userService.getServerOwner()
--    usersThatCanUseThisEndpoint.push(serverOwner.userId)
--
--    // Users can update themselves
--    usersThatCanUseThisEndpoint.push(id)
--
--    // User is allow to perform this update
--    if (usersThatCanUseThisEndpoint.includes(currentUser.userId)) {
--      const userPriorToUpdate = await this.userService.get(id)
--
--      // If trying to enable a user (but not the Guest Account), check if there is a seat available
--      if (
--        (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false)
--        && userPriorToUpdate.designation !== Designations.GUEST_ACCOUNT
--      ) {
--        if (!await this.seatsService.hasAvailableSeats()) {
--          throw new ForbiddenException('Cannot enable this user because there are no seats available.')
--        }
+-    // If trying to enable a cloud user, check if there is a seat available
+-    const userPriorToUpdate = await this.userService.get(id)
+-    if (
+-      (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false)
+-      && userPriorToUpdate.cardinalId
+-    ) {
+-      if (!await this.seatsService.hasAvailableSeats()) {
+-        throw new ForbiddenException('Cannot enable this user because there are no seats available.')
 -      }
+-    }
 -
--      try {
--        return await this.userService.update(id, updateUserDto)
--      } catch (error) {
--        throw new InternalServerErrorException(error.message)
-+    // If trying to enable a cloud user, check if there is a seat available
-+    const userPriorToUpdate = await this.userService.get(id)
-+    if (
-+      (updateUserDto?.enabled === true && userPriorToUpdate.enabled === false)
-+      && userPriorToUpdate.cardinalId
-+    ) {
-+      if (!await this.seatsService.hasAvailableSeats()) {
-+        throw new ForbiddenException('Cannot enable this user because there are no seats available.')
-       }
+     try {
+-      return await this.userService.update(id, updateUserDto)
+-    } catch (error) {
+-      throw new InternalServerErrorException(error.message)
++      const updatingUser = await this.userService.get(id)
++      const results = await this.updateUserService.validateAndUpdate(
++        updatingUser,
++        currentUser,
++        updateUserDto,
++      )
++      return results
++    } catch (err) {
++      throw new InternalServerErrorException(err.message)
      }
- 
--    throw new UnauthorizedException()
-+    try {
-+      return await this.userService.update(id, updateUserDto)
-+    } catch (error) {
-+      throw new InternalServerErrorException(error.message)
-+    }
    }
  }

@@ -1,0 +1,39 @@
+diff a/servers/media/src/middleware/UserActivity.middleware.ts b/servers/media/src/middleware/UserActivity.middleware.ts	(rejected hunks)
+@@ -1,8 +1,7 @@
+-import { Injectable, NestMiddleware } from '@nestjs/common'
++import { Injectable, Logger, NestMiddleware } from '@nestjs/common'
+ import { NextFunction } from 'express'
+ 
+-import { AuthService } from '../modules/auth/auth.service'
+-import { UserService } from '../modules/user/user.service'
++import { UpdateUserService } from '../modules/user/update-user.service'
+ 
+ /**
+  * This middleware reads the request and updates the activityStatus for each
+@@ -13,16 +12,20 @@ import { UserService } from '../modules/user/user.service'
+ @Injectable()
+ export class UserActivity implements NestMiddleware {
+   constructor(
+-    private readonly authService: AuthService,
+-    private readonly userService: UserService,
++    private readonly updateUserService: UpdateUserService,
+   ) {}
+ 
+   async use(request, response, next: NextFunction): Promise<void> {
+     if (request?.user) {
+-      await this.userService.update(request.user.userId, {
+-        activityStatus: 'seen', // TODO make this client-supplied
+-        activityStatusUpdatedAt: new Date(),
+-      })
++      try {
++        // TODO throttle this
++        await this.updateUserService.validateAndUpdate(request.user, request.user, {
++          activityStatus: 'seen', // TODO make this client-supplied
++          activityStatusUpdatedAt: new Date(),
++        })
++      } catch (err) {
++        Logger.error(err)
++      }
+     }
+ 
+     next()

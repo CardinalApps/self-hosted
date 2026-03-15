@@ -128,7 +128,7 @@ export class UserController {
     }
 
     try {
-      return await this.userService.update(currentUser.userId, updateUserDto)
+      return await this.updateUserService.validateAndUpdate(currentUser, currentUser, updateUserDto)
     } catch (error) {
       throw new InternalServerErrorException(error.message)
     }

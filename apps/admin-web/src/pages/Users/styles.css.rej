@@ -1,33 +1,10 @@
 diff a/apps/admin-web/src/pages/Users/styles.css b/apps/admin-web/src/pages/Users/styles.css	(rejected hunks)
-@@ -75,4 +75,31 @@
-       width: 100%;
-     }
+@@ -38,7 +38,7 @@
+ 
+   .user-actions {
+     display: grid;
+-    grid-template-columns: 50% 50%;
++    grid-template-columns: 1fr 1fr;
+     gap: 8px;
    }
-+
-+  .invite-link-info {
-+    display: flex;
-+    flex-direction: column;
-+    gap: 6px;
-+
-+    p {
-+      margin-bottom: 0;
-+      font-weight: 400;
-+      font-size: 13px;
-+    }
-+
-+    strong {
-+      
-+      &:after {
-+        content: ': ';
-+      }
-+    }
-+
-+    a {
-+      color: var(--accent-color);
-+
-+      &:hover {
-+        text-decoration: underline;
-+      }
-+    }
-+  }
  }

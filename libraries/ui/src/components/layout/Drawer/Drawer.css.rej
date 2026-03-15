@@ -1,18 +1,10 @@
 diff a/libraries/ui/src/components/layout/Drawer/Drawer.css b/libraries/ui/src/components/layout/Drawer/Drawer.css	(rejected hunks)
-@@ -122,6 +122,16 @@
-         font-size: 12px;
-       }
-     }
-+
-+    form {
-+      
-+      footer {
-+        width: 100%;
-+        display: flex;
-+        justify-content: flex-end;
-+        padding: 20px 0;
-+      }
-+    }
-   }
+@@ -8,7 +8,7 @@
+   z-index: 1000000;
  
-   .drawer-close {
+   .drawer-pane {
+-    width: 420px;
++    width: 460px;
+     max-width: 100vw;
+     position: absolute;
+     top: var(--gutter);
