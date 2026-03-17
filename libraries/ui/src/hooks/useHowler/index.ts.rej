@@ -1,0 +1,22 @@
+diff a/libraries/ui/src/hooks/useHowler/index.ts b/libraries/ui/src/hooks/useHowler/index.ts	(rejected hunks)
+@@ -97,17 +97,16 @@ export default function useHowler() {
+     })
+ 
+     const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
+-      dispatch(next({ playerId }))
++      howl.unload()
++      // Provide fromTrackId in case the user has manually clicked "next" while this is loading
++      dispatch(next({ playerId, fromTrackId: player.trackId }))
+       dispatch(toastActions.addToQueue({
+         title: i18n['howler.playback-timeout'][lang],
+         ttl: 5000,
+         type: 'danger',
+       }))
+-      howl.unload()
+     }, audio_playback_timeout as number)
+ 
+-    console.log('timer', timeout)
+-
+     howl.on('load', () => {
+       clearTimeout(timeout)
+       // Howl may be destroyed before load is complete
