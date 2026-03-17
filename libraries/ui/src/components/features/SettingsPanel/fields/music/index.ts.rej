@@ -1,11 +1,12 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/music/index.ts b/libraries/ui/src/components/features/SettingsPanel/fields/music/index.ts	(rejected hunks)
-@@ -1,7 +1,9 @@
+@@ -1,8 +1,10 @@
++import audioPlaybackTimeout from './audioPlaybackTimeout'
  import maxConcurrentAudioStreams from './maxConcurrentAudioStreams'
-+import maxConcurrentPlayingAudioStreams from './maxConcurrentPlayingAudioStreams'
+ import maxConcurrentPlayingAudioStreams from './maxConcurrentPlayingAudioStreams'
  import notifications from './notifications'
  
  export default {
++  audioPlaybackTimeout,
    maxConcurrentAudioStreams,
-+  maxConcurrentPlayingAudioStreams,
+   maxConcurrentPlayingAudioStreams,
    notifications,
- }

@@ -1,138 +1,16 @@
 diff a/libraries/ui/src/store/slices/music/thunks/next.ts b/libraries/ui/src/store/slices/music/thunks/next.ts	(rejected hunks)
-@@ -1,9 +1,9 @@
- import { createAsyncThunk } from '@reduxjs/toolkit'
--import { ServerQueue } from '..'
-+import { Player, QueueItem } from '..'
- 
- import { AppDispatch, RootState } from '../../../'
- 
--import { STORE_KEY } from '../constants'
-+import { PLAYBACK_STATE, STORE_KEY } from '../constants'
- import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
- import queryParams from '../../../../lib/net/queryParams'
- 
-@@ -12,28 +12,13 @@ export type NextArgs = {
- }
- 
- export type NextReturn = {
--  create: Array<{
--    trackId: string,
--    generatedPlayerId: string,
--    now: number,
--    queue: ServerQueue,
--  }>,
--  pause: Array<{
--    playerId?: string,
--  }>,
--  resume: Array<{
--    playerId?: string,
--    now: number,
--  }>,
--  remove: Array<{
--    playerId?: string,
--  }>,
-+  playerId: string,
-+  update?: Partial<Player>,
-+  isEndOfQueue: boolean,
- }
- 
- /**
-- * On next:
-- * 
-- *  1. 
-+ * Play the next audio track in the queue.
-  */
- const next = createAsyncThunk<
-   NextReturn,
-@@ -48,10 +33,9 @@ const next = createAsyncThunk<
-   const state = thunkAPI.getState()
- 
-   const workToDo: NextReturn = {
--    create: [],
--    pause: [],
--    resume: [],
--    remove: [],
-+    playerId,
-+    update: null,
-+    isEndOfQueue: false,
-   }
- 
-   const player = state.audio.players?.[playerId]
-@@ -61,51 +45,35 @@ const next = createAsyncThunk<
+@@ -45,11 +45,13 @@ const next = createAsyncThunk<
      return workToDo
    }
  
--  // TODO add prefetched next item(s) to store to avoid the next fetch
--  const prefetched = null
--
--  const nextToPlay = prefetched
--    ? null
--    : await homeServerAPI(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
--        take: 3,
--        //position: player,
--      }))
--
--  console.log(nextToPlay)
--
--
--
--
--
--  // If we are at the max concurrent players, save the playback history of the oldest ones before they are removed
--  // const numPlayers = Object.values(state.audio.players).length + workToDo.create.length
--  // const maxConcurrentPlayers = Number(state.settings.current[getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang).slug])
--
--  // if (numPlayers > maxConcurrentPlayers) {
--  //   const inOrderOfOldest = Object.values(state.audio.players).sort((a, b) => a?.initializedAt <= b?.initializedAt ? -1 : 1)
--  //   const numToStop = numPlayers - maxConcurrentPlayers
--  //   for (let i = 0; i < numToStop; i++) {
--  //     const idToStop = inOrderOfOldest[i].id
--  //     workToDo.remove?.push({ playerId: idToStop })
--  //   }
--  // }
-+  if (!player?.currentQueueItem?.queueItemId) {
-+    console.error('Cannot go to next item because there is no queue')
-+    return workToDo
-+  }
- 
--  // If we are at the max concurrent *playing* players, pause the oldest ones
--  // const oldestOtherPlayersPlayingOrLoading = Object.values(state.audio.players)
--  //   .map((player) => player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING ? { ...player } : null)
--  //   .filter((player) => !!player)
--  //   .sort((a, b) => a?.currentPlaybackStartedAt <= b?.currentPlaybackStartedAt ? -1 : 1)
-+  const [nextQueueItems] = await homeServerAPI<[QueueItem[], number]>(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
-+    currentQueueItemId: player?.currentQueueItem?.queueItemId,
-+    leading: 1,
-+    includeCurrentItemInReturn: false,
-+  }))
- 
--  // const maxConcurrentPlayingPlayers = Number(state.settings.current[getSetting('max_concurrent_playing_audio_streams')('music', lang as SupportedLang).slug])
--  // const numOtherPlayersAllowed = maxConcurrentPlayingPlayers - 1
-+  // End of queue
-+  if (!nextQueueItems?.length) {
++  // If we don't have a queue then behave as if we are at the end of a queue
+   if (!player?.currentQueueItem?.queueItemId) {
+-    console.error('Cannot go to next item because there is no queue')
 +    workToDo.isEndOfQueue = true
-+    return workToDo
-+  }
+     return workToDo
+   }
  
--  // if (oldestOtherPlayersPlayingOrLoading.length > numOtherPlayersAllowed) {
--  //   const numToStop = oldestOtherPlayersPlayingOrLoading.length - numOtherPlayersAllowed
--  //   for (let i = 0; i < numToStop; i++) {
--  //     const idToPause = oldestOtherPlayersPlayingOrLoading[i].id
--  //     workToDo.pause?.push({ playerId: idToPause })
--  //   }
--  // }
-+  const nextQueueItem = nextQueueItems?.[0]
-+
-+  // New track, same queue.
-+  // Changing the state to "loading" and setting a new track ID
-+  // will trigger useHowler() to update the audio playback.
-+  workToDo.update = {
-+    id: playerId,
-+    state: PLAYBACK_STATE.LOADING,
-+    trackId: nextQueueItem?.mediaId,
-+    currentQueueItem: nextQueueItem,
-+    currentPlaybackStartedAt: Date.now(),
-+  }
- 
-   return workToDo
- })
++  // If we have a queue then get the next item
+   const [nextQueueItems] = await homeServerAPI<[QueueItem[], number]>(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
+     currentQueueItemId: player?.currentQueueItem?.queueItemId,
+     leading: 1,

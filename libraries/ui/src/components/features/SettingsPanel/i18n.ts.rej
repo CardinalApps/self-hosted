@@ -3,9 +3,9 @@ diff a/libraries/ui/src/components/features/SettingsPanel/i18n.ts b/libraries/ui
    "settings.language.title": {
      "en": "Language",
    },
-+  "settings.music.multi-player": {
-+    "en": "Multi-Player",
++  "settings.music.players": {
++    "en": "Music Player",
 +  },
- }
- 
- export default i18n
+   "settings.music.multi-player": {
+     "en": "Multi-Player",
+   },
