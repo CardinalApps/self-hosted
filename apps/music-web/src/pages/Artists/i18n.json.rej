@@ -1,10 +1,11 @@
 diff a/apps/music-web/src/pages/Artists/i18n.json b/apps/music-web/src/pages/Artists/i18n.json	(rejected hunks)
-@@ -4,5 +4,8 @@
+@@ -2,9 +2,6 @@
+   "music-artists.title": {
+     "en": "Music Artists"
    },
-   "music-artists.order-by.name": {
-     "en": "Name"
-+  },
-+  "music-artists.order-by.created": {
-+    "en": "Added"
+-  "music-artists.order-by.name": {
+-    "en": "Name"
+-  },
+   "music-artists.order-by.created": {
+     "en": "Added"
    }
- }

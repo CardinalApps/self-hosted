@@ -1,13 +1,26 @@
 diff a/libraries/ui/src/store/apis/musicArtists.ts b/libraries/ui/src/store/apis/musicArtists.ts	(rejected hunks)
-@@ -2,9 +2,9 @@ import queryParams from '../../lib/net/queryParams'
+@@ -2,9 +2,13 @@ import queryParams from '../../lib/net/queryParams'
  import { baseHomeServerApi } from './baseHomeServerApi'
  
  import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
--import { CommonOrderParams, CommonSortParams, PaginationParams } from '../types/api'
-+import { CommonOrderParams, CommonOrderByParams, PaginationParams } from '../types/api'
+-import { CommonOrderParams, CommonOrderByParams, PaginationParams } from '../types/api'
++import { CommonOrderParams, PaginationParams } from '../types/api'
++import { ToolbarOrderByType } from '../../components/interaction/Toolbar/types'
  
--export type ArtistsSortParams = CommonSortParams | 'sortName'
-+export type ArtistsSortParams = CommonOrderByParams | 'sortName'
+-export type ArtistsSortParams = CommonOrderByParams | 'sortName'
++export type MusicAritstsOrderBy = Extract<ToolbarOrderByType,
++  'createdAt'
++  | 'name'
++>
  export type MusicArtistType = {
    id: number,
    name: string,
+@@ -25,7 +29,7 @@ export const musicArtistsApi = baseHomeServerApi
+       getInfiniteMusicArtists: builder.infiniteQuery<
+         [MusicArtistType[], number],
+         {
+-          orderBy?: ArtistsSortParams,
++          orderBy?: MusicAritstsOrderBy,
+           order?: CommonOrderParams,
+           libraries?: string[],
+         },

@@ -1,10 +1,24 @@
 diff a/apps/music-web/src/pages/Artists/Artists.tsx b/apps/music-web/src/pages/Artists/Artists.tsx	(rejected hunks)
-@@ -32,7 +32,7 @@ function ArtistsPage() {
-             },
-             {
-               slug: 'orderBy',
--              render: ToolbarItem.SORT,
-+              render: ToolbarItem.ORDERBY,
+@@ -3,6 +3,7 @@ import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+ import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
+ 
+ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
++import { MusicAritstsOrderBy } from '@cardinalapps/ui/src/store/apis/musicArtists'
+ 
+ import ArtistsInfiniteScroll from './ArtistsInfiniteScroll'
+ 
+@@ -35,11 +36,9 @@ function ArtistsPage() {
+               render: ToolbarItem.ORDERBY,
                initialValue: 'name',
                options: [
-                 {
+-                {
+-                  label: i18n['music-artists.order-by.name']['en'],
+-                  value: 'name',
+-                },
+-              ],
++                'name',
++                'createdAt',
++              ] as MusicAritstsOrderBy[],
+             },
+           ]}
+         />
