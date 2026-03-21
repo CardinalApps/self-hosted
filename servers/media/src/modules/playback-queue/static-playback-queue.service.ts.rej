@@ -1,45 +1,25 @@
 diff a/servers/media/src/modules/playback-queue/static-playback-queue.service.ts b/servers/media/src/modules/playback-queue/static-playback-queue.service.ts	(rejected hunks)
-@@ -39,32 +39,19 @@ export class StaticPlayback {
-   async initStaticQueue(queue: PlaybackQueue, staticQueueItems: Partial<PlaybackQueueItem>[]): Promise<boolean> {
-     const entriesToCreate = []
+@@ -41,10 +41,10 @@ export class StaticPlayback {
  
--    // TODO update frontend then uncomment this
--    // for (const position in staticQueueItems) {
--    //   const item = staticQueueItems[position]
--    //   if (item.mediaType === 'music_track') {
--    //     const entry = await this.queueItemRepository.create({
--    //       queue,
--    //       mediaType: 'music_track',
--    //       mediaId: item.mediaId,
--    //       position: Number(position),
--    //     })
--    //     entriesToCreate.push(entry)
--    //   } else {
--    //     Logger.warn('Missing queue item media_type', 'Playback')
--    //   }
--    // }
--
      for (const position in staticQueueItems) {
        const item = staticQueueItems[position]
--      // @ts-ignore
--      const entry = this.queueItemRepository.create({
--        queue,
--        mediaType: 'music_track',
--        mediaId: item,
--        position: Number(position),
--      })
--      entriesToCreate.push(entry)
-+      if (item.mediaType === 'music_track') {
-+        const entry = await this.queueItemRepository.create({
-+          queue,
-+          mediaType: 'music_track',
-+          mediaId: item.mediaId,
-+          position: Number(position),
-+        })
-+        entriesToCreate.push(entry)
-+      } else {
-+        Logger.warn('Missing queue item media_type', 'Playback')
-+      }
+-      if (item.mediaType === 'music_track') {
++      if (item.mediaType) {
+         const entry = await this.queueItemRepository.create({
+           queue,
+-          mediaType: 'music_track',
++          mediaType: item.mediaType,
+           mediaId: item.mediaId,
+           position: Number(position),
+         })
+@@ -54,6 +54,10 @@ export class StaticPlayback {
+       }
      }
  
++    if (!entriesToCreate.length) {
++      Logger.warn('No static queue entities created', 'Playback')
++    }
++
      try {
+       await this.queueItemRepository.insert(entriesToCreate)
+       return true

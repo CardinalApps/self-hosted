@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx b/libraries/ui/src/components/interaction/MusicRelease/MusicRelease.tsx	(rejected hunks)
-@@ -47,7 +47,7 @@ const MusicRelease = ({
-   //const { lang } = useSelector(settingsSelectors.current)
-   const [showInner, setShowInner] = useState<boolean>()
-   const [tracksInOrder, setTracksInOrder] = useState(tracks)
--  const trackIdsInRelease = tracksInOrder.map((track) => track.id).filter((track) => !!track)
-+  const trackIdsInRelease = tracksInOrder.map((track) => track.musicTrackId).filter((track) => !!track)
-   const coverSrc = useReleaseCover(hasArtwork ? releaseId : null)
- 
-   const getArtwork = () => {
+@@ -81,7 +81,7 @@ const MusicRelease = ({
+         }}
+       >
+         {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
+-        {!getArtwork() && <i className="no-artwork-icon far fa-image" />}
++        {/* {!getArtwork() && <i className="no-artwork-icon far fa-image" />} */}
+         {!!hasControls && (
+           <div className="controls">
+             <div className="col music-track-play-pause">

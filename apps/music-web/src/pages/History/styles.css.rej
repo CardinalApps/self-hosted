@@ -1,61 +1,24 @@
 diff a/apps/music-web/src/pages/History/styles.css b/apps/music-web/src/pages/History/styles.css	(rejected hunks)
-@@ -15,6 +15,11 @@
-     height: 100%;
-     position: relative;
+@@ -51,6 +51,7 @@
+         white-space: nowrap;
+         text-overflow: ellipsis;
+         overflow: hidden;
++        font-weight: 500;
+       }
  
-+    header {
-+      display: flex;
-+      justify-content: space-between;
-+    }
-+
-     a {
-       color: var(--text-color-2);
- 
-@@ -31,10 +36,45 @@
-     .cols {
-       height: 100%;
-       padding: 0 10px;
--      display: grid;
--      grid-template-columns: 50px 50px 1fr 200px;
-+      display: flex;
-+      gap: 10px;
-       align-items: center;
-+      overflow: hidden;
-       font-size: 14px;
-+
-+      .artwork-col {
-+        width: 30px;
-+      }
-+
-+      .track-col {
-+        flex-grow: 1;
+       .progress-col {
+@@ -66,12 +67,14 @@
+         flex-shrink: 1;
+         justify-content: flex-end;
+         text-align: right;
 +        white-space: nowrap;
-+        text-overflow: ellipsis;
-+        overflow: hidden;
-+      }
-+
-+      .progress-col {
-+        width: 35px;
-+      }
-+
-+      .user-col {
-+        width: 30px;
-+      }
-+
-+      .date-col {
-+        flex-grow: 1;
-+        flex-shrink: 1;
-+        justify-content: flex-end;
-+        text-align: right;
-+      }
-+
-+      .music-release {
-+        width: 100%;
-+
-+        .music-release-art {
-+          border-radius: 4px;
-+        }
-+      }
-     }
+       }
  
-     .progress-bar {
+       .music-release {
+         width: 100%;
+ 
+         .music-release-art {
++          height: auto;
+           border-radius: 4px;
+         }
+       }

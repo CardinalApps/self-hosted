@@ -1,61 +1,10 @@
 diff a/libraries/ui/src/store/slices/music/thunks/play.ts b/libraries/ui/src/store/slices/music/thunks/play.ts	(rejected hunks)
-@@ -11,7 +11,7 @@ import { PLAYBACK_STATE, STORE_KEY } from '../constants'
- import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
- 
- export type PlayArgs = {
--  trackId?: string,
-+  trackIds?: string[],
-   playerId?: string,
-   queueType?: QueueType
-   dynamicQueueType?: DynamicQueueType,
-@@ -60,7 +60,7 @@ const play = createAsyncThunk<
-   }
- >(`${STORE_KEY}/play`, async (args, thunkAPI): Promise<PlayReturn> => {
-   const {
--    trackId,
-+    trackIds = [],
-     playerId,
-     queueType = 'static',
-     dynamicQueueType,
-@@ -80,8 +80,8 @@ const play = createAsyncThunk<
-     return workToDo
-   }
- 
--  if (queueType === 'static' && !trackId && !playerId) {
--    console.error('Missing trackId or playerId for static queue')
-+  if (queueType === 'static' && !trackIds.length && !playerId) {
-+    console.error('Missing trackIds or playerId for static queue')
-     return workToDo
-   }
- 
-@@ -92,8 +92,8 @@ const play = createAsyncThunk<
-     resolvedPlayerId = playerId
-   }
-   // Look for a player with the given track ID
--  else if (!playerId && trackId) {
--    const player = Object.values(state.audio.players).find((player) => player.trackId === trackId)
-+  else if (!playerId && trackIds[0]) {
-+    const player = Object.values(state.audio.players).find((player) => player.trackId === trackIds[0])
-     if (player) {
-       resolvedPlayerId = player.id
-     }
-@@ -101,7 +101,7 @@ const play = createAsyncThunk<
- 
-   // When no player exists, create a new one
-   if (!resolvedPlayerId) {
--    let trackIdToPlay = trackId
-+    let trackIdToPlay = trackIds[0]
-     let currentQueueItem: QueueItem = null
-     let queue
- 
-@@ -116,8 +116,8 @@ const play = createAsyncThunk<
-             ? { libraries: currentLibraries.map((id) => ({ libraryId: id })) }
+@@ -117,7 +117,7 @@ const play = createAsyncThunk<
              : {}
            ),
--          ...(trackId
--            ? { staticItems: Array.isArray(trackId) ? trackId : [trackId] }
-+          ...(trackIds.length
-+            ? { staticItems: trackIds }
+           ...(trackIds.length
+-            ? { staticItems: trackIds }
++            ? { staticItems: trackIds.map((trackId) => ({ mediaId: trackId, mediaType: 'music_track' })) }
              : {}
            ),
          },

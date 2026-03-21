@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/components/layout/ProgressCircle/ProgressCircle.css b/libraries/ui/src/components/layout/ProgressCircle/ProgressCircle.css	(rejected hunks)
+@@ -17,6 +17,7 @@
+     fill: none;
+     stroke: var(--accent-color);
+     stroke-linecap: round;
++    transition: stroke-dashoffset 200ms;
+   }
+ 
+   .progress-circle-count {
