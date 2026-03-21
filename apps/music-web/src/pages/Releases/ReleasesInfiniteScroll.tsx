@@ -3,7 +3,7 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
 import {
   MusicReleaseType,
-  ReleasesSortParams,
+  MusicReleasesOrderBy,
   useGetInfiniteMusicReleasesInfiniteQuery,
 } from '@cardinalapps/ui/src/store/apis/musicReleases'
 import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
@@ -48,7 +48,7 @@ function ReleasesInfiniteScroll({
     isFetchingPreviousPage,
   } = useGetInfiniteMusicReleasesInfiniteQuery(
     {
-      sort: toolbarValues?.sort as ReleasesSortParams,
+      orderBy: toolbarValues?.orderBy as MusicReleasesOrderBy,
       order: toolbarValues?.order as CommonOrderParams,
       ...(libraries?.length ? { libraries } : {}),
     },

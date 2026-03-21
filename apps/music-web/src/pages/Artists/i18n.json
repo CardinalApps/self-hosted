@@ -2,7 +2,7 @@
   "music-artists.title": {
     "en": "Music Artists"
   },
-  "music-artists.order-by.name": {
-    "en": "Name"
+  "music-artists.order-by.created": {
+    "en": "Added"
   }
 }

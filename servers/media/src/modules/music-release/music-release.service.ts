@@ -134,7 +134,7 @@ export class MusicReleaseService {
       take,
       skip,
       order,
-      sort,
+      orderBy,
       artists,
       genres,
       tracks,
@@ -160,7 +160,7 @@ export class MusicReleaseService {
     }
 
     qb
-      .orderBy(`musicRelease.${sort}`, order)
+      .orderBy(`musicRelease.${orderBy}`, order)
       .take(take)
       .skip(skip)
 

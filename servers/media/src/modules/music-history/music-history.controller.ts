@@ -2,9 +2,9 @@ import {
   Controller,
   Body,
   Get,
-  Post,
   UseGuards,
   Query,
+  Patch,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -37,7 +37,7 @@ export class MusicHistoryController {
   /**
    * Create a history entry.
    */
-  @Post()
+  @Patch()
   @StandardEndpoint({
     summary: 'Save playback history.',
     capabilities: ['MusicHistory.Create'],
@@ -46,7 +46,7 @@ export class MusicHistoryController {
     @CurrentUser() user,
     @Body() createPlaybackEntryDto: CreateMusicHistoryEntryDto,
   ): Promise<MusicHistory> {
-    const entry = await this.playbackHistoryService.createPlaybackEntry(user, createPlaybackEntryDto)
+    const entry = await this.playbackHistoryService.upsertPlaybackEntry(user, createPlaybackEntryDto)
     return entry
   }
 

@@ -8,6 +8,7 @@ import { PlaybackQueue } from './playback-queue.entity'
 
 import { EventModule } from '../event/event.module'
 import { LibraryModule } from '../library/library.module'
+import { StaticPlayback } from './static-playback-queue.service'
 import { DynamicPlayback } from './dynamic-playback-queue.service'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { MusicTrackModule } from '../music-track/music-track.module'
@@ -24,9 +25,10 @@ import { QueueItemService } from './playback-queue-item.service'
     TypeOrmModule,
     QueueService,
     QueueItemService,
+    StaticPlayback,
     DynamicPlayback,
   ],
-  providers: [QueueService, QueueItemService, DynamicPlayback],
+  providers: [QueueService, QueueItemService, StaticPlayback, DynamicPlayback],
   controllers: [PlaybackQueueController],
 })
 export class PlaybackQueueModule {}

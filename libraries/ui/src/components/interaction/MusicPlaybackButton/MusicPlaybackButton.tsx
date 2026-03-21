@@ -9,7 +9,7 @@ import Loading from '../../layout/Loading'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { audioSelectors, audioActions, Player } from '../../../store/slices/music'
-import playMusic from '../../../store/slices/music/thunks/play'
+import play from '../../../store/slices/music/thunks/play'
 
 import i18n from './i18n'
 
@@ -52,7 +52,7 @@ const MusicPlaybackButton = ({
   const isPaused = paused.find((player: Player) => musicTrackIds.includes(player.trackId))
 
   const handlePlayClick = () => {
-    dispatch(playMusic({ trackId: musicTrackIdToPlay }))
+    dispatch(play({ trackIds: [musicTrackIdToPlay] }))
   }
 
   const handlePauseClick = () => {

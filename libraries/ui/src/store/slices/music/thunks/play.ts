@@ -11,7 +11,7 @@ import { PLAYBACK_STATE, STORE_KEY } from '../constants'
 import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
 
 export type PlayArgs = {
-  trackId?: string,
+  trackIds?: string[],
   playerId?: string,
   queueType?: QueueType
   dynamicQueueType?: DynamicQueueType,
@@ -42,15 +42,15 @@ export type PlayReturn = {
  * Play music. This is the general "play" button for all music playback, and it
  * can do many different things depending on the current state of the app.
  * 
- *  1. If the track is already loaded and paused, resume it.
- *  2. If the track is not loaded, create a new player for it.
- *    2.1 If a queue type was given, create the queue on the server before creating the player.
- *  3. If at max concurrent players, remove the oldest one(s).
- *    3.1 Save playback history before removing.
- *  4. If at max *playing* players, pause the oldest ones.
- *  5. Return the list of state updates to be performed by the reducer.
+ *  1. If the track is already loaded and paused, resume it
+ *  2. If the track is not loaded:
+ *    2.1 Create the queue on the server
+ *    2.2 Create a new player for the queue
+ *  3. If at max concurrent players, remove the oldest one(s)
+ *  4. If at max *playing* players, pause the oldest ones
+ *  5. Return the list of state updates to be performed by the reducer
  */
-const playMusic = createAsyncThunk<
+const play = createAsyncThunk<
   PlayReturn,
   PlayArgs,
   {
@@ -59,7 +59,12 @@ const playMusic = createAsyncThunk<
     rejectValue: { error: string },
   }
 >(`${STORE_KEY}/play`, async (args, thunkAPI): Promise<PlayReturn> => {
-  const { trackId, playerId, queueType, dynamicQueueType } = args
+  const {
+    trackIds = [],
+    playerId,
+    queueType = 'static',
+    dynamicQueueType,
+  } = args
   const state = thunkAPI.getState()
   const lang = state.settings?.current?.lang
 
@@ -70,8 +75,13 @@ const playMusic = createAsyncThunk<
     remove: [],
   }
 
-  if (!trackId && !playerId && !queueType) {
-    console.error('One of these is required when pressing play: trackId, playerId, or queueType')
+  if (queueType === 'dynamic' && !dynamicQueueType) {
+    console.error('Missing dynamic queue type')
+    return workToDo
+  }
+
+  if (queueType === 'static' && !trackIds.length && !playerId) {
+    console.error('Missing trackIds or playerId for static queue')
     return workToDo
   }
 
@@ -82,8 +92,8 @@ const playMusic = createAsyncThunk<
     resolvedPlayerId = playerId
   }
   // Look for a player with the given track ID
-  else if (!playerId && trackId) {
-    const player = Object.values(state.audio.players).find((player) => player.trackId === trackId)
+  else if (!playerId && trackIds[0]) {
+    const player = Object.values(state.audio.players).find((player) => player.trackId === trackIds[0])
     if (player) {
       resolvedPlayerId = player.id
     }
@@ -91,7 +101,7 @@ const playMusic = createAsyncThunk<
 
   // When no player exists, create a new one
   if (!resolvedPlayerId) {
-    let trackIdToPlay = trackId
+    let trackIdToPlay = trackIds[0]
     let currentQueueItem: QueueItem = null
     let queue
 
@@ -106,20 +116,22 @@ const playMusic = createAsyncThunk<
             ? { libraries: currentLibraries.map((id) => ({ libraryId: id })) }
             : {}
           ),
+          ...(trackIds.length
+            ? { staticItems: trackIds }
+            : {}
+          ),
         },
       })
 
       // Now kith (I wrote this on valentines day)
       queue = serverQueue
 
-      // Play the first item in the queue if no trackId was explicitly set
-      if (!trackId) {
-        currentQueueItem = serverQueue?.items?.[0]
-        if (currentQueueItem && currentQueueItem?.mediaType === 'music_track' && currentQueueItem?.mediaId) {
-          trackIdToPlay = currentQueueItem?.mediaId
-        } else {
-          console.error('Could not start playback because the first item in the queue is either missing or not a music track.', currentQueueItem)
-        }
+      // Play the first item in the queue
+      currentQueueItem = serverQueue?.items?.[0]
+      if (currentQueueItem && currentQueueItem?.mediaType === 'music_track' && currentQueueItem?.mediaId) {
+        trackIdToPlay = currentQueueItem?.mediaId
+      } else {
+        console.error('Could not start playback because the first item in the queue is either missing or not a music track.', currentQueueItem)
       }
 
       // Remove queue items; they are fundementally a server-side feature and we
@@ -146,7 +158,7 @@ const playMusic = createAsyncThunk<
     })
   }
 
-  // If we are at the max concurrent players, save the playback history of the oldest ones before they are removed
+  // If we are at the max concurrent players, remove the oldest ones
   const numPlayers = Object.values(state.audio.players).length + workToDo.create.length
   const maxConcurrentPlayers = Number(state.settings.current[getSetting('max_concurrent_audio_streams')('music', lang as SupportedLang).slug])
 
@@ -179,4 +191,4 @@ const playMusic = createAsyncThunk<
   return workToDo
 })
 
-export default playMusic
+export default play

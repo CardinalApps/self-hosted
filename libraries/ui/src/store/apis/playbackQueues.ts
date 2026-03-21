@@ -1,11 +1,12 @@
-import { DynamicQueueType, QueueType } from '@cardinalapps/types/src/playback-queue'
-
 import queryParams from '../../lib/net/queryParams'
 import { UserType } from '../../types/user'
 
 import { CommonOrderParams, PaginationParams } from '../types/api'
 import { baseHomeServerApi } from './baseHomeServerApi'
 import { QueueItem, ServerQueue } from '../slices/music'
+
+export type QueueType = 'static' | 'dynamic'
+export type DynamicQueueType = 'true_shuffle'
 
 /**
  * @deprecated

@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { motion } from 'framer-motion'
 
 import { ORDER_SLUG, DEFAULT_ORDER } from './items/Order'
-import { SORT_SLUG, DEFAULT_SORT } from './items/Sort'
+import { ORDER_BY_SLUG, DEFAULT_ORDER_BY } from './items/OrderBy'
 import { DATE_RANGE_SLUG, DEFAULT_DATE_RANGE } from './items/DateRange'
 import { PAGINATION_SLUG, DEFAULT_PAGINATION } from './items/Pagination'
 
@@ -22,7 +22,7 @@ import { ToolbarItemObject } from './types'
 
 const DEFAULT_VALUES = {
   [ORDER_SLUG]: DEFAULT_ORDER,
-  [SORT_SLUG]: DEFAULT_SORT,
+  [ORDER_BY_SLUG]: DEFAULT_ORDER_BY,
   [DATE_RANGE_SLUG]: DEFAULT_DATE_RANGE,
   [PAGINATION_SLUG]: DEFAULT_PAGINATION,
 }

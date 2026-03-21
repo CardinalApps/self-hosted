@@ -76,6 +76,8 @@ export const getFields = (app, lang) => {
           tabName: i18n['settings.tab-name-music-playback'][lang],
           tabIcon: 'fas fa-headphones-alt',
           fields: [
+            titleField(i18n['settings.music.players'][lang]),
+            musicFields.audioPlaybackTimeout,
             titleField(i18n['settings.music.multi-player'][lang]),
             musicFields.maxConcurrentAudioStreams,
             musicFields.maxConcurrentPlayingAudioStreams,

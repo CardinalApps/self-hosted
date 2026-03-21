@@ -3,7 +3,7 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
 import {
   MusicTrackType,
-  TracksSortParams,
+  MusicTracksOrderBy,
   useGetInfiniteMusicTracksInfiniteQuery,
 } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
@@ -46,7 +46,7 @@ function TracksInfiniteScroll({
     isFetchingPreviousPage,
   } = useGetInfiniteMusicTracksInfiniteQuery(
     {
-      sort: toolbarValues?.sort as TracksSortParams,
+      orderBy: toolbarValues?.orderBy as MusicTracksOrderBy,
       order: toolbarValues?.order as CommonOrderParams,
       ...(libraries?.length ? { libraries } : {}),
     },

@@ -158,6 +158,12 @@ export default {
   "settings.open-apps-in-new-tab.label": {
     "en": "Open apps in new tab",
   },
+  "settings.audio-playback-timeout.label": {
+    "en": "Audio playback timeout",
+  },
+  "settings.audio-playback-timeout.desc": {
+    "en": "Number of milliseconds until the app assumes that the audio won't play.",
+  },
   "settings.max-concurrent-audio-streams.label": {
     "en": "Max audio players",
   },

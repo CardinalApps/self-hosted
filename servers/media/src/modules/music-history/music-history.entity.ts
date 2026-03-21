@@ -4,19 +4,17 @@ import {
   ManyToOne,
   JoinColumn,
   Generated,
-  PrimaryGeneratedColumn,
+  OneToOne,
 } from 'typeorm'
 
 import { BaseEntity } from '../../entities/base.entity'
 
 import { User } from '../user/user.entity'
 import { MusicTrack } from '../music-track/music-track.entity'
+import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
 
 @Entity()
 export class MusicHistory extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
-
   @Column()
   @Generated('uuid')
   playbackEntryId: string
@@ -28,7 +26,11 @@ export class MusicHistory extends BaseEntity {
   @JoinColumn()
   track: MusicTrack
 
-  @ManyToOne(() => User)
+  @OneToOne(() => PlaybackQueueItem, (queueItem) => queueItem.id)
+  @JoinColumn()
+  queueItem?: PlaybackQueueItem
+
+  @ManyToOne(() => User, (user) => user.id)
   @JoinColumn()
   user: User
 }

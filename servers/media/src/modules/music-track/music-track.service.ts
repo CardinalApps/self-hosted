@@ -65,7 +65,7 @@ export class MusicTrackService {
       take,
       skip,
       order,
-      sort,
+      orderBy,
       metadata,
       release,
       artists,
@@ -94,11 +94,11 @@ export class MusicTrackService {
       'music_track_play_count')
 
     qb
-      .orderBy(`music_track.${sort}`, order)
+      .orderBy(`music_track.${orderBy}`, order)
       .take(take)
       .skip(skip)
 
-    if (sort === 'playCount') {
+    if (orderBy === 'playCount') {
       qb.orderBy('music_track_play_count', order)
     }
 

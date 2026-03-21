@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import Drawer from '../../layout/Drawer'
 
 import Order, { ORDER_SLUG } from './items/Order'
-import Sort, { SORT_SLUG } from './items/Sort'
+import OrderBy, { ORDER_BY_SLUG } from './items/OrderBy'
 import DateRange, { DATE_RANGE_SLUG } from './items/DateRange'
 import Delete, { DELETE_SLUG } from './items/Delete'
 import Deselect, { DESELECT_SLUG } from './items/Deselect'
@@ -17,12 +17,12 @@ import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 import useWindowSize from '../../../hooks/useWindowSize'
 
 import { formatWithCommas } from '../../../lib/formatting/number'
+import { ToolbarItemObject } from './types'
 
 import './Toolbar.css'
 
 import i18n from './i18n'
 
-import { ToolbarItemObject } from './types'
 
 type ToolbarItemsProps = {
   name?: string,
@@ -70,8 +70,8 @@ const ToolbarItems = ({
     switch (item) {
       case ORDER_SLUG:
         return Order
-      case SORT_SLUG:
-        return Sort
+      case ORDER_BY_SLUG:
+        return OrderBy
       case DATE_RANGE_SLUG:
         return DateRange
       case DELETE_SLUG:

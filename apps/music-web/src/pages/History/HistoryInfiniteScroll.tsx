@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
 import {
-  TracksSortParams,
+  MusicTracksOrderBy,
 } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { MusicHistoryEntryType, useGetInfiniteMusicHistoryInfiniteQuery } from '@cardinalapps/ui/src/store/apis/musicHistory'
 import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
@@ -51,7 +51,7 @@ function MusicHistoryInfiniteScroll({
     isFetchingPreviousPage,
   } = useGetInfiniteMusicHistoryInfiniteQuery(
     {
-      sort: toolbarValues?.sort as TracksSortParams,
+      orderBy: toolbarValues?.orderBy as MusicTracksOrderBy,
       order: toolbarValues?.order as CommonOrderParams,
     },
     { initialPageParam },
@@ -71,8 +71,8 @@ function MusicHistoryInfiniteScroll({
           <div>{<UserTag user={historyEntry.user} size='xs' showName={false} />}</div>
           <div><Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link></div>
           <div className="date">
-            <time title={formatDate(historyEntry?.createdAt)}>
-              {formatTimeAgo(historyEntry?.createdAt)}
+            <time title={formatDate(historyEntry?.updatedAt)}>
+              {formatTimeAgo(historyEntry?.updatedAt)}
             </time>
           </div>
         </div>
