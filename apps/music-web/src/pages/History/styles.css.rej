@@ -1,47 +1,61 @@
 diff a/apps/music-web/src/pages/History/styles.css b/apps/music-web/src/pages/History/styles.css	(rejected hunks)
-@@ -12,8 +12,42 @@
-   
-   .music-history-entry {
-     width: 100%;
--    display: grid;
--    grid-template-columns: 1fr;
--    border-bottom: 1px solid var(--border-color-1);
-+    height: 100%;
-+    position: relative;
+@@ -15,6 +15,11 @@
+     height: 100%;
+     position: relative;
+ 
++    header {
++      display: flex;
++      justify-content: space-between;
++    }
 +
-+    a {
-+      color: var(--text-color-2);
+     a {
+       color: var(--text-color-2);
+ 
+@@ -31,10 +36,45 @@
+     .cols {
+       height: 100%;
+       padding: 0 10px;
+-      display: grid;
+-      grid-template-columns: 50px 50px 1fr 200px;
++      display: flex;
++      gap: 10px;
+       align-items: center;
++      overflow: hidden;
+       font-size: 14px;
 +
-+      &:hover {
-+        color: var(--accent-color);
-+        text-decoration: underline;
++      .artwork-col {
++        width: 30px;
 +      }
-+    }
 +
-+    .date {
-+      text-align: right;
-+    }
++      .track-col {
++        flex-grow: 1;
++        white-space: nowrap;
++        text-overflow: ellipsis;
++        overflow: hidden;
++      }
 +
-+    .cols {
-+      height: 100%;
-+      padding: 0 10px;
-+      display: grid;
-+      grid-template-columns: 50px 50px 1fr 200px;
-+      align-items: center;
-+      font-size: 14px;
-+    }
++      .progress-col {
++        width: 35px;
++      }
 +
-+    .progress-bar {
-+      height: 100%;
-+      position: absolute;
-+      top: 0;
-+      left: 0;
-+      bottom: 0;
-+      border-radius: 4px;
-+      background-color: #000;
-+      opacity: 0.04;
-+      z-index: -1;
-+      pointer-events: none;
-+    }
-   }
- }
++      .user-col {
++        width: 30px;
++      }
++
++      .date-col {
++        flex-grow: 1;
++        flex-shrink: 1;
++        justify-content: flex-end;
++        text-align: right;
++      }
++
++      .music-release {
++        width: 100%;
++
++        .music-release-art {
++          border-radius: 4px;
++        }
++      }
+     }
+ 
+     .progress-bar {

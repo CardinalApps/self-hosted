@@ -3,8 +3,8 @@ diff a/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx b/apps/music-w
  import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
  import {
    MusicArtistType,
--  ArtistsSortParams,
-+  MusicArtistOrderBy,
+-  MusicArtistOrderBy,
++  MusicAritstsOrderBy,
    useGetInfiniteMusicArtistsInfiniteQuery,
  } from '@cardinalapps/ui/src/store/apis/musicArtists'
  import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
@@ -12,8 +12,8 @@ diff a/apps/music-web/src/pages/Artists/ArtistsInfiniteScroll.tsx b/apps/music-w
      isFetchingPreviousPage,
    } = useGetInfiniteMusicArtistsInfiniteQuery(
      {
--      orderBy: toolbarValues?.orderBy as ArtistsSortParams,
-+      orderBy: toolbarValues?.orderBy as MusicArtistOrderBy,
+-      orderBy: toolbarValues?.orderBy as MusicArtistOrderBy,
++      orderBy: toolbarValues?.orderBy as MusicAritstsOrderBy,
        order: toolbarValues?.order as CommonOrderParams,
        ...(libraries?.length ? { libraries } : {}),
      },
