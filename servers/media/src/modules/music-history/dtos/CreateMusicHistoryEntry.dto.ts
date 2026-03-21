@@ -10,4 +10,7 @@ export class CreateMusicHistoryEntryDto {
 
   @IsString()
   trackId: string
+
+  @IsString()
+  queueItemId: string
 }

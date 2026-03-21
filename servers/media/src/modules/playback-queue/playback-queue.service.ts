@@ -11,6 +11,7 @@ import { QueryPlaybackQueuesDto } from './dtos/QueryPlaybackQueue.dto'
 import { CreatePlaybackQueueDto } from './dtos/CreatePlaybackQueue'
 import { LibraryService } from '../library/library.service'
 import { DynamicPlayback } from './dynamic-playback-queue.service'
+import { StaticPlayback } from './static-playback-queue.service'
 
 @Injectable()
 export class QueueService {
@@ -20,6 +21,7 @@ export class QueueService {
     @InjectRepository(PlaybackQueue)
     private queueRepository: Repository<PlaybackQueue>,
     private readonly eventService: EventService,
+    private readonly staticQueueService: StaticPlayback,
     private readonly dynamicQueueService: DynamicPlayback,
     private readonly libraryService: LibraryService,
   ) {}
@@ -28,7 +30,12 @@ export class QueueService {
    * Create a queue.
    */
   async create(createQueueDto: CreatePlaybackQueueDto, user: User): Promise<PlaybackQueue> {
-    const { type, dynamicType, libraries } = createQueueDto
+    const {
+      type,
+      dynamicType,
+      libraries,
+      staticItems,
+    } = createQueueDto
     const libraryEntities = libraries
       ? await Promise.all(libraries.map((lib) => this.libraryService.getLibrary(lib.libraryId)))
       : undefined
@@ -41,7 +48,9 @@ export class QueueService {
         libraries: libraryEntities,
       })
 
-      if (type === 'dynamic') {
+      if (type === 'static') {
+        await this.staticQueueService.initStaticQueue(saved, staticItems)
+      } else if (type === 'dynamic') {
         await this.dynamicQueueService.initDynamicQueue(saved)
       }
 

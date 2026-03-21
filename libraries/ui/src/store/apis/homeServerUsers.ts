@@ -1,10 +1,10 @@
 import queryParams from '../../lib/net/queryParams'
-import { CommonSortParams, PaginationParams } from '../types/api'
+import { PaginationParams } from '../types/api'
 import { UserType } from '../../types/user'
 import { baseHomeServerApi } from './baseHomeServerApi'
 import { MusicTrackType } from './musicTracks'
 
-export type MusicHistorySortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
+export type MusicHistorySortParams = 'createdAt' | 'sortTitle' | 'trackNumber'
 export type MusicHistoryEntryType = {
   createdAt: string,
   id: number,

@@ -38,7 +38,7 @@ export const DefaultItems = (props) => {
           },
           {
             slug: 'sort',
-            render: ToolbarItem.SORT,
+            render: ToolbarItem.ORDERBY,
             initialValue: 'date_added',
           },
         ]}
@@ -78,7 +78,7 @@ export const CustomValues = (props) => {
                 value: 'extended_sort_2',
               },
             ],
-            render: ToolbarItem.SORT,
+            render: ToolbarItem.ORDERBY,
           },
           {
             slug: 'sort_custom',
@@ -93,7 +93,7 @@ export const CustomValues = (props) => {
                 value: 'custom_sort_2',
               },
             ],
-            render: ToolbarItem.SORT,
+            render: ToolbarItem.ORDERBY,
           },
           {
             slug: 'custom-dropdown',
@@ -146,7 +146,7 @@ export const Groups = (props) => {
             {
               slug: 'sort',
               initialValue: 'date_added',
-              render: ToolbarItem.SORT,
+              render: ToolbarItem.ORDERBY,
             },
           ],
         ]}

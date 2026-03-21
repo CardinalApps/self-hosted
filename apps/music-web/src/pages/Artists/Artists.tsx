@@ -3,6 +3,7 @@ import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
 import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+import { MusicAritstsOrderBy } from '@cardinalapps/ui/src/store/apis/musicArtists'
 
 import ArtistsInfiniteScroll from './ArtistsInfiniteScroll'
 
@@ -31,15 +32,13 @@ function ArtistsPage() {
               render: ToolbarItem.ORDER,
             },
             {
-              slug: 'sort',
-              render: ToolbarItem.SORT,
+              slug: 'orderBy',
+              render: ToolbarItem.ORDERBY,
               initialValue: 'name',
               options: [
-                {
-                  label: i18n['music-artists.order-by.name']['en'],
-                  value: 'name',
-                },
-              ],
+                'name',
+                'createdAt',
+              ] as MusicAritstsOrderBy[],
             },
           ]}
         />

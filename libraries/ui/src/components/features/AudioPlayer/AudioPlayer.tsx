@@ -60,7 +60,7 @@ const AudioPlayer = ({
   const [fadeIn, setFadeIn] = useState(false)
 
   const handlePlayClick = (id) => {
-    dispatch(play({ trackId: id }))
+    dispatch(play({ trackIds: [id] }))
   }
 
   const handlePauseClick = () => {

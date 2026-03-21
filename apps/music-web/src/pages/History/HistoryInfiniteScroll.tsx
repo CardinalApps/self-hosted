@@ -1,9 +1,6 @@
 import { useContext, useState } from 'react'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
-import {
-  TracksSortParams,
-} from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { MusicHistoryEntryType, useGetInfiniteMusicHistoryInfiniteQuery } from '@cardinalapps/ui/src/store/apis/musicHistory'
 import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
 import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
@@ -11,13 +8,16 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Virtual'
 import { formatDate, formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
 import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
+import ProgressCircle from '@cardinalapps/ui/src/components/layout/ProgressCircle'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 
 import i18n from './i18n.json'
+import Card from '@cardinalapps/ui/src/components/layout/Card'
+import MusicRelease from '../../../../../libraries/ui/src/components/interaction/MusicRelease'
 
 const ITEM_WIDTH = '100%'
-const ITEM_HEIGHT = 44
+const ITEM_HEIGHT = 50
 
 type MusicHistoryInfiniteScrollProps = {
   virtualViewName: string,
@@ -49,34 +49,51 @@ function MusicHistoryInfiniteScroll({
     fetchPreviousPage,
     isFetchingNextPage,
     isFetchingPreviousPage,
-  } = useGetInfiniteMusicHistoryInfiniteQuery(
+} = useGetInfiniteMusicHistoryInfiniteQuery(
     {
-      sort: toolbarValues?.sort as TracksSortParams,
       order: toolbarValues?.order as CommonOrderParams,
     },
-    { initialPageParam },
+    {
+      initialPageParam,
+      refetchOnMountOrArgChange: true,
+    },
   )
 
+
   const getItem = (historyEntry: MusicHistoryEntryType) => {
-    // FIXME
-    if (!historyEntry) {
-      console.warn('No entry?', historyEntry)
-      return null
-    }
+    const musicRelease = historyEntry.track?.release
     return (
-      <div className="music-history-entry">
-        <div className="progress-bar" style={{ width: `${(historyEntry?.progress || 0) * 100}%` }}></div>
+      <Card className="music-history-entry" padding={0} border={1} key={musicRelease.id}>
         <div className="cols">
-          <div>{Math.round(historyEntry?.progress * 100)}%</div>
-          <div>{<UserTag user={historyEntry.user} size='xs' showName={false} />}</div>
-          <div><Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link></div>
-          <div className="date">
-            <time title={formatDate(historyEntry?.createdAt)}>
-              {formatTimeAgo(historyEntry?.createdAt)}
+          <div className="artwork-col">
+            <MusicRelease
+              key={`item-${musicRelease?.musicReleaseId}`}
+              releaseId={musicRelease?.id}
+              hasControls={false}
+              coverSize={{ width: 30, height: 30 }}
+              releaseLink={getAppUrl('release', {
+                params: {
+                  ':id': musicRelease?.musicReleaseId?.toString() || '',
+                },
+              })}
+            />
+          </div>
+          <div className="track-col">
+            <Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link>
+          </div>
+          <div className="date-col">
+            <time title={formatDate(historyEntry?.updatedAt)}>
+              {formatTimeAgo(historyEntry?.updatedAt)}
             </time>
           </div>
+          <div className="progress-col">
+            <ProgressCircle current={historyEntry.progress} fontSize={9} size={35} showPercentage={true} />
+          </div>
+          <div className="user-col">
+            <UserTag user={historyEntry.user} size='xs' showName={false} />
+          </div>
         </div>
-      </div>
+      </Card>
     )
   }
 

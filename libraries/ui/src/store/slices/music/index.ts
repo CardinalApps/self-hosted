@@ -190,18 +190,18 @@ const audioSlice = createSlice({
     playerIds: (state) => Object.keys(state.players).join(','),
     playingIds: (state) =>
       Object.values(state.players)
-        .filter((track) => track.state === PLAYBACK_STATE.PLAYING)
-        .map((track) => track.id)
+        .filter((player) => player.state === PLAYBACK_STATE.PLAYING)
+        .map((player) => player.trackId)
         .join(','),
     pausedIds: (state) =>
       Object.values(state.players)
-        .filter((track) => track.state === PLAYBACK_STATE.PAUSED)
-        .map((track) => track.id)
+        .filter((player) => player.state === PLAYBACK_STATE.PAUSED)
+        .map((player) => player.trackId)
         .join(','),
     loadingIds: (state) =>
       Object.values(state.players)
-        .filter((track) => track.state === PLAYBACK_STATE.LOADING)
-        .map((track) => track.id)
+        .filter((player) => player.state === PLAYBACK_STATE.LOADING)
+        .map((player) => player.trackId)
         .join(','),
   },
 })

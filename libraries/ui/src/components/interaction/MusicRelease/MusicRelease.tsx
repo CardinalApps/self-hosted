@@ -81,7 +81,7 @@ const MusicRelease = ({
         }}
       >
         {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
-        {!getArtwork() && <i className="no-artwork-icon far fa-image" />}
+        {/* {!getArtwork() && <i className="no-artwork-icon far fa-image" />} */}
         {!!hasControls && (
           <div className="controls">
             <div className="col music-track-play-pause">

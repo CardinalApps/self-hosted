@@ -6,7 +6,6 @@ import { toArrayOfStrings } from '../../../utils/transformers'
 
 enum AllowedMusicReleasesOrderBy {
   'createdAt' = 'createdAt',
-  'updatedAt' = 'updatedAt',
   'title' = 'title',
 }
 
@@ -15,7 +14,7 @@ class MusicReleasesPagination extends Pagination {
   @IsOptional()
   @IsString()
   @IsIn(Object.values(AllowedMusicReleasesOrderBy))
-  sort?: AllowedMusicReleasesOrderBy = AllowedMusicReleasesOrderBy.createdAt
+  orderBy?: AllowedMusicReleasesOrderBy = AllowedMusicReleasesOrderBy.title
 }
 
 export class GetMusicReleasesDto extends MusicReleasesPagination {

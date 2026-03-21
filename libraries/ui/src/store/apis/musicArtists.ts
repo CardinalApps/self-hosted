@@ -2,9 +2,13 @@ import queryParams from '../../lib/net/queryParams'
 import { baseHomeServerApi } from './baseHomeServerApi'
 
 import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
-import { CommonOrderParams, CommonSortParams, PaginationParams } from '../types/api'
+import { CommonOrderParams, PaginationParams } from '../types/api'
+import { ToolbarOrderByType } from '../../components/interaction/Toolbar/types'
 
-export type ArtistsSortParams = CommonSortParams | 'sortName'
+export type MusicAritstsOrderBy = Extract<ToolbarOrderByType,
+  'createdAt'
+  | 'name'
+>
 export type MusicArtistType = {
   id: number,
   name: string,
@@ -25,7 +29,7 @@ export const musicArtistsApi = baseHomeServerApi
       getInfiniteMusicArtists: builder.infiniteQuery<
         [MusicArtistType[], number],
         {
-          sort?: ArtistsSortParams,
+          orderBy?: MusicAritstsOrderBy,
           order?: CommonOrderParams,
           libraries?: string[],
         },
@@ -41,12 +45,12 @@ export const musicArtistsApi = baseHomeServerApi
           getPreviousPageParam,
         },
         query({ queryArg, pageParam }) {
-          const { sort, order, libraries } = queryArg
+          const { orderBy, order, libraries } = queryArg
           const { take, skip } = pageParam
           return queryParams('/music/artists', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
-            ...(sort && { sort }),
+            ...(orderBy && { orderBy }),
             ...(order && { order }),
             ...(libraries && { libraries }),
             releases: true,

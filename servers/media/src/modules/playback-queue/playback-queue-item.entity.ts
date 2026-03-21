@@ -3,10 +3,12 @@ import {
   Column,
   ManyToOne,
   Generated,
+  OneToOne,
 } from 'typeorm'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { PlaybackQueue } from './playback-queue.entity'
+import { MusicHistory } from '../music-history/music-history.entity'
 
 @Entity()
 export class PlaybackQueueItem extends BaseEntity {
@@ -16,6 +18,9 @@ export class PlaybackQueueItem extends BaseEntity {
 
   @ManyToOne(() => PlaybackQueue)
   queue: PlaybackQueue
+
+  @OneToOne(() => PlaybackQueue, { nullable: true })
+  history?: MusicHistory
 
   @Column({ nullable: false })
   mediaType: 'music_track'

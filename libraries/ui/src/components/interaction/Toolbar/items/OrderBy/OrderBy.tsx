@@ -7,28 +7,25 @@ import { layoutSelectors } from '../../../../../store/slices/layout'
 
 import i18n from './i18n'
 
-import { ToolbarItemProps, ToolbarItem, ToolbarItemObject } from '../../types'
+import {
+  ToolbarItemProps,
+  ToolbarItem,
+  ToolbarItemObject,
+  ToolbarOrderByType,
+  ToolbarOrderByDropdownType,
+} from '../../types'
 
-import './Sort.css'
+import './OrderBy.css'
 
-export const SLUG = ToolbarItem.SORT
-export const DEFAULT_VALUE = 'date_added'
+export const SLUG = ToolbarItem.ORDERBY
+export const DEFAULT_VALUE = 'createdAt'
 
 export interface SortToolbarItemObject extends ToolbarItemObject {
-  options: {
-    value: string,
-    label: string,
-    sentenceCase: string,
-  }[],
-  extra: {
-    value: string,
-    label: string,
-    sentenceCase: string,
-  }[],
+  options: ToolbarOrderByDropdownType,
 }
 
 interface SortToolbarItemProps extends ToolbarItemProps {
-  item: SortToolbarItemObject
+  item: SortToolbarItemObject,
 }
 
 /**
@@ -36,7 +33,7 @@ interface SortToolbarItemProps extends ToolbarItemProps {
  * content. Pages can choose which default directives to support, and can extend
  * the directives with custom ones.
  */
-const ToolbarSort = ({
+const ToolbarOrderByDropdown = ({
   toolbarName,
   item,
   onChange = () => {},
@@ -45,43 +42,25 @@ const ToolbarSort = ({
   const { [toolbarName]: toolbarValues } = useSelector(layoutSelectors.toolbarValues)
   const slug = item?.slug || SLUG
 
-  const SORT_OPTIONS = [
-    {
-      value: 'date_added',
-      label: i18n['sort.date_added'][lang],
-      sentenceCase: i18n['sort.date_added'][lang].toLocaleLowerCase(),
-    },
-    {
-      value: 'name',
-      label: i18n['sort.name'][lang],
-      sentenceCase: i18n['sort.name'][lang].toLocaleLowerCase(),
-    },
-    {
-      value: 'random',
-      label: i18n['sort.random'][lang],
-      sentenceCase: i18n['sort.random'][lang].toLocaleLowerCase(),
-    },
-  ]
-
   const getOptions = () => {
-    if (item?.options) {
-      return item.options
-    } else {
-      return [
-        ...SORT_OPTIONS,
-        ...(item?.extra || []),
-      ]
-    }
+    return item.options.map((option: ToolbarOrderByType) => {
+      return {
+        value: option,
+        label: i18n[`orderby.${option}`]?.[lang] || option,
+        sentenceCase: i18n[`orderby.${option}`]?.[lang] || option,
+      }
+    })
   }
 
   return (
     <div className="sort">
       <Select
         name={slug}
-        selectPlaceholder={i18n['sort-by'][lang]}
-        selectedPrefix={`${i18n['sort-by'][lang]} `}
+        selectPlaceholder={i18n['orderby'][lang]}
+        selectedPrefix={`${i18n['orderby'][lang]} `}
         size="s"
         multi={false}
+        min={1}
         value={toolbarValues?.[slug] as string || item?.initialValue as string}
         options={getOptions()}
         onChange={(value) => onChange(slug, value, toolbarValues)}
@@ -90,4 +69,4 @@ const ToolbarSort = ({
   )
 }
 
-export default ToolbarSort
+export default ToolbarOrderByDropdown

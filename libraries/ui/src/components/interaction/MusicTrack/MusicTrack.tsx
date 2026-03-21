@@ -6,7 +6,7 @@ import MusicPlaybackButton from '../MusicPlaybackButton'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { audioSelectors } from '../../../store/slices/music'
-import playMusic from '../../../store/slices/music/thunks/play'
+import play from '../../../store/slices/music/thunks/play'
 import { RouterContext } from '../../../context/router'
 import { useReleaseCover } from '../../../hooks/useReleaseCover'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
@@ -59,8 +59,8 @@ const MusicTrack = ({
       && !e.target.matches('.music-playback-button')
       && !e.target.closest('.music-playback-button')
     ) {
-      dispatch(playMusic({
-        trackId: musicTrackId,
+      dispatch(play({
+        trackIds: [musicTrackId],
       }))
     }
   }

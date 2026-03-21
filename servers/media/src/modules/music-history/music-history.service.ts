@@ -9,14 +9,20 @@ import { EventService } from '../event/event.service'
 import { User } from '../user/user.entity'
 import { CreateMusicHistoryEntryDto } from './dtos/CreateMusicHistoryEntry.dto'
 import { GetMusicHistoryEntriesDto } from './dtos/GetMusicHistoryEntries.dto'
+import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
 
 @Injectable()
 export class MusicHistoryService {
   constructor(
     @InjectDataSource()
     private dataSource: DataSource,
+
     @InjectRepository(MusicHistory)
     private musicHistoryRepository: Repository<MusicHistory>,
+
+    @InjectRepository(PlaybackQueueItem)
+    private playbackQueueItemRepository: Repository<PlaybackQueueItem>,
+
     private readonly musicTrackService: MusicTrackService,
     private readonly eventService: EventService,
   ) {}
@@ -24,22 +30,39 @@ export class MusicHistoryService {
   /**
    * Add an entry to a user's playback history.
    */
-  async createPlaybackEntry(user: User, createMusicHistoryEntryDto: CreateMusicHistoryEntryDto): Promise<MusicHistory> {
+  async upsertPlaybackEntry(user: User, createMusicHistoryEntryDto: CreateMusicHistoryEntryDto): Promise<MusicHistory> {
+    const queueItem = await this.playbackQueueItemRepository.findOne({
+      where: {
+        queueItemId: createMusicHistoryEntryDto.queueItemId,
+      },
+    })
+
+    const historyEntry = await this.musicHistoryRepository.findOne({
+      where: {
+        queueItem: {
+          queueItemId: createMusicHistoryEntryDto.queueItemId,
+        },
+      },
+    })
+
     const track = await this.musicTrackService.get(createMusicHistoryEntryDto.trackId)
-    const duration = track?.duration || 0
+    const progress = track?.duration
+      ? createMusicHistoryEntryDto.seconds / track.duration
+      : 0
 
-    let progress = createMusicHistoryEntryDto.seconds / duration
-    if (progress > 0.991) {
-      progress = 1
-    }
+    const rounded = progress > 0.991
+      ? 1
+      : progress
 
-    const entry = await this.musicHistoryRepository.save({
-      progress,
+    const saved = await this.musicHistoryRepository.save({
+      ...(historyEntry ? { id: historyEntry.id } : {}),
+      queueItem,
+      progress: rounded,
       user,
       track,
     })
 
-    return entry
+    return saved
   }
 
   /**

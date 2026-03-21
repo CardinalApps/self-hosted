@@ -1,10 +1,24 @@
 import type { ReactNode } from 'react'
 
+export type ToolbarOrderByType =
+  'createdAt'
+  | 'updatedAt'
+  | 'title'
+  | 'name'
+  | 'duration'
+  | 'bitrate'
+  | 'trackNumber'
+  | 'discNumber'
+  | 'playCount'
+  | 'random'
+
+export type ToolbarOrderByDropdownType = ToolbarOrderByType[]
+
 export enum ToolbarItem {
   DATERANGE = 'daterange',
   PAGINATION = 'pagination',
   ORDER = 'order',
-  SORT = 'sort',
+  ORDERBY = 'orderby',
   DELETE = 'delete',
   DESELECT = 'deselect',
 }
@@ -14,6 +28,7 @@ export interface ToolbarItemObject {
   title?: string,
   initialValue?: unknown,
   options?: unknown[],
+  extra?: unknown,
   render?: ToolbarItem | (({ toolbarName, onChange }) => ReactNode),
 }
 

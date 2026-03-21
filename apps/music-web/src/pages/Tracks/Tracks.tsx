@@ -3,6 +3,7 @@ import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
 import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+import { MusicTracksOrderBy } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
 import TracksInfiniteScroll from './TracksInfiniteScroll'
 
@@ -31,27 +32,17 @@ function TracksPage() {
               render: ToolbarItem.ORDER,
             },
             {
-              slug: 'sort',
-              render: ToolbarItem.SORT,
+              slug: 'orderBy',
+              render: ToolbarItem.ORDERBY,
               initialValue: 'title',
               options: [
-                {
-                  label: i18n['music-tracks.order-by.title']['en'],
-                  value: 'title',
-                },
-                {
-                  label: i18n['music-tracks.order-by.track-num']['en'],
-                  value: 'trackNumber',
-                },
-                {
-                  label: i18n['music-tracks.order-by.duration']['en'],
-                  value: 'duration',
-                },
-                {
-                  label: i18n['music-tracks.order-by.bitrate']['en'],
-                  value: 'bitrate',
-                },
-              ],
+                'title',
+                'createdAt',
+                'playCount',
+                'trackNumber',
+                'duration',
+                'bitrate',
+              ] as MusicTracksOrderBy[],
             },
           ]}
         />

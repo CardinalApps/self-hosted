@@ -3,6 +3,7 @@ import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
 import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
+import { MusicReleasesOrderBy } from '@cardinalapps/ui/src/store/apis/musicReleases'
 
 import ReleasesInfiniteScroll from './ReleasesInfiniteScroll'
 
@@ -31,19 +32,13 @@ function ReleasesPage() {
               render: ToolbarItem.ORDER,
             },
             {
-              slug: 'sort',
-              render: ToolbarItem.SORT,
+              slug: 'orderBy',
+              render: ToolbarItem.ORDERBY,
               initialValue: 'title',
               options: [
-                {
-                  label: i18n['music-releases.order-by.title']['en'],
-                  value: 'title',
-                },
-                // {
-                //   label: 'Random',
-                //   value: 'random',
-                // },
-              ],
+                'title',
+                'createdAt',
+              ] as MusicReleasesOrderBy[],
             },
           ]}
         />

@@ -4,7 +4,7 @@ import useWindowSize from '../../../hooks/useWindowSize'
 
 import './Card.css'
 
-export type CardPadding = 'regular' | 'thick' | 'thin' | 'none'
+export type CardPadding = 'regular' | 'thick' | 'thin' | 'none' | number
 
 export type CardProps = {
   width?: number | string,
@@ -52,7 +52,7 @@ const Card = ({
       id={id || undefined}
       className={clsx(
         `card`,
-        `padding-${padding}`,
+        typeof padding === 'string' && `padding-${padding}`,
         `bg-${(mobileBg && windowWidth <= 768) ? mobileBg : bg}`,
         className,
         shadow ? `shadow-${shadow}` : '',
@@ -76,7 +76,12 @@ const Card = ({
           {headerRight && <div className="right-section">{headerRight}</div>}
         </header>
       }
-      <div className="card-content">
+      <div
+        className="card-content"
+        style={{
+          ...(typeof padding === 'number' ? { padding } : {}),
+        }}
+      >
         {children}
       </div>
       {!!footer &&

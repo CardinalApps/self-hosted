@@ -1,9 +1,17 @@
+import { ToolbarOrderByType } from '../../components/interaction/Toolbar/types'
 import queryParams from '../../lib/net/queryParams'
-import { CommonSortParams, CommonOrderParams, PaginationParams } from '../types/api'
+import { CommonOrderParams, PaginationParams } from '../types/api'
 import { getNextPageParam, getPreviousPageParam, ITEMS_PER_RTK_PAGE } from '../utils/infiniteScroll'
 import { baseHomeServerApi } from './baseHomeServerApi'
 
-export type TracksSortParams = CommonSortParams | 'sortTitle' | 'trackNumber'
+export type MusicTracksOrderBy = Extract<ToolbarOrderByType,
+  'createdAt'
+  | 'title'
+  | 'duration'
+  | 'bitrate'
+  | 'playCount'
+  | 'trackNumber'
+>
 export type MusicTrackType = {
   id: number,
   musicTrackId: string,
@@ -37,7 +45,7 @@ export const musicTracksApi = baseHomeServerApi
       getInfiniteMusicTracks: builder.infiniteQuery<
         [MusicTrackType[], number],
         {
-          sort?: TracksSortParams,
+          orderBy?: MusicTracksOrderBy,
           order?: CommonOrderParams,
           release?: boolean,
           metadata?: boolean
@@ -55,12 +63,12 @@ export const musicTracksApi = baseHomeServerApi
           getPreviousPageParam,
         },
         query({ queryArg, pageParam }) {
-          const { release, metadata, sort, order, libraries } = queryArg
+          const { release, metadata, orderBy, order, libraries } = queryArg
           const { take, skip } = pageParam
           return queryParams('/music/tracks', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
-            ...(sort && { sort }),
+            ...(orderBy && { orderBy }),
             ...(order && { order }),
             ...(release && { release }),
             ...(metadata && { metadata }),
@@ -75,7 +83,7 @@ export const musicTracksApi = baseHomeServerApi
       getMusicTracks: builder.query<
         [MusicTrackType[], number],
         PaginationParams & {
-          sort?: TracksSortParams,
+          sort?: MusicTracksOrderBy,
           order?: CommonOrderParams,
           release?: boolean,
           metadata?: boolean,

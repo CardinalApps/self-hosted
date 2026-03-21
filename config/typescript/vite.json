@@ -11,5 +11,12 @@
     "useDefineForClassFields": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
+    "paths": {
+      "@cardinalapps/access-control/*": ["../../libraries/access-control/*"],
+      "@cardinalapps/app-settings/*": ["../../libraries/app-settings/*"],
+      "@cardinalapps/products/*": ["../../libraries/products/*"],
+      "@cardinalapps/types/*": ["../../libraries/types/*"],
+      "@cardinalapps/ui/*": ["../../libraries/ui/*"]
+    }
   }
 }

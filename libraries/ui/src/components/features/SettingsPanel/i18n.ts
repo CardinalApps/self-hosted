@@ -40,6 +40,9 @@ const i18n: StringList = {
   "settings.language.title": {
     "en": "Language",
   },
+  "settings.music.players": {
+    "en": "Music Player",
+  },
   "settings.music.multi-player": {
     "en": "Multi-Player",
   },

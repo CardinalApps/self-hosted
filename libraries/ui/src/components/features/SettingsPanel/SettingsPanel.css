@@ -123,12 +123,17 @@
 
     &.type-title {
       margin-bottom: 15px;
+      padding-top: 15px;
 
       .settings-section-title {
         text-transform: uppercase;
         color: var(--text-color-2);
         font-weight: 800;
         font-size: 16px;
+      }
+
+      &:first-of-type {
+        padding-top: 0;
       }
     }
 

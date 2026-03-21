@@ -15,6 +15,11 @@
     height: 100%;
     position: relative;
 
+    header {
+      display: flex;
+      justify-content: space-between;
+    }
+
     a {
       color: var(--text-color-2);
 
@@ -31,10 +36,48 @@
     .cols {
       height: 100%;
       padding: 0 10px;
-      display: grid;
-      grid-template-columns: 50px 50px 1fr 200px;
+      display: flex;
+      gap: 10px;
       align-items: center;
+      overflow: hidden;
       font-size: 14px;
+
+      .artwork-col {
+        width: 30px;
+      }
+
+      .track-col {
+        flex-grow: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: 500;
+      }
+
+      .progress-col {
+        width: 35px;
+      }
+
+      .user-col {
+        width: 30px;
+      }
+
+      .date-col {
+        flex-grow: 1;
+        flex-shrink: 1;
+        justify-content: flex-end;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .music-release {
+        width: 100%;
+
+        .music-release-art {
+          height: auto;
+          border-radius: 4px;
+        }
+      }
     }
 
     .progress-bar {

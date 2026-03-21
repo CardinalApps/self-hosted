@@ -9,6 +9,10 @@ import queryParams from '../../../../lib/net/queryParams'
 
 export type NextArgs = {
   playerId?: string,
+
+  // Use a track ID to ensure that next() only goes through if this track is
+  // currently playing
+  fromTrackId?: string,
 }
 
 export type NextReturn = {
@@ -38,6 +42,11 @@ const next = createAsyncThunk<
     isEndOfQueue: false,
   }
 
+  // Only proceed if we would be going next from the given trackId
+  if (args.fromTrackId && state.audio.players[playerId].trackId !== args.fromTrackId) {
+    return workToDo
+  }
+
   const player = state.audio.players?.[playerId]
 
   if (!player) {
@@ -45,11 +54,13 @@ const next = createAsyncThunk<
     return workToDo
   }
 
+  // If we don't have a queue then behave as if we are at the end of a queue
   if (!player?.currentQueueItem?.queueItemId) {
-    console.error('Cannot go to next item because there is no queue')
+    workToDo.isEndOfQueue = true
     return workToDo
   }
 
+  // If we have a queue then get the next item
   const [nextQueueItems] = await homeServerAPI<[QueueItem[], number]>(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
     currentQueueItemId: player?.currentQueueItem?.queueItemId,
     leading: 1,
