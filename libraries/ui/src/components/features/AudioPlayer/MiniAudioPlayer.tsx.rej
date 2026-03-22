@@ -1,61 +1,25 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/MiniAudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/MiniAudioPlayer.tsx	(rejected hunks)
-@@ -75,35 +75,38 @@ const MiniAudioPlayer = () => {
+@@ -8,7 +8,6 @@ import { settingsSelectors } from '../../../store/slices/settings'
+ import { audioSelectors, Player } from '../../../store/slices/music'
+ 
+ import AudioPlayer from './AudioPlayer'
+-import Queue from '../../interaction/Queue/Queue'
+ 
+ import i18n from './i18n'
+ 
+@@ -74,15 +73,6 @@ const MiniAudioPlayer = () => {
+ 
    return (
      <div className={clsx('mini-audio-player')}>
-       {visiblePlayer && players?.[visiblePlayer]?.queue && (
--        <div className="mini-queue">
-+        <div className="mini-queue no-collapse">
-           <Queue
--            take={3}
-+            take={4}
-             queueId={players?.[visiblePlayer]?.queue.queueId}
-+            layout='list'
-           />
-         </div>
-       )}
+-      {visiblePlayer && players?.[visiblePlayer]?.queue && (
+-        <div className="mini-queue no-collapse">
+-          <Queue
+-            take={4}
+-            queueId={players?.[visiblePlayer]?.queue.queueId}
+-            layout='list'
+-          />
+-        </div>
+-      )}
        <div className="audio-players">
          {!!(Object.keys(players).length > 1) && !!visiblePlayer &&
--          <div className="audio-player-pagination">
--            <div className="audio-player-pagination-icons">
--              <Icon
--                fa="far fa-arrow-alt-circle-left"
--                className="prev-player"
--                onClick={() => changePlayer('prev')}
--              />
--              <Icon
--                fa="far fa-arrow-alt-circle-right"
--                className="next-player"
--                onClick={() => changePlayer('next')}
--              />
-+          <div className="mini-audio-player-controls">
-+            <div className="audio-player-pagination">
-+              <div className="audio-player-pagination-icons">
-+                <Icon
-+                  fa="far fa-arrow-alt-circle-left"
-+                  className="prev-player"
-+                  onClick={() => changePlayer('prev')}
-+                />
-+                <Icon
-+                  fa="far fa-arrow-alt-circle-right"
-+                  className="next-player"
-+                  onClick={() => changePlayer('next')}
-+                />
-+              </div>
-+              <p className="no-collapse">
-+                {
-+                  i18n['audio-player.pagination.label'][lang]
-+                    .replace('{current}', Object.keys(players).indexOf(visiblePlayer) + 1)
-+                    .replace('{total}', Object.keys(players).length)
-+                }
-+              </p>
-             </div>
--            <p className="no-collapse">
--              {
--                i18n['audio-player.pagination.label'][lang]
--                  .replace('{current}', Object.keys(players).indexOf(visiblePlayer) + 1)
--                  .replace('{total}', Object.keys(players).length)
--              }
--            </p>
-           </div>
-         }
-         <div className="audio-player-list">
+           <div className="mini-audio-player-controls">
