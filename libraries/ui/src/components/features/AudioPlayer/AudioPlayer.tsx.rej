@@ -1,46 +1,61 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/AudioPlayer.tsx	(rejected hunks)
-@@ -16,6 +16,7 @@ import previous from '../../../store/slices/music/thunks/previous'
- 
+@@ -17,6 +17,7 @@ import previous from '../../../store/slices/music/thunks/previous'
  import { getHowl } from '../../../hooks/useHowler'
  import { useReleaseCover } from '../../../hooks/useReleaseCover'
-+import { useCoverColors } from '../../../hooks/useCoverColors'
+ import { useCoverColors } from '../../../hooks/useCoverColors'
++import { settingsSelectors } from '../../../store/slices/settings'
  
  import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
  
-@@ -31,6 +32,7 @@ type AudioPlayerProps = {
-   className?: string,
-   playerId: string,
-   size: 'mini' | 'wide',
-+  onColorsLoaded?: (color: string[]) => void
- }
- 
- /**
-@@ -40,6 +42,7 @@ const AudioPlayer = ({
-   className,
-   playerId,
-   size,
-+  onColorsLoaded,
+@@ -46,7 +47,7 @@ const AudioPlayer = ({
  }: PropsWithChildren<AudioPlayerProps>) => {
    const howl = getHowl(playerId)
    const dispatch = useAppDispatch()
-@@ -57,6 +60,7 @@ const AudioPlayer = ({
-   } = useGetMusicTrackQuery({ id: player.trackId })
-   const track = musicTrackResponse
-   const [coverSrc] = useReleaseCover(track?.release?.id)
-+  const coverColors = useCoverColors(coverSrc)
-   const [fadeIn, setFadeIn] = useState(false)
- 
-   const handlePlayClick = (id) => {
-@@ -124,6 +128,12 @@ const AudioPlayer = ({
-     return () => clearTimeout(timeout)
-   }, [])
- 
-+  useEffect(() => {
-+    if (onColorsLoaded && coverColors) {
-+      onColorsLoaded(coverColors)
-+    }
-+  }, [onColorsLoaded, coverColors])
-+
-   return (
-     <div className={clsx("audio-player", className, !!fadeIn && 'fade-in')} data-size={size} data-state={player.state} key={playerId}>
-       <div className="metadata no-collapse">
+-  //const { max_concurrent_audio_streams } = useSelector(settingsSelectors.current)
++  const { enable_glass } = useAppSelector(settingsSelectors.current)
+   const playbackTimeInterval = useRef(null)
+   const players = useAppSelector(audioSelectors.players)
+   const player = players?.[playerId]
+@@ -170,32 +171,37 @@ const AudioPlayer = ({
+         <div className="audio-player-buttons">
+           <Icon
+             fa="fas fa-backward"
+-            className="audio-player-playback-button prev no-collapse"
++            className={clsx('audio-player-playback-button', 'prev', 'no-collapse')}
++            hoverType={enable_glass ? 'glass' : 'background'}
+             onClick={() => handlePrevClick()}
+           />
+           {!!(musicTrackLoading || musicBlobLoading) && <Loading size="s" />}
+           {!!isPaused && !musicTrackLoading && !musicBlobLoading &&
+             <Icon
+               fa="fas fa-play"
+-              className="audio-player-playback-button play"
++              className={clsx('audio-player-playback-button', 'play')}
++              hoverType={enable_glass ? 'glass' : 'background'}
+               onClick={() => handlePlayClick(track?.musicTrackId)}
+             />
+           }
+           {!!isPlaying && !musicTrackLoading && !musicBlobLoading &&
+             <Icon
+               fa="fas fa-pause"
+-              className="audio-player-playback-button pause"
++              className={clsx('audio-player-playback-button', 'pause')}
++              hoverType={enable_glass ? 'glass' : 'background'}
+               onClick={() => handlePauseClick()}
+             />
+           }
+           <Icon
+             fa="fas fa-forward"
+-            className="audio-player-playback-button next no-collapse"
++            className={clsx('audio-player-playback-button', 'next', 'no-collapse')}
++            hoverType={enable_glass ? 'glass' : 'background'}
+             onClick={() => handleNextClick()}
+           />
+           <Icon
+             fa="fas fa-stop"
+-            className="audio-player-playback-button stop no-collapse"
++            className={clsx('audio-player-playback-button', 'stop', 'no-collapse')}
++            hoverType={enable_glass ? 'glass' : 'background'}
+             onClick={() => handleStopClick()}
+           />
+         </div>

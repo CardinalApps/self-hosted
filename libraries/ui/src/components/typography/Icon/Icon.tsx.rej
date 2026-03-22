@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/components/typography/Icon/Icon.tsx b/libraries/ui/src/components/typography/Icon/Icon.tsx	(rejected hunks)
-@@ -50,7 +50,7 @@ const Icon = ({
-       )
-     } else {
-       return (
--        <span className={clsx('app-icon', 'span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
-+        <span className={clsx('span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
-           {iconEl}
-         </span>
-       )
+@@ -7,7 +7,7 @@ type IconProps = {
+   icon?: ReactNode,
+   fa?: string,
+   title?: string,
+-  hoverType?: 'background' | 'icon' | null,
++  hoverType?: 'background' | 'icon' | 'glass' | null,
+   href?: string,
+   target?: string,
+   className?: string,
