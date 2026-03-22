@@ -1,26 +1,16 @@
 diff a/libraries/ui/src/components/forms/ToggleSwitch/ToggleSwitch.css b/libraries/ui/src/components/forms/ToggleSwitch/ToggleSwitch.css	(rejected hunks)
-@@ -34,6 +34,12 @@
-     }
+@@ -45,13 +45,13 @@
    }
  
-+  .toggle-switch-box-inner {
-+    display: flex;
-+    align-items: center;
-+    gap: 8px;
-+  }
-+
-   .toggle-switch-box-meta-col {
-     flex-grow: 1;
+   .toggle-switch-box-title {
+-    margin-bottom: 5px;
+     color: var(--text-color-2);
+     font-size: 15px;
+     font-weight: 400;
    }
-@@ -62,11 +68,6 @@
-   }
- }
- 
--.toggle-switch-box-inner {
--  display: flex;
--  align-items: center;
--}
--
- .toggle-switch {
-   width: 50px;
-   height: 30px;
+   
+   .description {
++    margin-top: 3px;
+     padding-right: 15px;
+     font-weight: 400;
+     font-size: 13px;

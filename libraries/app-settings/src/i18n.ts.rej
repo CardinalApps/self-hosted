@@ -1,14 +1,24 @@
 diff a/libraries/app-settings/src/i18n.ts b/libraries/app-settings/src/i18n.ts	(rejected hunks)
-@@ -158,6 +158,12 @@ export default {
-   "settings.open-apps-in-new-tab.label": {
-     "en": "Open apps in new tab",
+@@ -14,6 +14,9 @@ export default {
+   "settings.accent-color.title": {
+     "en": "Accent colour",
    },
-+  "settings.audio-playback-timeout.label": {
-+    "en": "Audio playback timeout",
++  "settings.enable-glass.label": {
++    "en": "Enable glass accents",
 +  },
-+  "settings.audio-playback-timeout.desc": {
-+    "en": "Number of milliseconds until the app assumes that the audio won't play.",
-+  },
+   "settings.notifications.title": {
+     "en": "Enable notifications",
+   },
+@@ -165,10 +168,10 @@ export default {
+     "en": "Number of milliseconds until the app assumes that the audio won't play.",
+   },
    "settings.max-concurrent-audio-streams.label": {
-     "en": "Max audio players",
+-    "en": "Max audio players",
++    "en": "Max music players",
    },
+   "settings.max-concurrent-audio-streams.desc": {
+-    "en": "New players will pause old players until the max is reached, then oldest players are stopped.",
++    "en": "New players will pause old players until the max is reached, then oldest players are removed.",
+   },
+   "settings.max-concurrent-playing-audio-streams.label": {
+     "en": "Max concurrent audio streams",

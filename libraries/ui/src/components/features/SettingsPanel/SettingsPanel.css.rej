@@ -1,20 +1,12 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css b/libraries/ui/src/components/features/SettingsPanel/SettingsPanel.css	(rejected hunks)
-@@ -123,6 +123,7 @@
- 
-     &.type-title {
-       margin-bottom: 15px;
-+      padding-top: 15px;
- 
-       .settings-section-title {
-         text-transform: uppercase;
-@@ -130,6 +131,10 @@
-         font-weight: 800;
-         font-size: 16px;
+@@ -121,6 +121,10 @@
        }
-+
-+      &:first-of-type {
-+        padding-top: 0;
-+      }
      }
  
-     &.type-text {
++    &.type-select {
++      max-width: 240px;
++    }
++
+     &.type-title {
+       margin-bottom: 15px;
+       padding-top: 15px;

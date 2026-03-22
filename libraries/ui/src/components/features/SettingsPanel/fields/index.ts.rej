@@ -1,10 +1,9 @@
 diff a/libraries/ui/src/components/features/SettingsPanel/fields/index.ts b/libraries/ui/src/components/features/SettingsPanel/fields/index.ts	(rejected hunks)
-@@ -76,6 +76,8 @@ export const getFields = (app, lang) => {
-           tabName: i18n['settings.tab-name-music-playback'][lang],
-           tabIcon: 'fas fa-headphones-alt',
-           fields: [
-+            titleField(i18n['settings.music.players'][lang]),
-+            musicFields.audioPlaybackTimeout,
-             titleField(i18n['settings.music.multi-player'][lang]),
-             musicFields.maxConcurrentAudioStreams,
-             musicFields.maxConcurrentPlayingAudioStreams,
+@@ -26,6 +26,7 @@ export const getFields = (app, lang) => {
+     theme: [
+       commonFields.theme,
+       commonFields.accentColor,
++      commonFields.enableGlass,
+     ],
+   }
+ 
