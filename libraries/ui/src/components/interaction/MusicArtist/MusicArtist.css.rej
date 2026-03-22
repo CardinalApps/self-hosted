@@ -1,11 +1,33 @@
 diff a/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.css b/libraries/ui/src/components/interaction/MusicArtist/MusicArtist.css	(rejected hunks)
-@@ -32,6 +32,9 @@
-   .artist-name {
-     font-size: 18px;
-     font-weight: 600;
-+    text-overflow: ellipsis;
-+    white-space: nowrap;
-+    overflow: hidden;
+@@ -6,6 +6,8 @@
+   background-color: var(--bg-1);
+   overflow: hidden;
+ 
++  --image-height: 150px; 
++
+   header {
+     padding: 17px;
+   }
+@@ -38,7 +40,7 @@
    }
  
    .artist-image {
+-    height: 170px;
++    height: var(--image-height);
+     background-repeat: no-repeat;
+     background-size: cover;
+     background-position: center center;
+@@ -49,6 +51,13 @@
+     font-size: 12px;
+     font-weight: 500;
+     border-radius: 6px;
++    display: inline-flex;
++    gap: 5px;
++    align-items: center;
+     background-color: var(--bg-4);
+   }
++
++  .checkered {
++    height: var(--image-height);
++  }
+ }
