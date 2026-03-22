@@ -1,78 +1,37 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.css b/libraries/ui/src/components/features/AppBase/AppBase.css	(rejected hunks)
-@@ -215,43 +215,44 @@
-     left: 50%;
-     transform: translate(-50%, -50%);
-   }
-+}
+@@ -427,6 +427,27 @@
  
--  .virtual-empty {
--    width: 260px;
--    position: absolute;
--    top: 50%;
--    left: 50%;
--    transform: translate(-50%, -50%);
--    z-index: 100;
--
--    i {
--      width: 60px;
--      height: 60px;
--      font-size: 60px;
--      border-radius: 100%;
--      color: var(--accent-color);
--      display: flex;
--      align-items: center;
--      justify-content: center;
--    }
-+.virtual-empty,
-+.procedural-empty {
-+  width: 260px;
-+  position: absolute;
-+  top: 50%;
-+  left: 50%;
-+  transform: translate(-50%, -50%);
-+  z-index: 100;
+ .mini-audio-player {
+ 
++  &.glass-enabled .animated-gradient {
++    opacity: 1;
++  }
 +
-+  i {
-+    width: 60px;
-+    height: 60px;
-+    font-size: 60px;
-+    border-radius: 100%;
-+    color: var(--accent-color);
-+    display: flex;
-+    align-items: center;
-+    justify-content: center;
++  .animated-gradient {
++    position: absolute;
++    top: 0;
++    left: 0;
++    right: 0;
++    bottom: 0;
++    border-radius: var(--border-radius);
++    opacity: 0;
++    pointer-events: none;
++    z-index: 1;
 +  }
- 
--    p {
--      width: 100%;
--      font-size: 15px;
--      font-weight: 500;
--      line-height: 1.4em;
--      color: var(--text-color-2);
-+  p {
-+    width: 100%;
-+    font-size: 15px;
-+    font-weight: 500;
-+    line-height: 1.4em;
-+    color: var(--text-color-2);
- 
--      a, a:link, a:visited {
--        color: var(--accent-color);
--      }
-+    a, a:link, a:visited {
-+      color: var(--accent-color);
-     }
++
++  .audio-player[data-size="mini"] {
++    position: relative;
++    z-index: 2;
 +  }
- 
--    footer {
--      padding-left: 40px !important;
--      padding-right: 40px !important;
--      justify-content: flex-start !important;
--    }
-+  footer {
-+    padding-left: 40px !important;
-+    padding-right: 40px !important;
-+    justify-content: flex-start !important;
++
+   .audio-player-buttons {
+     width: 100%;
    }
- }
+@@ -457,6 +478,7 @@
  
+   .audio-player-list {
+     position: relative;
++    z-index: 2;
+   }
+ 
+   @media (max-width: 768px) {

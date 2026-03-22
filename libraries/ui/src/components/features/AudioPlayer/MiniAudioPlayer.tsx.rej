@@ -1,25 +1,44 @@
 diff a/libraries/ui/src/components/features/AudioPlayer/MiniAudioPlayer.tsx b/libraries/ui/src/components/features/AudioPlayer/MiniAudioPlayer.tsx	(rejected hunks)
-@@ -8,7 +8,6 @@ import { settingsSelectors } from '../../../store/slices/settings'
+@@ -6,6 +6,7 @@ import Icon from '../../typography/Icon'
+ 
+ import { settingsSelectors } from '../../../store/slices/settings'
  import { audioSelectors, Player } from '../../../store/slices/music'
++import AnimatedGradient from '../../layout/AnimatedGradient'
  
  import AudioPlayer from './AudioPlayer'
--import Queue from '../../interaction/Queue/Queue'
  
- import i18n from './i18n'
- 
-@@ -74,15 +73,6 @@ const MiniAudioPlayer = () => {
+@@ -22,7 +23,7 @@ import './AudioPlayer.css'
+  * based on the current Redux state.
+  */
+ const MiniAudioPlayer = () => {
+-  const { lang } = useSelector(settingsSelectors.current)
++  const { lang, enable_glass } = useSelector(settingsSelectors.current)
+   const players = useSelector(audioSelectors.players)
+   const playerIds = useSelector(audioSelectors.playerIds)
+   const playing = useSelector(audioSelectors.playing)
+@@ -72,7 +73,7 @@ const MiniAudioPlayer = () => {
+   }, [playingIds])
  
    return (
-     <div className={clsx('mini-audio-player')}>
--      {visiblePlayer && players?.[visiblePlayer]?.queue && (
--        <div className="mini-queue no-collapse">
--          <Queue
--            take={4}
--            queueId={players?.[visiblePlayer]?.queue.queueId}
--            layout='list'
--          />
--        </div>
--      )}
+-    <div className={clsx('mini-audio-player')}>
++    <div className={clsx('mini-audio-player', enable_glass && 'glass-enabled')}>
        <div className="audio-players">
          {!!(Object.keys(players).length > 1) && !!visiblePlayer &&
            <div className="mini-audio-player-controls">
+@@ -100,7 +101,15 @@ const MiniAudioPlayer = () => {
+           </div>
+         }
+         <div className="audio-player-list">
+-          {visiblePlayer && players?.[visiblePlayer] && <AudioPlayer className="top" key={visiblePlayer} playerId={visiblePlayer} size="mini" />}
++          {visiblePlayer && players?.[visiblePlayer] && (
++            <AudioPlayer
++              className={clsx('top', enable_glass && 'glass')}
++              key={visiblePlayer}
++              playerId={visiblePlayer}
++              size="mini"
++            />
++          )}
++          {!!enable_glass && <AnimatedGradient values={['rgba(41, 41, 127, 1)', 'rgba(13, 150, 0, 0.27)', 'rgba(65, 210, 33, 0.73)']} />}
+         </div>
+       </div>
+     </div>
