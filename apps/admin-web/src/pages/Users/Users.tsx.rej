@@ -1,10 +1,17 @@
 diff a/apps/admin-web/src/pages/Users/Users.tsx b/apps/admin-web/src/pages/Users/Users.tsx	(rejected hunks)
-@@ -125,7 +125,7 @@ function Users() {
-               {formatTimeAgo(lastSeen)}
-             </span>
-             )
--          : null
-+          : i18n['users.settings.info.last-seen.never'][lang]
-         }
-       </Table.Col>
-     )
+@@ -146,7 +146,6 @@ function Users() {
+       return []
+     }
+ 
+-
+     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
+     const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
+     const otherUsers = users
+@@ -306,6 +305,7 @@ function Users() {
+           null,
+         ]}
+         body={tableBody()}
++        loading={usersRes.isLoading}
+         emptyMessage={i18n['users.table.empty'][lang]}
+       />
+       {!!showManageInvitationsDrawer && (
