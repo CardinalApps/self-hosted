@@ -1,10 +1,31 @@
 diff a/libraries/ui/src/components/interaction/Table/Table.tsx b/libraries/ui/src/components/interaction/Table/Table.tsx	(rejected hunks)
-@@ -54,7 +54,7 @@ const Table = ({
-   onPageChange,
-   loading = false,
+@@ -5,7 +5,6 @@ import clsx from 'clsx'
+ 
+ import Pagination from '../Pagination'
+ import Loading from '../../layout/Loading'
+-import Icon from '../../typography/Icon'
+ 
+ import { settingsSelectors } from '../../../store/slices/settings'
+ 
+@@ -56,7 +55,6 @@ const Table = ({
    emptyMessage,
--  highlightRowOnHover,
-+  highlightRowOnHover = true,
+   highlightRowOnHover = true,
    highlightColOnHover,
-   emptyIcon = 'fas fa-wind',
+-  emptyIcon = 'fas fa-wind',
  }: TableProps) => {
+   const [rowHighlight, setRowHighlight] = useState<number>()
+   const [colHighlight, setColHighlight] = useState<number>()
+@@ -120,11 +118,10 @@ const Table = ({
+                     </tr>
+                   ))}
+                 </tbody>
+-              : <tbody className="tbody">
++              : <tbody className="tbody empty">
+                   <tr className="table-empty-message">
+                     <td colSpan={header?.length}>
+-                      <div>
+-                        {!!emptyIcon && <Icon fa={emptyIcon} />}
++                      <div className='checkered'>
+                         <p>{emptyMessage || i18n['default-empty-table-message'][lang]}</p>
+                       </div>
+                     </td>

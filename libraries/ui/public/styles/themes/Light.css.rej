@@ -1,12 +1,10 @@
 diff a/libraries/ui/public/styles/themes/Light.css b/libraries/ui/public/styles/themes/Light.css	(rejected hunks)
-@@ -49,6 +49,10 @@
-   /* Scrollbar */
+@@ -50,7 +50,7 @@
    --scrollbar-color: rgb(212, 212, 212);
  
-+  /* Checkered pattern */
-+  --checkered-color-1: #ccc;
-+  --checkered-color-2: #fff;
-+
+   /* Checkered pattern */
+-  --checkered-color-1: #ccc;
++  --checkered-color-1: #dcdcdc;
+   --checkered-color-2: #fff;
+ 
    .glass {
-     background: rgba(255, 255, 255, 0.2);
-     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
