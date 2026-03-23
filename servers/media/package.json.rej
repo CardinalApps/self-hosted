@@ -3,8 +3,8 @@ diff a/servers/media/package.json b/servers/media/package.json	(rejected hunks)
    "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
    "private": true,
    "scripts": {
--    "dev": "JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 INDEXING_LOG_LEVEL=20 NODE_ENV=development RELEASE_CHANNEL=development PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
-+    "dev": "KIOSK_MODE=true JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 INDEXING_LOG_LEVEL=20 NODE_ENV=development RELEASE_CHANNEL=development PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
+-    "dev": "KIOSK_MODE=true JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 INDEXING_LOG_LEVEL=20 NODE_ENV=development RELEASE_CHANNEL=development PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
++    "dev": "JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 INDEXING_LOG_LEVEL=20 NODE_ENV=development RELEASE_CHANNEL=development PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
      "dev:pg": "NODE_ENV=development RELEASE_CHANNEL=development INDEXING_LOG_LEVEL=20 JOBS_LOG_LEVEL=20 EVENTS_LOG_LEVEL=20 HTTP_LOG_LEVEL=20 CARDINAL_POSTGRES=true POSTGRES_HOST=172.20.0.4 POSTGRES_USER=developer POSTGRES_PASSWORD=developer PHOTOS_DIR=/home/brian/Pictures MUSIC_DIR=/home/brian/Music nest start --watch",
      "prebuild": "rimraf dist",
      "build": "nest build",
