@@ -1,25 +1,9 @@
 diff a/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx b/apps/admin-web/src/pages/Indexing/sections/RunsHistory.tsx	(rejected hunks)
-@@ -13,6 +13,7 @@ import { ListItem } from '@cardinalapps/ui/src/components/interaction/List/List'
- import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
- import homeServerAPI from '@cardinalapps/ui/src/lib/homeserver/homeServerAPI'
- import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
-+import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
- 
- import { useGetRunsQuery } from '@cardinalapps/ui/src/store/apis/runs'
- import { indexingSelectors } from '@cardinalapps/ui/src/store/slices/indexing'
-@@ -25,6 +26,7 @@ function RunsHistory() {
-   const itemsPerPage = 10
-   const dispatch = useAppDispatch()
-   const { lang } = useSelector(settingsSelectors.current)
-+  const userCanDeindex = useHasCapability('Indexing.Deindex')
-   const serverState = useSelector(indexingSelectors.serverState)
-   const initialTake = 5
-   const [take, setTake] = useState(initialTake)
-@@ -154,6 +156,7 @@ function RunsHistory() {
-         <>
-           <Button
-             onClick={() => setShowDeindexConfirm(true)}
-+            disabled={!userCanDeindex}
-           >
-             {i18n['data.media-reset.button'][lang]}
-           </Button>
+@@ -86,6 +86,7 @@ function RunsHistory() {
+         dispatch(toastActions.addToQueue({
+           title: i18n['data.media-reset.success-toast.title'][lang],
+           type: 'success',
++          ttl: 5000,
+         }))
+       })
+       .catch(() => {
