@@ -76,6 +76,25 @@
     }
   }
 
+  .major-badges {
+    display: flex;
+    gap: 5px;
+    
+    span {
+      padding: 5px 7px;
+      font-weight: 500;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 60px;
+      font-style: italic;
+      cursor: pointer;
+      color: #fff;
+      white-space: nowrap;
+      line-height: 1em;
+    }
+  }
+
   .cloud-status-icon {
     position: relative;
     top: 1px;

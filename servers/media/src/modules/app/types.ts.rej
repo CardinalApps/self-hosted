@@ -1,7 +1,8 @@
 diff a/servers/media/src/modules/app/types.ts b/servers/media/src/modules/app/types.ts	(rejected hunks)
-@@ -77,4 +77,5 @@ export type Versions = {
+@@ -77,5 +77,5 @@ export type Versions = {
  export type Instance = {
    instanceId: string,
    serverName: string,
-+  kiosk: boolean,
+-  kiosk: boolean,
++  kioskMode: boolean,
  }

@@ -1,0 +1,9 @@
+diff a/libraries/ui/src/store/apis/instance.ts b/libraries/ui/src/store/apis/instance.ts	(rejected hunks)
+@@ -12,6 +12,7 @@ export const instanceApi = baseHomeServerApi
+         {
+           instanceId: string,
+           serverName: string,
++          kioskMode: boolean,
+         },
+         void
+       >({

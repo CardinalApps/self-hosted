@@ -1,9 +1,66 @@
 diff a/libraries/ui/src/components/features/AppBase/AppBase.tsx b/libraries/ui/src/components/features/AppBase/AppBase.tsx	(rejected hunks)
-@@ -205,6 +205,7 @@ function AppBase({
-         type: 'danger',
-         title: i18n['health.network-error.title'][lang],
-         body: i18n['health.network-error.body'][lang].replace('{error}', latestHealthResponse?.response ? `<p>${latestHealthResponse?.response}</p>` : ''),
-+        ttl: 5000,
-       }))
-     }
-   }, [health])
+@@ -1,6 +1,7 @@
+ import { useEffect, useRef } from 'react'
+ import type { ReactNode } from 'react'
+ import { useSelector } from 'react-redux'
++import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ import { RouterContext, RouterContextType } from '../../../context/router'
+ import clsx from 'clsx'
+ 
+@@ -39,10 +40,10 @@ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
+ import { toastActions } from '../../../store/slices/toast'
+ import { settingsSelectors } from '../../../store/slices/settings'
+ import syncSettings from '../../../store/slices/settings/thunks/sync'
++import { useGetInstanceQuery } from '../../../store/apis/instance'
+ 
+ import useServerSideEvents from '../../../hooks/useServerSideEvents'
+ import useHowler from '../../../hooks/useHowler'
+-import { useAppDispatch } from '../../../hooks/useAppDispatch'
+ 
+ import { getJWT, JWT_TYPE } from '../../../lib/auth/jwt'
+ import { CardinalApp } from '../../../lib/env/cardinal'
+@@ -63,7 +64,6 @@ type AppBaseProps = {
+   authStorage?: 'localStorage' | 'sessionStorage',
+   onLoginSuccess?: () => void,
+   initialDeveloperMode?: boolean,
+-  kioskMode?: boolean,
+   basePath?: string,
+   topLevelContextMenuItems?: MenuItemGroup[],
+   onHomeServerRequiresFirstTimeSetup?: () => void,
+@@ -91,7 +91,6 @@ function AppBase({
+   cardinalAppId,
+   //authStorage = 'localStorage',
+   initialDeveloperMode = false,
+-  kioskMode = false,
+   basePath = '',
+   topLevelContextMenuItems,
+   onHomeServerRequiresFirstTimeSetup = () => console.log('a'),
+@@ -125,6 +124,9 @@ function AppBase({
+     developer_mode = initialDeveloperMode,
+   } = useSelector(settingsSelectors.current)
+ 
++  const instanceQuery = useGetInstanceQuery()
++  const { data: instanceData } = instanceQuery
++
+   const defaultHeader = (
+     <AppHeader
+       app={app}
+@@ -233,9 +235,17 @@ function AppBase({
+    */
+   useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
+   useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
+-  useEffect(() => { dispatch(appActions.setKioskMode(kioskMode)) }, [kioskMode])
+   useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
+ 
++  /**
++   * Kiosk mode is set server side.
++   */
++  useEffect(() => {
++    if (instanceData?.kioskMode) {
++      dispatch(appActions.setKioskMode(instanceData.kioskMode))
++    }
++  }, [instanceData?.kioskMode])
++
+   /**
+    * Set the app verison in the store on first startup.
+    */

@@ -246,7 +246,7 @@ export class AppController {
       example: {
         instanceId: "<id>",
         serverName: "My custom name",
-        kiosk: false,
+        kioskMode: false,
       },
     },
   })
@@ -257,7 +257,7 @@ export class AppController {
     return {
       instanceId: instanceId || '',
       serverName: serverName || '',
-      kiosk: kioskMode,
+      kioskMode,
     }
   }
 

@@ -1,20 +1,44 @@
 diff a/libraries/ui/src/components/features/AppHeader/AppHeader.css b/libraries/ui/src/components/features/AppHeader/AppHeader.css	(rejected hunks)
-@@ -79,16 +79,8 @@
+@@ -27,8 +27,11 @@
+     align-items: center;
+   }
  
-       &[data-status="loading"] {
-         background-color: none;
--
--        &:before {
--          content: '';
--          width: 20px;
--          top: 50%;
--          left: 0;
--          bottom: 0;
--          position: absolute;
--          background-color: var(--border-color-1);
--        }
-+        border-style: dashed;
-+        border-width: 2px;
+-  .search {
++  .mid {
+     flex-grow: 1;
++    display: flex;
++    align-items: center;
++    gap: 20px;
+   }
+ 
+   .title {
+@@ -191,6 +213,7 @@
+ 
+   @media screen and (max-width: 768px) {
+     height: auto;
++    padding-left: 5px;
+     margin-left: 0;
+     margin-right: 0;
+ 
+@@ -202,6 +225,10 @@
+       flex-grow: 1;
+     }
+ 
++    .major-badges {
++      flex-wrap: wrap;
++    }
++
+     .logo {
+       margin-right: 10px;
+       position: static;
+@@ -225,6 +252,10 @@
+         width: 38px;
        }
+     }
++
++    .search-bar {
++      display: none;
++    }
+   }
  
-       &[data-status="not-connected"] {
+   .webApps {
