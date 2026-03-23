@@ -7,6 +7,7 @@ import {
   Delete,
   Query,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import {
@@ -20,6 +21,7 @@ import { IndexingStates } from './enums'
 import { GETIndexStateResponse } from './types'
 
 import { IndexingService } from './indexing.service'
+import { IndexingSeedService } from './indexing-seed.service'
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
 import { User } from '../user/user.entity'
@@ -32,7 +34,7 @@ import { CreateRunDto } from './dtos/CreateRun.dto'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 
-import { getMediaDirs } from '../../utils/env'
+import { envVar, getMediaDirs } from '../../utils/env'
 import { MediaDirsType } from '../../utils/media'
 import { enumToCodeTags } from '../../utils/docs'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
@@ -44,6 +46,7 @@ import i18n from './i18n'
 export class IndexingController {
   constructor(
     private readonly indexingService: IndexingService,
+    private readonly indexingSeedService: IndexingSeedService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
   ) {}
@@ -237,5 +240,22 @@ export class IndexingController {
     } else {
       return await this.indexingService.deindexFiles(query.ids, query.hardDelete)
     }
+  }
+
+  /**
+   * A trigger for adding mock data to the database. Can only be used in kiosk
+   * mode.
+   */
+  @Post('/index/seed')
+  @StandardEndpoint({
+    summary: 'Seed the index with mock data.',
+    capabilities: ['Indexing.Operate'],
+  })
+  async seedIndex(@Query('count') count: string): Promise<void> {
+    if (!envVar('KIOSK_MODE', false)) {
+      throw new ForbiddenException('Kiosk mode must be enabled to run seeding.')
+    }
+    const n = parseInt(count, 10) || 1000
+    this.indexingSeedService.seed(n)
   }
 }

@@ -1,8 +1,11 @@
-import { useContext, type PropsWithChildren } from 'react'
+import { useContext, useState, type PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import { RouterContext } from '../../../context/router'
+import { useAppSelector } from '../../../hooks/useAppSelector'
+import { appSelectors } from '../../../store/slices/app'
+
 import { settingsSelectors } from '../../../store/slices/settings'
 
 import i18n from './i18n'
@@ -26,6 +29,15 @@ const MusicArtist = ({
 }: PropsWithChildren<MusicArtistProps>) => {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
+  const kioskMode = useAppSelector(appSelectors.kioskMode)
+  const [randomKioskNumber] = useState(Math.floor(Math.random() * 100) + 1)
+
+  const getArtistImage = () => {
+    if (kioskMode) {
+      return `https://cardinalpublicstorage.blob.core.windows.net/demo-images/pregenerated/artists/${randomKioskNumber}.jpg`
+    }
+    return image
+  }
 
   const optionalLink = (children) => {
     if (link && Link) {
@@ -42,7 +54,8 @@ const MusicArtist = ({
           <header>
             <p className="artist-name">{name}</p>
           </header>
-          {!!image && <div className="artist-image" style={{ backgroundImage: `url('${image}')`  }} />}
+          {!getArtistImage() && <div className="checkered" />}
+          {!!getArtistImage() && <div className="artist-image" style={{ backgroundImage: `url('${getArtistImage()}')`  }} />}
           {(!!numReleases || !!numTracks) && (
             <footer>
               {!!numReleases && numReleases === 1 && <span className="artist-stat">{i18n['artist.num-releases.singular'][lang].replace('{num}', numReleases)}</span>}

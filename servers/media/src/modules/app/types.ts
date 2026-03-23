@@ -77,4 +77,5 @@ export type Versions = {
 export type Instance = {
   instanceId: string,
   serverName: string,
+  kioskMode: boolean,
 }

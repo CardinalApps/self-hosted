@@ -4,6 +4,7 @@ import { AUTO_CHECK_FOR_UPDATES_SLUG, autoCheckForUpdateFactory } from './auto_c
 import { CUSTOM_CSS_SLUG, customCSSFactory } from './custom_css'
 import { DEVELOPER_MODE_SLUG, developerModeFactory } from './developer_mode'
 import { ENABLE_CUSTOM_CONTEXT_MENU_SLUG, enableCustomContextMenuFactory } from './enable_custom_context_menu'
+import { ENABLE_GLASS, enableGlassFactory } from './enable_glass'
 import { LANG_SLUG, langFactory } from './lang'
 import { NOTIFICATIONS_SLUG, notificationsFactory } from './notifications'
 import { START_PAGE_SLUG, startPageFactory } from './start_page'
@@ -18,6 +19,7 @@ export const commonFields = {
   [AUTO_CHECK_FOR_UPDATES_SLUG]: autoCheckForUpdateFactory,
   [DEVELOPER_MODE_SLUG]: developerModeFactory,
   [ENABLE_CUSTOM_CONTEXT_MENU_SLUG]: enableCustomContextMenuFactory,
+  [ENABLE_GLASS]: enableGlassFactory,
   [LANG_SLUG]: langFactory,
   [NOTIFICATIONS_SLUG]: notificationsFactory,
   [START_PAGE_SLUG]: startPageFactory,

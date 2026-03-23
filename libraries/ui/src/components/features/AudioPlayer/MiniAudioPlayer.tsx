@@ -6,9 +6,9 @@ import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { audioSelectors, Player } from '../../../store/slices/music'
+import AnimatedGradient from '../../layout/AnimatedGradient'
 
 import AudioPlayer from './AudioPlayer'
-import Queue from '../../interaction/Queue/Queue'
 
 import i18n from './i18n'
 
@@ -23,12 +23,13 @@ import './AudioPlayer.css'
  * based on the current Redux state.
  */
 const MiniAudioPlayer = () => {
-  const { lang } = useSelector(settingsSelectors.current)
+  const { lang, enable_glass } = useSelector(settingsSelectors.current)
   const players = useSelector(audioSelectors.players)
   const playerIds = useSelector(audioSelectors.playerIds)
   const playing = useSelector(audioSelectors.playing)
   const playingIds = useSelector(audioSelectors.playingIds)
   const [visiblePlayer, setVisiblePlayer] = useState<string | undefined>()
+  const [glassColors, setGlassColors] = useState<string[]>([])
 
   const changePlayer = (change) => {
     const currentIndex = Object.keys(players).indexOf(visiblePlayer)
@@ -73,16 +74,7 @@ const MiniAudioPlayer = () => {
   }, [playingIds])
 
   return (
-    <div className={clsx('mini-audio-player')}>
-      {visiblePlayer && players?.[visiblePlayer]?.queue && (
-        <div className="mini-queue no-collapse">
-          <Queue
-            take={4}
-            queueId={players?.[visiblePlayer]?.queue.queueId}
-            layout='list'
-          />
-        </div>
-      )}
+    <div className={clsx('mini-audio-player', enable_glass && 'glass-enabled')}>
       <div className="audio-players">
         {!!(Object.keys(players).length > 1) && !!visiblePlayer &&
           <div className="mini-audio-player-controls">
@@ -110,7 +102,16 @@ const MiniAudioPlayer = () => {
           </div>
         }
         <div className="audio-player-list">
-          {visiblePlayer && players?.[visiblePlayer] && <AudioPlayer className="top" key={visiblePlayer} playerId={visiblePlayer} size="mini" />}
+          {visiblePlayer && players?.[visiblePlayer] && (
+            <AudioPlayer
+              className={clsx('top', enable_glass && 'glass')}
+              key={visiblePlayer}
+              playerId={visiblePlayer}
+              size="mini"
+              onColorsLoaded={(colors) => setGlassColors(colors)}
+            />
+          )}
+          {!!enable_glass && <AnimatedGradient values={glassColors} />}
         </div>
       </div>
     </div>

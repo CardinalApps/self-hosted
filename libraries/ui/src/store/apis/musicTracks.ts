@@ -83,18 +83,18 @@ export const musicTracksApi = baseHomeServerApi
       getMusicTracks: builder.query<
         [MusicTrackType[], number],
         PaginationParams & {
-          sort?: MusicTracksOrderBy,
+          orderBy?: MusicTracksOrderBy,
           order?: CommonOrderParams,
           release?: boolean,
           metadata?: boolean,
           libraries?: string[],
         }
       >({
-        query: ({ take, skip, release, metadata, sort, order, libraries }) => {
+        query: ({ take, skip, release, metadata, orderBy, order, libraries }) => {
           return queryParams('/music/tracks', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
-            ...(sort && { sort }),
+            ...(orderBy && { orderBy }),
             ...(order && { order }),
             ...(release && { release }),
             ...(metadata && { metadata }),

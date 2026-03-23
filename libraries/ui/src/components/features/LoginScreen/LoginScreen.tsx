@@ -58,7 +58,6 @@ const LoginScreen = ({
   const dispatch = useAppDispatch()
   let app = useSelector(appSelectors.app)
   if (overrideApp) app = overrideApp
-  const kioskMode = useSelector(appSelectors.kioskMode)
   //const cloudUserLoggedIn = useSelector(cloudUserSelectors.loggedIn)
   const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
   //const currentCloudUser = useSelector(cloudUserSelectors.current)
@@ -68,9 +67,7 @@ const LoginScreen = ({
   const [showLocalAccountForm, setShowLocalAccountForm] = useState(false)
 
   const getBg = () => {
-    const base = kioskMode
-      ? ''
-      : AppBasePaths[app]
+    const base = AppBasePaths[app]
 
     switch (app) {
       case 'music':

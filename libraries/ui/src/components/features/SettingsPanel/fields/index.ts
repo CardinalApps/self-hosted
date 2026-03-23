@@ -26,6 +26,7 @@ export const getFields = (app, lang) => {
     theme: [
       commonFields.theme,
       commonFields.accentColor,
+      commonFields.enableGlass,
     ],
   }
 

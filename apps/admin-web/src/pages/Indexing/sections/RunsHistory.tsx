@@ -86,6 +86,7 @@ function RunsHistory() {
         dispatch(toastActions.addToQueue({
           title: i18n['data.media-reset.success-toast.title'][lang],
           type: 'success',
+          ttl: 5000,
         }))
       })
       .catch(() => {

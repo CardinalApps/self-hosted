@@ -23,7 +23,7 @@ function MostPlayedTracks() {
   const {
     data,
   } = useGetMusicTracksQuery({
-    sort: 'playCount',
+    orderBy: 'playCount',
     order: 'DESC',
     take: 40,
     ...(libraries?.length ? { libraries } : {}),

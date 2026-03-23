@@ -14,7 +14,7 @@ import MusicArtist from '@cardinalapps/ui/src/components/interaction/MusicArtist
 import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
 
 const ITEM_WIDTH = 320
-const ITEM_HEIGHT = 285
+const ITEM_HEIGHT = 265
 
 type TracksInfiniteScrollProps = {
   virtualViewName: string,
@@ -62,7 +62,6 @@ function ReleasesInfiniteScroll({
       <MusicArtist
         key={`item-${musicArtist?.musicArtistId}`}
         name={musicArtist?.name}
-        image={'/music/images/placeholder.jpg'}
         numReleases={musicArtist?.releases?.length || 0}
         numTracks={musicArtist?.tracks?.length || 0}
         link={getAppUrl('artist', {

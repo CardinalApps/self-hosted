@@ -14,6 +14,9 @@ export default {
   "settings.accent-color.title": {
     "en": "Accent colour",
   },
+  "settings.enable-glass.label": {
+    "en": "Enable glass accents",
+  },
   "settings.notifications.title": {
     "en": "Enable notifications",
   },
@@ -165,10 +168,10 @@ export default {
     "en": "Number of milliseconds until the app assumes that the audio won't play.",
   },
   "settings.max-concurrent-audio-streams.label": {
-    "en": "Max audio players",
+    "en": "Max music players",
   },
   "settings.max-concurrent-audio-streams.desc": {
-    "en": "New players will pause old players until the max is reached, then oldest players are stopped.",
+    "en": "New players will pause old players until the max is reached, then oldest players are removed.",
   },
   "settings.max-concurrent-playing-audio-streams.label": {
     "en": "Max concurrent audio streams",

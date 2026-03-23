@@ -45,13 +45,13 @@
   }
 
   .toggle-switch-box-title {
-    margin-bottom: 5px;
     color: var(--text-color-2);
     font-size: 15px;
     font-weight: 400;
   }
   
   .description {
+    margin-top: 3px;
     padding-right: 15px;
     font-weight: 400;
     font-size: 13px;

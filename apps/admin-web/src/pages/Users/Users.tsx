@@ -146,7 +146,6 @@ function Users() {
       return []
     }
 
-
     const guestAccount = users.find((user: UserType) => user.designation === 'guest_account')
     const ownerAccount = users.find((user: UserType) => user.roles.find((roleEntity) => roleEntity.role === 'owner'))
     const otherUsers = users
@@ -306,6 +305,7 @@ function Users() {
           null,
         ]}
         body={tableBody()}
+        loading={usersRes.isLoading}
         emptyMessage={i18n['users.table.empty'][lang]}
       />
       {!!showManageInvitationsDrawer && (

@@ -60,7 +60,6 @@ const DemoApp = () => {
           useLocation,
         }}
         version="0.1.2"
-        kioskMode={true}
         cardinalAppId="59068b7c-2c67-4d98-aef7-44d37914b86f"
         enableGlobalAudioPlayer={true}
         onLoginSuccess={() => console.log('Top level onLoginSuccess()')}

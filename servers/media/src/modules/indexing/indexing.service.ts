@@ -26,8 +26,14 @@ import { PhotoIndexingService } from './media/indexing.photos.service'
 import { MusicIndexingService } from './media/indexing.music.service'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
+import { MusicArtistMetadata } from '../music-artist/music-artist-metadata.entity'
 import { MusicRelease } from '../music-release/music-release.entity'
+import { MusicReleaseMetadata } from '../music-release/music-release-metadata.entity'
+import { MusicReleaseThumbnail } from '../music-release/music-release-thumbnail.entity'
 import { MusicGenre } from '../music-genres/music-genre.entity'
+import { MusicTrack } from '../music-track/music-track.entity'
+import { MusicTrackMetadata } from '../music-track/music-track-metadata.entity'
+import { MusicHistory } from '../music-history/music-history.entity'
 
 import { UserService } from '../user/user.service'
 
@@ -746,11 +752,16 @@ export class IndexingService {
     await queryRunner.connect()
     await queryRunner.startTransaction()
     try {
-      await queryRunner.manager.clear(Run)
-
-      // FIXME not sure why the cascades don't reach these tables
-      await queryRunner.manager.clear(MusicArtist)
+      // Clear in dependency order: leaves first, parents last
+      await queryRunner.manager.clear(MusicHistory)
+      await queryRunner.manager.clear(MusicTrackMetadata)
+      await queryRunner.manager.clear(MusicArtistMetadata)
+      await queryRunner.manager.clear(MusicReleaseMetadata)
+      await queryRunner.manager.clear(MusicReleaseThumbnail)
+      await queryRunner.manager.clear(MusicTrack)
+      await queryRunner.manager.clear(File)
       await queryRunner.manager.clear(MusicRelease)
+      await queryRunner.manager.clear(MusicArtist)
       await queryRunner.manager.clear(MusicGenre)
 
       await queryRunner.commitTransaction()

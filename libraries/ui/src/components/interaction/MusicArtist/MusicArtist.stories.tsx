@@ -27,4 +27,19 @@ export const Default = () => {
   )
 }
 
+export const Empty = () => {
+  useHowler()
+
+  return (
+    <MemoryRouter>
+      <MusicArtist
+        name="Archspire"
+        link="/artists/archspire"
+        numReleases={4}
+        numTracks={36}
+      />
+    </MemoryRouter>
+  )
+}
+
 export default meta

@@ -180,7 +180,7 @@
     "en": "Deindex Media"
   },
   "data.confirm-media-reset": {
-    "en": "<p>Deindexing your media files will remove your photos, music, movies, and TV from your Media Server. Features that require media, like photo albums and playlists, will be reset.</p><p>Your Media Server will become unresponsive while this process runs (it can take a while).</p>"
+    "en": "<p>This will reset your server's file index. All of your media data will be removed from your database. Your source files will not be touched.</p>"
   },
   "data.media-reset.success-toast.title": {
     "en": "Media successfully dexindexed."

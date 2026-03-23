@@ -7,7 +7,7 @@ type IconProps = {
   icon?: ReactNode,
   fa?: string,
   title?: string,
-  hoverType?: 'background' | 'icon' | null,
+  hoverType?: 'background' | 'icon' | 'glass' | null,
   href?: string,
   target?: string,
   className?: string,

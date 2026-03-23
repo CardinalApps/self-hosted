@@ -33,6 +33,7 @@ export type ENV_VAR =
   'RELEASE_CHANNEL' |
   'CARDINAL_HOME_SERVER_PORT' |
   'CARDINAL_CONTAINER' |
+  'KIOSK_MODE' |
 
   // Publicly documented
   'CARDINAL_POSTGRES' |

@@ -1,14 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
 import type { PropsWithChildren } from 'react'
+import { useAppSelector } from '../../../hooks/useAppSelector'
 import clsx from 'clsx'
 
-//import Icon from '../../typography/Icon'
 import MusicPlaybackButton, { PlayButtonSizeType } from '../MusicPlaybackButton'
 import { RouterContext } from '../../../context/router'
 import { useReleaseCover } from '../../../hooks/useReleaseCover'
 import { MusicTrackType } from '../../../store/apis/musicTracks'
-
-//import { settingsSelectors } from '../../../store/slices/settings'
+import { appSelectors } from '../../../store/slices/app'
 
 import './MusicRelease.css'
 
@@ -24,7 +23,7 @@ type MusicReleaseProps = {
   releaseLink?: string,
   artistName?: string,
   artistLink?: string,
-  coverSize?: { width?: number, height?: number },
+  coverSize?: { width?: number | string, height?: number | string },
   playButtonSize?: PlayButtonSizeType,
 }
 
@@ -40,17 +39,21 @@ const MusicRelease = ({
   releaseLink,
   artistName,
   artistLink,
-  coverSize = {},
+  coverSize = { width: 200, height: 200 },
   playButtonSize,
 }: PropsWithChildren<MusicReleaseProps>) => {
   const { Link } = useContext(RouterContext)
-  //const { lang } = useSelector(settingsSelectors.current)
+  const kioskMode = useAppSelector(appSelectors.kioskMode)
   const [showInner, setShowInner] = useState<boolean>()
   const [tracksInOrder, setTracksInOrder] = useState(tracks)
   const trackIdsInRelease = tracksInOrder.map((track) => track.musicTrackId).filter((track) => !!track)
-  const coverSrc = useReleaseCover(hasArtwork ? releaseId : null)
+  const [coverSrc, { coverIsLoading }] = useReleaseCover(hasArtwork && !kioskMode ? releaseId : null)
+  const [randomKioskNumber] = useState(Math.floor(Math.random() * 100) + 1)
 
   const getArtwork = () => {
+    if (kioskMode) {
+      return `https://cardinalpublicstorage.blob.core.windows.net/demo-images/pregenerated/album-covers/${randomKioskNumber}.png`
+    }
     if (overrideArtwork) {
       return overrideArtwork
     }
@@ -74,14 +77,14 @@ const MusicRelease = ({
         onBlur={() => hasControls ? setShowInner(false) : null}
         onMouseEnter={() => hasControls ?setShowInner(true) : null}
         onMouseLeave={() => hasControls ? setShowInner(false) : null}
-        style={{ ...(getArtwork() && {
+        style={{
           width: coverSize?.width,
           height: coverSize?.height,
-          backgroundImage: `url('${getArtwork()}')` }),
+          ...(getArtwork() ? { backgroundImage: `url('${getArtwork()}')` } : {} ),
         }}
       >
         {releaseLink && Link && <Link to={releaseLink} tabIndex={-1} className="cover-link"></Link>}
-        {/* {!getArtwork() && <i className="no-artwork-icon far fa-image" />} */}
+        {!coverIsLoading && !getArtwork() && <div className="checkered" />}
         {!!hasControls && (
           <div className="controls">
             <div className="col music-track-play-pause">

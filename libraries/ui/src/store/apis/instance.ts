@@ -12,6 +12,7 @@ export const instanceApi = baseHomeServerApi
         {
           instanceId: string,
           serverName: string,
+          kioskMode: boolean,
         },
         void
       >({

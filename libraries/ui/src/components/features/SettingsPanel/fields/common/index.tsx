@@ -2,6 +2,7 @@ import oidcBeta from './oidcBeta'
 import lang from './lang'
 import startPage from './startPage'
 import enableCustomContextMenu from './enableCustomContextMenu'
+import enableGlass from './enableGlass'
 import theme from './theme'
 import accentColor from './accentColor'
 import customCss from './customCss'
@@ -12,6 +13,7 @@ export default {
   lang,
   startPage,
   enableCustomContextMenu,
+  enableGlass,
   theme,
   accentColor,
   customCss,

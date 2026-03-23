@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import { RouterContext, RouterContextType } from '../../../context/router'
 import clsx from 'clsx'
 
@@ -39,10 +40,10 @@ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import { toastActions } from '../../../store/slices/toast'
 import { settingsSelectors } from '../../../store/slices/settings'
 import syncSettings from '../../../store/slices/settings/thunks/sync'
+import { useGetInstanceQuery } from '../../../store/apis/instance'
 
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
-import { useAppDispatch } from '../../../hooks/useAppDispatch'
 
 import { getJWT, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
@@ -63,7 +64,6 @@ type AppBaseProps = {
   authStorage?: 'localStorage' | 'sessionStorage',
   onLoginSuccess?: () => void,
   initialDeveloperMode?: boolean,
-  kioskMode?: boolean,
   basePath?: string,
   topLevelContextMenuItems?: MenuItemGroup[],
   onHomeServerRequiresFirstTimeSetup?: () => void,
@@ -91,7 +91,6 @@ function AppBase({
   cardinalAppId,
   //authStorage = 'localStorage',
   initialDeveloperMode = false,
-  kioskMode = false,
   basePath = '',
   topLevelContextMenuItems,
   onHomeServerRequiresFirstTimeSetup = () => console.log('a'),
@@ -124,6 +123,9 @@ function AppBase({
     enable_custom_context_menu,
     developer_mode = initialDeveloperMode,
   } = useSelector(settingsSelectors.current)
+
+  const instanceQuery = useGetInstanceQuery()
+  const { data: instanceData } = instanceQuery
 
   const defaultHeader = (
     <AppHeader
@@ -233,8 +235,16 @@ function AppBase({
    */
   useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
   useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
-  useEffect(() => { dispatch(appActions.setKioskMode(kioskMode)) }, [kioskMode])
   useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
+
+  /**
+   * Kiosk mode is set server side.
+   */
+  useEffect(() => {
+    if (instanceData?.kioskMode !== undefined) {
+      dispatch(appActions.setKioskMode(instanceData.kioskMode))
+    }
+  }, [instanceData?.kioskMode])
 
   /**
    * Set the app verison in the store on first startup.

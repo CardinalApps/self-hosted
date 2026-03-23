@@ -49,7 +49,7 @@ const MusicTrack = ({
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
   const playing = useSelector(audioSelectors.playing)
-  const artwork = useReleaseCover(hasArtwork ? releaseId : null)
+  const [artwork] = useReleaseCover(hasArtwork ? releaseId : null)
 
   const handleDoubleClick = (e) => {
     if (

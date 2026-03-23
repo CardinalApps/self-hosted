@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { IndexingController } from './indexing.controller'
 
 import { IndexingService } from './indexing.service'
+import { IndexingSeedService } from './indexing-seed.service'
 import { ScannerService } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
 import { MusicIndexingService } from './media/indexing.music.service'
@@ -41,6 +42,7 @@ import { UserModule } from '../user/user.module'
   ],
   providers: [
     IndexingService,
+    IndexingSeedService,
     ScannerService,
     MusicIndexingService,
     PhotoIndexingService,

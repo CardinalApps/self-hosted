@@ -55,6 +55,24 @@ const i18n: StringList = {
   "libraries.placeholder": {
     "en": "Library",
   },
+  "major-badge.kiosk": {
+    "en": "Kiosk Mode",
+  },
+  "major-badge.kiosk.desc": {
+    "en": "<h2>Kiosk Mode</h2><p>Kiosk mode is <strong>enabled</strong> for this Media Server. It is meant to demonstrate the feel of the UI with some data.</p><p>Mock data has been pregenerated for this demo; any similarities to real life music are purely coincidential.</p><p>A few other things are different in kiosk mode:</p><ul><li>Album covers were randomly generated and will change every time you load a page.</li><li>Artist images were sourced randomly from <a href='https://commons.wikimedia.org/wiki/Main_Page' target='_blank'>Wikimedia Commons</a>.</li><li>Most admin features are disabled.</li></ul>",
+  },
+  "major-badge.wip": {
+    "en": "In Development",
+  },
+  "major-badge.wip.desc": {
+    "en": "<h2>In Development</h2><p>You are looking at a work in progress. You can experiment with it and provide feedback. Don't bother reporting bugs that you see here.</p>",
+  },
+  "major-badge.planned": {
+    "en": "Planned",
+  },
+  "major-badge.planned.desc": {
+    "en": "<h2>Planned</h2><p>Work will begin on this app soon.</p>",
+  },
 }
 
 export default i18n

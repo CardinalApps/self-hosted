@@ -246,15 +246,18 @@ export class AppController {
       example: {
         instanceId: "<id>",
         serverName: "My custom name",
+        kioskMode: false,
       },
     },
   })
   async getInstance(): Promise<Instance> {
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name) as string
     const serverName = await this.settingsService.get(CardinalApp.ADMIN, 'server_name') as string
+    const kioskMode = envVar('KIOSK_MODE', false) as boolean
     return {
       instanceId: instanceId || '',
       serverName: serverName || '',
+      kioskMode,
     }
   }
 

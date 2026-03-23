@@ -108,7 +108,7 @@ export class MusicTrackService {
     const result = withRaw.entities.map((track, index) => {
       return {
         ...track,
-        playCount: parseInt(withRaw.raw[index]?.musicTrack_playCount, 10) || 0,
+        playCount: parseInt(withRaw.raw[index]?.music_track_play_count, 10) || 0,
       }
     })
 

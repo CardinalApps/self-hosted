@@ -27,6 +27,16 @@
       background-color: var(--bg-5);
     }
   }
+
+  &[data-hover-type="glass"] {
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+  }
 }
 
 .button-icon {
@@ -35,10 +45,6 @@
   border: none;
   background: none;
   -webkit-appearance: none;
-
-  /* &:hover {
-    background-color: var(--bg-5);
-  } */
 }
 
 .href-icon {

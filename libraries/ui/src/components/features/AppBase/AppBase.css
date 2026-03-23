@@ -427,6 +427,27 @@
 
 .mini-audio-player {
 
+  &.glass-enabled .animated-gradient {
+    opacity: 1;
+  }
+
+  .animated-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--border-radius);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .audio-player[data-size="mini"] {
+    position: relative;
+    z-index: 2;
+  }
+
   .audio-player-buttons {
     width: 100%;
   }
@@ -457,6 +478,7 @@
 
   .audio-player-list {
     position: relative;
+    z-index: 2;
   }
 
   @media (max-width: 768px) {
