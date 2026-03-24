@@ -1,11 +1,7 @@
 diff a/.gitignore b/.gitignore	(rejected hunks)
-@@ -16,4 +16,9 @@ bin
+@@ -22,3 +22,5 @@ servers/media/public/music
+ servers/media/public/photos
  
- storybook-static
- 
-+servers/media/public/admin
-+servers/media/public/cinema
-+servers/media/public/music
-+servers/media/public/photos
-+
  .DS_Store
++
++.claude
