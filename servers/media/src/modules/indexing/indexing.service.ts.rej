@@ -1,29 +1,25 @@
 diff a/servers/media/src/modules/indexing/indexing.service.ts b/servers/media/src/modules/indexing/indexing.service.ts	(rejected hunks)
-@@ -505,13 +505,23 @@ export class IndexingService {
-       where: { relativePath },
+@@ -219,7 +219,8 @@ export class IndexingService {
+   /**
+    * Returns all indexing runs in order from newest to oldest.
+    */
+-  async getRuns(pagination: Pagination, _includeEmptyRuns = true): Promise<[Run[], number]> {
++  // eslint-disable-next-line @typescript-eslint/no-unused-vars
++  async getRuns(pagination: Pagination, includeEmptyRuns = true): Promise<[Run[], number]> {
+     const { take, skip } = pagination
+     const runs = await this.dataSource
+       .getRepository(Run)
+@@ -686,12 +687,11 @@ export class IndexingService {
+   /**
+    * Handles skipping a file.
+    */
+-  private async skipFile(absolutePath: string, mediaType: MediaType): Promise<void> {
++  private async skipFile(_absolutePath: string, mediaType: MediaType): Promise<void> {
+     this.currentRun[mediaType].skipped++
+     this.eventService.emitPrivate(IndexingEvents.FILE_SKIPPED, {
+       mediaType,
      })
- 
--    // TODO add logic for change detection
--
-     if (!indexedReference) {
-       return FileOnDiskIndexingOperation.ADD
--    } else {
--      return FileOnDiskIndexingOperation.SKIP
-     }
-+
-+    try {
-+      const stats = fs.statSync(absolutePath)
-+      const sizeChanged = stats.size !== indexedReference.size
-+      const mtimeChanged = indexedReference.mtime == null || stats.mtime.getTime() !== indexedReference.mtime.getTime()
-+
-+      if (sizeChanged || mtimeChanged) {
-+        return FileOnDiskIndexingOperation.UPDATE
-+      }
-+    } catch (error) {
-+      Logger.error(`Could not stat file for change detection: ${absolutePath}`, 'Indexing')
-+    }
-+
-+    return FileOnDiskIndexingOperation.SKIP
+-    return
    }
  
    /**
