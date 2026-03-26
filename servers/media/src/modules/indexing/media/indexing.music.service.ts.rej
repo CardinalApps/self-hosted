@@ -1,9 +1,63 @@
 diff a/servers/media/src/modules/indexing/media/indexing.music.service.ts b/servers/media/src/modules/indexing/media/indexing.music.service.ts	(rejected hunks)
-@@ -654,6 +654,6 @@ export class MusicIndexingService {
-       return fromFolderStructure as unknown as number
+@@ -613,20 +613,22 @@ export class MusicIndexingService {
+   determineTrackNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
+     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'track')
+ 
+-    // FIXME the entity transformer should be doing this
+-    if (fromEmbeddedMetadata.metadataType === 'object') {
++    if (fromEmbeddedMetadata?.metadataType === 'object') {
++      let parsed: { no?: number } | null = null
+       try {
+-        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
+-        if (parsed?.no) {
+-          return parsed.no
+-        }
+-      } catch (error) { /* noop */ }
++        parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
++      } catch {
++        /* not valid JSON */
++      }
++      if (parsed?.no != null) {
++        return parsed.no
++      }
      }
  
--    return 0
-+    return 1
-   }
- }
+     const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'trackNumber')?.metaValue
+ 
+     if (fromFolderStructure) {
+-      return fromFolderStructure as unknown as number
++      return Number(fromFolderStructure)
+     }
+ 
+     return 0
+@@ -638,20 +640,22 @@ export class MusicIndexingService {
+   determineDiscNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
+     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'disk' || metadata?.metaKey === 'disc')
+ 
+-    // FIXME the entity transformer should be doing this
+-    if (fromEmbeddedMetadata.metadataType === 'object') {
++    if (fromEmbeddedMetadata?.metadataType === 'object') {
++      let parsed: { no?: number } | null = null
+       try {
+-        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
+-        if (parsed?.no) {
+-          return parsed.no
+-        }
+-      } catch (error) { /* noop */ }
++        parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
++      } catch {
++        /* not valid JSON */
++      }
++      if (parsed?.no != null) {
++        return parsed.no
++      }
+     }
+ 
+     const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'discNumber')?.metaValue
+ 
+     if (fromFolderStructure) {
+-      return fromFolderStructure as unknown as number
++      return Number(fromFolderStructure)
+     }
+ 
+     return 1
