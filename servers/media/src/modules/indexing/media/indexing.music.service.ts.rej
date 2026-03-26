@@ -1,63 +1,67 @@
 diff a/servers/media/src/modules/indexing/media/indexing.music.service.ts b/servers/media/src/modules/indexing/media/indexing.music.service.ts	(rejected hunks)
-@@ -613,20 +613,22 @@ export class MusicIndexingService {
-   determineTrackNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
-     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'track')
+@@ -84,6 +84,65 @@ export class MusicIndexingService {
+    */
+   private matchTrackAndDiscPrefix = /^[[|()]?([0-9]+)[-_]?([0-9]*)/
  
--    // FIXME the entity transformer should be doing this
--    if (fromEmbeddedMetadata.metadataType === 'object') {
-+    if (fromEmbeddedMetadata?.metadataType === 'object') {
-+      let parsed: { no?: number } | null = null
-       try {
--        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
--        if (parsed?.no) {
--          return parsed.no
--        }
--      } catch (error) { /* noop */ }
-+        parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
-+      } catch {
-+        /* not valid JSON */
-+      }
-+      if (parsed?.no != null) {
-+        return parsed.no
-+      }
-     }
- 
-     const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'trackNumber')?.metaValue
- 
-     if (fromFolderStructure) {
--      return fromFolderStructure as unknown as number
-+      return Number(fromFolderStructure)
-     }
- 
-     return 0
-@@ -638,20 +640,22 @@ export class MusicIndexingService {
-   determineDiscNumber(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): number {
-     const fromEmbeddedMetadata = embeddedMetadata.find((metadata) => metadata?.metaKey === 'disk' || metadata?.metaKey === 'disc')
- 
--    // FIXME the entity transformer should be doing this
--    if (fromEmbeddedMetadata.metadataType === 'object') {
-+    if (fromEmbeddedMetadata?.metadataType === 'object') {
-+      let parsed: { no?: number } | null = null
-       try {
--        const parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
--        if (parsed?.no) {
--          return parsed.no
--        }
--      } catch (error) { /* noop */ }
-+        parsed = JSON.parse(fromEmbeddedMetadata.metaValue)
-+      } catch {
-+        /* not valid JSON */
-+      }
-+      if (parsed?.no != null) {
-+        return parsed.no
-+      }
-     }
- 
-     const fromFolderStructure = fsMetadata.find((meta) => meta.metaKey === 'discNumber')?.metaValue
- 
-     if (fromFolderStructure) {
--      return fromFolderStructure as unknown as number
-+      return Number(fromFolderStructure)
-     }
- 
-     return 1
++  /**
++   * Updates the entities for a music track that was previously indexed.
++   *
++   * Preserves the existing MusicTrack ID (and therefore all MusicHistory rows
++   * attached to it). Replaces all MusicTrackMetadata rows, then updates the
++   * scalar columns on the existing track.
++   */
++  async updateMusicTrackEntities(file: File, existingTrack: MusicTrack, queryRunner?: QueryRunner): Promise<MusicTrack> {
++    await queryRunner.manager.delete(MusicTrackMetadata, { track: { id: existingTrack.id } })
++
++    const embeddedMetadata = await this.saveEmbeddedMetadata(file, existingTrack, queryRunner)
++    await this.saveFileStatMetadata(file, existingTrack, queryRunner)
++    const folderStructureMetadata = await this.saveFolderStructureMetadata(file, existingTrack, queryRunner)
++    const artists = await this.maybeCreateArtists(embeddedMetadata, folderStructureMetadata, queryRunner)
++    const genres = await this.maybeCreateGenres(embeddedMetadata, queryRunner)
++    const release = await this.maybeCreateRelease(
++      embeddedMetadata,
++      folderStructureMetadata,
++      artists?.[0],
++      artists,
++      genres,
++      queryRunner,
++    )
++    const trackNumber = this.determineTrackNumber(embeddedMetadata, folderStructureMetadata)
++    const discNumber = this.determineDiscNumber(embeddedMetadata, folderStructureMetadata)
++
++    const trackTitle = (
++      embeddedMetadata.find((meta) => meta.metaKey === 'title')?.metaValue
++      || folderStructureMetadata.find((meta) => meta.metaKey === 'trackName')?.metaValue
++      || IndexingFallbacks.UNKNOWN_TRACK
++    )
++
++    await queryRunner.manager.save(MusicTrack, {
++      id: existingTrack.id,
++      title: trackTitle as string,
++      sortTitle: sortableString(trackTitle),
++      artists: artists,
++      release: release,
++      trackNumber: trackNumber,
++      discNumber: discNumber,
++      duration: Number(embeddedMetadata.find((meta) => meta.metaKey === 'duration')?.metaValue) || null,
++      bitrate: Number(embeddedMetadata.find((meta) => meta.metaKey === 'bitrate')?.metaValue) || null,
++    })
++
++    const musicTrack = await this.musicTrackRepository.findOne({
++      where: {
++        musicTrackId: existingTrack.musicTrackId,
++      },
++      relations: {
++        artists: true,
++        release: true,
++      },
++    })
++
++    this.eventService.emitPrivate(IndexingEvents.MUSIC_TRACK_UPDATED, musicTrack as unknown as Record<string, unknown>)
++
++    return musicTrack
++  }
++
+   /**
+    * Indexes a music track.
+    */

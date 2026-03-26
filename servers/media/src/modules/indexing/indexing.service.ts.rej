@@ -1,25 +1,85 @@
 diff a/servers/media/src/modules/indexing/indexing.service.ts b/servers/media/src/modules/indexing/indexing.service.ts	(rejected hunks)
-@@ -219,7 +219,8 @@ export class IndexingService {
+@@ -696,15 +696,76 @@ export class IndexingService {
+ 
    /**
-    * Returns all indexing runs in order from newest to oldest.
+    * Handles updating the entities of a file that was previously indexed.
+-   * 
+-   * TODO
     */
--  async getRuns(pagination: Pagination, _includeEmptyRuns = true): Promise<[Run[], number]> {
-+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-+  async getRuns(pagination: Pagination, includeEmptyRuns = true): Promise<[Run[], number]> {
-     const { take, skip } = pagination
-     const runs = await this.dataSource
-       .getRepository(Run)
-@@ -686,12 +687,11 @@ export class IndexingService {
-   /**
-    * Handles skipping a file.
-    */
--  private async skipFile(absolutePath: string, mediaType: MediaType): Promise<void> {
-+  private async skipFile(_absolutePath: string, mediaType: MediaType): Promise<void> {
-     this.currentRun[mediaType].skipped++
-     this.eventService.emitPrivate(IndexingEvents.FILE_SKIPPED, {
-       mediaType,
-     })
+   private async updateFile(absolutePath: string, mediaType: MediaType): Promise<void> {
+-    this.currentRun[mediaType].indexed++
+-    this.eventService.emitPrivate(IndexingEvents.FILE_UPDATED, {
+-      mediaType,
+-    })
 -    return
++    const relativePath = makeMediaFilePathRelative(absolutePath)
++
++    let size: number
++    let mtime: Date
++
++    try {
++      const stats = fs.statSync(absolutePath)
++      size = stats?.size || 0
++      mtime = stats?.mtime || null
++    } catch (error) {
++      Logger.error(`Error reading file stats for ${absolutePath}. ${error?.message}`, 'Indexing')
++    }
++
++    const queryRunner = this.dataSource.createQueryRunner()
++    await queryRunner.connect()
++    await queryRunner.startTransaction()
++
++    try {
++      const file = await queryRunner.manager.findOne(File, {
++        where: { relativePath },
++        relations: { musicTrack: true, photo: true },
++      })
++
++      await queryRunner.manager.save(File, {
++        id: file.id,
++        size,
++        mtime,
++        lastSeen: new Date(),
++      })
++
++      switch (mediaType) {
++        case MediaType.PHOTOS:
++          await this.photoIndexingService.updatePhotoEntities(file, file.photo, queryRunner)
++          log(LogModule.INDEXING, LogLevel.DEBUG, `Updated file: ${relativePath}`)
++          break
++
++        case MediaType.MUSIC:
++          await this.musicIndexingService.updateMusicTrackEntities(file, file.musicTrack[0], queryRunner)
++          log(LogModule.INDEXING, LogLevel.DEBUG, `Updated file: ${relativePath}`)
++          break
++
++        case MediaType.MOVIES:
++        case MediaType.TV:
++          log(LogModule.INDEXING, LogLevel.DEBUG, `Cannot update this cinema file yet: ${relativePath}`)
++          break
++
++        default:
++          throw new Error('Unsupported file type at update time')
++      }
++
++      await queryRunner.commitTransaction()
++
++      this.currentRun[mediaType].indexed++
++
++      this.eventService.emitPrivate(IndexingEvents.FILE_UPDATED, {
++        mediaType,
++      })
++    } catch (error) {
++      Logger.error(`Could not update ${relativePath} because of an error: ${error?.message}`, 'Indexing')
++      Logger.error(error?.stack, 'Indexing')
++      await queryRunner.rollbackTransaction()
++      this.currentRun[mediaType].errored++
++      this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
++        mediaType,
++      })
++    } finally {
++      await queryRunner.release()
++    }
    }
  
    /**
