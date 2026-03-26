@@ -1,0 +1,15 @@
+diff a/servers/media/src/modules/indexing/entities/file.entity.ts b/servers/media/src/modules/indexing/entities/file.entity.ts	(rejected hunks)
+@@ -48,11 +48,11 @@ export class File extends BaseEntity {
+   jobTasks: JobTask[]
+ 
+   // From the file system root
+-  @Column({ unique: true })
++  @Column()
+   absolutePath: string
+ 
+   // Relative to the media directory that the user supplies
+-  @Column({ unique: true })
++  @Column()
+   relativePath: string
+ 
+   @Column({ nullable: true })
