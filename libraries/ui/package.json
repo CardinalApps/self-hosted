@@ -10,7 +10,7 @@
     "dev": "storybook dev -p 3099 --no-open",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "build": "storybook build",
+    "build": "mkdir -p storybook-static && storybook build",
     "serve": "serve ./storybook-static"
   },
   "dependencies": {
