@@ -1,0 +1,13 @@
+diff a/CLAUDE.md b/CLAUDE.md	(rejected hunks)
+@@ -1,3 +1,9 @@
+-# Git Practices
++# Summary
+ 
+-@docs/git.md
++This is a repository for media streaming software. It is a pnpm monorepo with a workspace that includes many frontend packages and backend packages.
++
++The frontend exists in `/apps`, it's made with React and Redux, and it imports code from `/libraries`. The backend lives in `/servers`, it's made with Node.js (using Nest.js or Express.js) and also imports code from `/libraries`. Code sharing is enouraged (but not excessively) since everything is written in TypeScript.
++
++# Commits
++
++Keep your commit messages short and to the point.
