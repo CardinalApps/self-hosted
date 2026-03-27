@@ -115,139 +115,129 @@ export class ScannerService {
    * Starts a new scan of the music directory. Returns true if the scan was
    * started, otherwise false.
    */
-  scanMusic(
+  async scanMusic(
     onFileFound: (file, type: MediaType) => void,
     abortController: AbortController,
   ): Promise<boolean> {
-    // FIXME
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
-      const mediaDirs = getMediaDirs()
-      const mediaDirPaths = []
+    const mediaDirs = getMediaDirs()
+    const mediaDirPaths = []
 
-      mediaDirPaths.push(`${mediaDirs.music}/**/*.{${Object.values(SupportedMusicFileExtensions).join()}}`)
+    mediaDirPaths.push(`${mediaDirs.music}/**/*.{${Object.values(SupportedMusicFileExtensions).join()}}`)
 
-      Object.keys(mediaDirs).forEach((type) => {
-        if (mediaDirs[type]) {
-          Logger.log(`Scanning for ${type} in ${mediaDirs[type]}`, 'Indexing')
-        }
-      })
-
-      const timeoutSeconds = envVar('INDEXING_SCAN_TIMEOUT', 120)
-      const cancelMusicScanTimeout = happensInXSeconds(timeoutSeconds, () => {
-        Logger.error(`Timed out when scanning for music. ${helpCode('0100')}`)
-        abortController.abort()
-        resolve(true)
-      })
-
-      log(LogModule.INDEXING, LogLevel.DEBUG, `Starting scan for music with a ${timeoutSeconds} second timeout`)
-
-      try {
-        const glob = globStream(mediaDirPaths, {
-          stat: true,
-          withFileTypes: true,
-          nocase: true,
-          signal: abortController.signal,
-          ignore: {
-            ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
-          },
-          follow: false,
-        })
-
-        for await (const found of glob) {
-          // Cancel the timeout when we find the first file
-          cancelMusicScanTimeout()
-
-          const file = found.fullpath()
-          this.scanResults.foundMusic.push(file)
-          onFileFound(file, MediaType.MUSIC)
-        }
-      } catch (error) {
-        if (error?.message === 'stream destroyed') {
-          Logger.warn('Indexing was paused during the initial scan. The music scan in progress has been discarded, and a new scan will begin when indexing is resumed.', 'Indexing')
-        } else {
-          Logger.error(error, 'Indexing')
-        }
+    Object.keys(mediaDirs).forEach((type) => {
+      if (mediaDirs[type]) {
+        Logger.log(`Scanning for ${type} in ${mediaDirs[type]}`, 'Indexing')
       }
-
-      resolve(true)
     })
+
+    const timeoutSeconds = envVar('INDEXING_SCAN_TIMEOUT', 120)
+    const cancelMusicScanTimeout = happensInXSeconds(timeoutSeconds, () => {
+      Logger.error(`Timed out when scanning for music. ${helpCode('0100')}`)
+      abortController.abort()
+    })
+
+    log(LogModule.INDEXING, LogLevel.DEBUG, `Starting scan for music with a ${timeoutSeconds} second timeout`)
+
+    try {
+      const glob = globStream(mediaDirPaths, {
+        stat: true,
+        withFileTypes: true,
+        nocase: true,
+        signal: abortController.signal,
+        ignore: {
+          ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
+        },
+        follow: false,
+      })
+
+      for await (const found of glob) {
+        // Cancel the timeout when we find the first file
+        cancelMusicScanTimeout()
+
+        const file = found.fullpath()
+        this.scanResults.foundMusic.push(file)
+        onFileFound(file, MediaType.MUSIC)
+      }
+    } catch (error) {
+      if (error?.message === 'stream destroyed') {
+        Logger.warn('Indexing was paused during the initial scan. The music scan in progress has been discarded, and a new scan will begin when indexing is resumed.', 'Indexing')
+      } else {
+        Logger.error(error, 'Indexing')
+      }
+    }
+
+    return true
   }
 
   /**
    * Starts a new scan of the photos directory. Returns true if the scan was
    * started, otherwise false.
    */
-  scanPhotos(
+  async scanPhotos(
     onFileFound: (file, type: MediaType) => void,
     abortController: AbortController,
   ): Promise<boolean> {
-    // FIXME
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
-      const mediaDirs = getMediaDirs()
-      const mediaDirPaths = []
+    const mediaDirs = getMediaDirs()
+    const mediaDirPaths = []
 
-      // We need to know all the Google Photos albums on the disk before we start
-      this.googlePhotosAlbumsOnDisk = await this.photoService.readGooglePhotosAlbumsOnDisk(mediaDirs.photos)
+    // We need to know all the Google Photos albums on the disk before we start
+    this.googlePhotosAlbumsOnDisk = await this.photoService.readGooglePhotosAlbumsOnDisk(mediaDirs.photos)
 
-      mediaDirPaths.push(`${mediaDirs.photos}/**/*.{${Object.values(SupportedPhotoFileExtensions).join()}}`)
+    mediaDirPaths.push(`${mediaDirs.photos}/**/*.{${Object.values(SupportedPhotoFileExtensions).join()}}`)
 
-      Object.keys(mediaDirs).forEach((type) => {
-        if (mediaDirs[type]) {
-          Logger.log(`Scanning for ${type} in ${mediaDirs[type]}`, 'Indexing')
-        }
-      })
-
-      const timeoutSeconds = envVar('INDEXING_SCAN_TIMEOUT', 120)
-      const cancelPhotosScanTimeout = happensInXSeconds(timeoutSeconds, () => {
-        Logger.error(`Timed out when scanning for photos. ${helpCode('0100')}`)
-        abortController.abort()
-        resolve(true)
-      })
-
-      log(LogModule.INDEXING, LogLevel.DEBUG, `Starting scan for photos with a ${timeoutSeconds} second timeout`)
-
-      try {
-        const glob = globStream(mediaDirPaths, {
-          stat: true,
-          withFileTypes: true,
-          nocase: true,
-          signal: abortController.signal,
-          ignore: {
-            ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
-          },
-          follow: false,
-        })
-
-        for await (const found of glob) {
-          // Cancel the timeout when we find the first file
-          cancelPhotosScanTimeout()
-
-          const file = found.fullpath()
-          if (!this.suspectedDuplicates.includes(file)) {
-            this.scanResults.foundPhotos.push(file)
-            onFileFound(file, MediaType.PHOTOS)
-          }
-        }
-      } catch (error) {
-        if (error?.message === 'stream destroyed') {
-          Logger.warn('Indexing was paused during the initial scan. The photos scan in progress has been discarded, and a new scan will begin when indexing is resumed.', 'Indexing')
-        } else {
-          Logger.error(error, 'Indexing')
-        }
+    Object.keys(mediaDirs).forEach((type) => {
+      if (mediaDirs[type]) {
+        Logger.log(`Scanning for ${type} in ${mediaDirs[type]}`, 'Indexing')
       }
-
-      if (this.suspectedDuplicates.length) {
-        const dedupedSuspected = [...new Set(this.suspectedDuplicates)]
-        log(LogModule.INDEXING, LogLevel.INFO, `Skipping ${dedupedSuspected.length} duplicate Google Photos`)
-      }
-
-      this.googlePhotosAlbumsOnDisk = []
-      this.suspectedDuplicates = []
-
-      resolve(true)
     })
+
+    const timeoutSeconds = envVar('INDEXING_SCAN_TIMEOUT', 120)
+    const cancelPhotosScanTimeout = happensInXSeconds(timeoutSeconds, () => {
+      Logger.error(`Timed out when scanning for photos. ${helpCode('0100')}`)
+      abortController.abort()
+    })
+
+    log(LogModule.INDEXING, LogLevel.DEBUG, `Starting scan for photos with a ${timeoutSeconds} second timeout`)
+
+    try {
+      const glob = globStream(mediaDirPaths, {
+        stat: true,
+        withFileTypes: true,
+        nocase: true,
+        signal: abortController.signal,
+        ignore: {
+          ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
+        },
+        follow: false,
+      })
+
+      for await (const found of glob) {
+        // Cancel the timeout when we find the first file
+        cancelPhotosScanTimeout()
+
+        const file = found.fullpath()
+        if (!this.suspectedDuplicates.includes(file)) {
+          this.scanResults.foundPhotos.push(file)
+          onFileFound(file, MediaType.PHOTOS)
+        }
+      }
+    } catch (error) {
+      if (error?.message === 'stream destroyed') {
+        Logger.warn('Indexing was paused during the initial scan. The photos scan in progress has been discarded, and a new scan will begin when indexing is resumed.', 'Indexing')
+      } else {
+        Logger.error(error, 'Indexing')
+      }
+    }
+
+    if (this.suspectedDuplicates.length) {
+      const dedupedSuspected = [...new Set(this.suspectedDuplicates)]
+      log(LogModule.INDEXING, LogLevel.INFO, `Skipping ${dedupedSuspected.length} duplicate Google Photos`)
+    }
+
+    this.googlePhotosAlbumsOnDisk = []
+    this.suspectedDuplicates = []
+
+    return true
   }
 
   /**

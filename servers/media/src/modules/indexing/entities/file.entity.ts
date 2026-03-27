@@ -48,11 +48,11 @@ export class File extends BaseEntity {
   jobTasks: JobTask[]
 
   // From the file system root
-  @Column({ unique: true })
+  @Column()
   absolutePath: string
 
   // Relative to the media directory that the user supplies
-  @Column({ unique: true })
+  @Column()
   relativePath: string
 
   @Column({ nullable: true })
@@ -70,6 +70,10 @@ export class File extends BaseEntity {
 
   @Column()
   size: number
+
+  @Column({ nullable: true })
+  @IsOptional()
+  mtime?: Date
 
   @Column()
   lastSeen: Date

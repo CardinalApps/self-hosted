@@ -13,6 +13,7 @@ bin
 .vercel
 .turbo
 .next
+.idea
 
 storybook-static
 
@@ -22,3 +23,5 @@ servers/media/public/music
 servers/media/public/photos
 
 .DS_Store
+
+.claude

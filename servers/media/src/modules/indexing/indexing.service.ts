@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
-import { DataSource, Repository, Brackets } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 import { v4 as uuid } from 'uuid'
 import * as fileType from 'file-type'
 
@@ -19,7 +19,7 @@ import {
 } from './events'
 
 import { RunStates, IndexingStates, FileOnDiskIndexingOperation } from './enums'
-import { InMemoryRun, FileToIndexInQueue, NewRunOptions, InMemoryRunPublic } from './types'
+import { InMemoryRun, InMemoryRunMediaCounts, FileToIndexInQueue, NewRunOptions, InMemoryRunPublic } from './types'
 
 import { ScannerService, ScanResults } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
@@ -132,39 +132,16 @@ export class IndexingService {
    * indexed = sum of added, skipped, errored
    */
   newInMemoryRun(id, options: NewRunOptions) {
+    const mediaCounts = () => ({ found: [], indexed: 0, added: 0, skipped: 0, errored: 0 })
     return {
       runId: id,
       user: options.user,
       startedAt: Date.now(),
       options,
-      music: {
-        found: [],
-        indexed: [],
-        added: [],
-        skipped: [],
-        errored: [],
-      },
-      photos: {
-        found: [],
-        indexed: [],
-        added: [],
-        skipped: [],
-        errored: [],
-      },
-      movies: {
-        found: [],
-        indexed: [],
-        added: [],
-        skipped: [],
-        errored: [],
-      },
-      tv: {
-        found: [],
-        indexed: [],
-        added: [],
-        skipped: [],
-        errored: [],
-      },
+      music: mediaCounts(),
+      photos: mediaCounts(),
+      movies: mediaCounts(),
+      tv: mediaCounts(),
     } as InMemoryRun
   }
 
@@ -190,17 +167,16 @@ export class IndexingService {
     if (!this.currentRun) {
       return null
     }
-    const sums = JSON.parse(JSON.stringify(this.currentRun))
-    for (const [key, value] of Object.entries(sums)) {
-      if (typeof value === 'object') {
-        for (const [subkey, subvalue] of Object.entries(value)) {
-          if (Array.isArray(subvalue)) {
-            sums[key][subkey] = subvalue.length
-          }
-        }
-      }
+    const toPublic = ({ found, ...rest }: InMemoryRunMediaCounts) => ({ found: found.length, ...rest })
+    return {
+      runId: this.currentRun.runId,
+      startedAt: this.currentRun.startedAt,
+      options: this.currentRun.options,
+      music: toPublic(this.currentRun.music),
+      photos: toPublic(this.currentRun.photos),
+      movies: toPublic(this.currentRun.movies),
+      tv: toPublic(this.currentRun.tv),
     }
-    return sums as unknown as InMemoryRunPublic
   }
 
   /**
@@ -245,29 +221,30 @@ export class IndexingService {
    */
   async getRuns(pagination: Pagination, includeEmptyRuns = true): Promise<[Run[], number]> {
     const { take, skip } = pagination
-    const runs = await this.dataSource
+    const qb = this.dataSource
       .getRepository(Run)
       .createQueryBuilder('run')
       .where([
         { status: RunStates.STARTED },
         { status: RunStates.COMPLETED },
       ])
-      .andWhere(
-        new Brackets((qb) => {
-          if (!includeEmptyRuns) {
-            qb.where('run.photosIndexed is not null')
-              .orWhere('run.musicIndexed is not null')
-              .orWhere('run.moviesIndexed is not null')
-              .orWhere('run.tvIndexed is not null')
-          }
-        }),
-      )
+
+    if (!includeEmptyRuns) {
+      qb.andWhere((qb) => {
+        const sub = qb.subQuery()
+          .select('1')
+          .from(File, 'file')
+          .where('file.runId = run.id')
+          .getQuery()
+        return `EXISTS ${sub}`
+      })
+    }
+
+    return qb
       .orderBy('run.createdAt', 'DESC')
       .take(take)
       .skip(skip)
       .getManyAndCount()
-
-    return runs
   }
 
   /**
@@ -430,27 +407,11 @@ export class IndexingService {
    * state and emit the final event.
    */
   private async complete(stoppedByUser = false): Promise<void> {
-    const totalAdded = this.currentRun.music.indexed.length + this.currentRun.photos.indexed.length + this.currentRun.movies.indexed.length + this.currentRun.tv.indexed.length
-    const totalSkipped = this.currentRun.music.skipped.length + this.currentRun.photos.skipped.length + this.currentRun.movies.skipped.length + this.currentRun.tv.skipped.length
-    //const totalFound = this.currentRun.music.found.length + this.currentRun.photos.found.length + this.currentRun.movies.found.length + this.currentRun.tv.found.length
+    const totalAdded = this.currentRun.music.indexed + this.currentRun.photos.indexed + this.currentRun.movies.indexed + this.currentRun.tv.indexed
+    const totalSkipped = this.currentRun.music.skipped + this.currentRun.photos.skipped + this.currentRun.movies.skipped + this.currentRun.tv.skipped
 
     Logger.log(`Indexed ${totalAdded} files this run`, 'Indexing')
     Logger.log(`Skipped ${totalSkipped} files this run; files are skipped when they have not changed since the last run`, 'Indexing')
-
-    const added: Partial<Run> = {
-      musicIndexed: this.currentRun.music.indexed.length
-        ? this.currentRun.music.indexed
-        : null,
-      photosIndexed: this.currentRun.photos.indexed.length
-        ? this.currentRun.photos.indexed
-        : null,
-      moviesIndexed: this.currentRun.movies.indexed.length
-        ? this.currentRun.movies.indexed
-        : null,
-      tvIndexed: this.currentRun.tv.indexed.length
-        ? this.currentRun.tv.indexed
-        : null,
-    }
 
     const endingRunStatus = stoppedByUser
       ? RunStates.STOPPED_BY_USER
@@ -463,10 +424,7 @@ export class IndexingService {
     await this.dataSource
       .createQueryBuilder()
       .update(Run)
-      .set({
-        status: endingRunStatus,
-        ...added,
-      })
+      .set({ status: endingRunStatus })
       .where('runId = :runId', { runId: this.currentRun.runId })
       .execute()
 
@@ -555,13 +513,23 @@ export class IndexingService {
       where: { relativePath },
     })
 
-    // TODO add logic for change detection
-
     if (!indexedReference) {
       return FileOnDiskIndexingOperation.ADD
-    } else {
-      return FileOnDiskIndexingOperation.SKIP
     }
+
+    try {
+      const stats = fs.statSync(absolutePath)
+      const sizeChanged = stats.size !== indexedReference.size
+      const mtimeChanged = indexedReference.mtime == null || stats.mtime.getTime() !== indexedReference.mtime.getTime()
+
+      if (sizeChanged || mtimeChanged) {
+        return FileOnDiskIndexingOperation.UPDATE
+      }
+    } catch (error) {
+      Logger.error(`Could not stat file for change detection: ${absolutePath}`, 'Indexing')
+    }
+
+    return FileOnDiskIndexingOperation.SKIP
   }
 
   /**
@@ -630,6 +598,7 @@ export class IndexingService {
     const extension = absolutePath.split('.').pop().toLowerCase()
     let mimeType
     let size
+    let mtime: Date
 
     try {
       const info = await fileType.fromFile(absolutePath)
@@ -641,8 +610,9 @@ export class IndexingService {
     try {
       const stats = fs.statSync(absolutePath)
       size = stats?.size || 0
+      mtime = stats?.mtime || null
     } catch (error) {
-      Logger.error(`Error parsing mime type. ${error?.message}`, 'Indexing')
+      Logger.error(`Error reading file stats for ${absolutePath}. ${error?.message}`, 'Indexing')
     }
 
     let app
@@ -672,6 +642,7 @@ export class IndexingService {
         mediaType,
         mimeType,
         size,
+        mtime,
         lastSeen: new Date(),
         user: this.currentRun.user,
       } as Partial<File>)
@@ -681,7 +652,7 @@ export class IndexingService {
         case MediaType.PHOTOS:
           await this.photoIndexingService.indexPhotoEntities(file, queryRunner)
           log(LogModule.INDEXING, LogLevel.DEBUG, `Indexed file: ${relativePath}`)
-          if (this.currentRun) this.currentRun[mediaType].added.push(absolutePath) // User may have stopped the run while indexing the photo
+          if (this.currentRun) this.currentRun[mediaType].added++ // User may have stopped the run while indexing the photo
           break
 
         // The file is a music track
@@ -702,7 +673,7 @@ export class IndexingService {
 
       await queryRunner.commitTransaction()
 
-      this.currentRun[mediaType].indexed.push(absolutePath)
+      this.currentRun[mediaType].indexed++
 
       this.eventService.emitPrivate(IndexingEvents.FILE_INDEXED, {
         mediaType,
@@ -711,7 +682,7 @@ export class IndexingService {
       Logger.error(`Could not index ${relativePath} because of an error: ${error?.message}`, 'Indexing')
       Logger.error(error?.stack, 'Indexing')
       await queryRunner.rollbackTransaction()
-      this.currentRun[mediaType].errored.push(absolutePath)
+      this.currentRun[mediaType].errored++
       this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
         mediaType,
       })
@@ -723,25 +694,85 @@ export class IndexingService {
   /**
    * Handles skipping a file.
    */
-  private async skipFile(absolutePath: string, mediaType: MediaType): Promise<void> {
-    this.currentRun[mediaType].skipped.push(absolutePath)
+  private async skipFile(_absolutePath: string, mediaType: MediaType): Promise<void> {
+    this.currentRun[mediaType].skipped++
     this.eventService.emitPrivate(IndexingEvents.FILE_SKIPPED, {
       mediaType,
     })
-    return
   }
 
   /**
    * Handles updating the entities of a file that was previously indexed.
-   * 
-   * TODO
    */
   private async updateFile(absolutePath: string, mediaType: MediaType): Promise<void> {
-    this.currentRun[mediaType].indexed.push(absolutePath)
-    this.eventService.emitPrivate(IndexingEvents.FILE_UPDATED, {
-      mediaType,
-    })
-    return
+    const relativePath = makeMediaFilePathRelative(absolutePath)
+
+    let size: number
+    let mtime: Date
+
+    try {
+      const stats = fs.statSync(absolutePath)
+      size = stats?.size || 0
+      mtime = stats?.mtime || null
+    } catch (error) {
+      Logger.error(`Error reading file stats for ${absolutePath}. ${error?.message}`, 'Indexing')
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    try {
+      const file = await queryRunner.manager.findOne(File, {
+        where: { relativePath },
+        relations: { musicTrack: true, photo: true },
+      })
+
+      await queryRunner.manager.save(File, {
+        id: file.id,
+        size,
+        mtime,
+        lastSeen: new Date(),
+      })
+
+      switch (mediaType) {
+        case MediaType.PHOTOS:
+          await this.photoIndexingService.updatePhotoEntities(file, file.photo, queryRunner)
+          log(LogModule.INDEXING, LogLevel.DEBUG, `Updated file: ${relativePath}`)
+          break
+
+        case MediaType.MUSIC:
+          await this.musicIndexingService.updateMusicTrackEntities(file, file.musicTrack[0], queryRunner)
+          log(LogModule.INDEXING, LogLevel.DEBUG, `Updated file: ${relativePath}`)
+          break
+
+        case MediaType.MOVIES:
+        case MediaType.TV:
+          log(LogModule.INDEXING, LogLevel.DEBUG, `Cannot update this cinema file yet: ${relativePath}`)
+          break
+
+        default:
+          throw new Error('Unsupported file type at update time')
+      }
+
+      await queryRunner.commitTransaction()
+
+      this.currentRun[mediaType].indexed++
+
+      this.eventService.emitPrivate(IndexingEvents.FILE_UPDATED, {
+        mediaType,
+      })
+    } catch (error) {
+      Logger.error(`Could not update ${relativePath} because of an error: ${error?.message}`, 'Indexing')
+      Logger.error(error?.stack, 'Indexing')
+      await queryRunner.rollbackTransaction()
+      this.currentRun[mediaType].errored++
+      this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
+        mediaType,
+      })
+    } finally {
+      await queryRunner.release()
+    }
   }
 
   /**

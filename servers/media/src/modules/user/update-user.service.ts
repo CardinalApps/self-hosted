@@ -68,7 +68,7 @@ export class UpdateUserService {
     const serverOwner = await this.userService.getServerOwner()
 
     // Server owner cannot be disabled by anyone
-    if (updateUserDto?.enabled === false && updatingUser.userId === serverOwner.userId) {
+    if (updateUserDto?.enabled === false && updatingUser.userId === serverOwner?.userId) {
       throw new Error('This user cannot be disabled.')
     }
 

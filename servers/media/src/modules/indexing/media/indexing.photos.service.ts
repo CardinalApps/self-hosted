@@ -1,15 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { Repository, DataSource, QueryRunner } from 'typeorm'
-import { v4 as uuid } from 'uuid'
-
 import { File } from '../entities/file.entity'
 import { Photo } from '../../photo/photo.entity'
 import { PhotoService } from '../../photo/photo.service'
 import { PhotoMetadata } from '../../photo/photo-metadata.entity'
-import { PhotoThumbnail } from '../../photo/photo-thumbnail.entity'
 
-import { ThumbnailService } from '../../thumbnail/thumbnail.service'
 import { EventService } from '../../event/event.service'
 import { IndexingEvents } from '../events'
 
@@ -39,13 +35,60 @@ export class PhotoIndexingService {
     @InjectRepository(File)
     private fileRepository: Repository<File>,
     private readonly photoService: PhotoService,
-    private readonly thumbnailService: ThumbnailService,
     private readonly eventService: EventService,
   ) {}
 
   /**
+   * Updates the entities for a photo that was previously indexed.
+   *
+   * Preserves the existing Photo ID (and therefore all PhotoAlbumEntry rows
+   * attached to it). Replaces all PhotoMetadata rows, then updates the scalar
+   * columns on the existing photo.
+   */
+  async updatePhotoEntities(file: File, existingPhoto: Photo, queryRunner?: QueryRunner): Promise<Photo> {
+    await queryRunner.manager.delete(PhotoMetadata, { photo: { id: existingPhoto.id } })
+
+    const trustedPhotoFileValues = getTrustedValuesFromFileStats(file.absolutePath)
+    const photoMetadataEntities = await this.createExifMetadata(file, existingPhoto, queryRunner)
+    const googlePhotosMetadata = await this.createGooglePhotosMetadata(file, existingPhoto, queryRunner)
+
+    await queryRunner.manager.save(Photo, {
+      id: existingPhoto.id,
+      takenAt: this.createTrustedValueFromMetadata('takenAt', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata),
+      modifiedAt: this.createTrustedValueFromMetadata('modifiedAt', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata),
+      takenOnDay: this.createTrustedValueFromMetadata('takenOnDay', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      timestamp: this.createTrustedValueFromMetadata('timestamp', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as number,
+      width: this.createTrustedValueFromMetadata('width', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as number,
+      height: this.createTrustedValueFromMetadata('height', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as number,
+      orientation: this.createTrustedValueFromMetadata('orientation', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      deviceMake: this.createTrustedValueFromMetadata('deviceMake', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      deviceModel: this.createTrustedValueFromMetadata('deviceModel', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      gpsLat: this.createTrustedValueFromMetadata('gpsLat', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as number,
+      gpsLng: this.createTrustedValueFromMetadata('gpsLng', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as number,
+      gpsLatRef: this.createTrustedValueFromMetadata('gpsLatRef', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      gpsLngRef: this.createTrustedValueFromMetadata('gpsLngRef', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      gpsAltitude: this.createTrustedValueFromMetadata('gpsAltitude', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      gpsDate: this.createTrustedValueFromMetadata('gpsDate', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+      gpsTime: this.createTrustedValueFromMetadata('gpsTime', file.absolutePath, photoMetadataEntities, trustedPhotoFileValues, googlePhotosMetadata) as string,
+    })
+
+    const photo = await this.photoRepository.findOne({
+      where: {
+        photoId: existingPhoto.photoId,
+      },
+      relations: {
+        thumbnail: true,
+      },
+    })
+
+    this.eventService.emitPrivate(IndexingEvents.PHOTO_UPDATED, photo as unknown as Record<string, unknown>)
+
+    return photo
+  }
+
+  /**
    * Indexes a photo.
-   * 
+   *
    * This will read a photo file on the disk, create database entities, and
    * create thumbnails of the photo.
    */
@@ -301,56 +344,6 @@ export class PhotoIndexingService {
       Logger.error(error)
       return []
     }
-  }
-
-  /**
-   * Creates thumbnail files and the database entities for a photo.
-   * 
-   * Creating thumbnails ia a slow operation, so for the initial indexing we only create what we need immediately.
-   * 
-   * @deprecated - This has been refactored into the photo_thumbnails job.
-   */
-  private async createAndIndexThumbnails(
-    file: File,
-    photo: Photo,
-    metadata: PhotoMetadata[],
-    queryRunner?: QueryRunner,
-  ): Promise<PhotoThumbnail[] | null> {
-    const thumbnails = await this.thumbnailService.createThumbnails({
-      absoluteFilePath: file.absolutePath,
-      sizes: {
-        small_nocrop: [null, 160],
-        medium_nocrop: [null, 500],
-      },
-    })
-
-    // If any of the thumbnails failed to be created properly, index the photo
-    // anyway and the client apps will just have to handle that situation.
-    if (thumbnails.status !== 'success' || !Object.keys(thumbnails?.files)?.length) {
-      Logger.warn(`Couldn't create one or more thumbnails for this image: ${file.absolutePath}`)
-    }
-
-    const toCreate = []
-
-    for (const [size, thumb] of Object.entries(thumbnails.files)) {
-      if (thumb && thumb?.absoluteFilePath) {
-        toCreate.push({
-          absolutePath: thumb?.absoluteFilePath,
-          relativeSrc: thumb?.relativeSrc,
-          size: size,
-          bytes: thumb?.size,
-          format: thumb?.format,
-          width: thumb?.width,
-          height: thumb?.height,
-          photo: photo,
-          thumbnailId: uuid(),
-        })
-      }
-    }
-
-    const entities = await this.photoService.createPhotoThumbnails(toCreate, queryRunner)
-
-    return entities
   }
 
   /**

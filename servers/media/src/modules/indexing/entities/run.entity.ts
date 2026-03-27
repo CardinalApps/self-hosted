@@ -19,16 +19,4 @@ export class Run extends BaseEntity {
 
   @Column()
   status: string
-
-  @Column({ nullable: true, type: 'json' })
-  photosIndexed?: unknown[] | Record<string, unknown>
-
-  @Column({ nullable: true, type: 'json' })
-  musicIndexed?: unknown[] | Record<string, unknown>
-
-  @Column({ nullable: true, type: 'json' })
-  moviesIndexed?: unknown[] | Record<string, unknown>
-
-  @Column({ nullable: true, type: 'json' })
-  tvIndexed?: unknown[] | Record<string, unknown>
 }

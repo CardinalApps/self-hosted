@@ -9,6 +9,14 @@ export type NewRunOptions = {
   }
 }
 
+export type InMemoryRunMediaCounts = {
+  found: string[], // kept as array to drive the scanner queue
+  indexed: number,
+  added: number,
+  skipped: number,
+  errored: number,
+}
+
 /**
  * The shape of a run while actively running and using in-memory storage.
  */
@@ -17,38 +25,14 @@ export type InMemoryRun = {
   user: Partial<User>,
   startedAt: number,
   options: NewRunOptions,
-  music: {
-    found: string[],
-    indexed: string[],
-    added: string[],
-    skipped: string[],
-    errored: string[],
-  },
-  photos: {
-    found: string[],
-    indexed: string[],
-    added: string[],
-    skipped: string[],
-    errored: string[],
-  },
-  movies: {
-    found: string[],
-    indexed: string[],
-    added: string[],
-    skipped: string[],
-    errored: string[],
-  },
-  tv: {
-    found: string[],
-    indexed: string[],
-    added: string[],
-    skipped: string[],
-    errored: string[],
-  },
+  music: InMemoryRunMediaCounts,
+  photos: InMemoryRunMediaCounts,
+  movies: InMemoryRunMediaCounts,
+  tv: InMemoryRunMediaCounts,
 }
 
 /**
- * The shape of a run while actively running and using in-memory storage.
+ * The public shape of an active run, as returned to clients.
  */
 export type InMemoryRunPublic = {
   runId: string,

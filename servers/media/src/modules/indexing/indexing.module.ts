@@ -18,7 +18,6 @@ import { MusicReleaseModule } from '../music-release/music-release.module'
 import { MusicArtistModule } from '../music-artist/music-artist.module'
 import { MusicGenreModule } from '../music-genres/music-genre.module'
 import { PhotoModule } from '../photo/photo.module'
-import { ThumbnailModule } from '../thumbnail/thumbnail.module'
 import { UserModule } from '../user/user.module'
 
 @Module({
@@ -30,7 +29,6 @@ import { UserModule } from '../user/user.module'
     MusicArtistModule,
     MusicGenreModule,
     PhotoModule,
-    ThumbnailModule,
     UserModule,
   ],
   exports: [
