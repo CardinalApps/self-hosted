@@ -69,6 +69,7 @@ export class MusicTrackController {
   @Get('/music/stream/:id')
   @StandardEndpoint({
     summary: 'Stream a music track.',
+    description: 'Stream a music track directly to your browser without any transcoding.',
     capabilities: ['MusicTracks.Play'],
   })
   async streamMusicTrack(

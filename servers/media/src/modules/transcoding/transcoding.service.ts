@@ -15,10 +15,15 @@ export class TranscodingService {
     const output = new PassThrough()
 
     const ffmpeg = spawn(ffmpegPath, [
-      '-i', inputPath,
-      '-c:a', 'libmp3lame',
-      '-b:a', '320k',
-      '-f', 'mp3',
+      '-i',
+      inputPath,
+      '-vn',
+      '-c:a',
+      'libmp3lame',
+      '-b:a',
+      '320k',
+      '-f',
+      'mp3',
       'pipe:1',
     ])
 
