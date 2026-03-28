@@ -32,3 +32,7 @@ To support this architecture, Cardinal offers two identity providers:
 
 - When working on Cardinal Media Server, you must support both SQLite and PostreSQL. Historically, to support both databases, the application layer has simply gone with the SQLite way of doing things, since PostgreSQL will support it. However that means not using JSONB or any of PostgreSQL's advanced features. That is why you will fine stringified arrays and objects in the database in some places. You are encouraged to suggest ways to fix and improve this for existing code and for future code. This typically means writing two functions: one for SQLite and one for PostgreSQL, but you can suggest it if you deem it worth the extra maintenance burden of two functions.
 - All other applications support just one type of database (either PostgreSQL or MongoDB). Check the package's dependencies to confirm.
+
+# Documentation
+
+Many of the features offered by Cardinal Media Server are documented in the @apps/help-web app. You should be familiar with the topics that are covered on the help site, and you should be aware when changes you make elsewhere require updating the help site. A common example is with environment vaiables in the Media Server, if you add or update one, it must be documented in the help app.
