@@ -1,86 +1,9 @@
 diff a/servers/media/src/modules/music-track/music-track.controller.ts b/servers/media/src/modules/music-track/music-track.controller.ts	(rejected hunks)
-@@ -3,7 +3,6 @@ import {
-   Controller,
-   Get,
-   Query,
--  UseGuards,
-   NotFoundException,
-   Param,
-   Res,
-@@ -13,15 +12,9 @@ import {
- } from '@nestjs/common'
- import {
-   ApiTags,
--  ApiSecurity,
--  ApiOperation,
--  ApiOkResponse,
- } from '@nestjs/swagger'
- import type { Response } from 'express'
- 
--import { AuthGuard } from '../../guards/auth.guard'
--import { ApiSecurityTypes } from '../../guards/types'
--
- import { MusicTrack } from './music-track.entity'
- import { MusicTrackService } from './music-track.service'
- 
-@@ -30,8 +23,10 @@ import { StreamMusicTrackDto } from './dtos/StreamMusicTrack.dto'
- import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
- 
- import { EventService } from '../event/event.service'
-+import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
- 
- @Controller()
-+@ApiTags('Music')
- export class MusicTrackController {
-   constructor(
-     private readonly musicTrackService: MusicTrackService,
-@@ -42,11 +37,10 @@ export class MusicTrackController {
-    * Get a music track.
-    */
-   @Get('/music/track/:id')
--  @ApiTags('Music')
--  @ApiOperation({ summary: 'Get a single music track.' })
--  @ApiOkResponse({ status: 200 })
--  @UseGuards(AuthGuard)
--  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-+  @StandardEndpoint({
-+    summary: 'Get a single music track.',
-+    capabilities: ['MusicTracks.Read'],
-+  })
-   async getMusicTrack(@Param() { id }: GetMusicTrackDto): Promise<MusicTrack> {
-     const musicTrack = await this.musicTrackService.get(id, { artists: true, release: { thumbnails: true } })
- 
-@@ -61,14 +55,10 @@ export class MusicTrackController {
-    * Get the users tracks.
-    */
-   @Get('/music/tracks')
--  @ApiTags('Music')
--  @ApiOperation({ summary: 'Query music tracks.' })
--  @ApiOkResponse({
--    status: 200,
--    description: 'Returns an array where the first item is the paginated set of results, and the second item is the total number of results for this query.',
-+  @StandardEndpoint({
-+    summary: 'Query music tracks.',
-+    capabilities: ['MusicTracks.Read'],
-   })
--  @UseGuards(AuthGuard)
--  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-   async getTracks(@Query() query: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
-     return await this.musicTrackService.query(query)
-   }
-@@ -77,11 +67,10 @@ export class MusicTrackController {
-    * Stream a music track.
-    */
+@@ -69,6 +69,7 @@ export class MusicTrackController {
    @Get('/music/stream/:id')
--  @ApiTags('Music')
--  @ApiOperation({ summary: 'Stream a music track.' })
--  @ApiOkResponse({ status: 200 })
--  @UseGuards(AuthGuard)
--  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-+  @StandardEndpoint({
-+    summary: 'Stream a music track.',
-+    capabilities: ['MusicTracks.Play'],
-+  })
+   @StandardEndpoint({
+     summary: 'Stream a music track.',
++    description: 'Stream a music track directly to your browser without any transcoding.',
+     capabilities: ['MusicTracks.Play'],
+   })
    async streamMusicTrack(
-     @Param() { id }: StreamMusicTrackDto,
-     @Req() req: Response,

@@ -24,9 +24,10 @@ export class TranscodingController {
     private readonly musicTrackService: MusicTrackService,
   ) {}
 
-  @Get('/music/transcode/:id')
+  @Get('/transcode/music/:id')
   @StandardEndpoint({
-    summary: 'Transcode and stream a music track to MP3.',
+    summary: 'Transcode and stream a music track.',
+    description: 'Your music file will be transcoded to MP3 @ 320kbps.',
     capabilities: ['MusicTracks.Play'],
   })
   async transcodeMusicTrack(
@@ -43,7 +44,7 @@ export class TranscodingController {
 
     res.set({
       'Content-Type': 'audio/mpeg',
-      'Transfer-Encoding': 'chunked',
+      'Accept-Ranges': 'none',
     })
 
     return new StreamableFile(stream)
