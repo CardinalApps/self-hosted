@@ -1,10 +1,10 @@
 diff a/libraries/ui/src/lib/homeserver/homeServerAPI.ts b/libraries/ui/src/lib/homeserver/homeServerAPI.ts	(rejected hunks)
-@@ -7,6 +7,8 @@ export type HomeServerAPIMiddleware = {
-   [name: string]: (res: string, endpoint: string, method: Method, body: Record<string, unknown>) => void,
- }
- 
-+export const CARDINAL_APP_HEADER = 'cardinal-app'
-+
- /**
-  * Holds all registered middleware functions.
-  */
+@@ -110,7 +110,7 @@ const homeServerAPI = <T>(
+     body: body,
+     // TODO disable caching of the 410 Gone response server-side (it can be
+     // returned on any endpoint)
+-    cache: 'no-cache',
++    //cache: 'no-cache',
+   })
+     .then((res) => {
+       triggerMiddleware(res, endpoint, method, body)
