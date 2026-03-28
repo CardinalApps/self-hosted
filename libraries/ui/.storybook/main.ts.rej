@@ -1,0 +1,14 @@
+diff a/libraries/ui/.storybook/main.ts b/libraries/ui/.storybook/main.ts	(rejected hunks)
+@@ -24,6 +24,12 @@ const config: StorybookConfig = {
+   docs: {
+     autodocs: false,
+   },
++  async viteFinal(config) {
++    return {
++      ...config,
++      publicDir: false,
++    }
++  },
+ }
+ 
+ export default config
