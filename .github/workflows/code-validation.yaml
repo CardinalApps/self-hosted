@@ -2,7 +2,17 @@ name: 🛁 Code Validation
 
 on:
   push:
+    paths:
+      - 'apps/**'
+      - 'config/**'
+      - 'libraries/**'
+      - 'servers/**'
   pull_request:
+    paths:
+      - 'apps/**'
+      - 'config/**'
+      - 'libraries/**'
+      - 'servers/**'
 
 jobs:
   discover:
