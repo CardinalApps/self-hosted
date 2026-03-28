@@ -18,8 +18,7 @@ import { toastActions } from '../../store/slices/toast'
 import i18n from './i18n'
 
 const howls = {}
-//const streamUrl = (id) => `${HOME_SERVER_HOST}/api/v1/music/stream/${id}`
-const streamUrl = (id) => `${HOME_SERVER_HOST}/api/v1/transcode/music/${id}`
+const streamUrl = (id) => `${HOME_SERVER_HOST}/api/v1/music/stream/${id}?transcode&bitrate=320`
 
 export const getHowl = (playerId) => howls?.[playerId]
 export const hasHowl = (playerId) => !!howls?.[playerId]
