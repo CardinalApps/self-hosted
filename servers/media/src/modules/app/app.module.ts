@@ -30,6 +30,7 @@ import { MusicHistoryModule } from '../music-history/music-history.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
+import { TranscodingModule } from '../transcoding/transcoding.module'
 
 import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
 import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
@@ -139,6 +140,7 @@ const resolvePostgresHost = () => {
     InvitationModule,
     PlaybackQueueModule,
     ClaimModule,
+    TranscodingModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', 'public'),
