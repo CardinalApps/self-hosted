@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import {
   Controller,
   Get,
+  Header,
   Query,
   NotFoundException,
   Param,
@@ -72,6 +73,7 @@ export class MusicReleaseController {
    * Returns the blob data of a release cover. Supports numeric row ID and musicReleaseId col.
    */
   @Get('/music/releases/:id/cover')
+  @Header('Cache-Control', 'private, max-age=31536000, immutable')
   @StandardEndpoint({
     summary: 'Get the cover image of a release.',
     capabilities: ['MusicReleases.Read'],

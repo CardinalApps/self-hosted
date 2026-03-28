@@ -110,7 +110,7 @@ const homeServerAPI = <T>(
     body: body,
     // TODO disable caching of the 410 Gone response server-side (it can be
     // returned on any endpoint)
-    cache: 'no-cache',
+    //cache: 'no-cache',
   })
     .then((res) => {
       triggerMiddleware(res, endpoint, method, body)
