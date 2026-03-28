@@ -1,10 +1,9 @@
 diff a/CLAUDE.md b/CLAUDE.md	(rejected hunks)
-@@ -27,3 +27,8 @@ To support this architecture, Cardinal offers two identity providers:
- - The cloud IDP may be unavailable at any time.
- - The local IDP offers a special account called the Guest Account. It does not require a username or password, but it may be disabled by the server owner.
- - Users can log into their local IDP using the cloud IDP by linking their cloud account to their local account. This one-to-one link is constructed by saving the cloud user ID in the local user entity, under the "cardinalId" property. A copy of the cloud user is also cached locally. Any local user that has a non-null `cardinalId` will require the special second authorization header to be included with all network requests, as per the OpenAPI specification.
+@@ -32,3 +32,7 @@ To support this architecture, Cardinal offers two identity providers:
+ 
+ - When working on Cardinal Media Server, you must support both SQLite and PostreSQL. Historically, to support both databases, the application layer has simply gone with the SQLite way of doing things, since PostgreSQL will support it. However that means not using JSONB or any of PostgreSQL's advanced features. That is why you will fine stringified arrays and objects in the database in some places. You are encouraged to suggest ways to fix and improve this for existing code and for future code. This typically means writing two functions: one for SQLite and one for PostgreSQL, but you can suggest it if you deem it worth the extra maintenance burden of two functions.
+ - All other applications support just one type of database (either PostgreSQL or MongoDB). Check the package's dependencies to confirm.
 +
-+# Database Layer
++# Documentation
 +
-+- When working on Cardinal Media Server, you must support both SQLite and PostreSQL. Historically, to support both databases, the application layer has simply gone with the SQLite way of doing things, since PostgreSQL will support it. However that means not using JSONB or any of PostgreSQL's advanced features. That is why you will fine stringified arrays and objects in the database in some places. You are encouraged to suggest ways to fix and improve this for existing code and for future code. This typically means writing two functions: one for SQLite and one for PostgreSQL, but you can suggest it if you deem it worth the extra maintenance burden of two functions.
-+- All other applications support just one type of database (either PostgreSQL or MongoDB). Check the package's dependencies to confirm.
++Many of the features offered by Cardinal Media Server are documented in the @apps/help-web app. You should be familiar with the topics that are covered on the help site, and you should be aware when changes you make elsewhere require updating the help site. A common example is with environment vaiables in the Media Server, if you add or update one, it must be documented in the help app.
