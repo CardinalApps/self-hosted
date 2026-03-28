@@ -2,6 +2,7 @@ import { join } from 'path'
 
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 //import { APP_INTERCEPTOR } from '@nestjs/core'
+import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ScheduleModule } from '@nestjs/schedule'
 import { ServeStaticModule } from '@nestjs/serve-static'
@@ -89,6 +90,7 @@ const resolvePostgresHost = () => {
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     // @ts-expect-error FIXME didn't feel like typing this when converting from vanilla JS
     TypeOrmModule.forRoot(envVar('CARDINAL_POSTGRES', false)
       ? {
