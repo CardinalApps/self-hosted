@@ -1,10 +1,11 @@
 import { Logger } from '@nestjs/common'
 import { envVar } from './env'
 
+// Severity levels
 export enum LogLevel {
   SILENT = 0,
-  DEBUG = 10,
-  INFO = 20,
+  INFO = 10,
+  DEBUG = 20,
 }
 
 export enum LogModule {
@@ -16,8 +17,8 @@ export enum LogModule {
 }
 
 /**
- * Optional logging utility designed to work with the log levels that the user
- * can set in env vars.
+ * Optional logging utility designed to work with the severity levels that the
+ * user can set in env vars.
  */
 export const log = (module: LogModule, level: LogLevel, message: string) => {
   let levelSetByEnvironment
@@ -40,11 +41,21 @@ export const log = (module: LogModule, level: LogLevel, message: string) => {
       break
   }
 
-  if (levelSetByEnvironment !== LogLevel.SILENT && level >= levelSetByEnvironment) {
-    if (level === LogLevel.DEBUG) {
-      Logger.debug(message, module)
-    } else if (level === LogLevel.INFO) {
-      Logger.log(message, module)
+  // Prints the message to the console using the correct Logging function fo the
+  // severity level of the incoming log
+  const print = (message, module) => level === LogLevel.DEBUG
+    ? Logger.debug(message, module)
+    : Logger.log(message, module)
+
+  // Filters logs depending on the severity levels set in the env vars
+  if (levelSetByEnvironment !== LogLevel.SILENT) {
+    // Lowest rung on the severity ladder
+    if (levelSetByEnvironment >= LogLevel.INFO && levelSetByEnvironment < LogLevel.DEBUG) {
+      print(message, module)
+    }
+    // Second rung
+    else if (levelSetByEnvironment >= LogLevel.DEBUG) {
+      print(message, module)
     }
   }
 }
