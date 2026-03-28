@@ -24,6 +24,12 @@ const config: StorybookConfig = {
   docs: {
     autodocs: false,
   },
+  async viteFinal(config) {
+    return {
+      ...config,
+      publicDir: false,
+    }
+  },
 }
 
 export default config
