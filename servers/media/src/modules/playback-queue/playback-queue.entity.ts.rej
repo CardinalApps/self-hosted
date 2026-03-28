@@ -3,12 +3,12 @@ diff a/servers/media/src/modules/playback-queue/playback-queue.entity.ts b/serve
    @JoinColumn()
    user: User
  
--  @Column({ nullable: false })
-+  @Column({ nullable: false, type: 'text' })
+-  @Column({ nullable: false, type: 'text' })
++  @Column({ nullable: false, type: 'varchar' })
    type: QueueType
  
--  @Column({ nullable: true })
-+  @Column({ nullable: true, type: 'text' })
+-  @Column({ nullable: true, type: 'text' })
++  @Column({ nullable: true, type: 'varchar' })
    dynamicType: DynamicQueueType
  
    @ManyToMany(() => Library, (library) => library.playbackQueues, { onDelete: 'CASCADE' })
