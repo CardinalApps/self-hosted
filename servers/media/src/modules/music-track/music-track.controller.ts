@@ -20,8 +20,10 @@ import { MusicTrackService } from './music-track.service'
 
 import { GetMusicTrackDto } from './dtos/GetMusicTrack.dto'
 import { StreamMusicTrackDto } from './dtos/StreamMusicTrack.dto'
+import { StreamMusicTrackQueryDto } from './dtos/StreamMusicTrackQuery.dto'
 import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
 
+import { TranscodingService } from '../transcoding/transcoding.service'
 import { EventService } from '../event/event.service'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 
@@ -30,6 +32,7 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 export class MusicTrackController {
   constructor(
     private readonly musicTrackService: MusicTrackService,
+    private readonly transcodingService: TranscodingService,
     private readonly eventService: EventService,
   ) {}
 
@@ -69,11 +72,12 @@ export class MusicTrackController {
   @Get('/music/stream/:id')
   @StandardEndpoint({
     summary: 'Stream a music track.',
-    description: 'Stream a music track directly to your browser without any transcoding.',
+    description: 'Stream a music track using either direct stream or transcoding.',
     capabilities: ['MusicTracks.Play'],
   })
   async streamMusicTrack(
     @Param() { id }: StreamMusicTrackDto,
+    @Query() query: StreamMusicTrackQueryDto,
     @Req() req: Response,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
@@ -83,12 +87,25 @@ export class MusicTrackController {
       throw new NotFoundException()
     }
 
+    // On-the-fly transcoding
+    if (query.transcode) {
+      const stream = this.transcodingService.transcodeAudioToMp3(musicTrack.file.absolutePath, query.bitrate)
+
+      res.set({
+        'Content-Type': 'audio/mpeg',
+        'Accept-Ranges': 'none',
+      })
+
+      return new StreamableFile(stream)
+    }
+
     const fileStats = fs.statSync(musicTrack.file.absolutePath)
 
     if (!fileStats) {
       throw new ServiceUnavailableException('Could not read file stats.')
     }
 
+    // Direct stream
     const range = req.header('range') as unknown as string
 
     if (range) {
