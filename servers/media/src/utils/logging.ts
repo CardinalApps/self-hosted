@@ -12,6 +12,7 @@ export enum LogModule {
   EVENTS = 'Events',
   INDEXING = 'Indexing',
   JOBS = 'Jobs',
+  TRANSCODING = 'Transcoding',
 }
 
 /**
@@ -33,6 +34,9 @@ export const log = (module: LogModule, level: LogLevel, message: string) => {
       break
     case LogModule.JOBS:
       levelSetByEnvironment = envVar('JOBS_LOG_LEVEL', LogLevel.INFO)
+      break
+    case LogModule.TRANSCODING:
+      levelSetByEnvironment = envVar('TRANSCODER_LOG_LEVEL', LogLevel.SILENT)
       break
   }
 
