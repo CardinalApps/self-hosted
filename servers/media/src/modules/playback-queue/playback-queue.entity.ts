@@ -25,10 +25,10 @@ export class PlaybackQueue extends BaseEntity {
   @JoinColumn()
   user: User
 
-  @Column({ nullable: false, type: 'text' })
+  @Column({ nullable: false, type: 'varchar' })
   type: QueueType
 
-  @Column({ nullable: true, type: 'text' })
+  @Column({ nullable: true, type: 'varchar' })
   dynamicType: DynamicQueueType
 
   @ManyToMany(() => Library, (library) => library.playbackQueues, { onDelete: 'CASCADE' })
