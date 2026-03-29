@@ -22,7 +22,7 @@ function randomBlotches(colors: string[]): Blotch[] {
     color,
     x: 10 + Math.random() * 80,
     y: 10 + Math.random() * 80,
-    size: 65 + Math.random() * 30,
+    size: 70 + Math.random() * 50,
   }))
 }
 
