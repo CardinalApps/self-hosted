@@ -5,8 +5,9 @@ import {
   ManyToMany,
   JoinColumn,
   JoinTable,
-  Generated,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { MusicTrack } from  '../music-track/music-track.entity'
@@ -22,8 +23,7 @@ export class MusicArtist extends BaseEntity {
   @JoinTable()
   releases?: MusicRelease[]
 
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   musicArtistId: string
 
   @Column({ nullable: true })

@@ -21,7 +21,8 @@ import { IndexingStates } from './enums'
 import { GETIndexStateResponse } from './types'
 
 import { IndexingService } from './indexing.service'
-import { IndexingSeedService } from './indexing-seed.service'
+import { IndexingSeedService } from './indexing-seed-old.service'
+import { IndexingSeedLargeService } from './indexing-seed.service'
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
 import { User } from '../user/user.entity'
@@ -47,6 +48,7 @@ export class IndexingController {
   constructor(
     private readonly indexingService: IndexingService,
     private readonly indexingSeedService: IndexingSeedService,
+    private readonly indexingSeedLargeService: IndexingSeedLargeService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
   ) {}
@@ -257,5 +259,23 @@ export class IndexingController {
     }
     const n = parseInt(count, 10) || 1000
     this.indexingSeedService.seed(n)
+  }
+
+  /**
+   * Seeds the index with millions of rows of mock music data for load testing.
+   * Can only be used in kiosk mode.
+   */
+  @Post('/index/seed/large')
+  @StandardEndpoint({
+    summary: 'Seed the index with 100 million mock music files.',
+    auth: false,
+    //capabilities: ['Indexing.Operate'],
+  })
+  async seedIndexLarge(@Query('count') count: string): Promise<void> {
+    if (!envVar('KIOSK_MODE', false)) {
+      throw new ForbiddenException('Kiosk mode must be enabled to run seeding.')
+    }
+    const n = parseInt(count, 10) || 5000
+    this.indexingSeedLargeService.seed(n)
   }
 }

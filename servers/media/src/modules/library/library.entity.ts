@@ -3,10 +3,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  Generated,
   PrimaryGeneratedColumn,
   ManyToMany,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 
@@ -18,8 +19,7 @@ export class Library extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   libraryId: string
 
   @Column()

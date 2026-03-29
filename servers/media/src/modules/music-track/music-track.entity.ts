@@ -6,8 +6,9 @@ import {
   ManyToMany,
   JoinColumn,
   JoinTable,
-  Generated,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { File } from  '../indexing/entities/file.entity'
@@ -30,8 +31,7 @@ export class MusicTrack extends BaseEntity {
   @JoinColumn()
   release: MusicRelease
 
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   musicTrackId: string
 
   @Column({ nullable: true })

@@ -28,6 +28,7 @@ import {
   getTrustedValuesFromFileStats,
   readEmbeddedMusicMetadata,
 } from '../../../utils/file'
+import { envVar } from '../../../utils/env'
 
 /**
  * Handles everything needed to index a music track.
@@ -202,22 +203,29 @@ export class MusicIndexingService {
    * Reads the embedded metdadata in the file and creates database entites for it.
    */
   async saveEmbeddedMetadata(file: File, musicTrack: MusicTrack, queryRunner?: QueryRunner): Promise<MusicTrackMetadata[]> {
-    const metadata = await readEmbeddedMusicMetadata(file.absolutePath)
+    let metadataToSave: Record<string, unknown>
+
+    if (envVar('KIOSK_MODE', false)) {
+      metadataToSave = buildKioskEmbeddedMetadata(file.absolutePath)
+    } else {
+      const metadata = await readEmbeddedMusicMetadata(file.absolutePath)
+
+      if (!metadata?.common && !metadata?.format) {
+        return []
+      }
+
+      metadataToSave = {
+        ...metadata.common,
+        ...metadata.format,
+      }
+
+      // contains binary data, cannot be serialized
+      if ('picture' in metadataToSave) {
+        delete metadataToSave.picture
+      }
+    }
+
     const rows = []
-
-    if (!metadata?.common && !metadata?.format) {
-      return []
-    }
-
-    const metadataToSave = {
-      ...metadata.common,
-      ...metadata.format,
-    }
-
-    // contains binary data, cannot be serialized
-    if ('picture' in metadataToSave) {
-      delete metadataToSave.picture
-    }
 
     for (const [metadataKey, metadataValue] of Object.entries(metadataToSave)) {
       const row: Partial<MusicTrackMetadata> = {
@@ -248,7 +256,9 @@ export class MusicIndexingService {
    * Reads the file system metadata that is embedded in the file.
    */
   async saveFileStatMetadata(file: File, musicTrack: MusicTrack, queryRunner?: QueryRunner): Promise<MusicTrackMetadata[]> {
-    const fileStat = await getTrustedValuesFromFileStats(file.absolutePath)
+    const fileStat = envVar('KIOSK_MODE', false)
+      ? buildKioskFileStatMetadata()
+      : getTrustedValuesFromFileStats(file.absolutePath)
     const rows = []
 
     if (!fileStat) {
@@ -284,7 +294,9 @@ export class MusicIndexingService {
    * Reads the embedded metdadata in the file and creates database entites for it.
    */
   async saveFolderStructureMetadata(file: File, musicTrack: MusicTrack, queryRunner?: QueryRunner): Promise<MusicTrackMetadata[]> {
-    const fileStructureMetadata = await this.findFolderStructureMetadata(file.absolutePath)
+    const fileStructureMetadata = envVar('KIOSK_MODE', false)
+      ? buildKioskFolderStructureMetadata(file.absolutePath)
+      : await this.findFolderStructureMetadata(file.absolutePath)
     const rows = []
 
     if (!fileStructureMetadata) {
@@ -718,5 +730,59 @@ export class MusicIndexingService {
     }
 
     return 1
+  }
+}
+
+/**
+ * Parses the kiosk seed path format:
+ *   /kiosk/artist-{n}/artist-{n}-release-{r}/artist-{n}-release-{r}-track-{t}.mp3
+ *
+ * Returns the segments needed by the three mock helpers below.
+ */
+function parseKioskPath(absolutePath: string): { artistName: string, releaseName: string, trackName: string, trackNumber: number } {
+  const parts = absolutePath.split(path.sep)
+  const artistName  = parts[parts.length - 3] ?? 'Unknown Artist'
+  const releaseName = parts[parts.length - 2] ?? 'Unknown Release'
+  const fileName    = parts[parts.length - 1] ?? ''
+  const trackName   = fileName.replace(/\.mp3$/, '')
+
+  // track number is the final numeric segment, e.g. artist-1-release-1-track-7 → 7
+  const trackNumMatch = trackName.match(/-(\d+)$/)
+  const trackNumber   = trackNumMatch ? Number(trackNumMatch[1]) : 1
+
+  return { artistName, releaseName, trackName, trackNumber }
+}
+
+function buildKioskEmbeddedMetadata(absolutePath: string): Record<string, unknown> {
+  const { artistName, releaseName, trackName, trackNumber } = parseKioskPath(absolutePath)
+  return {
+    title:       trackName,
+    artist:      artistName,
+    albumartist: artistName,
+    album:       releaseName,
+    track:       { no: trackNumber, of: 10 },
+    disk:        { no: 1, of: 1 },
+    duration:    180 + (trackNumber * 7),
+    bitrate:     320000,
+    codec:       'MP3',
+    sampleRate:  44100,
+    numberOfChannels: 2,
+  }
+}
+
+function buildKioskFileStatMetadata(): { createdAt: string, modifiedAt: string } {
+  return {
+    createdAt:  new Date(0).toString(),
+    modifiedAt: new Date(0).toString(),
+  }
+}
+
+function buildKioskFolderStructureMetadata(absolutePath: string): Record<string, string | number> {
+  const { artistName, releaseName, trackName, trackNumber } = parseKioskPath(absolutePath)
+  return {
+    artistName,
+    releaseName,
+    trackName,
+    trackNumber,
   }
 }

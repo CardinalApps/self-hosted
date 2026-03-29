@@ -3,9 +3,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  Generated,
   OneToOne,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 
@@ -15,8 +16,7 @@ import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
 
 @Entity()
 export class MusicHistory extends BaseEntity {
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   playbackEntryId: string
 
   @Column({ type: 'float' })

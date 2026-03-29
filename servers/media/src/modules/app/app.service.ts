@@ -239,12 +239,13 @@ export class AppService {
    * Resets all media data.
    */
   async resetMediaData(): Promise<boolean> {
-    const settled = await Promise.all([
-      this.indexingService.deleteAllIndexedData(),
-      this.jobService.deleteAllJobs(),
-    ])
+    // Sequential: job_task has a FK to file, so jobs must be cleared before indexed data
+    const results = [
+      await this.jobService.deleteAllJobs(),
+      await this.indexingService.deleteAllIndexedData(),
+    ]
 
-    const success = settled.every((result) => result === true)
+    const success = results.every((result) => result === true)
 
     if (success) {
       this.eventService.emitPublic(AppEvents.DEINDEX_ALL_MEDIA_SUCCESS)

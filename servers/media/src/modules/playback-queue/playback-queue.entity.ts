@@ -3,11 +3,12 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  Generated,
   ManyToMany,
   JoinTable,
   OneToMany,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { User } from '../user/user.entity'
@@ -17,8 +18,7 @@ import { DynamicQueueType, QueueType } from './dtos/CreatePlaybackQueue'
 
 @Entity()
 export class PlaybackQueue extends BaseEntity {
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   queueId: string
 
   @ManyToOne(() => User)

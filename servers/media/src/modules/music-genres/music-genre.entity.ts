@@ -2,8 +2,9 @@ import {
   Entity,
   Column,
   ManyToMany,
-  Generated,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { MusicRelease } from  '../music-release/music-release.entity'
@@ -16,8 +17,7 @@ export class MusicGenre extends BaseEntity {
   @ManyToMany(() => MusicRelease, (musicRelease) => musicRelease.genres, { onDelete: 'CASCADE' })
   releases?: MusicRelease[]
 
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   musicGenreId: string
 
   @Column({ nullable: true })

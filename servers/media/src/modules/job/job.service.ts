@@ -188,7 +188,8 @@ export class JobService {
    */
   async deleteAllJobs() {
     try {
-      await this.jobRepository.clear()
+      await this.jobTaskRepository.createQueryBuilder().delete().execute()
+      await this.jobRepository.createQueryBuilder().delete().execute()
       Logger.log('Deleted all jobs.', 'Jobs')
       return true
     } catch (e) {
