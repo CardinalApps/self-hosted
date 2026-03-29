@@ -1,9 +1,0 @@
-diff a/.gitignore b/.gitignore	(rejected hunks)
-@@ -13,6 +13,7 @@ bin
- .vercel
- .turbo
- .next
-+.idea
- 
- storybook-static
- 
