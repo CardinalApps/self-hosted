@@ -61,7 +61,7 @@ These are the packages in this monorepo.
 <details>
   <summary>About the commit history</summary>
   <p>This repository was created in March 2026. Prior to that, this project was closed source.</p>
-  <p>In 2023 this project began in pure JavaScript in separate repositories, and by 2026 it had become the fully TypeScript monorepo that is seen here. During those years the code went through a few different repositories, so there is unfortunately no single linear history of commits.</p>
+  <p>This project began in 2023, in pure JavaScript in separate repositories, and by 2026 it had become the fully TypeScript monorepo that is seen here. During those years the code went through a few different repositories, so there is unfortunately no single linear history of commits.</p>
   <p>The second commit in this repository is a squashed commit containing all the self-hosted code since the beginning. That one commit adds 270k lines of code, and it is also the last commit before AI coding assistants were allowed to contribute.</p>
 </details>
 
