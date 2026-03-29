@@ -1,3 +1,4 @@
+import * as crypto from 'crypto'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, IsNull, Not, Repository } from 'typeorm'
@@ -9,6 +10,7 @@ import SUBSCRIPTIONS, { getSubscription, SubscriptionTier } from '@cardinalapps/
 import { v4 as uuid } from 'uuid'
 
 import { getJWTPayload, CloudUserJWTPayload, LocalUserJWTPayload } from '../../utils/jwt'
+import { envVar } from '../../utils/env'
 import { SettingsService } from '../settings/settings.service'
 
 import { LocalUserService } from './local-user.service'
@@ -56,6 +58,43 @@ export class UserService {
       await this.createGuestAccount()
       Logger.log('Created guest account', 'User')
     }
+
+    const usernameToReset = envVar('RESET_LOCAL_USER_PW', null)
+    if (usernameToReset && typeof usernameToReset === 'string') {
+      await this.resetLocalUserPassword(usernameToReset)
+    }
+  }
+
+  /**
+   * Resets the password of a local user and prints the new password to the
+   * console. Triggered by the RESET_LOCAL_USER_PW environment variable.
+   */
+  private async resetLocalUserPassword(username: string): Promise<void> {
+    const user = await this.getUserByLocalUsername(username)
+
+    if (!user) {
+      Logger.error(`RESET_LOCAL_USER_PW: No local user found with username "${username}"`, 'User')
+      return
+    }
+
+    if (user.designation || user.cardinalId) {
+      Logger.error(`RESET_LOCAL_USER_PW: Cannot reset password for this user"`, 'User')
+      return
+    }
+
+    const newPassword = crypto.randomBytes(12).toString('hex')
+    user.password = newPassword
+    await this.userRepository.save(user)
+
+    const lines = [
+      `  Detected password reset for "${username}" using RESET_LOCAL_USER_PW  `,
+      `  New password: ${newPassword}  `,
+      `  You must now remove the environment variable from your Media Server deployment.  `,
+    ]
+    const width = Math.max(...lines.map((l) => l.length))
+    Logger.log(`╭${'─'.repeat(width)}╮`, 'User')
+    for (const line of lines) Logger.log(`│${line.padEnd(width)}│`, 'User')
+    Logger.log(`╰${'─'.repeat(width)}╯`, 'User')
   }
 
   /**

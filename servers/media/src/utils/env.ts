@@ -56,7 +56,8 @@ export type ENV_VAR =
   'PHOTOS_DIR' |
   'MOVIES_DIR' |
   'TV_DIR' |
-  'SIGNING_SECRET'
+  'SIGNING_SECRET' |
+  'RESET_LOCAL_USER_PW'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.
