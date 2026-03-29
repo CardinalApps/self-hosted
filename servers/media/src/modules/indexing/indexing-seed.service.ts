@@ -13,9 +13,10 @@ const BATCH_SIZE = 500
 const MAX_ARTISTS = 1_000_000
 const ALBUMS_PER_ARTIST = 10
 const TRACKS_PER_ALBUM = 10
+const LOG_EVERY_X_ENTRIES = 100
 
 /**
- * Seeds the database with 100 million simulated music files for load testing.
+ * Seeds the database with millions of mock music files for load testing.
  * Requires KIOSK_MODE=true.
  *
  * File path structure mirrors the music indexing conventions:
@@ -70,7 +71,7 @@ export class IndexingSeedLargeService {
             totalIndexed += batch.length
             batch = []
 
-            if (totalIndexed % 500 === 0) {
+            if (totalIndexed % LOG_EVERY_X_ENTRIES === 0) {
               this.logger.log(`Seeded ${totalIndexed.toLocaleString()} / ${totalFiles.toLocaleString()} files`)
             }
           }

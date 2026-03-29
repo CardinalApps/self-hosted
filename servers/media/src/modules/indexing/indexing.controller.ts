@@ -267,9 +267,8 @@ export class IndexingController {
    */
   @Post('/index/seed/large')
   @StandardEndpoint({
-    summary: 'Seed the index with 100 million mock music files.',
-    auth: false,
-    //capabilities: ['Indexing.Operate'],
+    summary: 'Seed the index with millions of mock music files.',
+    capabilities: ['Indexing.Operate'],
   })
   async seedIndexLarge(@Query('count') count: string): Promise<void> {
     if (!envVar('KIOSK_MODE', false)) {
