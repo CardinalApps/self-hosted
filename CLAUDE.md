@@ -6,7 +6,7 @@ The frontend exists in `/apps`, it's made with React and Redux, and it imports c
 
 # Commits
 
-Keep your commit messages short and to the point.
+Keep your commit messages short and to the point. Your commits should be just 1 or 2 sentences.
 
 # Application Authentication Layer
 

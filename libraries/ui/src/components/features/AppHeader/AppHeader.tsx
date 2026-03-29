@@ -72,13 +72,13 @@ const AppHeader = ({
     const badges = []
 
     if (kioskMode) {
-      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#578cdd' }}>{i18n['major-badge.kiosk'][lang]}</span>)
+      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><i className="fas fa-store" />{i18n['major-badge.kiosk'][lang]}</span>)
     }
     if (app === CardinalApp.CINEMA) {
-      badges.push(<span key="planned" onClick={() => setShowBadgeModal('planned')} style={{ background: '#d05858' }}>{i18n['major-badge.planned'][lang]}</span>)
+      badges.push(<span key="planned" onClick={() => setShowBadgeModal('planned')} style={{ background: '#007bd7' }}><i className="fas fa-clock" />{i18n['major-badge.planned'][lang]}</span>)
     }
     if (app === CardinalApp.PHOTOS) {
-      badges.push(<span key="wip" onClick={() => setShowBadgeModal('wip')} style={{ background: '#6aad68' }}>{i18n['major-badge.wip'][lang]}</span>)
+      badges.push(<span key="wip" onClick={() => setShowBadgeModal('wip')} style={{ background: '#700bd8' }}><i className="fas fa-terminal" />{i18n['major-badge.wip'][lang]}</span>)
     }
 
     return badges

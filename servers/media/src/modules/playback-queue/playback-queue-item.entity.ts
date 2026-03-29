@@ -2,9 +2,10 @@ import {
   Entity,
   Column,
   ManyToOne,
-  Generated,
   OneToOne,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { PlaybackQueue } from './playback-queue.entity'
@@ -12,8 +13,7 @@ import { MusicHistory } from '../music-history/music-history.entity'
 
 @Entity()
 export class PlaybackQueueItem extends BaseEntity {
-  @Column({ unique: true })
-  @Generated('uuid')
+  @UuidColumn({ unique: true })
   queueItemId: string
 
   @ManyToOne(() => PlaybackQueue)

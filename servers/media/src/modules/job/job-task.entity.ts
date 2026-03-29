@@ -2,9 +2,10 @@ import {
   Entity,
   Column,
   ManyToOne,
-  Generated,
   JoinColumn,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 import { IsDate, IsOptional, IsString } from 'class-validator'
 
 import { BaseEntity } from '../../entities/base.entity'
@@ -16,8 +17,7 @@ import { JobTaskResults } from './types'
 
 @Entity()
 export class JobTask extends BaseEntity {
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   jobTaskId: string
 
   @ManyToOne(() => Job, (job) => job.tasks, { onDelete: 'CASCADE', nullable: true })

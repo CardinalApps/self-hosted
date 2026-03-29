@@ -234,7 +234,7 @@ export class IndexingService {
         const sub = qb.subQuery()
           .select('1')
           .from(File, 'file')
-          .where('file.runId = run.id')
+          .where('file.run = run.id')
           .getQuery()
         return `EXISTS ${sub}`
       })
@@ -783,17 +783,20 @@ export class IndexingService {
     await queryRunner.connect()
     await queryRunner.startTransaction()
     try {
-      // Clear in dependency order: leaves first, parents last
-      await queryRunner.manager.clear(MusicHistory)
-      await queryRunner.manager.clear(MusicTrackMetadata)
-      await queryRunner.manager.clear(MusicArtistMetadata)
-      await queryRunner.manager.clear(MusicReleaseMetadata)
-      await queryRunner.manager.clear(MusicReleaseThumbnail)
-      await queryRunner.manager.clear(MusicTrack)
-      await queryRunner.manager.clear(File)
-      await queryRunner.manager.clear(MusicRelease)
-      await queryRunner.manager.clear(MusicArtist)
-      await queryRunner.manager.clear(MusicGenre)
+      // Delete in dependency order: leaves first, parents last.
+      // Uses DELETE instead of TRUNCATE so that PostgreSQL checks for actual
+      // FK violations (rows) rather than the mere existence of FK constraints.
+      const del = (entity) => queryRunner.manager.createQueryBuilder().delete().from(entity).execute()
+      await del(MusicHistory)
+      await del(MusicTrackMetadata)
+      await del(MusicArtistMetadata)
+      await del(MusicReleaseMetadata)
+      await del(MusicReleaseThumbnail)
+      await del(MusicTrack)
+      await del(File)
+      await del(MusicRelease)
+      await del(MusicArtist)
+      await del(MusicGenre)
 
       await queryRunner.commitTransaction()
       Logger.log('Deindexed all files.', 'Indexing')

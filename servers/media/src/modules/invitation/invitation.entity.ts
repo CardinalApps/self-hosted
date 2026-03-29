@@ -3,8 +3,9 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  Generated,
 } from 'typeorm'
+
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 
 import { BaseEntity } from '../../entities/base.entity'
 import { User } from '../user/user.entity'
@@ -13,8 +14,7 @@ export type InvitationType = 'link' | 'user'
 
 @Entity()
 export class Invitation extends BaseEntity {
-  @Column()
-  @Generated('uuid')
+  @UuidColumn()
   invitationId: string
 
   @Column({ nullable: false })
