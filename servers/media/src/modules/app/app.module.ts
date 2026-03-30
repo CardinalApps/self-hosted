@@ -56,7 +56,7 @@ import {
 
 const resolveDatabaseLogLevel = () => {
   const level = envVar('DATABASE_LOG_LEVEL', 0) as number
-  if (level > 0 && level <= 10) return ['query', 'error']
+  if (level > 0 && level <= 10) return ['query', 'schema', 'error']
   if (level > 0 && level <= 20) return ['error']
   return false
 }
