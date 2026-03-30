@@ -1,6 +1,7 @@
 import {
   Entity,
   Column,
+  Index,
   ManyToOne,
   JoinColumn,
   OneToOne,
@@ -15,6 +16,7 @@ import { MusicTrack } from '../music-track/music-track.entity'
 import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
 
 @Entity()
+@Index(['track'])
 export class MusicHistory extends BaseEntity {
   @UuidColumn()
   playbackEntryId: string
