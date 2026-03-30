@@ -36,6 +36,7 @@ export class MusicTrack extends BaseEntity {
   @JoinColumn()
   release: MusicRelease
 
+  @Index({ unique: true })
   @UuidColumn()
   musicTrackId: string
 
