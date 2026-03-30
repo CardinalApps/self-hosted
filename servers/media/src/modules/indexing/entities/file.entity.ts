@@ -1,6 +1,7 @@
 import {
   Entity,
   Column,
+  Index,
   OneToOne,
   OneToMany,
   ManyToOne,
@@ -48,6 +49,7 @@ export class File extends BaseEntity {
   jobTasks: JobTask[]
 
   // From the file system root
+  @Index()
   @Column()
   absolutePath: string
 
