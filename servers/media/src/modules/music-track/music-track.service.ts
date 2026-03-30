@@ -32,12 +32,7 @@ export class MusicTrackService {
    * Returns the total number of music tracks.
    */
   async count(): Promise<number> {
-    const result = await this.musicTrackRepository.findAndCount({
-      take: 1,
-      skip: 0,
-    })
-
-    return result?.[1] || 0
+    return this.musicTrackRepository.count()
   }
 
   /**

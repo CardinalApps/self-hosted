@@ -39,12 +39,7 @@ export class LibraryService {
    * Returns the total number of libraries.
    */
   async countLibraries(): Promise<number> {
-    const result = await this.libraryRepository.findAndCount({
-      take: 1,
-      skip: 0,
-    })
-
-    return result?.[1] || 0
+    return this.libraryRepository.count()
   }
 
   /**

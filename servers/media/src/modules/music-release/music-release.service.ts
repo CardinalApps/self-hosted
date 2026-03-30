@@ -44,12 +44,7 @@ export class MusicReleaseService {
    * Returns the total number of music releases.
    */
   async count(): Promise<number> {
-    const result = await this.musicReleaseRepository.findAndCount({
-      take: 1,
-      skip: 0,
-    })
-
-    return result?.[1] || 0
+    return this.musicReleaseRepository.count()
   }
 
   /**

@@ -28,12 +28,7 @@ export class MusicArtistService {
    * Returns the total number of music artists.
    */
   async count(): Promise<number> {
-    const result = await this.musicArtistRepository.findAndCount({
-      take: 1,
-      skip: 0,
-    })
-
-    return result?.[1] || 0
+    return this.musicArtistRepository.count()
   }
 
   /**
