@@ -31,6 +31,27 @@ export class DatabaseService {
     } else {
       Logger.error(`Invalid database configuration, got type ${this?.dataSource?.options?.type}. ${helpCode('0009')}`, 'Database')
     }
+
+    await this.createJunctionTableIndexes()
+  }
+
+  /**
+   * TypeORM's synchronize creates a composite PK on junction tables but only
+   * covers lookups from the owner side. These indexes cover the inverse
+   * direction, e.g. "get all tracks for an artist" or "get all artists for a
+   * release".
+   */
+  private async createJunctionTableIndexes(): Promise<void> {
+    const indexes = [
+      `CREATE INDEX IF NOT EXISTS idx_music_track_artists_music_artist_id
+         ON music_track_artists_music_artist (music_artist_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_music_artist_releases_music_release_id
+         ON music_artist_releases_music_release (music_release_id)`,
+    ]
+
+    for (const sql of indexes) {
+      await this.dataSource.query(sql)
+    }
   }
 
   /**

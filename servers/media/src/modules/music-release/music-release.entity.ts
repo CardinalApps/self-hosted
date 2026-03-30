@@ -21,6 +21,7 @@ import { MusicReleaseThumbnail } from './music-release-thumbnail.entity'
 @Entity()
 @Index(['title'])
 @Index(['createdAt'])
+@Index(['artist'])
 export class MusicRelease extends BaseEntity {
   @OneToMany(() => MusicTrack, (musicTrack) => musicTrack.release, { onDelete: 'CASCADE' })
   @JoinColumn()
