@@ -47,6 +47,7 @@ export class MusicRelease extends BaseEntity {
   @JoinTable()
   genres?: MusicGenre[]
 
+  @Index({ unique: true })
   @UuidColumn()
   musicReleaseId: string
 
