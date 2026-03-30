@@ -1,6 +1,7 @@
 import {
   Entity,
   Column,
+  Index,
   OneToMany,
   ManyToOne,
   ManyToMany,
@@ -18,6 +19,8 @@ import { MusicTrackMetadata } from './music-track-metadata.entity'
 import { MusicHistory } from '../music-history/music-history.entity'
 
 @Entity()
+@Index(['file'])
+@Index(['release'])
 export class MusicTrack extends BaseEntity {
   @ManyToOne(() => File, (file) => file.musicTrack, { onDelete: 'CASCADE' })
   @JoinColumn()
