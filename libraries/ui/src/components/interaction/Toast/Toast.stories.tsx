@@ -1,9 +1,9 @@
+import { fn } from '@storybook/test'
 import { useDispatch } from 'react-redux'
 import { Meta, StoryObj } from '@storybook/react'
 
 import Toast from './Toast'
 import Toaster from './Toaster'
-
 import Button from '../Button'
 
 import { toastActions } from '../../../store/slices/toast'
@@ -11,31 +11,44 @@ import { toastActions } from '../../../store/slices/toast'
 const meta = {
   title: 'Interaction/Toast',
   component: Toast,
-  argTypes: {},
+  argTypes: {
+    title: { control: 'text', table: { category: 'Content' } },
+    body: { control: 'text', table: { category: 'Content' } },
+    type: {
+      control: { type: 'select' },
+      options: [undefined, 'success', 'warning', 'danger'],
+      table: { category: 'Appearance' },
+    },
+    ttl: {
+      control: { type: 'number' },
+      table: { category: 'Behavior' },
+    },
+    showClose: { control: 'boolean', table: { category: 'Behavior' } },
+  },
 } satisfies Meta<typeof Toast>
 type Story = StoryObj<typeof meta>
 
 export const JustATitle: Story = {
   args: {
-    title: 'Something good has happened',
+    title: 'Library scan complete',
   },
 }
 
 export const WithAMessage: Story = {
   args: {
-    title: 'This is the title',
-    body: `<p>You got mail.</p><p>The body of the toast can have paragraphs. If there's a lot of text, it looks like this.</p>`,
+    title: 'Library scan complete',
+    body: '<p>147 new tracks were found and added to your library.</p>',
   },
 }
 
 export const AllDressed: Story = {
   args: {
-    title: 'This is the title',
-    body: `<p>You got mail.</p><p>The body of the toast can have paragraphs. If there's a lot of text, it looks like this.</p>`,
+    title: 'New album available',
+    body: '<p>Cardinal Music found a new album in your library and it has been added to your collection.</p>',
     controls: (
       <>
-        <Button onClick={() => alert('Clicky')}>Take Action</Button>
-        <Button onClick={() => alert('Clicky')}>Do something</Button>
+        <Button onClick={fn()}>View album</Button>
+        <Button onClick={fn()}>Dismiss</Button>
       </>
     ),
   },
@@ -43,18 +56,18 @@ export const AllDressed: Story = {
 
 export const Closeable: Story = {
   args: {
-    title: 'Something good has happened',
+    title: 'Background scan running',
     showClose: true,
-    onClose: () => alert('You clicked close'),
+    onClose: fn(),
   },
 }
 
-export const TTL: Story = {
+export const WithTTL: Story = {
   args: {
     type: 'warning',
-    title: 'I will fade out in 5 seconds',
+    title: 'This toast fades out after 5 seconds',
     ttl: 5000,
-    onClose: () => console.log('onClose() after fade out'),
+    onClose: fn(),
   },
 }
 
@@ -63,57 +76,58 @@ export const DoAToast = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>
-        <div style={{ width: '100%', gap: 15, display: 'flex' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ width: '100%', gap: 12, display: 'flex', flexWrap: 'wrap' }}>
           <Button
             onClick={() => dispatch(toastActions.addToQueue({
-              title: `You dispatched this toast`,
+              title: 'Library scan complete',
+              body: '<p>147 new tracks were found.</p>',
               ttl: 3000,
             }))}>
-              Default, 3000 TTL
-          </Button>
-          <Button
-            onClick={() => dispatch(toastActions.addToQueue({
-              type: `warning`,
-              title: `You dispatched this toast`,
-              ttl: 3000,
-            }))}>
-              Warning, 3000 TTL
-          </Button>
-          <Button
-            onClick={() => dispatch(toastActions.addToQueue({
-              type: `danger`,
-              title: `You dispatched this toast`,
-              body: 'More information: <a href="https://help.cardinalapps.io/help-codes/ERR_CP_0010">help.cardinalapps.io/help-codes/ERR_CP_0010</a>',
-              ttl: 3000,
-            }))}>
-              Error, 3000 TTL
-          </Button>
-        </div>
-        <div style={{ width: '100%', gap: 15, display: 'flex' }}>
-          <Button
-            onClick={() => dispatch(toastActions.addToQueue({
-              type: 'success',
-              title: `You dispatched this toast`,
-              showClose: true,
-            }))}>
-              Default, no TTL
+            Success, 3s
           </Button>
           <Button
             onClick={() => dispatch(toastActions.addToQueue({
               type: 'warning',
-              title: `You dispatched this toast`,
-              showClose: true,
+              title: 'Storage is nearly full',
+              ttl: 3000,
             }))}>
-              Warning, no TTL
+            Warning, 3s
           </Button>
           <Button
             onClick={() => dispatch(toastActions.addToQueue({
               type: 'danger',
-              title: `You dispatched this toast`,
+              title: 'Failed to connect',
+              body: 'Check that the server is running and try again.',
+              ttl: 3000,
+            }))}>
+            Error, 3s
+          </Button>
+        </div>
+        <div style={{ width: '100%', gap: 12, display: 'flex', flexWrap: 'wrap' }}>
+          <Button
+            onClick={() => dispatch(toastActions.addToQueue({
+              type: 'success',
+              title: 'Changes saved',
               showClose: true,
             }))}>
-              Error, no TTL
+            Success, no TTL
+          </Button>
+          <Button
+            onClick={() => dispatch(toastActions.addToQueue({
+              type: 'warning',
+              title: 'Session expiring soon',
+              showClose: true,
+            }))}>
+            Warning, no TTL
+          </Button>
+          <Button
+            onClick={() => dispatch(toastActions.addToQueue({
+              type: 'danger',
+              title: 'Authentication failed',
+              showClose: true,
+            }))}>
+            Error, no TTL
           </Button>
         </div>
       </div>

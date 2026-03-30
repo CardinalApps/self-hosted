@@ -1,3 +1,4 @@
+import { fn } from '@storybook/test'
 import type { Meta } from '@storybook/react'
 
 import List from './List'
@@ -11,15 +12,14 @@ const meta = {
 export const Default = () => {
   return (
     <List
-      name={'form-list'}
+      name={'media-folders'}
       items={[
-        { name: <span data-test>Item 1</span> },
-        { name: 'Item 2', value: 'item-2', avatar: { type: 'image', image: 'elephant.jpg' } },
-        { name: 'Item 3', value: 'item-3' },
-        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', value: 'item-4' },
-        { name: 'Item 5', value: 'item-5' },
-        { name: 'Item 6', value: 'item-6' },
-        { name: 'Item 6', value: 'item-6', label: 'Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label. Rows can have this additional label.' },
+        { name: 'Music', value: 'music', icon: { fa: 'fas fa-music' } },
+        { name: 'Photos', value: 'photos', avatar: { type: 'image', image: 'elephant.jpg' } },
+        { name: 'Films', value: 'films', icon: { fa: 'fas fa-film' } },
+        { name: 'Audiobooks', value: 'audiobooks', icon: { fa: 'fas fa-book' } },
+        { name: 'Podcasts', value: 'podcasts' },
+        { name: 'A very long library name that might overflow in narrower layouts and should wrap or truncate gracefully', value: 'long-name' },
       ]}
     />
   )
@@ -28,37 +28,18 @@ export const Default = () => {
 export const Controls = () => {
   return (
     <List
-      name={'controls-list'}
+      name={'library-controls'}
       items={[
-        { name: 'Item 1' },
-        { name: 'Item 2', value: 'item-2', controls: ['add', 'remove', 'delete'], avatar: { type: 'image', image: 'birb.jpg' } },
-        { name: 'Item 3', value: 'item-3', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', controls: ['add', 'remove', 'delete'], icon: { fa: 'fas fa-x-ray' } },
-        { name: 'Item 5', value: 'item-5', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 6', value: 'item-6', controls: ['add', 'remove', 'delete'] },
+        { name: 'Music', value: 'music', controls: ['add', 'remove', 'delete'], icon: { fa: 'fas fa-music' } },
+        { name: 'Photos', value: 'photos', controls: ['add', 'remove', 'delete'], avatar: { type: 'image', image: 'birb.jpg' } },
+        { name: 'Films', value: 'films', controls: ['add', 'remove', 'delete'], icon: { fa: 'fas fa-film' } },
+        { name: 'Audiobooks', value: 'audiobooks', controls: ['remove', 'delete'] },
+        { name: 'Podcasts', value: 'podcasts', controls: ['add'] },
+        { name: 'A very long library name that might overflow in narrower layouts', controls: ['add', 'remove', 'delete'] },
       ]}
-      onAdd={(item) => console.log('onAdd', item)}
-      onRemove={(item) => console.log('onRemove', item)}
-      onDelete={(item) => console.log('onDelete', item)}
-    />
-  )
-}
-
-export const Buttons = () => {
-  return (
-    <List
-      name={'controls-list'}
-      items={[
-        { name: 'Item 1' },
-        { name: 'Item 2', value: 'item-2', controls: ['add', 'remove', 'delete'], avatar: { type: 'image', image: 'birb.jpg' } },
-        { name: 'Item 3', value: 'item-3', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', controls: ['add', 'remove', 'delete'], icon: { fa: 'fas fa-x-ray' } },
-        { name: 'Item 5', value: 'item-5', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 6', value: 'item-6', controls: ['add', 'remove', 'delete'] },
-      ]}
-      onAdd={(item) => console.log('onAdd', item)}
-      onRemove={(item) => console.log('onRemove', item)}
-      onDelete={(item) => console.log('onDelete', item)}
+      onAdd={fn()}
+      onRemove={fn()}
+      onDelete={fn()}
     />
   )
 }
@@ -66,18 +47,17 @@ export const Buttons = () => {
 export const ControlsPending = () => {
   return (
     <List
-      name={'controls-list'}
+      name={'pending-list'}
       items={[
-        { name: 'Item 1' },
-        { name: 'Pending add', value: 'item-2', pendingAdd: true, controls: ['remove'] },
-        { name: 'Pending delete', value: 'item-3', pendingDelete: true, controls: ['delete'] },
-        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 5', value: 'item-5', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 6', value: 'item-6', controls: ['add', 'remove', 'delete'] },
+        { name: 'Music', value: 'music', controls: ['remove'] },
+        { name: 'Photos — pending add', value: 'photos', pendingAdd: true, controls: ['remove'] },
+        { name: 'Films — pending delete', value: 'films', pendingDelete: true, controls: ['delete'] },
+        { name: 'Audiobooks', value: 'audiobooks', controls: ['add', 'remove', 'delete'] },
+        { name: 'Podcasts', value: 'podcasts', controls: ['add', 'remove', 'delete'] },
       ]}
-      onAdd={(item) => console.log('onAdd', item)}
-      onRemove={(item) => console.log('onRemove', item)}
-      onDelete={(item) => console.log('onDelete', item)}
+      onAdd={fn()}
+      onRemove={fn()}
+      onDelete={fn()}
     />
   )
 }
@@ -85,19 +65,18 @@ export const ControlsPending = () => {
 export const Compact = () => {
   return (
     <List
-      name={'controls-list'}
+      name={'compact-list'}
       layout={'compact'}
       items={[
-        { name: 'Item 1' },
-        { name: 'Pending add', value: 'item-2', pendingAdd: true, controls: ['remove'] },
-        { name: 'Pending delete', value: 'item-3', pendingDelete: true, controls: ['delete'] },
-        { name: 'Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4 Item 4', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 5', value: 'item-5', controls: ['add', 'remove', 'delete'] },
-        { name: 'Item 6', value: 'item-6', controls: ['add', 'remove', 'delete'] },
+        { name: 'Music', value: 'music', controls: ['remove'] },
+        { name: 'Photos', value: 'photos', pendingAdd: true, controls: ['remove'] },
+        { name: 'Films', value: 'films', pendingDelete: true, controls: ['delete'] },
+        { name: 'Audiobooks', value: 'audiobooks', controls: ['add', 'remove', 'delete'] },
+        { name: 'Podcasts', value: 'podcasts', controls: ['add', 'remove', 'delete'] },
       ]}
-      onAdd={(item) => console.log('onAdd', item)}
-      onRemove={(item) => console.log('onRemove', item)}
-      onDelete={(item) => console.log('onDelete', item)}
+      onAdd={fn()}
+      onRemove={fn()}
+      onDelete={fn()}
     />
   )
 }
@@ -105,16 +84,17 @@ export const Compact = () => {
 export const KeyValue = () => {
   return (
     <List
-      name={'controls-list'}
+      name={'server-info'}
       layout={'compact'}
       items={[
-        { name: 'The List component can be used to display key-value pairs.', label: "Value 1" },
-        { name: 'Key 2', label: 'Value 2' },
-        { name: 'Key 3', value: 'item-3', label: "Value 3", controls: ['add', 'remove', 'delete'] },
+        { name: 'Server Version', label: '2.4.1' },
+        { name: 'Node.js', label: '18.12.0' },
+        { name: 'Database', label: 'SQLite 3.40.0' },
+        { name: 'Uptime', label: '14 days, 3 hours' },
+        { name: 'Media Items', label: '42,731', controls: ['add', 'remove'] },
       ]}
-      onAdd={(item) => console.log('onAdd', item)}
-      onRemove={(item) => console.log('onRemove', item)}
-      onDelete={(item) => console.log('onDelete', item)}
+      onAdd={fn()}
+      onRemove={fn()}
     />
   )
 }
@@ -122,7 +102,7 @@ export const KeyValue = () => {
 export const Empty = () => {
   return (
     <List
-      name={'form-list'}
+      name={'empty-list'}
       items={[]}
     />
   )

@@ -12,24 +12,26 @@ const meta = {
 } satisfies Meta<typeof Confirm>
 
 export const Default = () => {
-  const [showConfirm, setShowConfim] = useState<boolean>(false)
-  const [confirmed, setConfirmed] = useState<boolean>()
+  const [showConfirm, setShowConfirm] = useState<boolean>(false)
+  const [confirmed, setConfirmed] = useState<boolean | undefined>()
 
   return (
     <div>
       <ModalLayer />
       <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-        <Button onClick={() => setShowConfim(true)}>
-          Get confirmation
+        <Button onClick={() => setShowConfirm(true)}>
+          Request confirmation
         </Button>
-        <p>Result: {confirmed ? 'Confirmed' : 'Not confirmed'}</p>
+        {confirmed !== undefined && (
+          <p style={{ opacity: 0.7 }}>Result: <strong>{confirmed ? 'Confirmed' : 'Cancelled'}</strong></p>
+        )}
       </div>
       {showConfirm &&
         <Confirm
-          title={'Confirm that action'}
-          message={<p>Confirmation messages can have custom content. If none is supplied, a default will be used.</p>}
+          title="Save changes?"
+          message={<p>Any unsaved changes will be lost if you navigate away. Are you sure you want to continue?</p>}
           onClose={(confirmed) => {
-            setShowConfim(false)
+            setShowConfirm(false)
             setConfirmed(confirmed)
           }}
         />
@@ -39,24 +41,26 @@ export const Default = () => {
 }
 
 export const Short = () => {
-  const [showConfirm, setShowConfim] = useState<boolean>(false)
-  const [confirmed, setConfirmed] = useState<boolean>()
+  const [showConfirm, setShowConfirm] = useState<boolean>(false)
+  const [confirmed, setConfirmed] = useState<boolean | undefined>()
 
   return (
     <div>
       <ModalLayer />
       <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-        <Button onClick={() => setShowConfim(true)}>
-          Get confirmation
+        <Button onClick={() => setShowConfirm(true)}>
+          Request confirmation
         </Button>
-        <p>Result: {confirmed ? 'Confirmed' : 'Not confirmed'}</p>
+        {confirmed !== undefined && (
+          <p style={{ opacity: 0.7 }}>Result: <strong>{confirmed ? 'Confirmed' : 'Cancelled'}</strong></p>
+        )}
       </div>
       {showConfirm &&
         <Confirm
-          title={'Confirm'}
-          message={<p>Smol</p>}
+          title="Are you sure?"
+          message={<p>This cannot be undone.</p>}
           onClose={(confirmed) => {
-            setShowConfim(false)
+            setShowConfirm(false)
             setConfirmed(confirmed)
           }}
         />
@@ -68,22 +72,24 @@ export const Short = () => {
 export const EnterText = () => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
-  const [confirmed, setConfirmed] = useState<boolean>()
+  const [confirmed, setConfirmed] = useState<boolean | undefined>()
 
   return (
     <div>
       <ModalLayer />
       <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
         <Button onClick={() => setShowConfirm(true)}>
-          Get confirmation
+          Delete library
         </Button>
-        <p>Result: {confirmed ? 'Confirmed' : 'Not confirmed'}</p>
+        {confirmed !== undefined && (
+          <p style={{ opacity: 0.7 }}>Result: <strong>{confirmed ? 'Confirmed' : 'Cancelled'}</strong></p>
+        )}
       </div>
       {showConfirm &&
         <Confirm
-          title={'Confirm'}
-          message={<p>Are you sure you want to delete $importantThing?</p>}
-          mustEnterText="Important Resource"
+          title="Delete library"
+          message={<p>This will permanently delete <strong>Cardinal Music</strong> and all associated data. This action cannot be undone. Type the library name to confirm.</p>}
+          mustEnterText="Cardinal Music"
           loading={loading}
           confirmButtonIsDangerous={true}
           onClose={(confirmed) => {

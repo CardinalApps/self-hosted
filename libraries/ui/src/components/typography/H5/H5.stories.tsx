@@ -5,13 +5,15 @@ import H5 from './H5'
 const meta = {
   title: 'Typography/H5',
   component: H5,
-  argTypes: {},
+  argTypes: {
+    children: { control: 'text', table: { category: 'Content' } },
+  },
 } satisfies Meta<typeof H5>
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    children: 'Default Heading 5',
+    children: 'The quick Cardinal jumps over the lazy dog',
   },
 }
 

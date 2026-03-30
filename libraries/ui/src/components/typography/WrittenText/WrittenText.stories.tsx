@@ -19,46 +19,38 @@ export const Default: Story = {
       <h5>The quick red Cardinal jumped over the lazy dog</h5>
       <h6>The quick red Cardinal jumped over the lazy dog</h6>
 
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio, pretium congue risus eu, accumsan egestas sapien. Nulla feugiat metus nisl, ac consectetur tellus volutpat nec. Aliquam hendrerit gravida accumsan. Sed consectetur a urna sit amet accumsan. Quisque tellus eros, porta eu hendrerit eget, sodales porttitor odio. Cras eu rutrum risus. In sit amet erat gravida, rhoncus nisi vel, pharetra velit.</p>
+      <p>Cardinal Media Server is a self-hosted media streaming platform. <strong>Your media stays on hardware you own</strong>, served over a connection you control. Depending on your setup, Cardinal can run on a home server, a VPS, a NAS device, or even a Raspberry Pi.</p>
       <code>
-      function example() {
-        return 'Help I'm alive'
-      }
+function streamTrack(trackId) {
+  const url = api.getStreamUrl(trackId)
+  audioPlayer.load(url)
+  audioPlayer.play()
+}
       </code>
-      <p><strong>Quisque ac egestas lectus.</strong> Etiam <a href="#" target="_blank">sagittis porta</a> condimentum. Suspendisse ornare feugiat erat et placerat. Duis eget aliquam ex. Donec quis sollicitudin tortor. Ut felis tellus, cursus nec ipsum consectetur, dapibus sollicitudin tortor. Aenean efficitur suscipit mauris sit amet dignissim.</p>
-      <p><em>Mauris convallis dictum eros, ac interdum metus tristique vel. Praesent mi risus, tincidunt a ipsum ut, vehicula ultricies orci. Vivamus risus turpis, tempor semper sollicitudin ac, condimentum quis quam. Aenean eu hendrerit elit.</em> Suspendisse luctus facilisis vestibulum. Donec faucibus nunc sodales, finibus elit eget, lacinia nibh. Proin in dolor blandit, fermentum erat eget, accumsan nibh. Fusce sed sem sodales, accumsan odio sit amet, porta augue. Vestibulum in lectus ipsum. Mauris tempus accumsan placerat. Integer nec feugiat velit. In hac habitasse platea dictumst. Vestibulum bibendum nulla ex, vitae dictum quam ultricies in.</p>
-      <p>Suspendisse ornare feugiat erat et placerat. <code>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio.</code> Suspendisse ornare feugiat erat et placerat.</p>
-      
-      <div class="arrow-link"><a href="#">Arrow link example</a></div>
+      <p><strong>Cardinal Music</strong> lets you <a href="#" target="_blank">stream your music collection</a> from anywhere. It supports FLAC, MP3, AAC, and most other common audio formats.</p>
+      <p><em>Cardinal Photos</em> organises your photo library with albums, faces, and location-based browsing. It can run AI-powered image recognition entirely on your own hardware.</p>
+      <p>To configure the server port, set <code>CARDINAL_MEDIA_PORT</code> in your environment before starting the server.</p>
+
+      <div class="arrow-link"><a href="#">Read the setup guide</a></div>
 
       <ul>
-        <li>Milk</li>
+        <li>Cardinal Music — audio streaming</li>
         <li>
-          Eggs
+          Cardinal Photos — photo management
           <ul>
-            <li>Large</li>
-            <li>Free range</li>
+            <li>Albums</li>
+            <li>Face recognition</li>
+            <li>Map view</li>
           </ul>
         </li>
-        <li>
-          Bread
-          <ul>
-            <li>Cynaide</li>
-            <li>Orange juice</li>
-            <li>Pepsi</li>
-          </ul>
-        </li>
-        <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio, pretium congue risus eu, accumsan egestas sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio, pretium congue risus eu, accumsan egestas sapien.</li>
-        <li>Cheese</li>
+        <li>Cardinal Cinema — video streaming</li>
       </ul>
-      
+
       <ol>
-        <li>Milk</li>
-        <li>Eggs</li>
-        <li>Bread</li>
-        <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio, pretium congue risus eu, accumsan egestas sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio, pretium congue risus eu, accumsan egestas sapien.</li>
-        <li>Cheese</li>
-        <li><code>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lacus odio.</code></li>
+        <li>Install Cardinal Media Server</li>
+        <li>Add your media directories</li>
+        <li>Run the library scanner</li>
+        <li>Connect your apps</li>
       </ol>
 
       <img src="/images/1.jpg" alt="Test image">

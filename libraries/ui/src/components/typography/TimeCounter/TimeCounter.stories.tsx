@@ -6,7 +6,16 @@ import TimeCounter from './TimeCounter'
 const meta = {
   title: 'Typography/TimeCounter',
   component: TimeCounter,
-  argTypes: {},
+  argTypes: {
+    startedAt: {
+      control: { type: 'number' },
+      table: { category: 'Time' },
+    },
+    phrase: {
+      control: 'text',
+      table: { category: 'Content' },
+    },
+  },
 } satisfies Meta<typeof TimeCounter>
 type Story = StoryObj<typeof meta>
 
@@ -37,7 +46,7 @@ export const DaysAgo: Story = {
 export const CustomPhrase: Story = {
   args: {
     startedAt: Date.now() - ms('2.97 minutes'),
-  phrase: 'The server has been running for {time} since Saturday',
+    phrase: 'Server has been running for {time}',
   },
 }
 

@@ -5,26 +5,37 @@ import Code from './Code'
 const meta = {
   title: 'Typography/Code',
   component: Code,
-  argTypes: {},
+  argTypes: {
+    children: { control: 'text', table: { category: 'Content' } },
+  },
 } satisfies Meta<typeof Code>
 type Story = StoryObj<typeof meta>
 
 export const Inline: Story = {
   args: {
-    children: 'ResourceType',
+    children: 'CARDINAL_MEDIA_PORT=8080',
   },
 }
 
 export const Block: Story = {
   args: {
-    children: (
-      `const filter = (data) => data.filter((item) => !!item.value)
-      const result = filter.includes('psuedo code)
-      
-      if (result) {
-        return 'Success'
-      }`
-    ),
+    children: `const streamTrack = async (trackId: string) => {
+  const url = await api.getStreamUrl(trackId)
+  audioPlayer.load(url)
+  audioPlayer.play()
+}`,
+  },
+}
+
+export const InContext: Story = {
+  render: () => (
+    <p style={{ maxWidth: 500 }}>
+      To configure the server port, set the <Code>CARDINAL_MEDIA_PORT</Code> environment variable
+      before starting the server. The default value is <Code>8080</Code>.
+    </p>
+  ),
+  parameters: {
+    controls: { disable: true },
   },
 }
 
