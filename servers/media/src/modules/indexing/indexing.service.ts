@@ -431,9 +431,26 @@ export class IndexingService {
     this.eventService.emitAll(IndexingEvents.CURRENT_PROGRESS, this.getCurrentRunPublic())
     this.eventService.emitAll(IndexingEvents.COMPLETED, this.getCurrentRunPublic())
 
+    if (this.dataSource.options.type === 'postgres') {
+      await this.analyzeIndexedTables()
+    }
+
     this.resetState()
 
     Logger.log(`Indexing run complete`, 'Indexing')
+  }
+
+  /**
+   * Refreshes the PostgreSQL query planner's statistics after a bulk insert
+   * run. Without this, the planner uses stale row-count estimates that can
+   * lead to poor query plans until the autovacuum daemon catches up.
+   */
+  private async analyzeIndexedTables(): Promise<void> {
+    const tables = ['file', 'music_track', 'music_release', 'music_artist', 'music_track_metadata', 'music_release_metadata']
+    for (const table of tables) {
+      await this.dataSource.query(`ANALYZE ${table}`)
+    }
+    Logger.log('ANALYZE complete on indexed tables', 'Indexing')
   }
 
   /**
