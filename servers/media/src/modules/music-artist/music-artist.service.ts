@@ -97,6 +97,7 @@ export class MusicArtistService {
     // When filtering by library, join files
     if (libraries && libraries.length) {
       const libraryEntities = await this.libraryService.getLibraries(libraries)
+      if (!tracks) qb.leftJoin('musicArtist.tracks', 'tracks')
       qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
     }
 

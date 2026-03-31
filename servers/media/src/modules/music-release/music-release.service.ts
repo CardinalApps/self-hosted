@@ -144,13 +144,14 @@ export class MusicReleaseService {
     if (artists) qb.leftJoinAndSelect('musicRelease.artist', 'artist')
     if (artists) qb.leftJoinAndSelect('musicRelease.artists', 'artists')
     if (genres) qb.leftJoinAndSelect('musicRelease.genres', 'genres')
-    if (tracks || hasLibraries) qb.leftJoinAndSelect('musicRelease.tracks', 'tracks')
+    if (tracks) qb.leftJoinAndSelect('musicRelease.tracks', 'tracks')
     if (thumbnails) qb.leftJoinAndSelect('musicRelease.thumbnails', 'thumbnails')
     if (metadata) qb.leftJoinAndSelect('musicRelease.metadata', 'metadata')
 
     // When filtering by library, join tracks and files
     if (libraries && libraries.length) {
       const libraryEntities = await this.libraryService.getLibraries(libraries)
+      if (!tracks) qb.leftJoin('musicRelease.tracks', 'tracks')
       qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
     }
 
