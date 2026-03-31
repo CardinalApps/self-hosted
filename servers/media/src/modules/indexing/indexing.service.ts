@@ -203,17 +203,14 @@ export class IndexingService {
    * Counts indexed files.
    */
   async countIndexedFiles() {
-    const musicFiles = await this.fileRepository.findAndCount({ where: { mediaType: MediaType.MUSIC }, take: 1, skip: 0 })
-    const photoFiles = await this.fileRepository.findAndCount({ where: { mediaType: MediaType.PHOTOS }, take: 1, skip: 0 })
-    const movieFiles = await this.fileRepository.findAndCount({ where: { mediaType: MediaType.MOVIES }, take: 1, skip: 0 })
-    const tvFiles = await this.fileRepository.findAndCount({ where: { mediaType: MediaType.TV }, take: 1, skip: 0 })
+    const [musicFiles, photoFiles, movieFiles, tvFiles] = await Promise.all([
+      this.fileRepository.count({ where: { mediaType: MediaType.MUSIC } }),
+      this.fileRepository.count({ where: { mediaType: MediaType.PHOTOS } }),
+      this.fileRepository.count({ where: { mediaType: MediaType.MOVIES } }),
+      this.fileRepository.count({ where: { mediaType: MediaType.TV } }),
+    ])
 
-    return {
-      musicFiles: musicFiles?.[1] || 0,
-      photoFiles: photoFiles?.[1] || 0,
-      movieFiles: movieFiles?.[1] || 0,
-      tvFiles: tvFiles?.[1] || 0,
-    }
+    return { musicFiles, photoFiles, movieFiles, tvFiles }
   }
 
   /**
