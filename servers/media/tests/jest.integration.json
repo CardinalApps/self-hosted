@@ -6,12 +6,7 @@
   "silent": true,
   "verbose": true,
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
-  },
-  "globals": {
-    "ts-jest": {
-      "tsconfig": "./tsconfig.test.json"
-    }
+    "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "./tsconfig.test.json" }]
   },
   "testTimeout": 60000,
   "detectOpenHandles": true,
