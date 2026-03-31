@@ -34,6 +34,7 @@ export class DatabaseService {
     }
 
     await this.createJunctionTableIndexes()
+    await this.createPartialIndexes()
   }
 
   /**
@@ -65,6 +66,32 @@ export class DatabaseService {
 
     for (const pragma of pragmas.filter(Boolean)) {
       await this.dataSource.query(pragma)
+    }
+  }
+
+  /**
+   * Partial indexes that only cover rows where deleted_at IS NULL, matching
+   * the WHERE clause TypeORM appends to every soft-delete entity query. These
+   * stay smaller and faster than the full indexes as soft-deleted rows
+   * accumulate over time, and the query planner will prefer them for the
+   * common case where deleted rows are excluded.
+   */
+  private async createPartialIndexes(): Promise<void> {
+    const indexes = [
+      `CREATE INDEX IF NOT EXISTS idx_file_active_absolute_path
+         ON file (absolute_path) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_music_track_active_release_id
+         ON music_track (release_id) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_music_track_active_title
+         ON music_track (title) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_music_release_active_title
+         ON music_release (title) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_music_artist_active_name
+         ON music_artist (name) WHERE deleted_at IS NULL`,
+    ]
+
+    for (const sql of indexes) {
+      await this.dataSource.query(sql)
     }
   }
 
