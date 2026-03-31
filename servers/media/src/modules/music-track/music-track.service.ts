@@ -80,32 +80,38 @@ export class MusicTrackService {
       qb.innerJoin('music_track.file', ...this.libraryService.createJoinArgs(libraryEntities))
     }
 
-    // Calculate play count
-    qb.addSelect((subQuery) =>
-      subQuery
-        .select('COUNT(history.id)', 'count')
+    // Join pre-aggregated play counts in a single pass rather than a
+    // correlated subquery per row.
+    qb.leftJoin(
+      (subQuery) => subQuery
+        .select('history.track_id', 'track_id')
+        .addSelect('COUNT(history.id)', 'play_count')
         .from(MusicHistory, 'history')
-        .where('history.track_id = music_track.id'),
-      'music_track_play_count')
-
-    qb
-      .orderBy(`music_track.${orderBy}`, order)
-      .take(take)
-      .skip(skip)
+        .groupBy('history.track_id'),
+      'play_counts',
+      'play_counts.track_id = music_track.id',
+    )
+    qb.addSelect('COALESCE(play_counts.play_count, 0)', 'music_track_play_count')
 
     if (orderBy === 'playCount') {
       qb.orderBy('music_track_play_count', order)
+    } else {
+      qb.orderBy(`music_track.${orderBy}`, order)
     }
+    qb.take(take).skip(skip)
 
-    // playCount requires manual mapping
     const count = await qb.getCount()
     const withRaw = await qb.getRawAndEntities()
-    const result = withRaw.entities.map((track, index) => {
-      return {
-        ...track,
-        playCount: parseInt(withRaw.raw[index]?.music_track_play_count, 10) || 0,
-      }
-    })
+
+    // Map by ID rather than array index — index alignment breaks when M2M
+    // joins (e.g. artists) cause TypeORM to produce multiple raw rows per entity.
+    const playCountMap = new Map(
+      withRaw.raw.map((row) => [row.music_track_id, parseInt(row.music_track_play_count, 10) || 0]),
+    )
+    const result = withRaw.entities.map((track) => ({
+      ...track,
+      playCount: playCountMap.get(track.id) ?? 0,
+    }))
 
     return [result, count]
   }
