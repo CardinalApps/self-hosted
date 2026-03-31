@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../",
+  "testRegex": "tests/.*\\.integration\\.ts$",
+  "testEnvironment": "node",
+  "verbose": true,
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "globals": {
+    "ts-jest": {
+      "tsconfig": "./tsconfig.test.json"
+    }
+  },
+  "testTimeout": 60000,
+  "detectOpenHandles": true,
+  "forceExit": true
+}
