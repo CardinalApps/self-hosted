@@ -1,6 +1,7 @@
 import {
   Entity,
   Column,
+  Index,
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
@@ -13,6 +14,7 @@ import { EmbeddedMetadataType } from '../../utils/file'
 import { unstringifyIfPrimitive } from '../../utils/transformers'
 
 @Entity()
+@Index(['track', 'metaKey'])
 export class MusicTrackMetadata extends BaseEntity {
   @ManyToOne(() => MusicTrack, (musicTrack) => musicTrack.metadata, { onDelete: 'CASCADE' })
   @JoinColumn()
