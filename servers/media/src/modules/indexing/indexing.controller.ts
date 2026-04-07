@@ -22,6 +22,7 @@ import { GETIndexStateResponse } from './types'
 
 import { IndexingService } from './indexing.service'
 import { IndexingSeedLargeService } from './indexing-seed.service'
+import { IndexingSeedFsService } from './indexing-seed-fs.service'
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
 import { User } from '../user/user.entity'
@@ -47,6 +48,7 @@ export class IndexingController {
   constructor(
     private readonly indexingService: IndexingService,
     private readonly indexingSeedLargeService: IndexingSeedLargeService,
+    private readonly indexingSeedFsService: IndexingSeedFsService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
   ) {}
@@ -257,5 +259,23 @@ export class IndexingController {
     }
     const n = parseInt(count, 10) || 5000
     this.indexingSeedLargeService.seed(n)
+  }
+
+  /**
+   * Creates a mock music file system under /music for testing the indexer.
+   * Can only be used in kiosk mode.
+   */
+  @Post('/index/seed/fs')
+  @StandardEndpoint({
+    summary: 'Seed the file system with mock music folders and files.',
+    auth: false,
+    //capabilities: ['Indexing.Operate'],
+  })
+  async seedIndexFs(@Query('artists') artists: string): Promise<void> {
+    if (!envVar('KIOSK_MODE', false)) {
+      throw new ForbiddenException('Kiosk mode must be enabled to run seeding.')
+    }
+    const n = parseInt(artists, 10) || 10
+    this.indexingSeedFsService.seed(n)
   }
 }
