@@ -9,7 +9,7 @@ import { User } from '../user/user.entity'
 import { MusicIndexingService } from './media/indexing.music.service'
 import { envVar } from '../../utils/env'
 
-const BATCH_SIZE = 100
+const BATCH_SIZE = 500
 const ALBUMS_PER_ARTIST = 10
 const TRACKS_PER_ALBUM = 10
 

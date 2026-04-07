@@ -5,6 +5,7 @@ import { IndexingController } from './indexing.controller'
 
 import { IndexingService } from './indexing.service'
 import { IndexingSeedLargeService } from './indexing-seed.service'
+import { IndexingSeedFsService } from './indexing-seed-fs.service'
 import { ScannerService } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
 import { MusicIndexingService } from './media/indexing.music.service'
@@ -41,6 +42,7 @@ import { UserModule } from '../user/user.module'
   providers: [
     IndexingService,
     IndexingSeedLargeService,
+    IndexingSeedFsService,
     ScannerService,
     MusicIndexingService,
     PhotoIndexingService,
