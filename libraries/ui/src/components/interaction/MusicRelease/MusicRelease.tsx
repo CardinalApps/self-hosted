@@ -1,13 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import type { PropsWithChildren } from 'react'
-import { useAppSelector } from '../../../hooks/useAppSelector'
 import clsx from 'clsx'
 
 import MusicPlaybackButton, { PlayButtonSizeType } from '../MusicPlaybackButton'
 import { RouterContext } from '../../../context/router'
 import { useReleaseCover } from '../../../hooks/useReleaseCover'
 import { MusicTrackType } from '../../../store/apis/musicTracks'
-import { appSelectors } from '../../../store/slices/app'
 
 import './MusicRelease.css'
 
@@ -43,17 +41,12 @@ const MusicRelease = ({
   playButtonSize,
 }: PropsWithChildren<MusicReleaseProps>) => {
   const { Link } = useContext(RouterContext)
-  const kioskMode = useAppSelector(appSelectors.kioskMode)
   const [showInner, setShowInner] = useState<boolean>()
   const [tracksInOrder, setTracksInOrder] = useState(tracks)
   const trackIdsInRelease = tracksInOrder.map((track) => track.musicTrackId).filter((track) => !!track)
-  const [coverSrc, { coverIsLoading }] = useReleaseCover(hasArtwork && !kioskMode ? releaseId : null)
-  const [randomKioskNumber] = useState(Math.floor(Math.random() * 100) + 1)
+  const [coverSrc, { coverIsLoading }] = useReleaseCover(hasArtwork ? releaseId : null)
 
   const getArtwork = () => {
-    if (kioskMode) {
-      return `https://cardinalpublicstorage.blob.core.windows.net/demo-images/pregenerated/album-covers/${randomKioskNumber}.png`
-    }
     if (overrideArtwork) {
       return overrideArtwork
     }

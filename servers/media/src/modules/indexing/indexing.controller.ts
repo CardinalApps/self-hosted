@@ -268,8 +268,7 @@ export class IndexingController {
   @Post('/index/seed/fs')
   @StandardEndpoint({
     summary: 'Seed the file system with mock music folders and files.',
-    auth: false,
-    //capabilities: ['Indexing.Operate'],
+    capabilities: ['Indexing.Operate'],
   })
   async seedIndexFs(@Query('artists') artists: string): Promise<void> {
     if (!envVar('KIOSK_MODE', false)) {
