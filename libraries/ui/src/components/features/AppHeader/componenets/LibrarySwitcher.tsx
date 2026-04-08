@@ -40,6 +40,7 @@ const LibrarySwitcher = () => {
           <Select
             name="library-context"
             selectPlaceholder={i18n['libraries.placeholder'][lang]}
+            noOptionsText={i18n['libraries.none'][lang]}
             options={libraryOptions()}
             value={currentLibrary}
             multi={true}

@@ -184,13 +184,14 @@
 
     .no-options {
       width: 100%;
+      padding: 5px;
       min-height: 60px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-weight: 800;
-      font-size: 12px;
-      text-transform: uppercase;
+      font-weight: 500;
+      font-size: 11px;
+      text-align: center;
       color: var(--text-color-4);
     }
   }

@@ -59,6 +59,7 @@ const ToolbarItems = ({
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
   const windowSize = useWindowSize()
+  const pageTitle = useSelector(layoutSelectors.pageTitle)
   const { lang } = useSelector(settingsSelectors.current)
   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
   const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
@@ -138,6 +139,22 @@ const ToolbarItems = ({
     return total === 1
       ? itemNameSingular ? itemNameSingular : i18n['item.singular.default'][lang]
       : itemNamePlural ? itemNamePlural : i18n['item.plural.default'][lang]
+  }
+
+  /**
+   * Displays the current page name.
+   */
+  const PageTitleGroup = function() {
+    if (!pageTitle) {
+      return <></>
+    }
+    return (
+      <>
+        <div className="toolbar-group">
+          <h2 className="toolbar-page-title">{pageTitle}</h2>
+        </div>
+      </>
+    )
   }
 
   /**
@@ -289,6 +306,7 @@ const ToolbarItems = ({
     ?
       // Desktop toolbar
       <>
+        <PageTitleGroup />
         <SimpleCountGroup />
         <VirtualLayoutGroup />
         <SelectionGroup />
@@ -301,6 +319,7 @@ const ToolbarItems = ({
         {!!mobileToolbarModalIsOpen &&
           <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
             <div className="mobile-toolbar-drawer">
+              <PageTitleGroup />
               <SimpleCountGroup />
               <VirtualLayoutGroup />
               <SelectionGroup />

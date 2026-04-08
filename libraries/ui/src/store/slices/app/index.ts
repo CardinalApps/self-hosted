@@ -8,6 +8,7 @@ import { STORE_KEY } from './constants'
 
 type AppSliceState = {
   app: CardinalApp,
+  name: string | null,
   version: string | null,
   cardinalAppId: string | null,
   kioskMode: boolean | false,
@@ -22,6 +23,7 @@ type AppSliceState = {
 
 const initialState: AppSliceState = {
   app: null,
+  name: null,
   version: null,
   cardinalAppId: null,
   kioskMode: false,
@@ -55,6 +57,9 @@ const appSlice = createSlice({
     setBasePath: (state, action: PayloadAction<string>) => {
       state.basePath = action.payload
     },
+    setAppName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -70,6 +75,7 @@ const appSlice = createSlice({
     version: (state) => state.version,
     kioskMode: (state) => state.kioskMode,
     basePath: (state) => state.basePath,
+    name: (state) => state.name,
   },
 })
 

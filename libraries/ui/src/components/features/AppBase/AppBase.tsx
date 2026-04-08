@@ -129,10 +129,7 @@ function AppBase({
 
   const defaultHeader = (
     <AppHeader
-      app={app}
-      logoClickTo={routes.ROOT}
       onSwitchAccountClick={() => navigate(routes.LOGIN)}
-      appName={name}
       loginButton={ssoButton}
     />
   )
@@ -236,6 +233,7 @@ function AppBase({
   useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
   useEffect(() => { dispatch(appActions.setCardinalAppId(cardinalAppId)) }, [cardinalAppId])
   useEffect(() => { dispatch(appActions.setBasePath(basePath)) }, [basePath])
+  useEffect(() => { dispatch(appActions.setAppName(name)) }, [name])
 
   /**
    * Kiosk mode is set server side.
