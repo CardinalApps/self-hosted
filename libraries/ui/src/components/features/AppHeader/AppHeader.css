@@ -1,60 +1,23 @@
 .app-header {
-  width: 100%;
-  padding: 6px 12px 6px 20px;
-  border-bottom: 1px solid var(--border-color-3);
+  padding: 7px 7px 7px 22px;
+  position: fixed;
+  top: var(--gutter);
+  right: var(--gutter);
+  border: 1px solid var(--border-color-1);
+  border-radius: 100px;
   display: flex;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
+  box-shadow: var(--box-shadow-2);
   justify-content: space-between;
-  position: relative;
-  z-index: 100;
+  z-index: 10000;
   transition: box-shadow 400ms;
+  background-color: var(--bg-1);
 
-  > div {
+  > section {
     height: 100%;
     display: flex;
     align-items: center;
-  }
-
-  .logo {
-    margin-right: 14px;
-  }
-
-  .logo-type {
-    width: 290px;
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-  }
-
-  .mid {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .title {
-    margin-bottom: 0;
-    margin-right: 30px;
-    font-size: 22px;
-    cursor: default;
-    user-select: none;
-  }
-
-  .left {
-    flex-grow: 1;
-  }
-
-  .right {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-
-    > section {
-      display: flex;
-      gap: 5px
-    }
   }
 
   .major-badges {

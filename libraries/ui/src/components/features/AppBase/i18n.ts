@@ -82,6 +82,18 @@ const i18n: StringList = {
   "procedural.empty.desc": {
     "en": "<p>Add media to this page by indexing your photos, music, and movie & TV files.</p>",
   },
+  "admin-title": {
+    "en": "Admin",
+  },
+  "music-title": {
+    "en": "Music",
+  },
+  "photos-title": {
+    "en": "Photos",
+  },
+  "cinema-title": {
+    "en": "Cinema",
+  },
 }
 
 export default i18n
