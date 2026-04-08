@@ -1,18 +1,6 @@
 import { StringList } from "../../../types/i18n"
 
 const i18n: StringList = {
-  "admin-title": {
-    "en": "Admin",
-  },
-  "music-title": {
-    "en": "Music",
-  },
-  "photos-title": {
-    "en": "Photos",
-  },
-  "cinema-title": {
-    "en": "Cinema",
-  },
   "cloud-status-icon.media-server.title": {
     "en": "Media Server status",
   },
@@ -54,6 +42,9 @@ const i18n: StringList = {
   },
   "libraries.placeholder": {
     "en": "Library",
+  },
+  "libraries.none": {
+    "en": "Create Libraries in the Admin app",
   },
   "major-badge.kiosk": {
     "en": "Kiosk Mode",

@@ -19,6 +19,7 @@ type SelectProps = {
   selectPlaceholder?: string,
   searchPlaceholder?: string,
   selectedPrefix?: string,
+  noOptionsText?: string,
   value?: string | string[],
   options?: Record<string, unknown> | Record<string, unknown>[],
   typingAreaStyles?: CSSProperties,
@@ -88,6 +89,7 @@ const Select = ({
   selectPlaceholder,
   searchPlaceholder,
   selectedPrefix = '',
+  noOptionsText,
   value,
   options = [],
   typingAreaStyles,
@@ -210,9 +212,9 @@ const Select = ({
    * Blur event for options.
    */
   const onSelectBlur = (e) => {
-    const isOutside = !e.relatedTarget?.closest(`.custom-select[data-name=${name}]`)
+    const isOutside = !e.target?.closest(`.custom-select[data-name=${name}]`)
 
-    if (isOutside && !e?.relatedTarget?.closest(`.custom-select[data-name=${name}]`)) {
+    if (isOutside) {
       setPopoutOpen(false)
     }
   }
@@ -248,7 +250,7 @@ const Select = ({
     if (filtered.length) {
       return filtered
     } else {
-      return [<div className="no-options" key="no-options">{i18n['custom-select.no-options'][lang]}</div>]
+      return [<div className="no-options" key="no-options">{noOptionsText || i18n['custom-select.no-options'][lang]}</div>]
     }
   }
 

@@ -1,6 +1,5 @@
 import { useContext, useRef } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
-import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import Columns, { Column } from '../../layout/Columns'
@@ -8,12 +7,19 @@ import DocLink from '../../interaction/DocLink'
 import SidebarNav from '../../interaction/SidebarNav'
 import { MiniAudioPlayer } from '../AudioPlayer'
 import { DirectoryTreeSidebarPortal, DirectoryTreeMobileButton } from '../../interaction/DirectoryTree'
+import H1 from '../../typography/H1'
 import H2 from '../../typography/H2'
+import { settingsSelectors } from '../../../store/slices/settings'
+import BrandLogo from '../../layout/BrandLogo'
 
-import { layoutSelectors } from '../../../store/slices/layout'
+import { layoutSelectors, SIDEBAR_MODE } from '../../../store/slices/layout'
 import { PAGE_LAYOUT } from '../../../store/slices/layout'
 import { RouterContext } from '../../../context/router'
 import AccessError from '../../layout/AccessError'
+import { appSelectors } from '../../../store/slices/app'
+import { useAppSelector } from '../../../hooks/useAppSelector'
+
+import i18n from './i18n'
 
 export type SidebarOptions = {
   overflow: boolean,
@@ -35,11 +41,16 @@ function AppScaffold({
 }: PropsWithChildren<AppScaffoldProps>) {
   const { Routes, Route } = useContext(RouterContext)
   const pageScrollRef = useRef(null)
-  const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
-  const layout = useSelector(layoutSelectors.current)
-  const pageTitle = useSelector(layoutSelectors.pageTitle)
-  const pageDocLink = useSelector(layoutSelectors.pageDocLink)
-  const mobileFileBrowserIsOpen = useSelector(layoutSelectors.mobileFileBrowserIsOpen)
+  const { Link } = useContext(RouterContext)
+  const mobileNavIsOpen = useAppSelector(layoutSelectors.mobileNavIsOpen)
+  const sidebarMode = useAppSelector(layoutSelectors.sidebarMode)
+  const layout = useAppSelector(layoutSelectors.current)
+  const pageTitle = useAppSelector(layoutSelectors.pageTitle)
+  const pageDocLink = useAppSelector(layoutSelectors.pageDocLink)
+  const mobileFileBrowserIsOpen = useAppSelector(layoutSelectors.mobileFileBrowserIsOpen)
+  const app = useAppSelector(appSelectors.app)
+  const appName = useAppSelector(appSelectors.name)
+  const { lang } = useAppSelector(settingsSelectors.current)
 
   const hasPageTitleBar = () => {
     const supportedLayouts = [
@@ -47,7 +58,6 @@ function AppScaffold({
       PAGE_LAYOUT.thin,
       PAGE_LAYOUT.fixed,
       PAGE_LAYOUT.files,
-      PAGE_LAYOUT.virtual,
       PAGE_LAYOUT.procedural,
     ]
     if (supportedLayouts.includes(layout)) {
@@ -58,12 +68,45 @@ function AppScaffold({
     return false
   }
 
+  const logoText = () => {
+    if (sidebarMode === SIDEBAR_MODE.collapsed) {
+      return null
+    }
+
+    if (appName) {
+      return <H1 className="title">{appName}</H1>
+    }
+
+    switch (app) {
+      case 'admin':
+        return <H1 className="title">{i18n['admin-title'][lang]}</H1>
+
+      case 'music':
+        return <H1 className="title">{i18n['music-title'][lang]}</H1>
+
+      case 'photos':
+        return <H1 className="title">{i18n['photos-title'][lang]}</H1>
+
+      case 'cinema':
+        return <H1 className="title">{i18n['cinema-title'][lang]}</H1>
+    }
+  }
+
   return (
     <div className={clsx('scaffold')} data-layout={layout}>
-      <div className={clsx('app-header-row')}>
-        {header}
-      </div>
+      {header}
       <div className={clsx('sidebar-nav-col')}>
+        <div className="logo-type">
+          {Link
+            ? <Link to={'/'} className="logo">
+                <BrandLogo icon="birb" size="s" />
+              </Link>
+            : <div className="logo">
+                <BrandLogo icon="birb" size="s" />
+              </div>
+          }
+          {logoText()}
+        </div>
         <SidebarNav overflow={sidebarOptions?.overflow}>
           {sidebarOptions?.navigation}
         </SidebarNav>
