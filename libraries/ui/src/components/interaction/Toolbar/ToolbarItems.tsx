@@ -59,7 +59,7 @@ const ToolbarItems = ({
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
   const windowSize = useWindowSize()
-  const pageTitle = useSelector(layoutSelectors.pageTitle)
+  // const pageTitle = useSelector(layoutSelectors.pageTitle)
   const { lang } = useSelector(settingsSelectors.current)
   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
   const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
@@ -144,18 +144,18 @@ const ToolbarItems = ({
   /**
    * Displays the current page name.
    */
-  const PageTitleGroup = function() {
-    if (!pageTitle) {
-      return <></>
-    }
-    return (
-      <>
-        <div className="toolbar-group">
-          <h2 className="toolbar-page-title">{pageTitle}</h2>
-        </div>
-      </>
-    )
-  }
+  // const PageTitleGroup = function() {
+  //   if (!pageTitle) {
+  //     return <></>
+  //   }
+  //   return (
+  //     <>
+  //       <div className="toolbar-group">
+  //         <h2 className="toolbar-page-title">{pageTitle}</h2>
+  //       </div>
+  //     </>
+  //   )
+  // }
 
   /**
    * Displays a simple count of how many items are in the archive. Requires
@@ -306,7 +306,7 @@ const ToolbarItems = ({
     ?
       // Desktop toolbar
       <>
-        <PageTitleGroup />
+        {/* <PageTitleGroup /> */}
         <SimpleCountGroup />
         <VirtualLayoutGroup />
         <SelectionGroup />
@@ -319,7 +319,7 @@ const ToolbarItems = ({
         {!!mobileToolbarModalIsOpen &&
           <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
             <div className="mobile-toolbar-drawer">
-              <PageTitleGroup />
+              {/* <PageTitleGroup /> */}
               <SimpleCountGroup />
               <VirtualLayoutGroup />
               <SelectionGroup />
