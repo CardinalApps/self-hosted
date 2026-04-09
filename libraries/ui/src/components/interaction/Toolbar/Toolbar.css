@@ -2,7 +2,7 @@
   height: 48px;
   margin-bottom: 20px;
   border-radius: 10px;
-  border: 1px solid var(--border-color-1);
+  border: 1px solid var(--border-color-3);
   display: inline-flex;
   align-items: center;
   position: relative;
@@ -102,7 +102,7 @@
       top: 0px;
       right: 0;
       bottom: 0px;
-      background-color: var(--border-color-1);
+      background-color: var(--border-color-3);
     }
 
     &:first-of-type {

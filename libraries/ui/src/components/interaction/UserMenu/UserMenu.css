@@ -1,6 +1,6 @@
 .user-menu {
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   position: relative;
 
   &.open {
@@ -8,11 +8,7 @@
     .avatar-btn {
 
       .user-avatar {
-        transform: scale(1.5) translate(-19px, 22px);
-      }
-
-      .user-avatar.guest {
-        transform: scale(1.2) translate(-19px, 22px);
+        transform: scale(2) translate(-19px, 22px);
       }
 
       i {
