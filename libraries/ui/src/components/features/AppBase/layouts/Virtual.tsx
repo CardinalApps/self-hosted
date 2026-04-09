@@ -139,7 +139,7 @@ function VirtualLayout({
     getScrollElement: () => parentRef.current,
     overscan: 4,
     gap,
-    paddingStart: 120,
+    paddingStart: 88,
     paddingEnd: 20,
     onChange: (instance) => onVirtualChange(
       instance?.range?.startIndex + 1,

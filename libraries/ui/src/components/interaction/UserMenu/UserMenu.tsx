@@ -109,7 +109,7 @@ const UserMenu = ({
   return (
     <div className={clsx(`user-menu`, menuIsOpen && 'open', currentHomeServerUser?.cardinalId && 'cloud-user-logged-in')}>
       <button className="avatar-btn" onClick={() => setMenuIsOpen(!menuIsOpen)}>
-        <UserTag user={currentHomeServerUser} showName={false} size="m" />
+        <UserTag user={currentHomeServerUser} showName={false} size="s" />
       </button>
       <div className="user-dropdown-under">
         <div className="user-dropdown-inner">

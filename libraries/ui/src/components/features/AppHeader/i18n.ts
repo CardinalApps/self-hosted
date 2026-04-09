@@ -64,6 +64,18 @@ const i18n: StringList = {
   "major-badge.planned.desc": {
     "en": "<h2>Planned</h2><p>Work will begin on this app soon.</p>",
   },
+  "admin-title": {
+    "en": "Admin",
+  },
+  "music-title": {
+    "en": "Music",
+  },
+  "photos-title": {
+    "en": "Photos",
+  },
+  "cinema-title": {
+    "en": "Cinema",
+  },
 }
 
 export default i18n
