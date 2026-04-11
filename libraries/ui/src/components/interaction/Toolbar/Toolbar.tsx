@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { CSSProperties } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
-import { motion } from 'framer-motion'
 
 import { ORDER_SLUG, DEFAULT_ORDER } from './items/Order'
 import { ORDER_BY_SLUG, DEFAULT_ORDER_BY } from './items/OrderBy'
@@ -10,15 +9,11 @@ import { DATE_RANGE_SLUG, DEFAULT_DATE_RANGE } from './items/DateRange'
 import { PAGINATION_SLUG, DEFAULT_PAGINATION } from './items/Pagination'
 
 import ToolbarItems from './ToolbarItems'
+import { ToolbarItemObject } from './types'
 
-import { settingsSelectors } from '../../../store/slices/settings'
 import { layoutActions } from '../../../store/slices/layout'
 
 import './Toolbar.css'
-
-import i18n from './i18n'
-
-import { ToolbarItemObject } from './types'
 
 const DEFAULT_VALUES = {
   [ORDER_SLUG]: DEFAULT_ORDER,
@@ -64,8 +59,6 @@ const Toolbar = ({
   style,
 }: ToolbarProps) => {
   const dispatch = useDispatch()
-  const { lang } = useSelector(settingsSelectors.current)
-  const [resetIconAnimation, setResetIconAnimation] = useState('')
 
   /**
    * Merge the hardcoded DEFAULT_VALUES with the initial values supplied in the
@@ -88,45 +81,6 @@ const Toolbar = ({
     return defaultInitialValues
   }
 
-  const reset = () => {
-    dispatch(layoutActions.setToolbarValues({
-      name,
-      values: getDefaultValues(),
-    }))
-    onReset?.()
-    setResetIconAnimation('spin')
-    if (virtualViewName) {
-      dispatch(layoutActions.resetScrollPoint(virtualViewName))
-    }
-  }
-
-  const ResetGroup = () => {
-    return (
-      <div className="toolbar-group">
-        <motion.div
-          className={clsx('toolbar-item', 'reset')}
-          initial={{
-            transform: 'rotate(0deg)',
-          }}
-          animate={{
-            transform: resetIconAnimation ? 'rotate(-360deg)' : 'rotate(0deg)',
-            transition: { type: 'spring', duration: 0.5 },
-          }}
-          onClick={() => {
-            if (resetIconAnimation) {
-              setResetIconAnimation('')
-            }
-          }}
-          onAnimationComplete={() => setResetIconAnimation?.('')}
-        >
-          <button className="toolbar-button" onClick={reset} title={i18n['reset.title'][lang]}>
-            <i className="toolbar-icon fas fa-undo-alt" />
-          </button>
-        </motion.div>
-      </div>
-    )
-  }
-
   /**
    * Save toolbar values in store on init if they haven't been set yet.
    */
@@ -145,6 +99,7 @@ const Toolbar = ({
           items={items}
           onClearSelection={onClearSelection}
           onDeleteSelection={onDeleteSelection}
+          onReset={onReset}
           numShowingItems={numShowingItems}
           numArchiveItems={numArchiveItems}
           numItemsSelected={numItemsSelected}
@@ -153,7 +108,6 @@ const Toolbar = ({
           virtualViewName={virtualViewName}
           defaultValues={getDefaultValues()}
         />
-        <ResetGroup />
       </div>
     </>
   )
