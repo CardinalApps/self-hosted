@@ -94,6 +94,10 @@ function lerpColor(a: string, b: string, t: number): string {
 }
 
 function parseColor(color: string): [number, number, number] | null {
+  const rgbMatch = color.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/)
+  if (rgbMatch) {
+    return [parseInt(rgbMatch[1]), parseInt(rgbMatch[2]), parseInt(rgbMatch[3])]
+  }
   const hex = color.replace('#', '').slice(0, 6)
   if (hex.length === 6) {
     return [
@@ -306,6 +310,29 @@ const AnimatedGradient = ({
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
     }
   }, [displayValues])
+
+  // When tabbing back, rAF resumes with the real current timestamp while
+  // startRef holds a stale pre-hide timestamp, making elapsed huge and t=1.
+  // Reset the start time so the transition replays cleanly, and force a
+  // repaint of the last known state in case nothing was animating.
+  useEffect(() => {
+    const el = ref.current
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') return
+
+      if (startRef.current !== null) {
+        // Animation was in progress — reset start so it replays from t=0.
+        startRef.current = performance.now()
+      } else if (el) {
+        // No animation running — repaint the last committed state.
+        el.style.background = buildBackground(fromRef.current)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   return (
     <div
