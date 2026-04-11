@@ -47,7 +47,6 @@ function AppScaffold({
       PAGE_LAYOUT.thin,
       PAGE_LAYOUT.fixed,
       PAGE_LAYOUT.files,
-      PAGE_LAYOUT.procedural,
     ]
     if (supportedLayouts.includes(layout)) {
       if (pageTitle || pageDocLink) {

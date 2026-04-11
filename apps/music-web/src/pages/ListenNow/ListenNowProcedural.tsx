@@ -1,16 +1,10 @@
-import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
-import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
-
 import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Procedural'
 import TrueShuffle from './items/TrueShuffle'
 import RecentlyAddedReleases from './items/RecentlyAddedReleases'
 import MostPlayedTracks from './items/MostPlayedTracks'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
-import i18n from './i18n.json'
-
 function ListenNowProcedural() {
-  const { lang } = useAppSelector(settingsSelectors.current)
 
   /**
    * We need at least 1 track to show this page.
@@ -35,15 +29,6 @@ function ListenNowProcedural() {
       isReady={isSuccess}
       hasContent={!!musicTracks.length}
     >
-      {
-      /**
-       * Page title.
-       */
-      }
-      <ProceduralLayout.Title>
-        {i18n['title'][lang]}
-      </ProceduralLayout.Title>
-
       {
       /**
        * Action buttons.

@@ -15,6 +15,7 @@ export type ToolbarOrderByType =
 export type ToolbarOrderByDropdownType = ToolbarOrderByType[]
 
 export enum ToolbarItem {
+  BREADCRUMBS = 'breadcrumbs',
   DATERANGE = 'daterange',
   PAGINATION = 'pagination',
   ORDER = 'order',

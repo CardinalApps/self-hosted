@@ -1,14 +1,4 @@
 .history-infinite-scroll {
-
-  .virtual-row {
-
-    &:last-of-type {
-      
-      .music-history-entry {
-        border-bottom: none;
-      }
-    }
-  }
   
   .music-history-entry {
     width: 100%;

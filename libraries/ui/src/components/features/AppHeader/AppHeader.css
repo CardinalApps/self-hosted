@@ -20,6 +20,7 @@
   padding: 0 2px 0 11px;
   border: 1px solid var(--border-color-1);
   border-radius: 100px;
+  position: relative;
   display: flex;
   flex-grow: 1;
   align-items: center;
@@ -27,8 +28,23 @@
   transition: box-shadow 400ms;
   background-color: var(--bg-1);
 
+  &:before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    right: -3px;
+    bottom: -25px;
+    background-color: var(--bg-2);
+    z-index: -1;
+  }
+
   &.glass {
     box-shadow: var(--box-shadow-2);
+
+    &:before {
+      display: none;
+    }
 
     .toolbar {
       background-color: transparent;
@@ -58,7 +74,7 @@
     flex-shrink: 0;
     align-items: center;
     display: flex;
-    gap: 10px;
+    gap: 20px;
 
     .logo {
       height: 100%;

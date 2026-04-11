@@ -46,7 +46,7 @@ function AppPage({
   children,
   restoreScrollPoint = true,
   toolbar,
-  toolbarPortal,
+  toolbarPortal = true,
   showLibrarySwitcher = false,
   networkError,
   style,

@@ -22,14 +22,16 @@ import { ToolbarItemObject } from './types'
 import './Toolbar.css'
 
 import i18n from './i18n'
+import { motion } from 'framer-motion'
+import clsx from 'clsx'
 
 
 type ToolbarItemsProps = {
   name?: string,
   items?: ToolbarItemObject[],
-  onReset?: () => void,
   onClearSelection?: () => void,
   onDeleteSelection?: () => void,
+  onReset?: () => void,
   numShowingItems?: number | string,
   numArchiveItems?: number,
   numItemsSelected?: number,
@@ -49,6 +51,7 @@ const ToolbarItems = ({
   items = [],
   onClearSelection = () => {},
   onDeleteSelection,
+  onReset,
   numShowingItems,
   numItemsSelected,
   itemNamePlural,
@@ -59,10 +62,11 @@ const ToolbarItems = ({
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
   const windowSize = useWindowSize()
-  // const pageTitle = useSelector(layoutSelectors.pageTitle)
+  const pageTitle = useSelector(layoutSelectors.pageTitle)
   const { lang } = useSelector(settingsSelectors.current)
   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
   const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
+  const [resetIconAnimation, setResetIconAnimation] = useState('')
 
   /**
    * Return an instance of a built-in toolbar component.
@@ -144,18 +148,18 @@ const ToolbarItems = ({
   /**
    * Displays the current page name.
    */
-  // const PageTitleGroup = function() {
-  //   if (!pageTitle) {
-  //     return <></>
-  //   }
-  //   return (
-  //     <>
-  //       <div className="toolbar-group">
-  //         <h2 className="toolbar-page-title">{pageTitle}</h2>
-  //       </div>
-  //     </>
-  //   )
-  // }
+  const BreadcrumbsGroup = function() {
+    if (!pageTitle) {
+      return null
+    }
+    return (
+      <>
+        <div className="toolbar-group">
+          <h2 className="toolbar-page-title">{pageTitle}</h2>
+        </div>
+      </>
+    )
+  }
 
   /**
    * Displays a simple count of how many items are in the archive. Requires
@@ -163,7 +167,7 @@ const ToolbarItems = ({
    */
   const SimpleCountGroup = function() {
     if (!numArchiveItems) {
-      return <></>
+      return null
     }
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
@@ -298,19 +302,62 @@ const ToolbarItems = ({
     )
   }
 
+  const reset = () => {
+    dispatch(layoutActions.setToolbarValues({
+      name,
+      values: defaultValues,
+    }))
+    onReset?.()
+    setResetIconAnimation('spin')
+    if (virtualViewName) {
+      dispatch(layoutActions.resetScrollPoint(virtualViewName))
+    }
+  }
+
+  const ResetGroup = () => {
+    if (!items.length) {
+      return null
+    }
+    return (
+      <div className="toolbar-group">
+        <motion.div
+          className={clsx('toolbar-item', 'reset')}
+          initial={{
+            transform: 'rotate(0deg)',
+          }}
+          animate={{
+            transform: resetIconAnimation ? 'rotate(-360deg)' : 'rotate(0deg)',
+            transition: { type: 'spring', duration: 0.5 },
+          }}
+          onClick={() => {
+            if (resetIconAnimation) {
+              setResetIconAnimation('')
+            }
+          }}
+          onAnimationComplete={() => setResetIconAnimation?.('')}
+        >
+          <button className="toolbar-button" onClick={reset} title={i18n['reset.title'][lang]}>
+            <i className="toolbar-icon fas fa-undo-alt" />
+          </button>
+        </motion.div>
+      </div>
+    )
+  }
+
   if (!windowSize?.width) {
-    return <></>
+    return null
   }
 
   return windowSize.width > 768
     ?
       // Desktop toolbar
       <>
-        {/* <PageTitleGroup /> */}
+        <BreadcrumbsGroup />
         <SimpleCountGroup />
         <VirtualLayoutGroup />
         <SelectionGroup />
         <ProvidedItemsGroup />
+        <ResetGroup />
       </>
     :
       // Mobile toolbar
@@ -319,11 +366,12 @@ const ToolbarItems = ({
         {!!mobileToolbarModalIsOpen &&
           <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
             <div className="mobile-toolbar-drawer">
-              {/* <PageTitleGroup /> */}
+              <BreadcrumbsGroup />
               <SimpleCountGroup />
               <VirtualLayoutGroup />
               <SelectionGroup />
               <ProvidedItemsGroup />
+              <ResetGroup />
             </div>
           </Drawer>
         }
