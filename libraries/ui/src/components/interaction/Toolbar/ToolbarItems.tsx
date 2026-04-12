@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -41,6 +41,7 @@ type ToolbarItemsProps = {
   virtualViewName?: string,
   className?: string,
   style?: CSSProperties,
+  collider?: string,
 }
 
 /**
@@ -59,6 +60,7 @@ const ToolbarItems = ({
   numArchiveItems,
   virtualViewName,
   defaultValues,
+  collider,
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
   const windowSize = useWindowSize()
@@ -67,6 +69,92 @@ const ToolbarItems = ({
   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
   const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
   const [resetIconAnimation, setResetIconAnimation] = useState('')
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const overflowRef = useRef<HTMLDivElement>(null)
+  const overflowTriggerRef = useRef<HTMLDivElement>(null)
+  const setOverflowRef = (el: HTMLDivElement | null) => {
+    overflowRef.current = el
+    if (!el) return
+    const groups = Array.from(el.querySelectorAll<HTMLElement>(':scope > .toolbar-group'))
+    const numVisible = groups.length - numHidden
+    groups.forEach((g, i) => { g.style.display = i < numVisible ? 'none' : '' })
+  }
+  const [overflowOpen, setOverflowOpen] = useState(false)
+  const [numHidden, setNumHidden] = useState(0)
+
+  useEffect(() => {
+    if (!collider || !toolbarRef.current) return
+
+    const measure = () => {
+      const toolbar = toolbarRef.current?.parentElement
+      const colliderEl = document.querySelector(collider)
+      if (!toolbar || !colliderEl) return
+
+      // Only direct children, excluding the overflow trigger itself
+      const groups = Array.from(toolbarRef.current!.querySelectorAll<HTMLElement>(':scope > .toolbar-group:not(.toolbar-overflow-trigger)'))
+
+      // Show all groups first so the toolbar reflects its full width
+      groups.forEach((g) => (g.style.display = ''))
+
+      let hidden = 0
+      while (
+        colliderEl.getBoundingClientRect().left - toolbar.getBoundingClientRect().right < 20 &&
+        hidden < groups.length
+      ) {
+        groups[groups.length - 1 - hidden].style.display = 'none'
+        hidden++
+      }
+      setNumHidden(hidden)
+    }
+
+    measure()
+
+    const toolbarEl = toolbarRef.current?.parentElement
+    const colliderEl = document.querySelector(collider)
+
+    const resizeObserver = new ResizeObserver(measure)
+    if (toolbarEl) resizeObserver.observe(toolbarEl)
+    if (colliderEl) resizeObserver.observe(colliderEl)
+
+    const mutationObserver = new MutationObserver(measure)
+    if (toolbarEl) mutationObserver.observe(toolbarEl, { childList: true })
+
+    window.addEventListener('resize', measure)
+
+    return () => {
+      resizeObserver.disconnect()
+      mutationObserver.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [collider, windowSize])
+
+  useEffect(() => {
+    if (!overflowOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOverflowOpen(false)
+    }
+    const onMouseDown = (e: MouseEvent) => {
+      if (!overflowTriggerRef.current?.contains(e.target as Node)) {
+        setOverflowOpen(false)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('mousedown', onMouseDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('mousedown', onMouseDown)
+    }
+  }, [overflowOpen])
+
+  useEffect(() => {
+    const overflow = overflowRef.current
+    if (!overflow) return
+    const groups = Array.from(overflow.querySelectorAll<HTMLElement>(':scope > .toolbar-group'))
+    const numVisible = groups.length - numHidden
+    groups.forEach((g, i) => {
+      g.style.display = i < numVisible ? 'none' : ''
+    })
+  }, [numHidden, overflowOpen])
 
   /**
    * Return an instance of a built-in toolbar component.
@@ -351,27 +439,44 @@ const ToolbarItems = ({
   return windowSize.width > 768
     ?
       // Desktop toolbar
-      <>
-        <BreadcrumbsGroup />
-        <SimpleCountGroup />
-        <VirtualLayoutGroup />
-        <SelectionGroup />
-        <ProvidedItemsGroup />
-        <ResetGroup />
-      </>
+      <div ref={toolbarRef} className="toolbar-collider">
+        {BreadcrumbsGroup()}
+        {SimpleCountGroup()}
+        {VirtualLayoutGroup()}
+        {SelectionGroup()}
+        {ProvidedItemsGroup()}
+        {ResetGroup()}
+        {collider && numHidden > 0 && (
+          <div className="toolbar-group toolbar-overflow-trigger" ref={overflowTriggerRef}>
+            <button className="overflow-button" onClick={() => setOverflowOpen((o) => !o)}>
+              <i className="toolbar-icon fas fa-ellipsis-h" />
+            </button>
+            {overflowOpen && (
+              <div className="toolbar-overflow-popout" ref={setOverflowRef}>
+                {BreadcrumbsGroup()}
+                {SimpleCountGroup()}
+                {VirtualLayoutGroup()}
+                {SelectionGroup()}
+                {ProvidedItemsGroup()}
+                {ResetGroup()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     :
       // Mobile toolbar
       <>
-        <MobileFilterGroup />
+        {MobileFilterGroup()}
         {!!mobileToolbarModalIsOpen &&
           <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
             <div className="mobile-toolbar-drawer">
-              <BreadcrumbsGroup />
-              <SimpleCountGroup />
-              <VirtualLayoutGroup />
-              <SelectionGroup />
-              <ProvidedItemsGroup />
-              <ResetGroup />
+              {BreadcrumbsGroup()}
+              {SimpleCountGroup()}
+              {VirtualLayoutGroup()}
+              {SelectionGroup()}
+              {ProvidedItemsGroup()}
+              {ResetGroup()}
             </div>
           </Drawer>
         }

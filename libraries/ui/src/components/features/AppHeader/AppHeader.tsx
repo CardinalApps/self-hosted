@@ -1,5 +1,4 @@
 import { useContext, useState, type PropsWithChildren, type ReactNode } from 'react'
-import useElementOverlap from '../../../hooks/useElementOverlap'
 import { useAppSelector } from '../../../hooks/useAppSelector'
 import { appSelectors } from '../../../store/slices/app'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
@@ -46,7 +45,6 @@ const AppHeader = ({
   const sidebarMode = useAppSelector(layoutSelectors.sidebarMode)
   const app = useAppSelector(appSelectors.app)
   const appName = useAppSelector(appSelectors.name)
-  const toolbarOverlap = useElementOverlap(['#toolbar-portal', '.menu-col'])
 
   const majorBadges = () => {
     const badges = []
@@ -90,7 +88,7 @@ const AppHeader = ({
 
   return (
     <header className="app-header">
-      <div className={clsx('app-header-bar', enable_glass && 'glass', toolbarOverlap && 'toolbar-overflow')}>
+      <div className={clsx('app-header-bar', enable_glass && 'glass')}>
         <section className="logo-col">
           <div className="logo-type">
             {Link

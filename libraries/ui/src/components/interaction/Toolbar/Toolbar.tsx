@@ -36,6 +36,7 @@ type ToolbarProps = {
   virtualViewName?: string,
   className?: string,
   style?: CSSProperties,
+  collider?: string,
 }
 
 /**
@@ -57,6 +58,7 @@ const Toolbar = ({
   virtualViewName,
   className,
   style,
+  collider = '.menu-col',
 }: ToolbarProps) => {
   const dispatch = useDispatch()
 
@@ -93,7 +95,7 @@ const Toolbar = ({
 
   return (
     <>
-      <div className={clsx('toolbar', className)} style={style}>
+      <div className={clsx('toolbar', 'toolbar-uid-' + name, className)} style={style}>
         <ToolbarItems
           name={name}
           items={items}
@@ -107,6 +109,7 @@ const Toolbar = ({
           itemNameSingular={itemNameSingular}
           virtualViewName={virtualViewName}
           defaultValues={getDefaultValues()}
+          collider={collider}
         />
       </div>
     </>
