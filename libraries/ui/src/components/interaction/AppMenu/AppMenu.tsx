@@ -25,8 +25,15 @@ const AppMenu = ({
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
-    <MenuButton solid={false} align={align} size="m" title={i18n['icon.title'][lang]} icon={<i className="fas fa-th" />}>
-      <div className="app-menu">
+    <MenuButton
+      width={230}
+      solid={false}
+      align={align}
+      size="m"
+      title={i18n['icon.title'][lang]}
+      icon={<i className="fas fa-th" />}
+    >
+      <MenuButton.Section className="app-menu">
         <div className="web-apps">
           <div>
             <a href="/admin" target={target} title={i18n['app.titleAttr.admin']['en']}>
@@ -61,7 +68,7 @@ const AppMenu = ({
             </a>
           </div>
         </div>
-      </div>
+      </MenuButton.Section>
     </MenuButton>
   )
 }

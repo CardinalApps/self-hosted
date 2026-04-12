@@ -47,23 +47,46 @@ const CloudStatusIcon = () => {
       solid={false}
       size="m"
       align={'right'}
+      title={i18n['cloud-status-icon.title']['en']}
       icon={
         <div className="status-dots">
-          <div
-            className="status-dot"
-            title={`${i18n['cloud-status-icon.media-server.title'][lang]}: ${i18n[`cloud-status-icon.dots.${getMediaServerStatus()}`][lang]}`}
-            data-status={getMediaServerStatus()}
-          />
           <div
             className="status-dot"
             title={`${i18n['cloud-status-icon.cloud-services.title'][lang]}: ${currentMediaServerUser?.designation === 'guest_account' ? i18n['cloud-status-icon.guest-account'][lang] : i18n[`cloud-status-icon.dots.${getCloudStatus()}`][lang]}`}
             data-status={getCloudStatus()}
           />
+          <div
+            className="status-dot"
+            title={`${i18n['cloud-status-icon.media-server.title'][lang]}: ${i18n[`cloud-status-icon.dots.${getMediaServerStatus()}`][lang]}`}
+            data-status={getMediaServerStatus()}
+          />
         </div>
       }
     >
-      <div className="status-overview">
-        <p className="title">{i18n['cloud-status-icon.title'][lang]}</p>
+      <MenuButton.Section className="current-status">
+        <div className="server">
+          <p className="server-name">
+            <i className="fas fa-cloud" />
+            {i18n['cloud-status-icon.cloud-services.title'][lang]}
+          </p>
+          <p className="realtime">
+            {currentMediaServerUser?.designation === 'guest_account' ? i18n['cloud-status-icon.guest-account'][lang] : i18n[`cloud-status-icon.dots.${getCloudStatus()}`][lang]}
+          </p>
+        </div>
+        <div className="server">
+          <p className="server-name">
+            <i className="fas fa-home" />
+            {i18n['cloud-status-icon.media-server.title'][lang]}
+          </p>
+          <p className="realtime">
+            {i18n[`cloud-status-icon.dots.${getMediaServerStatus()}`][lang]}
+          </p>
+        </div>
+      </MenuButton.Section>
+      <MenuButton.Section
+        className="status-overview"
+        title={i18n['cloud-status-icon.dots.legend'][lang]}
+      >
         <ul className="dot-legend">
           <li>
             <div className="status-dot" data-status={STATUS_DOTS.connected} />
@@ -78,7 +101,7 @@ const CloudStatusIcon = () => {
             <span>{i18n['cloud-status-icon.dots.not-connected'][lang]}</span>
           </li>
         </ul>
-      </div>
+      </MenuButton.Section>
     </MenuButton>
   )
 }

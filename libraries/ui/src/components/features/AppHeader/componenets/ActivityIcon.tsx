@@ -136,9 +136,7 @@ const ActivityIcon = () => {
         />
       }
     >
-      <div className="currently-active">
-        <p className="title">{i18n['activity-icon.title'][lang]}</p>
-
+      <MenuButton.Section className="currently-active">
         {!somethingIsActive &&
           <div className="no-activity">
             {i18n['activity.none'][lang]}
@@ -170,7 +168,7 @@ const ActivityIcon = () => {
             </div>
           )
         })}
-      </div>
+      </MenuButton.Section>
     </MenuButton>
   )
 }
