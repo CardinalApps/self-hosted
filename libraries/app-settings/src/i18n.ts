@@ -179,4 +179,10 @@ export default {
   "settings.max-concurrent-playing-audio-streams.desc": {
     "en": "How many of the current players can be playing audio at the same time.",
   },
+  "settings.max-rating.label": {
+    "en": "Max rating",
+  },
+  "settings.max-rating.desc": {
+    "en": "Number of stars used for ratings. Ratings are stored as percentages, and favourites are anything with a 100% rating.",
+  },
 }

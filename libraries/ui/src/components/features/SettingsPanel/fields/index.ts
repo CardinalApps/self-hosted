@@ -42,6 +42,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
             adminServerFields.openAppsInNewTab,
             adminServerFields.autoCheckForUpdates,
+            adminServerFields.maxRating,
           ],
         },
         // Theme settings tab
