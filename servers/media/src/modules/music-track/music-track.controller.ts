@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger'
 import type { Response } from 'express'
 
+import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 import { MusicTrack } from './music-track.entity'
 import { MusicTrackService } from './music-track.service'
 
@@ -62,8 +63,8 @@ export class MusicTrackController {
     summary: 'Query music tracks.',
     capabilities: ['MusicTracks.Read'],
   })
-  async getTracks(@Query() query: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
-    return await this.musicTrackService.query(query)
+  async getTracks(@CurrentUser() user, @Query() query: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
+    return await this.musicTrackService.query(query, user)
   }
 
   /**
