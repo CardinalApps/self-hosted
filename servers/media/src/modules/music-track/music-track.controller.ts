@@ -16,7 +16,7 @@ import {
 import type { Response } from 'express'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
-import { MusicTrack } from './music-track.entity'
+import { MusicTrack, MusicTrackComputed } from './music-track.entity'
 import { MusicTrackService } from './music-track.service'
 
 import { GetMusicTrackDto } from './dtos/GetMusicTrack.dto'
@@ -45,8 +45,8 @@ export class MusicTrackController {
     summary: 'Get a single music track.',
     capabilities: ['MusicTracks.Read'],
   })
-  async getMusicTrack(@Param() { id }: GetMusicTrackDto): Promise<MusicTrack> {
-    const musicTrack = await this.musicTrackService.get(id, { artists: true, release: { thumbnails: true } })
+  async getMusicTrack(@CurrentUser() user, @Param() { id }: GetMusicTrackDto): Promise<MusicTrackComputed> {
+    const musicTrack = await this.musicTrackService.get(id, { artists: true, release: { thumbnails: true } }, user)
 
     if (!musicTrack) {
       throw new NotFoundException()
@@ -63,7 +63,7 @@ export class MusicTrackController {
     summary: 'Query music tracks.',
     capabilities: ['MusicTracks.Read'],
   })
-  async getTracks(@CurrentUser() user, @Query() query: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
+  async getTracks(@CurrentUser() user, @Query() query: GetMusicTracksDto): Promise<[MusicTrackComputed[], number]> {
     return await this.musicTrackService.query(query, user)
   }
 

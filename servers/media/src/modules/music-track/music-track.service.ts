@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { Repository, DataSource, QueryRunner } from 'typeorm'
 
-import { MusicTrack } from './music-track.entity'
+import { MusicTrack, MusicTrackComputed } from './music-track.entity'
 import { MusicTrackMetadata } from './music-track-metadata.entity'
 import { File } from '../indexing/entities/file.entity'
 
@@ -40,7 +40,7 @@ export class MusicTrackService {
   /**
    * Gets a single music track.
    */
-  async get(id: number | string, relations = {}): Promise<MusicTrack | null> {
+  async get(id: number | string, relations = {}, user?: User): Promise<MusicTrackComputed | null> {
     const where = typeof id === 'number' ? { id: id } : { musicTrackId: id }
 
     const musicTrack = await this.musicTrackRepository.find({
@@ -54,10 +54,19 @@ export class MusicTrackService {
       return null
     }
 
-    return musicTrack[0]
+    const track = musicTrack[0]
+
+    if (user) {
+      const ratingRow = await this.dataSource.getRepository(Rating).findOne({
+        where: { user: { id: user.id }, track: { id: track.id } },
+      })
+      return { ...track, rating: ratingRow?.rating ?? null }
+    }
+
+    return track
   }
 
-  async query(getMusicTracksDto: GetMusicTracksDto, user?: User): Promise<[MusicTrack[], number]> {
+  async query(getMusicTracksDto: GetMusicTracksDto, user?: User): Promise<[MusicTrackComputed[], number]> {
     const {
       take,
       skip,
@@ -108,6 +117,8 @@ export class MusicTrackService {
 
     if (orderBy === 'playCount') {
       qb.orderBy('music_track_play_count', order)
+    } else if (orderBy === 'rating' && user) {
+      qb.orderBy('music_track_rating', order)
     } else {
       qb.orderBy(`music_track.${orderBy}`, order)
     }
