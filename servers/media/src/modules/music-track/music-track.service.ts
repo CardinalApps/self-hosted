@@ -11,6 +11,8 @@ import { EventService } from '../event/event.service'
 import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
 import { LibraryService } from '../library/library.service'
 import { MusicHistory } from '../music-history/music-history.entity'
+import { Rating } from '../rating/rating.entity'
+import { User } from '../user/user.entity'
 
 @Injectable()
 export class MusicTrackService {
@@ -55,7 +57,7 @@ export class MusicTrackService {
     return musicTrack[0]
   }
 
-  async query(getMusicTracksDto: GetMusicTracksDto): Promise<[MusicTrack[], number]> {
+  async query(getMusicTracksDto: GetMusicTracksDto, user?: User): Promise<[MusicTrack[], number]> {
     const {
       take,
       skip,
@@ -93,6 +95,17 @@ export class MusicTrackService {
     )
     qb.addSelect('COALESCE(play_counts.play_count, 0)', 'music_track_play_count')
 
+    // Join the current user's rating if a user is provided
+    if (user) {
+      qb.addSelect((subQuery) =>
+        subQuery
+          .select('rating.rating', 'rating')
+          .from(Rating, 'rating')
+          .where('rating.track_id = music_track.id')
+          .andWhere('rating.user_id = :userId', { userId: user.id }),
+        'music_track_rating')
+    }
+
     if (orderBy === 'playCount') {
       qb.orderBy('music_track_play_count', order)
     } else {
@@ -105,13 +118,17 @@ export class MusicTrackService {
 
     // Map by ID rather than array index — index alignment breaks when M2M
     // joins (e.g. artists) cause TypeORM to produce multiple raw rows per entity.
-    const playCountMap = new Map(
-      withRaw.raw.map((row) => [row.music_track_id, parseInt(row.music_track_play_count, 10) || 0]),
+    const rawMap = new Map(
+      withRaw.raw.map((row) => [row.music_track_id, row]),
     )
-    const result = withRaw.entities.map((track) => ({
-      ...track,
-      playCount: playCountMap.get(track.id) ?? 0,
-    }))
+    const result = withRaw.entities.map((track) => {
+      const raw = rawMap.get(track.id)
+      return {
+        ...track,
+        playCount: parseInt(raw?.music_track_play_count, 10) || 0,
+        rating: raw?.music_track_rating ?? null,
+      }
+    })
 
     return [result, count]
   }

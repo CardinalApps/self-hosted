@@ -19,6 +19,7 @@ export const MediaServerAspects = [
   'MusicGenres',
   'MusicTracks',
   'MusicHistory',
+  'Ratings',
   'PhotosApp',
   'Photos',
   'PhotoFaces',
@@ -82,6 +83,11 @@ export const MediaServerCapabilities = [
 
   'MusicHistory.Create',
   'MusicHistory.Read',
+
+  'Ratings.Create',
+  'Ratings.Read',
+  'Ratings.Update',
+  'Ratings.Delete',
 
   'PhotosApp.Login',
 
@@ -152,6 +158,7 @@ const ALL_MUSIC_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> =
   'MusicGenres.*',
   'MusicTracks.*',
   'MusicHistory.*',
+  'Ratings.*',
 ]
 const ALL_PHOTOS_APP_CAPABILITIES: CapabilityAssignments<MediaServerCapability> = [
   'PhotosApp.*',

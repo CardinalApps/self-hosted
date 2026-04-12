@@ -17,6 +17,7 @@ import { MusicArtist } from  '../music-artist/music-artist.entity'
 import { MusicRelease } from  '../music-release/music-release.entity'
 import { MusicTrackMetadata } from './music-track-metadata.entity'
 import { MusicHistory } from '../music-history/music-history.entity'
+import { Rating } from '../rating/rating.entity'
 
 @Entity()
 @Index(['file'])
@@ -65,8 +66,14 @@ export class MusicTrack extends BaseEntity {
   @OneToMany(() => MusicHistory, (musicHistory) => musicHistory.track, { onDelete: 'CASCADE' })
   @JoinColumn()
   history?: MusicHistory[]
+
+  @OneToMany(() => Rating, (rating) => rating.track, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  ratings?: Rating[]
 }
 
 export class MusicTrackComputed extends MusicTrack {
   numEntries?: number
+  playCount?: number
+  rating?: number | null
 }

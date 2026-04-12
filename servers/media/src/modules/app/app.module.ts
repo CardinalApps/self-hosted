@@ -28,6 +28,7 @@ import { JobModule } from '../job/job.module'
 import { RBACModule } from '../rbac/rbac.module'
 import { LibraryModule } from '../library/library.module'
 import { MusicHistoryModule } from '../music-history/music-history.module'
+import { RatingModule } from '../rating/rating.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
@@ -139,6 +140,7 @@ const resolvePostgresHost = () => {
     RBACModule,
     LibraryModule,
     MusicHistoryModule,
+    RatingModule,
     InvitationModule,
     PlaybackQueueModule,
     ClaimModule,
