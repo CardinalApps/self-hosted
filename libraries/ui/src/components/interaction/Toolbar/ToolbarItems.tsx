@@ -410,19 +410,11 @@ const ToolbarItems = ({
       <div className="toolbar-group">
         <motion.div
           className={clsx('toolbar-item', 'reset')}
-          initial={{
-            transform: 'rotate(0deg)',
-          }}
-          animate={{
-            transform: resetIconAnimation ? 'rotate(-360deg)' : 'rotate(0deg)',
-            transition: { type: 'spring', duration: 0.5 },
-          }}
-          onClick={() => {
-            if (resetIconAnimation) {
-              setResetIconAnimation('')
-            }
-          }}
-          onAnimationComplete={() => setResetIconAnimation?.('')}
+          key={resetIconAnimation}
+          initial={{ rotate: 0 }}
+          animate={resetIconAnimation ? { rotate: -360 } : {}}
+          transition={{ type: 'spring', duration: 0.5 }}
+          onAnimationComplete={() => setResetIconAnimation('')}
         >
           <button className="toolbar-button" onClick={reset} title={i18n['reset.title'][lang]}>
             <i className="toolbar-icon fas fa-undo-alt" />

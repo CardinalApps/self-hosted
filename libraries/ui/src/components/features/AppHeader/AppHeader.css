@@ -1,8 +1,8 @@
 .app-header {
   position: fixed;
-  top: calc(var(--gutter) / 2);
-  left: calc(var(--gutter) / 2);
-  right: calc(var(--gutter) / 2);
+  top: 10px;
+  left: 20px;
+  right: 20px;
   display: flex;
   gap: var(--gutter);
   z-index: 10000;
