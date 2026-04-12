@@ -172,22 +172,11 @@
     }
 
     .status-overview {
-      width: 260px;
-      padding: 15px 20px 10px 20px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--box-shadow-2);
-      border: 1px solid var(--border-color-1);
-      background-color: var(--bg-1);
-      z-index: 1000;
+      border-top: 1px solid var(--border-color-1);
 
-      .title {
-        margin-bottom: 10px;
+      .legend-title {
         font-size: 14px;
-        font-weight: 800;
-        color: var(--text-color-1);
-        text-transform: uppercase;
+        font-weight: 500;
       }
 
       .dot-legend {
@@ -212,26 +201,38 @@
         }
       }
     }
+
+    .current-status {
+
+      .server {
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .server-name {
+        display: flex;
+        gap: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        align-items: center;
+
+        i {
+          min-width: 20px;
+          font-size: 13px;
+          color: var(--text-color-2);
+        }
+      }
+
+      .realtime {
+        padding-left: 26px;
+        font-weight: 400;
+        font-size: 13px;
+      }
+    }
   }
 
   .currently-active {
-    width: 260px;
-    padding: 15px 20px 10px 20px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--box-shadow-2);
-    border: 1px solid var(--border-color-1);
-    background-color: var(--bg-1);
-    z-index: 1000;
-
-    .title {
-      margin-bottom: 10px;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text-color-1);
-      text-transform: uppercase;
-    }
 
     .no-activity {
       margin-bottom: 5px;

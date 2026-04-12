@@ -2,13 +2,19 @@ import { StringList } from "../../../types/i18n"
 
 const i18n: StringList = {
   "cloud-status-icon.media-server.title": {
-    "en": "Media Server status",
+    "en": "Media Server",
   },
   "cloud-status-icon.cloud-services.title": {
-    "en": "Cardinal Cloud status",
+    "en": "Cardinal Cloud",
   },
   "cloud-status-icon.title": {
     "en": "Connection Status",
+  },
+  "cloud-status-icon.current": {
+    "en": "Current Status",
+  },
+  "cloud-status-icon.dots.legend": {
+    "en": "Legend",
   },
   "cloud-status-icon.dots.connected": {
     "en": "Connected",
@@ -23,7 +29,7 @@ const i18n: StringList = {
     "en": "Log into a Cardinal account to use Cloud Services",
   },
   "cloud-status-icon.reachable": {
-    "en": "Cardinal's cloud services are online.",
+    "en": "Cardinal's cloud services are online",
   },
   "activity-icon.title": {
     "en": "Activity",

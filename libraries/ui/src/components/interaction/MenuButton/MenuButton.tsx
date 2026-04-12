@@ -3,9 +3,11 @@ import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import './MenuButton.css'
+import clsx from 'clsx'
 
 type MenuButtonProps = {
   className?: string,
+  width?: number,
   icon?: ReactNode,
   size?: 's' | 'm',
   overrideButtonStyle?: CSSProperties,
@@ -25,6 +27,7 @@ type MenuButtonProps = {
  */
 const MenuButton = ({
   className,
+  width,
   icon,
   size = 's',
   overrideButtonStyle,
@@ -70,12 +73,13 @@ const MenuButton = ({
   }, [])
 
   return (
-    <div ref={ref} className={`menu-button align-${align} ${className ? className : ''}`} title={title}>
+    <div ref={ref} className={`menu-button align-${align} ${className ? className : ''}`}>
       <button
         className={`size-${size} ${solid ? 'solid': ''} ${isOpen ? 'open' : ''}`}
         type="button"
         onClick={handleOnClick}
         style={overrideButtonStyle}
+        title={title}
       >
         {
           icon
@@ -91,13 +95,26 @@ const MenuButton = ({
             animate={{ opacity: 1, y: 0, transition: { type: "spring", mass: 0.1 } }}
             exit={{ opacity: 0, y: -4, transition: { type: "spring", mass: 0.1 } }}
           >
-            <div className="menu-box-inner">
+            <div
+              className="menu-box-inner"
+              style={width ? { width } : undefined}
+            >
+              {title && <p className="inner-title">{title}</p>}
               {children}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+MenuButton.Section = (props: PropsWithChildren<{ title?: string, className?: string, }>) => {
+  return (
+    <section className={clsx('menu-button-section', props?.className)}>
+      {props?.title && <p className="menu-button-section-title">{props?.title}</p>}
+      {props?.children}
+    </section>
   )
 }
 

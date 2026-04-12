@@ -113,4 +113,33 @@
     top: 100%;
     padding-top: 10px;
   }
+
+  .menu-box-inner {
+    width: 260px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--box-shadow-2);
+    border: 1px solid var(--border-color-1);
+    background-color: var(--bg-1);
+    z-index: 1000;
+
+    .inner-title {
+      padding: 15px 20px 0 20px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-color-1);
+      text-transform: uppercase;
+    }
+
+    .menu-button-section {
+      padding: 15px 20px 10px 20px;
+
+      .menu-button-section-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+    }
+  }
 }
