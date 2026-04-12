@@ -5,7 +5,7 @@
   --sidebar-nav-gutter: 40px;
   --file-browser-width: 340px;
   --file-browser-gutter: 10px;
-  --header-height: var(--gutter);
+  --header-height: 85px;
 
   &[data-sidebar-mode="collapsed"] {
     --sidebar-nav-width: 66px;
@@ -100,7 +100,7 @@
 [data-layout="standard"] {
 
   .page-content {
-    
+    padding-top: var(--header-height);
   }
 }
 
