@@ -94,12 +94,13 @@ const AppHeader = ({
             {Link
               ? <Link to={'/'} className="logo">
                   <BrandLogo icon="birb" size="s" />
+                  {logoText()}
                 </Link>
               : <div className="logo">
                   <BrandLogo icon="birb" size="s" />
+                  {logoText()}
                 </div>
             }
-            {logoText()}
           </div>
         </section>
         <section className="middle-col">
