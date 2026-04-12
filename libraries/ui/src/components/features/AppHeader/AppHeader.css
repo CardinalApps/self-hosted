@@ -208,6 +208,10 @@
         margin-bottom: 10px;
         display: flex;
         flex-direction: column;
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
       }
 
       .server-name {
