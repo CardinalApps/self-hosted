@@ -176,7 +176,7 @@
     }
 
     &:hover {
-      background-color: none !important;
+      background-color: var(--bg-1) !important;
 
       i {
         color: var(--accent-color);
