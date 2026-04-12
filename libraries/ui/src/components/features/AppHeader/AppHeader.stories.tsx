@@ -7,7 +7,6 @@ import SSOLogin from '../../interaction/SSOLogin'
 
 import fetchCloudUser from '../../../store/slices/cloudUser/thunks/fetch'
 import { setJwt } from '../../../lib/auth/jwt'
-import { CardinalApp } from '../../../lib/env/cardinal'
 
 const meta = {
   title: 'Feature/AppHeader',
@@ -35,7 +34,6 @@ export const Admin = () => {
       }}
     >
       <AppHeader
-        app={CardinalApp.ADMIN}
         onSwitchAccountClick={() => alert('Switch accounts')}
         loginButton={
           <SSOLogin
@@ -70,7 +68,6 @@ export const Music = () => {
       }}
     >
       <AppHeader
-        app={CardinalApp.MUSIC}
         onSwitchAccountClick={() => alert('Switch accounts')}
         loginButton={
           <SSOLogin
@@ -105,7 +102,6 @@ export const Photos = () => {
       }}
     >
       <AppHeader
-        app={CardinalApp.PHOTOS}
         onSwitchAccountClick={() => alert('Switch accounts')}
         loginButton={
           <SSOLogin
@@ -140,7 +136,6 @@ export const Cinema = () => {
       }}
     >
       <AppHeader
-        app={CardinalApp.CINEMA}
         onSwitchAccountClick={() => alert('Switch accounts')}
         loginButton={
           <SSOLogin
