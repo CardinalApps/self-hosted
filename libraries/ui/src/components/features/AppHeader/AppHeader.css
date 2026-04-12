@@ -7,8 +7,8 @@
   gap: var(--gutter);
   z-index: 10000;
 
-  --logo-col-size-expanded: 288px;
-  --logo-col-size-collapsed: 104px;
+  --logo-col-size-expanded: 278px;
+  --logo-col-size-collapsed: 94px;
 
   .user-avatar {
     box-shadow: none;
