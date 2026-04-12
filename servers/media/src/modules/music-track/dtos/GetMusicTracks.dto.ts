@@ -12,6 +12,7 @@ enum AllowedMusicTracksOrderBy {
   'duration' = 'duration',
   'bitrate' = 'bitrate',
   'playCount' = 'playCount',
+  'rating' = 'rating',
 }
 
 class MusicTracksPagination extends Pagination {
