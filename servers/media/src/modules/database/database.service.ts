@@ -53,10 +53,10 @@ export class DatabaseService {
    *                    than failing immediately under write contention.
    */
   private async configureSQLite(): Promise<void> {
-    const walEnabled = envVar('SQLITE_WAL', true)
+    const walEnabled = envVar('SQLITE_WAL', false)
 
     const pragmas = [
-      walEnabled ? 'PRAGMA journal_mode = WAL' : null,
+      walEnabled ? 'PRAGMA journal_mode = WAL' : 'PRAGMA journal_mode = DELETE',
       walEnabled ? 'PRAGMA synchronous = NORMAL' : 'PRAGMA synchronous = FULL',
       'PRAGMA cache_size = -64000',
       'PRAGMA temp_store = MEMORY',
@@ -64,7 +64,7 @@ export class DatabaseService {
       'PRAGMA busy_timeout = 5000',
     ]
 
-    for (const pragma of pragmas.filter(Boolean)) {
+    for (const pragma of pragmas) {
       await this.dataSource.query(pragma)
     }
   }
