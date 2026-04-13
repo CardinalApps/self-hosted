@@ -43,6 +43,7 @@ export const getFields = (app, lang) => {
             adminServerFields.openAppsInNewTab,
             adminServerFields.autoCheckForUpdates,
             adminServerFields.maxRating,
+            adminServerFields.enableHalfRatings,
           ],
         },
         // Theme settings tab

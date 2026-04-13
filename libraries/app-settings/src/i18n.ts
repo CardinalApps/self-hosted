@@ -185,4 +185,10 @@ export default {
   "settings.max-rating.desc": {
     "en": "Number of stars used for ratings. Ratings are stored as percentages, and favourites are anything with a 100% rating.",
   },
+  "settings.enable-half-ratings.label": {
+    "en": "Enable half-star ratings",
+  },
+  "settings.enable-half-ratings.desc": {
+    "en": "Allow ratings in half-star increments.",
+  },
 }

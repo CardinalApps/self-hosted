@@ -132,7 +132,6 @@ const MusicTrack = ({
           <Ratings
             rating={localRating}
             maxRating={maxRating}
-            lang={lang}
             onChange={handleRatingChange}
           />
         </div>

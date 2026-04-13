@@ -30,6 +30,12 @@
       right: 0;
     }
 
+    .ratings-star-full {
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
+
     .fa-icon {
       font-size: 18px;
       color: var(--text-color-5);
