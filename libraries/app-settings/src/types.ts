@@ -25,7 +25,8 @@ export type InputValue =
   null
 
 export type StorageLocation =
-  'client' | // TODO
+  // TODO implement storing state on the client side
+  'client' |
   'home_server'
 
 export type SettingsObject = {
@@ -36,6 +37,10 @@ export type SettingsObject = {
   options?: Record<string | number | symbol, unknown> | unknown[] | string
   defaultValue?: string | number | unknown[] | object | null | undefined | boolean
   description?: string
+
+  // You probably do not want to set this on the base settings objects - let the
+  // runtime set it based on the current namespace
+  app?: SupportedCardinalApp | null
 
   // these callbacks will be given the current input value, and can modify it
   // before returning it

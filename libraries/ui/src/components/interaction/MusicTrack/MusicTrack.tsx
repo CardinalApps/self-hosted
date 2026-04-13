@@ -50,7 +50,9 @@ const MusicTrack = ({
 }: PropsWithChildren<MusicTrackProps>) => {
   const dispatch = useAppDispatch()
   const { Link } = useContext(RouterContext)
-  const { lang } = useSelector(settingsSelectors.current)
+  const { lang, max_rating: maxRatingSetting } = useSelector(settingsSelectors.current)
+  console.log(maxRatingSetting, 'maxRa')
+  const maxRating = (maxRatingSetting as number) ?? 1
   const playing = useSelector(audioSelectors.playing)
   const [artwork] = useReleaseCover(hasArtwork ? releaseId : null)
 
@@ -76,18 +78,19 @@ const MusicTrack = ({
     }
   }
 
-  const handleRatingClick = async () => {
+  const currentStars = localRating !== null ? Math.round(localRating * maxRating) : 0
+
+  const handleStarClick = async (starIndex: number) => {
     if (!musicTrackId) return
-    if (localRating !== null) {
+    if (currentStars === starIndex) {
       setLocalRating(null)
       await deleteRating({ trackId: musicTrackId })
     } else {
-      setLocalRating(1)
-      await setRating({ trackId: musicTrackId, rating: 1 })
+      const newRating = starIndex / maxRating
+      setLocalRating(newRating)
+      await setRating({ trackId: musicTrackId, rating: newRating })
     }
   }
-
-  const isRated = localRating !== null
 
   return (
     <div className="music-track" onDoubleClick={handleDoubleClick}>
@@ -130,13 +133,19 @@ const MusicTrack = ({
       )}
       {!!canRate &&
         <div className="col music-track-rating">
-          <Icon
-            fa="fas fa-star"
-            hoverType="icon"
-            className={isRated ? 'is-rated' : undefined}
-            title={isRated ? i18n['rating.action.remove'][lang] : i18n['rating.action.rate'][lang]}
-            onClick={handleRatingClick}
-          />
+          {[...Array(maxRating)].map((_, i) => {
+            const starIndex = i + 1
+            return (
+              <Icon
+                key={starIndex}
+                fa="fas fa-star"
+                hoverType="icon"
+                className={starIndex <= currentStars ? 'is-rated' : undefined}
+                title={starIndex <= currentStars ? i18n['rating.action.remove'][lang] : i18n['rating.action.rate'][lang]}
+                onClick={() => handleStarClick(starIndex)}
+              />
+            )
+          })}
         </div>
       }
       {!!artwork &&

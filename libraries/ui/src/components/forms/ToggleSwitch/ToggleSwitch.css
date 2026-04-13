@@ -30,7 +30,7 @@
     .toggle-switch-box-inner {
       width: 100%;
       justify-content: space-between;
-      gap: 8px;
+      gap: 30px;
     }
   }
 
@@ -42,6 +42,12 @@
 
   .toggle-switch-box-meta-col {
     flex-grow: 1;
+  }
+
+  .toggle-switch-box-control-col {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .toggle-switch-box-title {

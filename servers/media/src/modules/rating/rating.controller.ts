@@ -4,7 +4,6 @@ import {
   Get,
   Put,
   Delete,
-  Patch,
   Query,
   Param,
 } from '@nestjs/common'
@@ -14,12 +13,10 @@ import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 
 import { Rating } from './rating.entity'
-import { RatingSettings } from './rating-settings.entity'
 import { RatingService } from './rating.service'
 
 import { SetRatingDto } from './dtos/SetRating.dto'
 import { GetRatingsDto } from './dtos/GetRatings.dto'
-import { UpdateRatingSettingsDto } from './dtos/UpdateRatingSettings.dto'
 
 @ApiTags('Ratings')
 @Controller('ratings')
@@ -71,30 +68,4 @@ export class RatingController {
     return await this.ratingService.query(user, query)
   }
 
-  /**
-   * Get the current user's rating settings.
-   */
-  @Get('settings')
-  @StandardEndpoint({
-    summary: 'Get rating settings for the currently logged in user.',
-    capabilities: ['Ratings.Read'],
-  })
-  async getSettings(@CurrentUser() user): Promise<RatingSettings> {
-    return await this.ratingService.getSettings(user)
-  }
-
-  /**
-   * Update the current user's rating settings.
-   */
-  @Patch('settings')
-  @StandardEndpoint({
-    summary: 'Update rating settings for the currently logged in user.',
-    capabilities: ['Ratings.Update'],
-  })
-  async updateSettings(
-    @CurrentUser() user,
-    @Body() updateRatingSettingsDto: UpdateRatingSettingsDto,
-  ): Promise<RatingSettings> {
-    return await this.ratingService.updateSettings(user, updateRatingSettingsDto)
-  }
 }

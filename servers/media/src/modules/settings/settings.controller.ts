@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common'
 import {
   ApiTags,
+  ApiOkResponse,
+  ApiParam,
 } from '@nestjs/swagger'
 
 import { SettingsService } from './settings.service'
@@ -33,6 +35,8 @@ export class SettingsController {
   @StandardEndpoint({
     summary: 'Get app settings.',
   })
+  @ApiParam({ name: 'app', enum: ['admin', 'music', 'photos', 'cinema'], description: 'The Cardinal app to get settings for.' })
+  @ApiOkResponse({ type: GetAppSettingsResponse })
   async getAppSettings(@Param() params: GetAppSettings): Promise<GetAppSettingsResponse> {
     const settings = await this.settingsService.getAppSettings(params.app)
 
@@ -47,7 +51,9 @@ export class SettingsController {
   @Patch('/settings')
   @StandardEndpoint({
     summary: 'Save app settings.',
+    description: 'When saving app settings, set the `app` for which this update applies. Explicitly set the app to `null` to apply the update to all apps.',
   })
+  @ApiOkResponse({ type: UpsertSettingsResponse })
   async upsertSettings(@Body() { app, settings }: UpsertSettings): Promise<UpsertSettingsResponse> {
     if (!Object.keys(settings).length) {
       throw new BadRequestException()
