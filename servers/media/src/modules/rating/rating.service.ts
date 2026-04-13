@@ -3,12 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { Rating } from './rating.entity'
-import { RatingSettings } from './rating-settings.entity'
 import { MusicTrackService } from '../music-track/music-track.service'
 import { User } from '../user/user.entity'
 import { SetRatingDto } from './dtos/SetRating.dto'
 import { GetRatingsDto } from './dtos/GetRatings.dto'
-import { UpdateRatingSettingsDto } from './dtos/UpdateRatingSettings.dto'
 
 const FAVORITE_THRESHOLD = 1
 
@@ -17,9 +15,6 @@ export class RatingService {
   constructor(
     @InjectRepository(Rating)
     private ratingRepository: Repository<Rating>,
-
-    @InjectRepository(RatingSettings)
-    private ratingSettingsRepository: Repository<RatingSettings>,
 
     private readonly musicTrackService: MusicTrackService,
   ) {}
@@ -90,30 +85,4 @@ export class RatingService {
     return await qb.getManyAndCount()
   }
 
-  /**
-   * Get the current user's rating settings, creating defaults if they don't exist.
-   */
-  async getSettings(user: User): Promise<RatingSettings> {
-    const existing = await this.ratingSettingsRepository.findOne({
-      where: { user: { id: user.id } },
-    })
-
-    if (existing) {
-      return existing
-    }
-
-    return await this.ratingSettingsRepository.save({ user })
-  }
-
-  /**
-   * Update the current user's rating settings.
-   */
-  async updateSettings(user: User, updateRatingSettingsDto: UpdateRatingSettingsDto): Promise<RatingSettings> {
-    const settings = await this.getSettings(user)
-
-    return await this.ratingSettingsRepository.save({
-      id: settings.id,
-      starCount: updateRatingSettingsDto.starCount,
-    })
-  }
 }

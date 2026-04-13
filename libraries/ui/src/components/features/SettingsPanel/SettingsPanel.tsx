@@ -145,9 +145,17 @@ const SettingsPanel = ({
                       ? tab.fields.map((fieldFactory, fieldIndex) => {
                         const field = fieldFactory(app, settings?.lang)
                         const valueInStore = settings?.[field.slug]
+
                         // The field can set the overrideApp value to null to
                         // apply the settings change to all apps
-                        const fieldOnChange = (value, overrideApp) => save(field.slug, value, overrideApp === null ? null : app)
+                        const fieldOnChange = (value, overrideApp) => {
+                          const appNamespace = typeof overrideApp !== 'undefined'
+                            ? overrideApp
+                            : typeof field?.app !== 'undefined'
+                              ? field.app
+                              : app
+                          save(field.slug, value, appNamespace)
+                        }
                         return (
                           <Field key={field.slug || fieldIndex} field={field}>
                             <div className="settings-input">

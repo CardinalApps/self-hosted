@@ -107,6 +107,7 @@
       padding: 15px 20px;
       display: flex;
       align-items: center;
+      gap: 30px;
       flex-wrap: nowrap;
       border-radius: 10px;
       border: 1px solid var(--border-color-3);
@@ -114,10 +115,6 @@
 
       .toggle-switch {
         background-color: var(--bg-4);
-      }
-      
-      .field-label {
-        margin-bottom: 5px;
       }
     }
 

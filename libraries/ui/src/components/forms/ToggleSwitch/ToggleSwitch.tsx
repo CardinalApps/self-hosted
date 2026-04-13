@@ -59,27 +59,29 @@ const ToggleSwitch = ({
           {title && <p className="toggle-switch-box-title" dangerouslySetInnerHTML={{ __html: title }} />}
           {description && <div className="description" dangerouslySetInnerHTML={{ __html: description }} />}
         </div>
-        {labelAlign === 'left' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
-        {labelAlign === 'left' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
-        <label className={clsx('toggle-switch', value === value2 ? 'enabled' : '', !!disabled && 'disabled')}>
-          <input
-            type="checkbox"
-            name={name}
-            //value={value}
-            checked={!!value}
-            onChange={(e) => {
-              if (!disabled) {
-                onChange(e.target.checked ? value2 : value1)
-              }
-            }}
-          />
-          <div className="focus"></div>
-          <div className="grab"></div>
-          {!!disabled && <i className="lock fas fa-lock" />}
-        </label>
+        <div className="toggle-switch-box-control-col">
+          {labelAlign === 'left' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
+          {labelAlign === 'left' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
+          <label className={clsx('toggle-switch', value === value2 ? 'enabled' : '', !!disabled && 'disabled')}>
+            <input
+              type="checkbox"
+              name={name}
+              //value={value}
+              checked={!!value}
+              onChange={(e) => {
+                if (!disabled) {
+                  onChange(e.target.checked ? value2 : value1)
+                }
+              }}
+            />
+            <div className="focus"></div>
+            <div className="grab"></div>
+            {!!disabled && <i className="lock fas fa-lock" />}
+          </label>
+        </div>
+        {labelAlign === 'right' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
+        {labelAlign === 'right' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
       </div>
-      {labelAlign === 'right' && showActiveLabel && <div className="toggle-switch-active-label">{getActiveLabel()}</div>}
-      {labelAlign === 'right' && label && <div className="toggle-switch-label" dangerouslySetInnerHTML={{ __html: label }} />}
     </div>
   )
 }

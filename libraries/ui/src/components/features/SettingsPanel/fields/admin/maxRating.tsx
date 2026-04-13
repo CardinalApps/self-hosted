@@ -8,6 +8,7 @@ const maxRating = (app, lang) => {
 
   return Object.freeze({
     ...fieldObj,
+    app: null,
     render: ({ value, onChange }) => {
       return (
         <NumberInput
