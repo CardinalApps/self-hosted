@@ -16,7 +16,7 @@ import {
 import type { Response } from 'express'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
-import { MusicTrack, MusicTrackComputed } from './music-track.entity'
+import { MusicTrackComputed } from './music-track.entity'
 import { MusicTrackService } from './music-track.service'
 
 import { GetMusicTrackDto } from './dtos/GetMusicTrack.dto'

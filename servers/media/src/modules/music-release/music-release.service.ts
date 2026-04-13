@@ -137,8 +137,6 @@ export class MusicReleaseService {
       metadata,
       libraries,
     } = getMusicReleasesDto
-    const hasLibraries = libraries && libraries.length
-
     const qb = this.musicReleaseRepository.createQueryBuilder('musicRelease')
 
     if (artists) qb.leftJoinAndSelect('musicRelease.artist', 'artist')
