@@ -11,7 +11,7 @@ import { EventService } from '../event/event.service'
 import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
 import { LibraryService } from '../library/library.service'
 import { MusicHistory } from '../music-history/music-history.entity'
-import { Rating } from '../rating/rating.entity'
+import { Rating, RatingMediaType } from '../rating/rating.entity'
 import { User } from '../user/user.entity'
 
 @Injectable()
@@ -58,7 +58,7 @@ export class MusicTrackService {
 
     if (user) {
       const ratingRow = await this.dataSource.getRepository(Rating).findOne({
-        where: { user: { id: user.id }, track: { id: track.id } },
+        where: { user: { id: user.id }, mediaType: RatingMediaType.MUSIC_TRACK, mediaId: track.musicTrackId },
       })
       return { ...track, rating: ratingRow?.rating ?? null }
     }
@@ -110,7 +110,8 @@ export class MusicTrackService {
         subQuery
           .select('rating.rating', 'rating')
           .from(Rating, 'rating')
-          .where('rating.track_id = music_track.id')
+          .where('rating.media_type = :mediaType', { mediaType: RatingMediaType.MUSIC_TRACK })
+          .andWhere('rating.media_id = music_track.music_track_id')
           .andWhere('rating.user_id = :userId', { userId: user.id }),
         'music_track_rating')
     }

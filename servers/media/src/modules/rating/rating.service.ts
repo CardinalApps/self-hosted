@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { Rating } from './rating.entity'
-import { MusicTrackService } from '../music-track/music-track.service'
+import { Rating, RatingMediaType } from './rating.entity'
+import { MusicTrack } from '../music-track/music-track.entity'
 import { User } from '../user/user.entity'
 import { SetRatingDto } from './dtos/SetRating.dto'
 import { GetRatingsDto } from './dtos/GetRatings.dto'
@@ -15,43 +15,43 @@ export class RatingService {
   constructor(
     @InjectRepository(Rating)
     private ratingRepository: Repository<Rating>,
-
-    private readonly musicTrackService: MusicTrackService,
   ) {}
 
   /**
-   * Set or update a rating for a music track.
+   * Set or update a rating for a media item.
    */
   async upsertRating(user: User, setRatingDto: SetRatingDto): Promise<Rating> {
-    const track = await this.musicTrackService.get(setRatingDto.trackId)
-
-    if (!track) {
-      throw new NotFoundException('Music track not found.')
-    }
+    const { mediaType, mediaId, rating } = setRatingDto
 
     const existing = await this.ratingRepository.findOne({
       where: {
         user: { id: user.id },
-        track: { id: track.id },
+        mediaType,
+        mediaId,
       },
     })
 
-    return await this.ratingRepository.save({
+    const saved = await this.ratingRepository.save({
       ...(existing ? { id: existing.id } : {}),
-      rating: setRatingDto.rating,
-      track,
+      rating,
+      mediaType,
+      mediaId,
       user,
     })
+
+    delete saved.user
+    return saved
   }
 
   /**
-   * Remove a rating for a music track.
+   * Remove a rating for a media item.
    */
-  async deleteRating(user: User, trackId: string): Promise<void> {
+  async deleteRating(user: User, mediaType: RatingMediaType, mediaId: string): Promise<void> {
     const existing = await this.ratingRepository.findOne({
       where: {
         user: { id: user.id },
-        track: { musicTrackId: trackId },
+        mediaType,
+        mediaId,
       },
     })
 
@@ -63,20 +63,28 @@ export class RatingService {
   }
 
   /**
-   * Query ratings for the current user.
+   * Query ratings for the current user. Pass a mediaType to filter by type and
+   * hydrate the associated media object on each rating.
    */
-  async query(user: User, getRatingsDto: GetRatingsDto): Promise<[Rating[], number]> {
+  async query(user: User, getRatingsDto: GetRatingsDto, type?: RatingMediaType): Promise<[Rating[], number]> {
     const { take, skip, sort, order, favorites } = getRatingsDto
 
     const qb = this.ratingRepository.createQueryBuilder('rating')
       .where('rating.user_id = :userId', { userId: user.id })
-      .leftJoinAndSelect('rating.track', 'track')
-      .leftJoinAndSelect('track.release', 'release')
-      .leftJoinAndSelect('release.thumbnails', 'thumbnails')
-      .leftJoinAndSelect('track.artists', 'artists')
       .orderBy(`rating.${sort}`, order)
       .take(take)
       .skip(skip)
+
+    if (type) {
+      qb.andWhere('rating.media_type = :type', { type })
+    }
+
+    if (type === RatingMediaType.MUSIC_TRACK) {
+      qb.leftJoinAndMapOne('rating.media', MusicTrack, 'track', 'track.music_track_id = rating.media_id')
+        .leftJoinAndSelect('track.release', 'release')
+        .leftJoinAndSelect('release.thumbnails', 'thumbnails')
+        .leftJoinAndSelect('track.artists', 'artists')
+    }
 
     if (favorites) {
       qb.andWhere('rating.rating = :threshold', { threshold: FAVORITE_THRESHOLD })

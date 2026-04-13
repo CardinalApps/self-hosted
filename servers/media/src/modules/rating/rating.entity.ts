@@ -9,10 +9,15 @@ import {
 import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 import { BaseEntity } from '../../entities/base.entity'
 import { User } from '../user/user.entity'
-import { MusicTrack } from '../music-track/music-track.entity'
+
+export const RatingMediaType = {
+  MUSIC_TRACK: 'music_track',
+} as const
+
+export type RatingMediaType = typeof RatingMediaType[keyof typeof RatingMediaType]
 
 @Entity()
-@Unique(['user', 'track'])
+@Unique(['user', 'mediaType', 'mediaId'])
 export class Rating extends BaseEntity {
   @UuidColumn()
   ratingId: string
@@ -20,9 +25,11 @@ export class Rating extends BaseEntity {
   @Column({ type: 'float' })
   rating: number
 
-  @ManyToOne(() => MusicTrack, (track) => track.ratings, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  track: MusicTrack
+  @Column()
+  mediaType: RatingMediaType
+
+  @Column()
+  mediaId: string
 
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn()

@@ -1,11 +1,11 @@
 import { baseHomeServerApi } from './baseHomeServerApi'
-import { MusicTrackType } from './musicTracks'
 
 export type RatingType = {
   id: number,
   ratingId: string,
   rating: number,
-  track: MusicTrackType,
+  mediaType: string,
+  mediaId: string,
   createdAt: string,
   updatedAt: string,
 }
@@ -16,7 +16,7 @@ export const ratingsApi = baseHomeServerApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
-      setRating: builder.mutation<RatingType, { trackId: string, rating: number }>({
+      setRating: builder.mutation<RatingType, { mediaType: string, mediaId: string, rating: number }>({
         query: (body) => ({
           url: '/ratings',
           method: 'PUT',
@@ -25,9 +25,9 @@ export const ratingsApi = baseHomeServerApi
         invalidatesTags: ['MusicTracks'],
       }),
 
-      deleteRating: builder.mutation<void, { trackId: string }>({
-        query: ({ trackId }) => ({
-          url: `/ratings/${trackId}`,
+      deleteRating: builder.mutation<void, { mediaType: string, mediaId: string }>({
+        query: ({ mediaType, mediaId }) => ({
+          url: `/ratings/${mediaType}/${mediaId}`,
           method: 'DELETE',
         }),
         invalidatesTags: ['MusicTracks'],

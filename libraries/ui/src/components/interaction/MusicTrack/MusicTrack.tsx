@@ -79,12 +79,15 @@ const MusicTrack = ({
 
   const handleRatingChange = async (newRating: number | null) => {
     if (!musicTrackId) return
+    const previousRating = localRating
     if (newRating === null) {
       setLocalRating(null)
-      await deleteRating({ trackId: musicTrackId })
+      const { error } = await deleteRating({ mediaType: 'music_track', mediaId: musicTrackId })
+      if (error) setLocalRating(previousRating)
     } else {
       setLocalRating(newRating)
-      await setRating({ trackId: musicTrackId, rating: newRating })
+      const { error } = await setRating({ mediaType: 'music_track', mediaId: musicTrackId, rating: newRating })
+      if (error) setLocalRating(previousRating)
     }
   }
 

@@ -2,6 +2,7 @@ import { Transform } from 'class-transformer'
 import { IsBoolean, IsOptional, IsString, IsIn } from 'class-validator'
 
 import { Pagination } from '../../../dtos/pagination.dto'
+import { RatingMediaType } from '../rating.entity'
 
 enum AllowedRatingsOrderBy {
   'createdAt' = 'createdAt',
@@ -21,4 +22,9 @@ export class GetRatingsDto extends RatingsPagination {
   @IsOptional()
   @IsBoolean()
   favorites?: boolean = false
+
+  @IsOptional()
+  @IsString()
+  @IsIn(Object.values(RatingMediaType))
+  type?: RatingMediaType
 }

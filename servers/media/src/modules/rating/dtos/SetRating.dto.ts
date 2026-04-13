@@ -1,11 +1,16 @@
 import { Transform } from 'class-transformer'
-import { IsNumber, IsString, Min, Max } from 'class-validator'
+import { IsNumber, IsString, IsIn, Min, Max } from 'class-validator'
 
 import { toNumber } from '../../../utils/transformers'
+import { RatingMediaType } from '../rating.entity'
 
 export class SetRatingDto {
   @IsString()
-  trackId: string
+  @IsIn(Object.values(RatingMediaType))
+  mediaType: RatingMediaType
+
+  @IsString()
+  mediaId: string
 
   @Transform(toNumber)
   @IsNumber()
