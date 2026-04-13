@@ -1,8 +1,8 @@
 import { useContext, useState, useEffect, type PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
 
-import Icon from '../../typography/Icon'
 import MusicPlaybackButton from '../MusicPlaybackButton'
+import Ratings from '../Ratings'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { audioSelectors } from '../../../store/slices/music'
@@ -51,7 +51,6 @@ const MusicTrack = ({
   const dispatch = useAppDispatch()
   const { Link } = useContext(RouterContext)
   const { lang, max_rating: maxRatingSetting } = useSelector(settingsSelectors.current)
-  console.log(maxRatingSetting, 'maxRa')
   const maxRating = (maxRatingSetting as number) ?? 1
   const playing = useSelector(audioSelectors.playing)
   const [artwork] = useReleaseCover(hasArtwork ? releaseId : null)
@@ -78,15 +77,12 @@ const MusicTrack = ({
     }
   }
 
-  const currentStars = localRating !== null ? Math.round(localRating * maxRating) : 0
-
-  const handleStarClick = async (starIndex: number) => {
+  const handleRatingChange = async (newRating: number | null) => {
     if (!musicTrackId) return
-    if (currentStars === starIndex) {
+    if (newRating === null) {
       setLocalRating(null)
       await deleteRating({ trackId: musicTrackId })
     } else {
-      const newRating = starIndex / maxRating
       setLocalRating(newRating)
       await setRating({ trackId: musicTrackId, rating: newRating })
     }
@@ -133,19 +129,12 @@ const MusicTrack = ({
       )}
       {!!canRate &&
         <div className="col music-track-rating">
-          {[...Array(maxRating)].map((_, i) => {
-            const starIndex = i + 1
-            return (
-              <Icon
-                key={starIndex}
-                fa="fas fa-star"
-                hoverType="icon"
-                className={starIndex <= currentStars ? 'is-rated' : undefined}
-                title={starIndex <= currentStars ? i18n['rating.action.remove'][lang] : i18n['rating.action.rate'][lang]}
-                onClick={() => handleStarClick(starIndex)}
-              />
-            )
-          })}
+          <Ratings
+            rating={localRating}
+            maxRating={maxRating}
+            lang={lang}
+            onChange={handleRatingChange}
+          />
         </div>
       }
       {!!artwork &&
