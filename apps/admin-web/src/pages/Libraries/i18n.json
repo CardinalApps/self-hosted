@@ -14,17 +14,23 @@
   "libraries.create.name.title": {
     "en": "Map directory to library"
   },
-  "libraries.create.name.placeholder": {
-    "en": "Name"
+  "libraries.create.name.label": {
+    "en": "Library Name"
   },
   "libraries.create.desc": {
-    "en": "Map your system folders to libraries."
+    "en": "Your library will include all of the content from the folders that you've selected."
+  },
+  "libraries.create.none-selected": {
+    "en": "Select one or more folders for your new library."
   },
   "libraries.create.submit": {
     "en": "Create library"
   },
+  "libraries.create.success": {
+    "en": "Your library is ready"
+  },
   "libraries.create.dirs.title": {
-    "en": "Select a directory"
+    "en": "Select Folders"
   },
   "libraries.table.header.name": {
     "en": "Name"
@@ -90,6 +96,12 @@
     "en": "Not shared with {n} users."
   },
   "libraries.table.empty-message": {
-    "en": "Select directories, then give your first library a name."
+    "en": "Select directories, then create your first library."
+  },
+  "libraries.summary.singular": {
+    "en": "You have {total} library."
+  },
+  "libraries.summary.plural": {
+    "en": "You have {total} libraries."
   }
 }
