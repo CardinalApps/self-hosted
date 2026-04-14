@@ -2,7 +2,7 @@ import { StringList } from "../../../types/i18n"
 
 const i18n: StringList = {
   "selected-path.label": {
-    "en": "Selected:",
+    "en": "{num} Selected",
   },
   "selected-path.none": {
     "en": "None",

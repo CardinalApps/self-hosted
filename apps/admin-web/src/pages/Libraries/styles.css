@@ -4,10 +4,6 @@
     margin-bottom: 25px;
   }
 
-  .name {
-    
-  }
-
   .paths {
     padding: 4px;
     border-radius: 6px;
@@ -21,6 +17,11 @@
       max-width: 100%;
       user-select: all;
     }
+  }
+
+  .library-table-path-list {
+    display: flex;
+    flex-direction: column;
   }
 
   .librariesTable {

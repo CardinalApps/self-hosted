@@ -8,6 +8,7 @@
   position: relative;
   --sidebar-collapsed-width: 74px;
   --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  transition: padding 300ms;
 
   ::-webkit-scrollbar {
     width: 0;

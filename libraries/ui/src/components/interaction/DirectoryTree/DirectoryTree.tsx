@@ -6,9 +6,7 @@ import clsx from 'clsx'
 
 import Card from '../../layout/Card'
 import Loading from '../../layout/Loading'
-import H4 from '../../typography/H4'
 import Checkbox from '../../forms/Checkbox'
-import type { CardPadding } from '../../layout/Card/Card'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 
@@ -36,7 +34,6 @@ type DirectoryTreeProps = {
   portal?: boolean,
   selectDirectory?: boolean,
   selectFile?: boolean,
-  cardPadding?: CardPadding,
   style?: Record<string, unknown>,
   onSelect?: (node: TreeNode | TreeNode[] | undefined, tree: TreeNode) => void,
   onClick?: (node: TreeNode, tree: TreeNode) => void,
@@ -58,7 +55,6 @@ const DirectoryTree = ({
   portal = false,
   selectDirectory = false,
   selectFile = false,
-  cardPadding = 'thin',
   style = {},
   onSelect,
   onClick,
@@ -70,6 +66,9 @@ const DirectoryTree = ({
   const { lang } = useSelector(settingsSelectors.current)
   const [, setRerender] = useState<number>()
   const rerender = () => setRerender(Math.random())
+  const numSelected = multi
+    ? Array.isArray(selected) ? selected.length : 0
+    : selected ? 1 : 0
 
   /**
    * Optionally use the global sidebar.
@@ -345,18 +344,19 @@ const DirectoryTree = ({
   }, [initialPaths])
 
   return maybeUsePortal(
-    <Card className="directory-tree" padding={cardPadding} style={style}>
-      {!!title && <H4>{title}</H4>}
-      {/* {!!selectDirectory &&
-        <p className="selected-path">
-          <strong>{i18n['selected-path.label'][lang]}</strong>
-          {selected
-            ? selected?.path
-            : <>{i18n['selected-path.none'][lang]}</>
-          }
-        </p>
-      } */}
-      <ol className="directory-list">
+    <Card className="directory-tree" padding={'none'} style={style}>
+      <header>
+        {!!title && <p className="directory-tree-title">{title}</p>}
+        <div className="directory-tree-controls">
+          <div>
+            {i18n['selected-path.label'][lang].replace('{num}', numSelected)}
+          </div>
+        </div>
+      </header>
+      <ol
+        className={clsx('directory-list')}
+        data-can-select-dirs={selectDirectory ? 'true' : 'false'}
+      >
         {renderTree()}
       </ol>
     </Card>,

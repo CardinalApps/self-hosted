@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
-import CreateSomething from '@cardinalapps/ui/src/components/interaction/CreateSomething'
 import DirectoryTree from '@cardinalapps/ui/src/components/interaction/DirectoryTree'
 import Table from '@cardinalapps/ui/src/components/interaction/Table'
 import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
@@ -17,7 +16,6 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import {
   Library,
   useGetLibrariesQuery,
-  useCreateLibraryMutation,
   useUpdateLibraryMutation,
   useDeleteLibraryMutation,
 } from '@cardinalapps/ui/src/store/apis/libraries'
@@ -28,12 +26,17 @@ import HasCapabilities from '@cardinalapps/ui/src/components/layout/HasCapabilit
 import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
 import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
 import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
 
 import homeServerAPI from '@cardinalapps/ui/src/lib/homeserver/homeServerAPI'
 
 import i18n from './i18n.json'
 
 import './styles.css'
+import CreateLibraryDrawer from './CreateLibraryDrawer'
 
 const TOOLBAR_NAME = 'admin-libraries'
 
@@ -41,11 +44,11 @@ function Libraries() {
   const { lang } = useSelector(settingsSelectors.current)
   const userCanUpdateLibrary = useHasCapability('Libraries.Update')
   const userCanDeleteLibrary = useHasCapability('Libraries.Delete')
-  const [createLibrary, createLibraryResult] = useCreateLibraryMutation()
   const [selectedDirectories, setSelectedDirectories] = useState<TreeNode[]>()
   const [allUsers, setAllUsers] = useState<UserType[]>([])
   const [openLibrary, setOpenLibrary] = useState<Library>()
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [showCreateLibraryDrawer, setShowCreateLibraryDrawer] = useState<boolean>(false)
   const [updateLibrary, updateLibraryResult] = useUpdateLibraryMutation()
   const [deleteLibrary, deleteLibrartResult] = useDeleteLibraryMutation()
   const {
@@ -100,10 +103,12 @@ function Libraries() {
         ),
         (
           <Table.Col key="paths">
-            {library.paths?.length
-              ? library.paths.map((path) => <span key={path}>{path}</span>)
-              : <span>{i18n['libraries.no-paths'][lang]}</span>
-            }
+            <div className="library-table-path-list">
+              {library.paths?.length
+                ? library.paths.map((path) => <span key={path}>{path}</span>)
+                : <span>{i18n['libraries.no-paths'][lang]}</span>
+              }
+            </div>
           </Table.Col>
         ),
         (
@@ -133,16 +138,6 @@ function Libraries() {
       ])
     })
     return rows
-  }
-
-  /**
-   * Create a library.
-   */
-  const handleCreate = (name) => {
-    if (!selectedDirectories || !selectedDirectories.length) {
-      return
-    }
-    createLibrary({ name, paths: selectedDirectories.map((selected) => selected.path) })
   }
 
   /**
@@ -290,18 +285,37 @@ function Libraries() {
         />
       }
 
+      <CardGrid>
+        {
+        /*
+          * Number of local users card.
+          */
+        }
+        <CardGrid.Card
+          size="xs"
+          icon={<Icon fa="fas fa-book-open" />}
+          header={<H5>{i18n['libraries.create.title'][lang]}</H5>}
+          capabilities={['Libraries.Create']}
+          footer={(
+            <>
+              <Button
+                onClick={() => setShowCreateLibraryDrawer(true)}
+                type="button"
+              >
+                {i18n['libraries.create.submit'][lang]}
+              </Button>
+            </>
+          )}
+        >
+          {pluralize(
+            allLibraries.length,
+            i18n['libraries.summary.singular'][lang].replace('{total}', allLibraries.length),
+            i18n['libraries.summary.plural'][lang].replace('{total}', allLibraries.length),
+          )}
+        </CardGrid.Card>
+      </CardGrid>
+
       <div className={'libraries'}>
-        <div className={'create'}>
-          <CreateSomething
-            fieldLabel={i18n['libraries.create.name.title'][lang]}
-            placeholder={i18n['libraries.create.name.placeholder'][lang]}
-            submitLabel={i18n['libraries.create.submit'][lang]}
-            rtkResult={createLibraryResult}
-            onSubmit={(name) => {
-              handleCreate(name)
-            }}
-          />
-        </div>
         <div className={'librariesTable'}>
           <Table
             header={[
@@ -316,6 +330,13 @@ function Libraries() {
           />
         </div>
       </div>
+
+      {!!showCreateLibraryDrawer && (
+        <CreateLibraryDrawer
+          selectedDirectories={selectedDirectories}
+          onClose={() => setShowCreateLibraryDrawer(false)}
+        />
+      )}
     </AppPage>
   )
 }

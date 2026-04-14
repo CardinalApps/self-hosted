@@ -121,7 +121,7 @@ const Table = ({
               : <tbody className="tbody empty">
                   <tr className="table-empty-message">
                     <td colSpan={header?.length}>
-                      <div className='checkered'>
+                      <div>
                         <p>{emptyMessage || i18n['default-empty-table-message'][lang]}</p>
                       </div>
                     </td>

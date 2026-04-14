@@ -1,16 +1,55 @@
 .directory-tree {
+  position: relative;
+  padding-top: var(--directory-tree-title-height);
+
+  --directory-tree-title-height: 54px;
+
+  header {
+    height: var(--directory-tree-title-height);
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color-1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--bg-1);
+    z-index: 50;
+
+    .directory-tree-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-color-2);
+      text-transform: uppercase;
+    }
+
+    .directory-tree-controls {
+      display: flex;
+      font-size: 14px;
+    }
+  }
   
   .directory-list {
     list-style: none;
+    padding: 0 5px;
+
+    &[data-can-select-dirs="false"] {
+
+      .dir .text {
+        overflow: visible;
+      }
+    }
 
     ol {
-      padding-left: 10px;
+      padding-left: 5px;
       border-left: 1px dotted var(--border-color-2);
     }
 
     .root-dir {
+      margin-top: 10px;
       padding-top: 0;
-      font-size: 16px;
+      font-size: 15px;
       color: var(--text-color-1);
     }
 
@@ -40,13 +79,9 @@
 
       &.selected {
         background-color: var(--bg-3);
-        outline: 1px solid var(--border-color-2);
 
-        > .icon {
-          width: 20px;
-          cursor: pointer;
-          color: var(--success);
-          transform: scale(1.1) translateX(2px) translateY(1px);
+        .icon {
+          color: var(--accent-color);
         }
       }
 
@@ -81,7 +116,7 @@
       .path-button {
         cursor: pointer;
         border-radius: 4px;
-        font-size: 16px;
+        font-size: 15px;
         text-wrap: nowrap;
         text-align: left;
         overflow: hidden;
