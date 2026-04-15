@@ -627,14 +627,13 @@ export class MusicIndexingService {
     queryRunner?: QueryRunner,
   ): Promise<MusicRelease | null> {
     const releaseTitle = this.determineReleaseTitle(embeddedMetadata, fsMetadata)
-    const exists = await this.musicReleaseService.getByName(releaseTitle, artist?.name)
 
-    if (exists) {
-      return exists
-    } else {
-      const release = await this.musicReleaseService.create(releaseTitle, artist, artists, genres, queryRunner)
-      return release
+    for (const a of (artists ?? [])) {
+      const exists = await this.musicReleaseService.getByName(releaseTitle, a.name)
+      if (exists) return exists
     }
+
+    return await this.musicReleaseService.create(releaseTitle, artist, artists, genres, queryRunner)
   }
 
   /**
