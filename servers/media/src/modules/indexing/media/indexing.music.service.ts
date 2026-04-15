@@ -588,13 +588,13 @@ export class MusicIndexingService {
     const trackArtists: MusicArtist[] = []
 
     for (const artistName of this.determineArtists(embeddedMetadata, fsMetadata)) {
-      const exists = await this.musicArtistService.getByName(artistName)
-      trackArtists.push(exists ?? await this.musicArtistService.create(artistName, queryRunner))
+      const artist = await this.musicArtistService.getByName(artistName)
+        ?? await this.musicArtistService.create(artistName, queryRunner)
+      trackArtists.push(artist)
     }
 
     const releaseArtistName = this.determineReleaseArtist(embeddedMetadata, fsMetadata)
-    const releaseArtistExists = await this.musicArtistService.getByName(releaseArtistName)
-    const releaseArtist = releaseArtistExists ?? await this.musicArtistService.create(releaseArtistName, queryRunner)
+    const releaseArtist = trackArtists.find((a) => a.name === releaseArtistName) ?? trackArtists[0]
 
     return { trackArtists, releaseArtist }
   }
