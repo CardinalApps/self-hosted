@@ -516,66 +516,6 @@ export class MusicIndexingService {
   }
 
   /**
-   * Analyzes all the given metadata to find all of the artists associated with
-   * the release.
-   * 
-   * The first item in the array is going to be the most "primary" artist.
-   * 
-   * This guarentees at least one artist name. If none was found, it will be
-   * `Unknown Artist`.
-   */
-  determineArtists(embeddedMetadata?: MusicTrackMetadata[], fsMetadata?: MusicTrackMetadata[]): string[] | null {
-    const found = []
-
-    const artist = embeddedMetadata.find((metadata) => metadata?.metaKey === 'artist')?.metaValue
-    if (artist && !found.includes(artist)) {
-      found.push(artist)
-    }
-
-    const albumArtist = embeddedMetadata.find((metadata) => metadata?.metaKey === 'albumartist')?.metaValue
-    if (albumArtist && !found.includes(albumArtist)) {
-      found.push(albumArtist)
-    }
-
-    const artists = embeddedMetadata.find((metadata) => metadata?.metaKey === 'artists')?.metaValue?.split(',')
-    artists?.forEach((artist) => {
-      if (artist && !found.includes(artist)) {
-        found.push(artist)
-      }
-    })
-
-    // Only use sortable name as primary name if no other name was found
-    if (!found.length) {
-      const artistSort = embeddedMetadata.find((metadata) => metadata?.metaKey === 'artistsort')?.metaValue
-      if (artistSort && !found.includes(artistSort)) {
-        found.push(artistSort)
-      }
-    }
-
-    // Only use sortable name as primary name if no other name was found
-    if (!found.length) {
-      const albumArtistSort = embeddedMetadata.find((metadata) => metadata?.metaKey === 'albumartistsort')?.metaValue
-      if (albumArtistSort && !found.includes(albumArtistSort)) {
-        found.push(albumArtistSort)
-      }
-    }
-
-    // only use filesystem metadata if there was no embedded metadata
-    if (!found.length) {
-      const fsArtistName = fsMetadata.find((metadata) => metadata?.metaKey === 'artistName')?.metaValue
-      if (fsArtistName && !found.includes(fsArtistName)) {
-        found.push(fsArtistName)
-      }
-    }
-
-    if (!found.length) {
-      found.push(IndexingFallbacks.UNKNOWN_ARTIST)
-    }
-
-    return found
-  }
-
-  /**
    * Creates artist entities only if we need to. Returns both the track-level
    * artists and the release-level artist separately, since they have different
    * attribution semantics.
@@ -585,18 +525,11 @@ export class MusicIndexingService {
     fsMetadata: MusicTrackMetadata[],
     queryRunner?: QueryRunner,
   ): Promise<{ trackArtists: MusicArtist[], releaseArtist: MusicArtist }> {
-    const trackArtists: MusicArtist[] = []
+    const artistName = this.determineReleaseArtist(embeddedMetadata, fsMetadata)
+    const artist = await this.musicArtistService.getByName(artistName)
+      ?? await this.musicArtistService.create(artistName, queryRunner)
 
-    for (const artistName of this.determineArtists(embeddedMetadata, fsMetadata)) {
-      const artist = await this.musicArtistService.getByName(artistName)
-        ?? await this.musicArtistService.create(artistName, queryRunner)
-      trackArtists.push(artist)
-    }
-
-    const releaseArtistName = this.determineReleaseArtist(embeddedMetadata, fsMetadata)
-    const releaseArtist = trackArtists.find((a) => a.name === releaseArtistName) ?? trackArtists[0]
-
-    return { trackArtists, releaseArtist }
+    return { trackArtists: [artist], releaseArtist: artist }
   }
 
   /**
