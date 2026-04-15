@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
-import { Repository, DataSource, QueryRunner } from 'typeorm'
+import { Repository, DataSource, QueryRunner, ILike } from 'typeorm'
 
 import { MusicArtist } from './music-artist.entity'
 import { MusicArtistMetadata } from './music-artist-metadata.entity'
@@ -59,7 +59,7 @@ export class MusicArtistService {
   async getByName(name: string, relations = {}): Promise<MusicArtist | null> {
     const artists = await this.musicArtistRepository.find({
       where: {
-        name: name,
+        name: ILike(name),
       },
       relations: {
         ...relations,
