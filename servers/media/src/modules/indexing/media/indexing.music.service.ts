@@ -98,13 +98,13 @@ export class MusicIndexingService {
     const embeddedMetadata = await this.saveEmbeddedMetadata(file, existingTrack, queryRunner)
     await this.saveFileStatMetadata(file, existingTrack, queryRunner)
     const folderStructureMetadata = await this.saveFolderStructureMetadata(file, existingTrack, queryRunner)
-    const artists = await this.maybeCreateArtists(embeddedMetadata, folderStructureMetadata, queryRunner)
+    const { trackArtists, releaseArtist } = await this.maybeCreateArtists(embeddedMetadata, folderStructureMetadata, queryRunner)
     const genres = await this.maybeCreateGenres(embeddedMetadata, queryRunner)
     const release = await this.maybeCreateRelease(
       embeddedMetadata,
       folderStructureMetadata,
-      artists?.[0],
-      artists,
+      releaseArtist,
+      trackArtists,
       genres,
       queryRunner,
     )
@@ -121,7 +121,7 @@ export class MusicIndexingService {
       id: existingTrack.id,
       title: trackTitle as string,
       sortTitle: sortableString(trackTitle),
-      artists: artists,
+      artists: trackArtists,
       release: release,
       trackNumber: trackNumber,
       discNumber: discNumber,
@@ -152,13 +152,13 @@ export class MusicIndexingService {
     const embeddedMetadata = await this.saveEmbeddedMetadata(file, initialMusicTrackEntity, queryRunner)
     await this.saveFileStatMetadata(file, initialMusicTrackEntity, queryRunner)
     const folderStructureMetadata = await this.saveFolderStructureMetadata(file, initialMusicTrackEntity, queryRunner)
-    const artists = await this.maybeCreateArtists(embeddedMetadata, folderStructureMetadata, queryRunner)
+    const { trackArtists, releaseArtist } = await this.maybeCreateArtists(embeddedMetadata, folderStructureMetadata, queryRunner)
     const genres = await this.maybeCreateGenres(embeddedMetadata, queryRunner)
     const release = await this.maybeCreateRelease(
       embeddedMetadata,
       folderStructureMetadata,
-      artists?.[0],
-      artists,
+      releaseArtist,
+      trackArtists,
       genres,
       queryRunner,
     )
@@ -176,7 +176,7 @@ export class MusicIndexingService {
       id: initialMusicTrackEntity.id,
       title: trackTitle as string,
       sortTitle: sortableString(trackTitle),
-      artists: artists,
+      artists: trackArtists,
       release: release,
       trackNumber: trackNumber,
       discNumber: discNumber,
@@ -576,27 +576,27 @@ export class MusicIndexingService {
   }
 
   /**
-   * Creates an artist entity only if we need to.
+   * Creates artist entities only if we need to. Returns both the track-level
+   * artists and the release-level artist separately, since they have different
+   * attribution semantics.
    */
   async maybeCreateArtists(
     embeddedMetadata: MusicTrackMetadata[],
     fsMetadata: MusicTrackMetadata[],
     queryRunner?: QueryRunner,
-  ): Promise<MusicArtist[] | null> {
-    const artistNames = this.determineArtists(embeddedMetadata, fsMetadata)
-    const artistEntities = []
+  ): Promise<{ trackArtists: MusicArtist[], releaseArtist: MusicArtist }> {
+    const trackArtists: MusicArtist[] = []
 
-    for (const artistName of artistNames) {
+    for (const artistName of this.determineArtists(embeddedMetadata, fsMetadata)) {
       const exists = await this.musicArtistService.getByName(artistName)
-      if (exists) {
-        artistEntities.push(exists)
-      } else {
-        const created = await this.musicArtistService.create(artistName, queryRunner)
-        artistEntities.push(created)
-      }
+      trackArtists.push(exists ?? await this.musicArtistService.create(artistName, queryRunner))
     }
 
-    return artistEntities
+    const releaseArtistName = this.determineReleaseArtist(embeddedMetadata, fsMetadata)
+    const releaseArtistExists = await this.musicArtistService.getByName(releaseArtistName)
+    const releaseArtist = releaseArtistExists ?? await this.musicArtistService.create(releaseArtistName, queryRunner)
+
+    return { trackArtists, releaseArtist }
   }
 
   /**
@@ -616,24 +616,58 @@ export class MusicIndexingService {
   }
 
   /**
+   * Returns true when the track belongs to a compilation album. Checks the
+   * compilation tag first, then falls back to the "Various Artists" convention.
+   */
+  isCompilationAlbum(embeddedMetadata: MusicTrackMetadata[]): boolean {
+    const compilation = embeddedMetadata.find((m) => m.metaKey === 'compilation')?.metaValue
+    if (compilation === 'true' || compilation === '1') return true
+
+    const albumArtist = embeddedMetadata.find((m) => m.metaKey === 'albumartist')?.metaValue
+    if (albumArtist?.toLowerCase() === 'various artists') return true
+
+    return false
+  }
+
+  /**
+   * Analyzes all given metadata to determine the primary artist of the release.
+   * Prioritizes albumartist over artist since this is release-level attribution,
+   * not track-level.
+   */
+  determineReleaseArtist(embeddedMetadata: MusicTrackMetadata[], fsMetadata: MusicTrackMetadata[]): string {
+    const albumArtist = embeddedMetadata.find((m) => m.metaKey === 'albumartist')?.metaValue
+    if (albumArtist) return albumArtist
+
+    const albumArtistSort = embeddedMetadata.find((m) => m.metaKey === 'albumartistsort')?.metaValue
+    if (albumArtistSort) return albumArtistSort
+
+    const artist = embeddedMetadata.find((m) => m.metaKey === 'artist')?.metaValue
+    if (artist) return artist
+
+    const fsArtistName = fsMetadata.find((m) => m.metaKey === 'artistName')?.metaValue
+    if (fsArtistName) return fsArtistName
+
+    return IndexingFallbacks.UNKNOWN_ARTIST
+  }
+
+  /**
    * Creates a release entity only if we need to.
    */
   async maybeCreateRelease(
     embeddedMetadata: MusicTrackMetadata[],
     fsMetadata: MusicTrackMetadata[],
-    artist: MusicArtist,
-    artists: MusicArtist[],
+    releaseArtist: MusicArtist,
+    trackArtists: MusicArtist[],
     genres: MusicGenre[],
     queryRunner?: QueryRunner,
   ): Promise<MusicRelease | null> {
     const releaseTitle = this.determineReleaseTitle(embeddedMetadata, fsMetadata)
+    const exists = await this.musicReleaseService.getByName(releaseTitle, releaseArtist?.name)
 
-    for (const a of (artists ?? [])) {
-      const exists = await this.musicReleaseService.getByName(releaseTitle, a.name)
-      if (exists) return exists
-    }
+    if (exists) return exists
 
-    return await this.musicReleaseService.create(releaseTitle, artist, artists, genres, queryRunner)
+    const releaseArtists = this.isCompilationAlbum(embeddedMetadata) ? [releaseArtist] : trackArtists
+    return await this.musicReleaseService.create(releaseTitle, releaseArtist, releaseArtists, genres, queryRunner)
   }
 
   /**
