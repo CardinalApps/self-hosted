@@ -27,31 +27,39 @@ function ArtistsPage() {
           name={TOOLBAR_NAME}
           virtualViewName={VIRTUAL_VIEW_NAME}
           items={[
-            {
-              slug: ToolbarItem.BREADCRUMBS,
-              render: ToolbarItem.BREADCRUMBS,
-            },
-            {
-              slug: ToolbarItem.VIRTUALLAYOUT,
-              render: ToolbarItem.VIRTUALLAYOUT,
-            },
-            {
-              slug: 'order',
-              render: ToolbarItem.ORDER,
-            },
-            {
-              slug: 'orderBy',
-              render: ToolbarItem.ORDERBY,
-              initialValue: 'name',
-              options: [
-                'name',
-                'createdAt',
-              ] as MusicAritstsOrderBy[],
-            },
-            {
-              slug: ToolbarItem.RESET,
-              render: ToolbarItem.RESET,
-            },
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+            [
+              {
+                slug: ToolbarItem.VIRTUALLAYOUT,
+                render: ToolbarItem.VIRTUALLAYOUT,
+              },
+            ],
+            [
+              {
+                slug: 'order',
+                render: ToolbarItem.ORDER,
+              },
+              {
+                slug: 'orderBy',
+                render: ToolbarItem.ORDERBY,
+                initialValue: 'name',
+                options: [
+                  'name',
+                  'createdAt',
+                ] as MusicAritstsOrderBy[],
+              },
+            ],
+            [
+              {
+                slug: ToolbarItem.RESET,
+                render: ToolbarItem.RESET,
+              },
+            ],
           ]}
         />
       )}

@@ -26,7 +26,7 @@ export const DefaultItems = (props) => {
       <Toolbar
         {...props}
         name="story-default-items"
-        items={[
+        items={[[
           {
             slug: 'order',
             render: ToolbarItem.ORDER,
@@ -45,7 +45,7 @@ export const DefaultItems = (props) => {
             slug: ToolbarItem.SIMPLECOUNT,
             render: ToolbarItem.SIMPLECOUNT,
           },
-        ]}
+        ]]}
         numArchiveItems={100}
       />
     </div>
@@ -60,7 +60,7 @@ export const CustomValues = (props) => {
       <Toolbar
         {...props}
         name={toolbarName}
-        items={[
+        items={[[
           {
             slug: 'daterange',
             initialValue: {
@@ -120,7 +120,7 @@ export const CustomValues = (props) => {
               )
             },
           },
-        ]}
+        ]]}
       />
     </div>
   )
@@ -188,7 +188,7 @@ export const Selection = (props) => {
         name="story-selection"
         numArchiveItems={Object.keys(selected).length}
         numItemsSelected={Object.values(selected).filter((v) => !!v).length}
-        items={[
+        items={[[
           {
             slug: ToolbarItem.SELECTION,
             render: ToolbarItem.SELECTION,
@@ -214,7 +214,7 @@ export const Selection = (props) => {
             render: ToolbarItem.RESET,
             extra: { onReset: () => setSelected(init) },
           },
-        ]}
+        ]]}
       />
       <ol style={{ listStyleType: 'numeric', padding: '0 0 0 20px' }}>
         {Object.keys(selected).map((key) => (

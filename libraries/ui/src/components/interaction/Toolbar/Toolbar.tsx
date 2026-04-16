@@ -9,7 +9,7 @@ import { DATE_RANGE_SLUG, DEFAULT_DATE_RANGE } from './items/DateRange'
 import { PAGINATION_SLUG, DEFAULT_PAGINATION } from './items/Pagination'
 
 import ToolbarItems from './ToolbarItems'
-import { ToolbarItemObject } from './types'
+import { ToolbarItems as ToolbarItemsType } from './types'
 
 import { layoutActions } from '../../../store/slices/layout'
 
@@ -24,7 +24,7 @@ const DEFAULT_VALUES = {
 
 type ToolbarProps = {
   name?: string,
-  items?: ToolbarItemObject[],
+  items?: ToolbarItemsType,
   numShowingItems?: number | string,
   numArchiveItems?: number,
   numItemsSelected?: number,

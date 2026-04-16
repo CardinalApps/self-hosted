@@ -572,7 +572,7 @@ function VirtualPhotoList({
               {/* FIXME toolbar state has moved to the store */}
               <Toolbar
                 className={clsx(toolbar, toolbarShifted && 'shift')}
-                items={[
+                items={[[
                   {
                     slug: 'order',
                     initialValue: toolbarDefaults.order,
@@ -588,7 +588,7 @@ function VirtualPhotoList({
                     render: ToolbarItem.SELECTION,
                     extra: { onClearSelection: () => clearSelectedPhotos() },
                   },
-                ]}
+                ]]}
                 numArchiveItems={data.length}
                 numItemsSelected={selectedPhotos.length}
               />

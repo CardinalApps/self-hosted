@@ -24,7 +24,7 @@ function MusicHistoryPage() {
         <Toolbar
           name={TOOLBAR_NAME}
           virtualViewName={VIRTUAL_VIEW_NAME}
-          items={[
+          items={[[
             {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
@@ -42,7 +42,7 @@ function MusicHistoryPage() {
               slug: ToolbarItem.RESET,
               render: ToolbarItem.RESET,
             },
-          ]}
+          ]]}
         />
       )}
     >

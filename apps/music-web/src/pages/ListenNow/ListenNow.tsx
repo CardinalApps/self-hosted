@@ -21,12 +21,12 @@ function ListenNow() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
-          items={[
+          items={[[
             {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
             },
-          ]}
+          ]]}
         />
       )}
     >

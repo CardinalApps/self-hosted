@@ -47,6 +47,8 @@ export interface ToolbarItemObject {
   render?: ToolbarItem | (({ toolbarName, onChange }) => ReactNode),
 }
 
+export type ToolbarItems = ToolbarItemObject[][]
+
 export type ToolbarItemProps = {
   toolbarName?: string,
   item?: ToolbarItemObject,

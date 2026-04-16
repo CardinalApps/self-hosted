@@ -20,7 +20,7 @@ import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 
 import useWindowSize from '../../../hooks/useWindowSize'
 
-import { ToolbarItemObject } from './types'
+import { ToolbarItems as ToolbarItemsType } from './types'
 
 import './Toolbar.css'
 
@@ -28,7 +28,7 @@ import './Toolbar.css'
 
 type ToolbarItemsProps = {
   name?: string,
-  items?: ToolbarItemObject[],
+  items?: ToolbarItemsType,
   numShowingItems?: number | string,
   numArchiveItems?: number,
   numItemsSelected?: number,
@@ -179,38 +179,6 @@ const ToolbarItems = ({
   }
 
   /**
-   * Group up toolbar items. We want an array of arrays, where each subarray is
-   * a group.
-   */
-  const groupedItems = (): ToolbarItemObject[][] => {
-    if (!items.length) {
-      return [[]]
-    }
-
-    const allGroups = []
-    const automaticGroup = []
-
-    items.forEach((item) => {
-      // An item without a group goes into the automatic group
-      if (typeof items[0] === 'object' && !Array.isArray(items[0]) && items[0] !== null) {
-        automaticGroup.push(item)
-      }
-      // Each array is a group
-      else if (Array.isArray(item)) {
-        allGroups.push(item)
-      } else {
-        console.warn('Invalid toolbar item was supplied:', item)
-      }
-    })
-
-    if (automaticGroup.length) {
-      allGroups.unshift(automaticGroup)
-    }
-
-    return allGroups
-  }
-
-  /**
    * All toolbar items use this for updating their values.
    */
   const onItemValueChange = (slug, newVal, toolbarValues) => {
@@ -230,7 +198,7 @@ const ToolbarItems = ({
   const ProvidedItemsGroup = function() {
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
-      !!items.length && groupedItems().map((group, i) => {
+      !!items.length && items.map((group, i) => {
         return (
           <div className="toolbar-group" key={i}>
             {group.map((item, i) => {

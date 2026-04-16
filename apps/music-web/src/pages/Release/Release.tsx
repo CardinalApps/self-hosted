@@ -67,7 +67,7 @@ function ReleasePage() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
-          items={[
+          items={[[
             {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
@@ -76,7 +76,7 @@ function ReleasePage() {
                 crumbs: [{ label: data?.title }],
               },
             },
-          ]}
+          ]]}
         />
       )}
     >

@@ -37,7 +37,7 @@ function ArtistPage() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
-          items={[
+          items={[[
             {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
@@ -46,7 +46,7 @@ function ArtistPage() {
                 crumbs: [{ label: data?.name }],
               },
             },
-          ]}
+          ]]}
         />
       )}
     >
