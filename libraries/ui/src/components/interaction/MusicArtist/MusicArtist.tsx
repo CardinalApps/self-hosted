@@ -41,29 +41,26 @@ const MusicArtist = ({
 
   const optionalLink = (children) => {
     if (link && Link) {
-      return <Link className="artist-link" to={link}>{children}</Link>
+      return <Link className="artist-link artist-layout" to={link}>{children}</Link>
     } else {
-      return children
+      return <div className="artist-layout">{children}</div>
     }
   }
 
   return (
-    <div className={clsx(`music-artist`)}>
+    <div className={clsx(`music-artist`, getArtistImage() && 'has-image')}>
       {optionalLink(
         <>
-          <header>
-            <p className="artist-name">{name}</p>
-          </header>
-          {!getArtistImage() && <div className="checkered" />}
           {!!getArtistImage() && <div className="artist-image" style={{ backgroundImage: `url('${getArtistImage()}')`  }} />}
+          <p className="artist-name">{name}</p>
           {(!!numReleases || !!numTracks) && (
-            <footer>
+            <div className="artist-meta">
               {!!numReleases && numReleases === 1 && <span className="artist-stat">{i18n['artist.num-releases.singular'][lang].replace('{num}', numReleases)}</span>}
               {!!numReleases && numReleases !== 1 && <span className="artist-stat">{i18n['artist.num-releases.plural'][lang].replace('{num}', numReleases)}</span>}
 
               {!!numTracks && numTracks === 1 && <span className="artist-stat">{i18n['artist.num-tracks.singular'][lang].replace('{num}', numTracks)}</span>}
               {!!numTracks && numTracks !== 1 && <span className="artist-stat">{i18n['artist.num-tracks.plural'][lang].replace('{num}', numTracks)}</span>}
-            </footer>
+            </div>
           )}
         </>,
       )}

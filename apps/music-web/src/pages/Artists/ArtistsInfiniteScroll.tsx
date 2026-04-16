@@ -13,8 +13,8 @@ import VirtualLayout from '@cardinalapps/ui/src/components/features/AppBase/layo
 import MusicArtist from '@cardinalapps/ui/src/components/interaction/MusicArtist'
 import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
 
-const ITEM_WIDTH = 320
-const ITEM_HEIGHT = 265
+const ITEM_WIDTH = '100%'
+const ITEM_HEIGHT = 90
 
 type TracksInfiniteScrollProps = {
   virtualViewName: string,
