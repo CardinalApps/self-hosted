@@ -159,9 +159,46 @@
   }
 }
 
-.toolbar-page-title {
+.toolbar-breadcrumbs {
+  display: flex;
+  align-items: center;
   margin-left: 12px;
   margin-right: 12px;
+}
+
+.toolbar-breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-breadcrumb {
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  color: var(--text-color-4);
+  text-transform: uppercase;
+}
+
+a.toolbar-breadcrumb {
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--accent-color);
+  }
+}
+
+.toolbar-breadcrumb-separator {
+  margin: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  color: var(--text-color-4);
+}
+
+.toolbar-page-title {
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;

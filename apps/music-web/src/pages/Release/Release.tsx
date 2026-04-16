@@ -8,8 +8,10 @@ import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 import { useGetMusicReleaseQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
 import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
-import H1 from '@cardinalapps/ui/src/components/typography/H1'
 import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError/AccessError'
+import Toolbar from '../../../../../libraries/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '../../../../../libraries/ui/src/components/interaction/Toolbar/types'
+import { MusicRoutes } from '../../../../../libraries/ui/src/lib/net/router'
 
 import ReleaseArtists from './ReleaseArtists'
 import ReleaseMeta from './ReleaseMeta'
@@ -18,6 +20,8 @@ import ReleaseGenres from './ReleaseGenres'
 import i18n from './i18n.json'
 
 import './styles.css'
+
+const TOOLBAR_NAME = 'music-release-toolbar'
 
 function ReleasePage() {
   const { useParams } = useContext(RouterContext)
@@ -60,8 +64,22 @@ function ReleasePage() {
       networkError={error as NetworkError}
       loading={isLoading}
       capabilities={['MusicReleases.Read']}
+      toolbar={(
+        <Toolbar
+          name={TOOLBAR_NAME}
+          items={[
+            {
+              slug: ToolbarItem.BREADCRUMBS,
+              render: ToolbarItem.BREADCRUMBS,
+              extra: {
+                rootLink: MusicRoutes.releases,
+                crumbs: [{ label: data?.title }],
+              },
+            },
+          ]}
+        />
+      )}
     >
-      <H1 className="release-name">{data?.title}</H1>
       <div className="release-page-cols">
         <div className="release-left-col">
           <MusicRelease

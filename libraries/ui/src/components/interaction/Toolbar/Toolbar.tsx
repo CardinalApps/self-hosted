@@ -25,9 +25,6 @@ const DEFAULT_VALUES = {
 type ToolbarProps = {
   name?: string,
   items?: ToolbarItemObject[],
-  onReset?: () => void,
-  onClearSelection?: () => void,
-  onDeleteSelection?: () => void,
   numShowingItems?: number | string,
   numArchiveItems?: number,
   numItemsSelected?: number,
@@ -47,9 +44,6 @@ type ToolbarProps = {
 const Toolbar = ({
   name,
   items = [],
-  onReset = () => {},
-  onClearSelection = () => {},
-  onDeleteSelection,
   numShowingItems,
   numArchiveItems,
   numItemsSelected,
@@ -99,9 +93,6 @@ const Toolbar = ({
         <ToolbarItems
           name={name}
           items={items}
-          onClearSelection={onClearSelection}
-          onDeleteSelection={onDeleteSelection}
-          onReset={onReset}
           numShowingItems={numShowingItems}
           numArchiveItems={numArchiveItems}
           numItemsSelected={numItemsSelected}

@@ -2,6 +2,7 @@ import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 import ListenNowProcedural from './ListenNowProcedural'
 import Toolbar from '../../../../../libraries/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '../../../../../libraries/ui/src/components/interaction/Toolbar/types'
 
 import './styles.css'
 
@@ -20,6 +21,12 @@ function ListenNow() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            {
+              slug: ToolbarItem.BREADCRUMBS,
+              render: ToolbarItem.BREADCRUMBS,
+            },
+          ]}
         />
       )}
     >

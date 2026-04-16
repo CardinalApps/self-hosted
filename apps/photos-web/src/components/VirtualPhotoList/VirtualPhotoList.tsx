@@ -578,11 +578,19 @@ function VirtualPhotoList({
                     initialValue: toolbarDefaults.order,
                     render: ToolbarItem.ORDER,
                   },
+                  {
+                    slug: ToolbarItem.RESET,
+                    render: ToolbarItem.RESET,
+                    extra: { onReset: () => clearSelectedPhotos() },
+                  },
+                  {
+                    slug: ToolbarItem.SELECTION,
+                    render: ToolbarItem.SELECTION,
+                    extra: { onClearSelection: () => clearSelectedPhotos() },
+                  },
                 ]}
                 numArchiveItems={data.length}
                 numItemsSelected={selectedPhotos.length}
-                onReset={() => clearSelectedPhotos()}
-                onClearSelection={() => clearSelectedPhotos()}
               />
             </motion.div>
           }

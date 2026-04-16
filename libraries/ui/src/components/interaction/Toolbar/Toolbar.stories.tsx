@@ -41,6 +41,10 @@ export const DefaultItems = (props) => {
             render: ToolbarItem.ORDERBY,
             initialValue: 'date_added',
           },
+          {
+            slug: ToolbarItem.SIMPLECOUNT,
+            render: ToolbarItem.SIMPLECOUNT,
+          },
         ]}
         numArchiveItems={100}
       />
@@ -149,6 +153,12 @@ export const Groups = (props) => {
               render: ToolbarItem.ORDERBY,
             },
           ],
+          [
+            {
+              slug: ToolbarItem.SIMPLECOUNT,
+              render: ToolbarItem.SIMPLECOUNT,
+            },
+          ],
         ]}
       />
     </div>
@@ -178,22 +188,33 @@ export const Selection = (props) => {
         name="story-selection"
         numArchiveItems={Object.keys(selected).length}
         numItemsSelected={Object.values(selected).filter((v) => !!v).length}
-        onClearSelection={() => {
-          const updated = {}
-          Object.keys(selected).forEach((v, i) => (updated[i+1] = false))
-          setSelected(updated)
-        }}
-        onDeleteSelection={() => {
-          const updated = {}
-          // only keep unselected items
-          for (const [key, value] of Object.entries(selected)) {
-            if (!value) {
-              updated[key] = value
-            }
-          }
-          setSelected(updated)
-        }}
-        onReset={() => setSelected(init)}
+        items={[
+          {
+            slug: ToolbarItem.SELECTION,
+            render: ToolbarItem.SELECTION,
+            extra: {
+              onClearSelection: () => {
+                const updated = {}
+                Object.keys(selected).forEach((v, i) => (updated[i+1] = false))
+                setSelected(updated)
+              },
+              onDeleteSelection: () => {
+                const updated = {}
+                for (const [key, value] of Object.entries(selected)) {
+                  if (!value) {
+                    updated[key] = value
+                  }
+                }
+                setSelected(updated)
+              },
+            },
+          },
+          {
+            slug: ToolbarItem.RESET,
+            render: ToolbarItem.RESET,
+            extra: { onReset: () => setSelected(init) },
+          },
+        ]}
       />
       <ol style={{ listStyleType: 'numeric', padding: '0 0 0 20px' }}>
         {Object.keys(selected).map((key) => (

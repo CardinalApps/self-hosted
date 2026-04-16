@@ -5,12 +5,16 @@ import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 import { useGetMusicArtistQuery } from '@cardinalapps/ui/src/store/apis/musicArtists'
-import H1 from '@cardinalapps/ui/src/components/typography/H1'
 import ArtistReleases from './ArtistReleases'
+import Toolbar from '../../../../../libraries/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '../../../../../libraries/ui/src/components/interaction/Toolbar/types'
+import { MusicRoutes } from '../../../../../libraries/ui/src/lib/net/router'
 
 import i18n from './i18n.json'
 
 import './styles.css'
+
+const TOOLBAR_NAME = 'music-artist-toolbar'
 
 function ArtistPage() {
   const { useParams } = useContext(RouterContext)
@@ -30,8 +34,22 @@ function ArtistPage() {
       networkError={error as NetworkError}
       loading={isLoading}
       capabilities={['MusicArtists.Read']}
+      toolbar={(
+        <Toolbar
+          name={TOOLBAR_NAME}
+          items={[
+            {
+              slug: ToolbarItem.BREADCRUMBS,
+              render: ToolbarItem.BREADCRUMBS,
+              extra: {
+                rootLink: MusicRoutes.artists,
+                crumbs: [{ label: data?.name }],
+              },
+            },
+          ]}
+        />
+      )}
     >
-      <H1 className="release-name">{data?.name}</H1>
       <ArtistReleases artist={data} />
     </AppPage>
   )

@@ -22,6 +22,20 @@ export enum ToolbarItem {
   ORDERBY = 'orderby',
   DELETE = 'delete',
   DESELECT = 'deselect',
+  RESET = 'reset',
+  VIRTUALLAYOUT = 'virtuallayout',
+  SIMPLECOUNT = 'simplecount',
+  SELECTION = 'selection',
+}
+
+export type BreadcrumbItem = {
+  label: string,
+  to: string,
+}
+
+export type BreadcrumbsExtra = {
+  rootLink?: string,
+  crumbs?: BreadcrumbItem[],
 }
 
 export interface ToolbarItemObject {
@@ -29,7 +43,7 @@ export interface ToolbarItemObject {
   title?: string,
   initialValue?: unknown,
   options?: unknown[],
-  extra?: unknown,
+  extra?: BreadcrumbsExtra | unknown,
   render?: ToolbarItem | (({ toolbarName, onChange }) => ReactNode),
 }
 

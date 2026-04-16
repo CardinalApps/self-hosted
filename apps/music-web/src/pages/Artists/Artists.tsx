@@ -11,7 +11,7 @@ import i18n from './i18n.json'
 
 import './styles.css'
 
-const TOOLBAR_NAME = 'artists-toolbar'
+const TOOLBAR_NAME = 'music-artists-toolbar'
 const VIRTUAL_VIEW_NAME = 'artists-page'
 
 function ArtistsPage() {
@@ -28,6 +28,14 @@ function ArtistsPage() {
           virtualViewName={VIRTUAL_VIEW_NAME}
           items={[
             {
+              slug: ToolbarItem.BREADCRUMBS,
+              render: ToolbarItem.BREADCRUMBS,
+            },
+            {
+              slug: ToolbarItem.VIRTUALLAYOUT,
+              render: ToolbarItem.VIRTUALLAYOUT,
+            },
+            {
               slug: 'order',
               render: ToolbarItem.ORDER,
             },
@@ -39,6 +47,10 @@ function ArtistsPage() {
                 'name',
                 'createdAt',
               ] as MusicAritstsOrderBy[],
+            },
+            {
+              slug: ToolbarItem.RESET,
+              render: ToolbarItem.RESET,
             },
           ]}
         />

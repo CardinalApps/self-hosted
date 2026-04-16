@@ -2,6 +2,9 @@
   "music-artist.title": {
     "en": "Music Artist"
   },
+  "music-artists.title": {
+    "en": "Music Artists"
+  },
   "music-artist.releases": {
     "en": "Releases"
   }
