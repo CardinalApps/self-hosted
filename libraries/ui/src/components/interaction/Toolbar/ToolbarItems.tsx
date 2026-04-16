@@ -4,6 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import Drawer from '../../layout/Drawer'
 
+import Breadcrumbs, { BREADCRUMBS_SLUG } from './items/Breadcrumbs'
+import Reset, { RESET_SLUG } from './items/Reset'
+import VirtualLayout, { VIRTUAL_LAYOUT_SLUG } from './items/VirtualLayout'
+import SimpleCount, { SIMPLE_COUNT_SLUG } from './items/SimpleCount'
+import Selection, { SELECTION_SLUG } from './items/Selection'
 import Order, { ORDER_SLUG } from './items/Order'
 import OrderBy, { ORDER_BY_SLUG } from './items/OrderBy'
 import DateRange, { DATE_RANGE_SLUG } from './items/DateRange'
@@ -11,27 +16,19 @@ import Delete, { DELETE_SLUG } from './items/Delete'
 import Deselect, { DESELECT_SLUG } from './items/Deselect'
 import Pagination, { PAGINATION_SLUG } from './items/Pagination'
 
-import { settingsSelectors } from '../../../store/slices/settings'
 import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 
 import useWindowSize from '../../../hooks/useWindowSize'
 
-import { formatWithCommas } from '../../../lib/formatting/number'
 import { ToolbarItemObject } from './types'
 
 import './Toolbar.css'
 
-import i18n from './i18n'
-import { motion } from 'framer-motion'
-import clsx from 'clsx'
 
 
 type ToolbarItemsProps = {
   name?: string,
   items?: ToolbarItemObject[],
-  onClearSelection?: () => void,
-  onDeleteSelection?: () => void,
-  onReset?: () => void,
   numShowingItems?: number | string,
   numArchiveItems?: number,
   numItemsSelected?: number,
@@ -50,9 +47,6 @@ type ToolbarItemsProps = {
 const ToolbarItems = ({
   name,
   items = [],
-  onClearSelection = () => {},
-  onDeleteSelection,
-  onReset,
   numShowingItems,
   numItemsSelected,
   itemNamePlural,
@@ -64,11 +58,8 @@ const ToolbarItems = ({
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
   const windowSize = useWindowSize()
-  const pageTitle = useSelector(layoutSelectors.pageTitle)
-  const { lang } = useSelector(settingsSelectors.current)
   const [mobileToolbarModalIsOpen, setMobileToolbarModalIsOpen] = useState(false)
   const { [virtualViewName]: virtualView } = useSelector(layoutSelectors.virtualViews)
-  const [resetIconAnimation, setResetIconAnimation] = useState('')
   const toolbarRef = useRef<HTMLDivElement>(null)
   const overflowRef = useRef<HTMLDivElement>(null)
   const overflowTriggerRef = useRef<HTMLDivElement>(null)
@@ -159,8 +150,19 @@ const ToolbarItems = ({
   /**
    * Return an instance of a built-in toolbar component.
    */
-  const getBuiltInItem = (item) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getBuiltInItem = (item): React.ComponentType<any> => {
     switch (item) {
+      case BREADCRUMBS_SLUG:
+        return Breadcrumbs
+      case RESET_SLUG:
+        return Reset
+      case VIRTUAL_LAYOUT_SLUG:
+        return VirtualLayout
+      case SIMPLE_COUNT_SLUG:
+        return SimpleCount
+      case SELECTION_SLUG:
+        return Selection
       case ORDER_SLUG:
         return Order
       case ORDER_BY_SLUG:
@@ -223,110 +225,6 @@ const ToolbarItems = ({
   }
 
   /**
-   * Return the automatically-pluraized noun of what this toolbar is controlling
-   * (e.g., photos, albums, etc).
-   */
-  const itemName = function() {
-    const total = virtualViewName ? virtualView?.total : numArchiveItems
-    return total === 1
-      ? itemNameSingular ? itemNameSingular : i18n['item.singular.default'][lang]
-      : itemNamePlural ? itemNamePlural : i18n['item.plural.default'][lang]
-  }
-
-  /**
-   * Displays the current page name.
-   */
-  const BreadcrumbsGroup = function() {
-    if (!pageTitle) {
-      return null
-    }
-    return (
-      <>
-        <div className="toolbar-group">
-          <h2 className="toolbar-page-title">{pageTitle}</h2>
-        </div>
-      </>
-    )
-  }
-
-  /**
-   * Displays a simple count of how many items are in the archive. Requires
-   * `numArchiveItems`.
-   */
-  const SimpleCountGroup = function() {
-    if (!numArchiveItems) {
-      return null
-    }
-    const total = virtualViewName ? virtualView?.total : numArchiveItems
-    return (
-      <>
-        {!!total && !numItemsSelected && !numShowingItems &&
-          <div className="toolbar-group">
-            <p className="toolbar-total-items toolbar-text">
-              {i18n['total-items'][lang]
-                .replace('{total}', formatWithCommas(total))
-                .replace('{item}', itemName())
-              }
-            </p>
-          </div>
-        }
-      </>
-    )
-  }
-
-  /**
-   * Shows the current virtualized range when this toolbar is connected to a
-   * virtual layout.
-   */
-  const VirtualLayoutGroup = function() {
-    return (
-      !!virtualView?.start && !!virtualView?.end && !!virtualView?.total &&
-        <div className="toolbar-group">
-          <p className="toolbar-total-items toolbar-text">
-            {i18n['paginated-items'][lang]
-              .replace('{paginated}', `${formatWithCommas(virtualView.start)}-${formatWithCommas(virtualView.end)}`)
-              .replace('{total}', formatWithCommas(virtualView.total))
-              .replace('{item}', itemName())
-            }
-          </p>
-        </div>
-    )
-  }
-
-  /**
-   * Shows the current selection of items.
-   */
-  const SelectionGroup = function() {
-    const total = virtualViewName ? virtualView?.total : numArchiveItems
-    return (
-      /* Controls for the selected items */
-      !!total && !!numItemsSelected &&
-        <div className="toolbar-group">
-          <p className="toolbar-total-items toolbar-text">
-            {i18n['selected-items'][lang]
-              .replace('{selected}', formatWithCommas(numItemsSelected))
-              .replace('{total}', formatWithCommas(total))
-              .replace('{item}', itemName())
-            }
-          </p>
-          {/* Controls for the current selection */}
-          {!!total && !!numItemsSelected &&
-            <>
-              <div className="toolbar-item">
-                <Deselect onClick={onClearSelection} />
-              </div>
-              {!!onDeleteSelection &&
-                <div className="toolbar-item">
-                  <Delete onClick={onDeleteSelection} />
-                </div>
-              }
-            </>
-          }
-        </div>
-    )
-  }
-
-  /**
    * Render all of the items provided by the Toolbar `items` prop.
    */
   const ProvidedItemsGroup = function() {
@@ -346,6 +244,12 @@ const ToolbarItems = ({
                       item={item}
                       onChange={onItemValueChange}
                       numArchiveItems={total}
+                      numItemsSelected={numItemsSelected}
+                      numShowingItems={numShowingItems}
+                      itemNameSingular={itemNameSingular}
+                      itemNamePlural={itemNamePlural}
+                      defaultValues={defaultValues}
+                      virtualViewName={virtualViewName}
                     />
                   </div>
                 )
@@ -390,40 +294,6 @@ const ToolbarItems = ({
     )
   }
 
-  const reset = () => {
-    dispatch(layoutActions.setToolbarValues({
-      name,
-      values: defaultValues,
-    }))
-    onReset?.()
-    setResetIconAnimation('spin')
-    if (virtualViewName) {
-      dispatch(layoutActions.resetScrollPoint(virtualViewName))
-    }
-  }
-
-  const ResetGroup = () => {
-    if (!items.length) {
-      return null
-    }
-    return (
-      <div className="toolbar-group">
-        <motion.div
-          className={clsx('toolbar-item', 'reset')}
-          key={resetIconAnimation}
-          initial={{ rotate: 0 }}
-          animate={resetIconAnimation ? { rotate: -360 } : {}}
-          transition={{ type: 'spring', duration: 0.5 }}
-          onAnimationComplete={() => setResetIconAnimation('')}
-        >
-          <button className="toolbar-button" onClick={reset} title={i18n['reset.title'][lang]}>
-            <i className="toolbar-icon fas fa-undo-alt" />
-          </button>
-        </motion.div>
-      </div>
-    )
-  }
-
   if (!windowSize?.width) {
     return null
   }
@@ -432,12 +302,7 @@ const ToolbarItems = ({
     ?
       // Desktop toolbar
       <div ref={toolbarRef} className="toolbar-collider">
-        {BreadcrumbsGroup()}
-        {SimpleCountGroup()}
-        {VirtualLayoutGroup()}
-        {SelectionGroup()}
         {ProvidedItemsGroup()}
-        {ResetGroup()}
         {collider && numHidden > 0 && (
           <div className="toolbar-group toolbar-overflow-trigger" ref={overflowTriggerRef}>
             <button className="overflow-button" onClick={() => setOverflowOpen((o) => !o)}>
@@ -445,12 +310,7 @@ const ToolbarItems = ({
             </button>
             {overflowOpen && (
               <div className="toolbar-overflow-popout" ref={setOverflowRef}>
-                {BreadcrumbsGroup()}
-                {SimpleCountGroup()}
-                {VirtualLayoutGroup()}
-                {SelectionGroup()}
                 {ProvidedItemsGroup()}
-                {ResetGroup()}
               </div>
             )}
           </div>
@@ -463,12 +323,7 @@ const ToolbarItems = ({
         {!!mobileToolbarModalIsOpen &&
           <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
             <div className="mobile-toolbar-drawer">
-              {BreadcrumbsGroup()}
-              {SimpleCountGroup()}
-              {VirtualLayoutGroup()}
-              {SelectionGroup()}
               {ProvidedItemsGroup()}
-              {ResetGroup()}
             </div>
           </Drawer>
         }
