@@ -7,6 +7,7 @@ import { Repository, DataSource, QueryRunner } from 'typeorm'
 import { MusicRelease } from './music-release.entity'
 import { MusicReleaseMetadata } from './music-release-metadata.entity'
 import { MusicReleaseThumbnail } from './music-release-thumbnail.entity'
+import { ReleaseType } from './enums'
 
 import { EventService } from '../event/event.service'
 
@@ -99,11 +100,20 @@ export class MusicReleaseService {
   /**
    * Creates a new music release in the database.
    */
+  async updateReleaseType(id: number, releaseType: ReleaseType, queryRunner?: QueryRunner): Promise<void> {
+    if (queryRunner) {
+      await queryRunner.manager.update(MusicRelease, id, { releaseType })
+    } else {
+      await this.musicReleaseRepository.update(id, { releaseType })
+    }
+  }
+
   async create(
     title: string,
     artist: MusicArtist,
     artists?: MusicArtist[],
     genres?: MusicGenre[],
+    releaseType?: ReleaseType,
     queryRunner?: QueryRunner,
   ): Promise<MusicRelease> {
     const initial = {
@@ -112,6 +122,7 @@ export class MusicReleaseService {
       artist: artist,
       artists: artists,
       genres: genres,
+      releaseType: releaseType,
     } as Partial<MusicRelease>
 
     if (queryRunner) {

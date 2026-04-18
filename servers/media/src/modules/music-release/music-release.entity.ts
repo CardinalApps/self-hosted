@@ -17,6 +17,7 @@ import { MusicArtist } from  '../music-artist/music-artist.entity'
 import { MusicGenre } from  '../music-genres/music-genre.entity'
 import { MusicReleaseMetadata } from './music-release-metadata.entity'
 import { MusicReleaseThumbnail } from './music-release-thumbnail.entity'
+import { ReleaseType } from './enums'
 
 @Entity()
 @Index(['title'])
@@ -57,6 +58,9 @@ export class MusicRelease extends BaseEntity {
 
   @Column({ nullable: true })
   sortTitle?: string
+
+  @Column({ type: 'text', nullable: true })
+  releaseType?: ReleaseType
 
   @OneToMany(() => MusicReleaseMetadata, (musicReleaseMetadata) => musicReleaseMetadata.release, { onDelete: 'CASCADE' })
   @JoinColumn()

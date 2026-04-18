@@ -20,6 +20,7 @@ import {
   MusicFileSystemStructureMetadata,
 } from '../types'
 import { IndexingFallbacks } from '../enums'
+import { ReleaseType } from '../../music-release/enums'
 
 import { sortableString } from '../../../utils/string'
 import {
@@ -549,6 +550,32 @@ export class MusicIndexingService {
   }
 
   /**
+   * Determines the release type from embedded metadata.
+   *
+   * Priority:
+   *   1. RELEASETYPE tag (MusicBrainz-aware taggers, e.g. Picard, beets)
+   *   2. COMPILATION flag / "Various Artists" albumartist convention
+   *
+   * When RELEASETYPE is a multi-value list (e.g. "album; live"), the first
+   * value is used. Returns null when no signal is present.
+   */
+  determineReleaseType(embeddedMetadata: MusicTrackMetadata[]): ReleaseType | null {
+    const releaseTypeRaw = embeddedMetadata.find((m) => m.metaKey === 'releasetype')?.metaValue
+
+    if (releaseTypeRaw) {
+      const primary = releaseTypeRaw.split(/[;,]/)[0].trim().toLowerCase()
+      const match = Object.values(ReleaseType).find((v) => v === primary)
+      if (match) return match
+    }
+
+    if (this.isCompilationAlbum(embeddedMetadata)) {
+      return ReleaseType.COMPILATION
+    }
+
+    return null
+  }
+
+  /**
    * Returns true when the track belongs to a compilation album. Checks the
    * compilation tag first, then falls back to the "Various Artists" convention.
    */
@@ -595,12 +622,18 @@ export class MusicIndexingService {
     queryRunner?: QueryRunner,
   ): Promise<MusicRelease | null> {
     const releaseTitle = this.determineReleaseTitle(embeddedMetadata, fsMetadata)
+    const releaseType = this.determineReleaseType(embeddedMetadata)
     const exists = await this.musicReleaseService.getByName(releaseTitle, releaseArtist?.name)
 
-    if (exists) return exists
+    if (exists) {
+      if (!exists.releaseType && releaseType) {
+        await this.musicReleaseService.updateReleaseType(exists.id, releaseType, queryRunner)
+      }
+      return exists
+    }
 
     const releaseArtists = this.isCompilationAlbum(embeddedMetadata) ? [releaseArtist] : trackArtists
-    return await this.musicReleaseService.create(releaseTitle, releaseArtist, releaseArtists, genres, queryRunner)
+    return await this.musicReleaseService.create(releaseTitle, releaseArtist, releaseArtists, genres, releaseType, queryRunner)
   }
 
   /**
