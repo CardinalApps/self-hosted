@@ -16,7 +16,10 @@ export enum IndexingEvents {
   MUSIC_TRACK_ADDED = `indexing.music_track_added`,
   MUSIC_TRACK_UPDATED = `indexing.music_track_updated`,
   MUSIC_ARTIST_ADDED = `indexing.music_artist_added`,
+  MUSIC_ARTIST_UPDATED = `indexing.music_artist_updated`,
   MUSIC_RELEASE_ADDED = `indexing.music_release_added`,
+  MUSIC_RELEASE_UPDATED = `indexing.music_release_updated`,
+  MUSIC_GENRE_ADDED = `indexing.music_genre_added`,
   CURRENT_PROGRESS = `indexing.current_progress`,
   COMPLETED = `indexing.completed`,
 }

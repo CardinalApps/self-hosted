@@ -8,7 +8,7 @@ import { IndexingSeedLargeService } from './indexing-seed.service'
 import { IndexingSeedFsService } from './indexing-seed-fs.service'
 import { ScannerService } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
-import { MusicIndexingService } from './media/indexing.music.service'
+import { MusicIndexingService } from './media/music/indexing.music.service'
 
 import { File } from './entities/file.entity'
 import { Run } from './entities/run.entity'

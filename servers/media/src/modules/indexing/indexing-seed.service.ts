@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid'
 import { File } from './entities/file.entity'
 import { Run } from './entities/run.entity'
 import { User } from '../user/user.entity'
-import { MusicIndexingService } from './media/indexing.music.service'
+import { MusicIndexingService } from './media/music/indexing.music.service'
 import { envVar } from '../../utils/env'
 
 const BATCH_SIZE = 500
