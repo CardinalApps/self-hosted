@@ -1,6 +1,14 @@
 .music-artist-page {
 
   .music-artist-releases {
+
+    .music-release-type {
+      margin-bottom: 40px;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
     
     .release-list {
       display: flex;

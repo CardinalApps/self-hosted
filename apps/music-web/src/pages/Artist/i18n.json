@@ -7,5 +7,29 @@
   },
   "music-artist.releases": {
     "en": "Releases"
+  },
+  "music-artist.releases.albums": {
+    "en": "Albums"
+  },
+  "music-artist.releases.eps": {
+    "en": "EPs"
+  },
+  "music-artist.releases.singles": {
+    "en": "Singles"
+  },
+  "music-artist.releases.compilations": {
+    "en": "Compilations"
+  },
+  "music-artist.releases.soundtracks": {
+    "en": "Soundtracks"
+  },
+  "music-artist.releases.live": {
+    "en": "Live"
+  },
+  "music-artist.releases.remixes": {
+    "en": "Remixes"
+  },
+  "music-artist.releases.other": {
+    "en": "Other"
   }
 }
