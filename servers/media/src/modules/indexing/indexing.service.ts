@@ -23,7 +23,7 @@ import { InMemoryRun, InMemoryRunMediaCounts, FileToIndexInQueue, NewRunOptions,
 
 import { ScannerService, ScanResults } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
-import { MusicIndexingService } from './media/indexing.music.service'
+import { MusicIndexingService } from './media/music/indexing.music.service'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
 import { MusicArtistMetadata } from '../music-artist/music-artist-metadata.entity'
