@@ -18,6 +18,7 @@ import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeS
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
+import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
@@ -197,6 +198,14 @@ function Users() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+          ]}
         />
       )}
     >

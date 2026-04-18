@@ -29,15 +29,21 @@ function MusicHistoryPage() {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
             },
+          ],
+          [
             {
               slug: ToolbarItem.VIRTUALLAYOUT,
               render: ToolbarItem.VIRTUALLAYOUT,
             },
+          ],
+          [
             {
               slug: 'order',
               render: ToolbarItem.ORDER,
               initialValue: 'DESC',
             },
+          ],
+          [
             {
               slug: ToolbarItem.RESET,
               render: ToolbarItem.RESET,

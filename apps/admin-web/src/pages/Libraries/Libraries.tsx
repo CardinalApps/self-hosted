@@ -30,13 +30,14 @@ import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
+import CreateLibraryDrawer from './CreateLibraryDrawer'
+import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import homeServerAPI from '@cardinalapps/ui/src/lib/homeserver/homeServerAPI'
 
 import i18n from './i18n.json'
 
 import './styles.css'
-import CreateLibraryDrawer from './CreateLibraryDrawer'
 
 const TOOLBAR_NAME = 'admin-libraries'
 
@@ -186,6 +187,14 @@ function Libraries() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+          ]}
         />
       )}
     >

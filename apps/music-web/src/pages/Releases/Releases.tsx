@@ -26,33 +26,41 @@ function ReleasesPage() {
         <Toolbar
           name={TOOLBAR_NAME}
           virtualViewName={VIRTUAL_VIEW_NAME}
-          items={[[
-            {
-              slug: ToolbarItem.BREADCRUMBS,
-              render: ToolbarItem.BREADCRUMBS,
-            },
-            {
-              slug: ToolbarItem.VIRTUALLAYOUT,
-              render: ToolbarItem.VIRTUALLAYOUT,
-            },
-            {
-              slug: 'order',
-              render: ToolbarItem.ORDER,
-            },
-            {
-              slug: 'orderBy',
-              render: ToolbarItem.ORDERBY,
-              initialValue: 'title',
-              options: [
-                'title',
-                'createdAt',
-              ] as MusicReleasesOrderBy[],
-            },
-            {
-              slug: ToolbarItem.RESET,
-              render: ToolbarItem.RESET,
-            },
-          ]]}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+            [
+              {
+                slug: ToolbarItem.VIRTUALLAYOUT,
+                render: ToolbarItem.VIRTUALLAYOUT,
+              },
+            ],
+            [
+              {
+                slug: 'order',
+                render: ToolbarItem.ORDER,
+              },
+              {
+                slug: 'orderBy',
+                render: ToolbarItem.ORDERBY,
+                initialValue: 'title',
+                options: [
+                  'title',
+                  'createdAt',
+                ] as MusicReleasesOrderBy[],
+              },
+            ],
+            [
+              {
+                slug: ToolbarItem.RESET,
+                render: ToolbarItem.RESET,
+              },
+            ],
+          ]}
         />
       )}
     >

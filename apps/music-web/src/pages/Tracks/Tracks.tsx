@@ -31,10 +31,14 @@ function TracksPage() {
               slug: ToolbarItem.BREADCRUMBS,
               render: ToolbarItem.BREADCRUMBS,
             },
+          ],
+          [
             {
               slug: ToolbarItem.VIRTUALLAYOUT,
               render: ToolbarItem.VIRTUALLAYOUT,
             },
+          ],
+          [
             {
               slug: 'order',
               render: ToolbarItem.ORDER,
@@ -52,6 +56,8 @@ function TracksPage() {
                 'bitrate',
               ] as MusicTracksOrderBy[],
             },
+          ],
+          [
             {
               slug: ToolbarItem.RESET,
               render: ToolbarItem.RESET,

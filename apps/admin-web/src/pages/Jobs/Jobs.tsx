@@ -13,6 +13,7 @@ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout'
 import Active from './cards/Active'
 import History from './cards/History'
 import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { useGetJobTypesQuery, useGetJobsQuery } from '@cardinalapps/ui/src/store/apis/jobs'
 
@@ -81,6 +82,14 @@ function Jobs() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+          ]}
         />
       )}
     >

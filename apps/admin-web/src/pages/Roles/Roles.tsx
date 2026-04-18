@@ -11,6 +11,7 @@ import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import RolesList from './RolesList'
 import CapabilitiesList from './CapabilitiesList'
 import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import i18n from './i18n.json'
 import './styles.css'
@@ -30,6 +31,14 @@ function Roles() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+          ]}
         />
       )}
     >

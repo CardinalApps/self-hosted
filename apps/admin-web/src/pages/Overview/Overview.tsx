@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Toolbar from '@cardinalapps/ui/src/components/interaction/Toolbar'
+import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 
@@ -26,6 +27,14 @@ function Overview() {
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
+          items={[
+            [
+              {
+                slug: ToolbarItem.BREADCRUMBS,
+                render: ToolbarItem.BREADCRUMBS,
+              },
+            ],
+          ]}
         />
       )}
     >
