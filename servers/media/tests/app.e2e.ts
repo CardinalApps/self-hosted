@@ -48,12 +48,12 @@
 //   [x] GET    /api/v1/licensing/seats              - Get information about seat usage
 //   [x] GET    /api/v1/licensing/subscription       - Get the subscription tier
 //
-// Libraries
-//   [ ] GET    /api/v1/libraries                    - Get the current user's all libraries
-//   [ ] POST   /api/v1/library                      - Create a new library
-//   [ ] GET    /api/v1/library/{id}                 - Get a library
-//   [ ] PATCH  /api/v1/library/{id}                 - Update a library
-//   [ ] DELETE /api/v1/library/{id}                 - Delete a library
+// Libraries (tests/integration/libraries/libraries.spec.ts)
+//   [x] GET    /api/v1/libraries                    - Get the current user's all libraries
+//   [x] POST   /api/v1/library                      - Create a new library
+//   [x] GET    /api/v1/library/{id}                 - Get a library
+//   [x] PATCH  /api/v1/library/{id}                 - Update a library
+//   [x] DELETE /api/v1/library/{id}                 - Delete a library
 //
 // Indexing
 //   [ ] GET    /api/v1/index/state                  - Get the current state of the indexing service
