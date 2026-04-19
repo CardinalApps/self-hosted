@@ -67,13 +67,13 @@
 //   [ ] POST   /api/v1/index/seed/fs               - Seed the file system with mock music folders/files
 //   [ ] POST   /api/v1/index/seed/large             - Seed the index with millions of mock music files
 //
-// Jobs
-//   [ ] GET    /api/v1/jobs                         - Fetch server jobs
-//   [ ] GET    /api/v1/jobs/types                   - Get all job types
-//   [ ] POST   /api/v1/job                          - Create a new job
-//   [ ] GET    /api/v1/job/{id}                     - Get a single job
-//   [ ] PATCH  /api/v1/job/{id}                     - Control a job
-//   [ ] GET    /api/v1/job/{id}/tasks               - Get a job's tasks
+// Jobs (tests/integration/jobs/jobs.spec.ts)
+//   [x] GET    /api/v1/jobs                         - Fetch server jobs
+//   [x] GET    /api/v1/jobs/types                   - Get all job types
+//   [x] POST   /api/v1/job                          - Create a new job
+//   [x] GET    /api/v1/job/{id}                     - Get a single job
+//   [x] PATCH  /api/v1/job/{id}                     - Control a job
+//   [x] GET    /api/v1/job/{id}/tasks               - Get a job's tasks
 //
 // Music
 //   [ ] GET    /api/v1/music/artists                - Query music artists
