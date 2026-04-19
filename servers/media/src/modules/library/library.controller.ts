@@ -85,12 +85,16 @@ export class LibraryController {
     @CurrentUser() user,
     @Param() params: GetLibraryDto,
   ): Promise<Library> {
-    return await this.libraryRepository.findOne({
+    const library = await this.libraryRepository.findOne({
       where: {
         id: params.id,
         user: user.id,
       },
     })
+
+    if (!library) throw new NotFoundException()
+
+    return library
   }
 
   /**

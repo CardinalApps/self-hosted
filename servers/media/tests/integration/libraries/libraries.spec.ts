@@ -219,11 +219,9 @@ describe('DELETE /api/v1/library/:id', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .expect(200)
 
-    const res = await request(testApp.app.getHttpServer())
+    await request(testApp.app.getHttpServer())
       .get(`/api/v1/library/${libraryId}`)
       .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body).toBeNull()
+      .expect(404)
   })
 })
