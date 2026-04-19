@@ -48,7 +48,7 @@ describe('GET /api/v1/users/public', () => {
     expect(Array.isArray(res.body)).toBe(true)
     expect(res.body.length).toBeGreaterThan(0)
     // Sensitive fields must not be exposed
-    res.body.forEach((user) => {
+    res.body.forEach((user: unknown) => {
       expect(user).not.toHaveProperty('password')
       expect(user).toHaveProperty('userId')
     })
@@ -87,9 +87,9 @@ describe('GET /api/v1/users', () => {
       .expect(200)
 
     const users = res.body[0]
-    users.forEach((user) => {
+    users.forEach((user: unknown) => {
       expect(user).toHaveProperty('roles')
-      expect(Array.isArray(user.roles)).toBe(true)
+      expect(Array.isArray((user as { roles: unknown }).roles)).toBe(true)
     })
   })
 
@@ -267,6 +267,7 @@ describe('PATCH /api/v1/users/:id', () => {
     const targetUser = await userService.createUser({
       dto: { username: 'update-target', password: 'initialpass', role: 'administrator' },
     })
+    if (!targetUser) throw new Error('Test setup failed: could not create target user')
     targetUserId = targetUser.userId
   })
 
