@@ -1,7 +1,14 @@
 import * as request from 'supertest'
+import { getRepositoryToken } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 import { createTestApp, destroyTestApp, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
+import { RBACService } from '../../../src/modules/rbac/rbac.service'
+import { DatabaseService } from '../../../src/modules/database/database.service'
+import { User } from '../../../src/modules/user/user.entity'
+import { OPTIONS } from '../../../src/utils/options'
+import { SubscriptionTierSlug } from '@cardinalapps/products/dist/cjs/subscriptions'
 
 let testApp: TestApp
 let authToken: string
@@ -101,5 +108,69 @@ describe('GET /api/v1/licensing/seats', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/licensing/seats')
       .expect(403)
+  })
+})
+
+// -------------------------------------------------------------------------
+// Seat count changes with a cloud owner
+// -------------------------------------------------------------------------
+
+describe('seat and subscription changes after a cloud owner is added', () => {
+  let ownerUserId: string
+
+  beforeAll(async () => {
+    const userRepository = testApp.moduleRef.get<Repository<User>>(getRepositoryToken(User))
+    const rbacService = testApp.moduleRef.get(RBACService)
+    const databaseService = testApp.moduleRef.get(DatabaseService)
+
+    // Insert a cloud user directly, bypassing the JWT validation that
+    // createServerOwner() requires. The pro tier provides 20 seats.
+    const ownerData: Partial<User> = {
+      userId: 'test-cloud-owner',
+      cardinalId: 'test-cardinal-id',
+      cachedCloudUser: { subscription: SubscriptionTierSlug.PRO },
+      cachedCloudUserAt: new Date(),
+      enabled: true,
+    }
+    const savedOwner = await userRepository.save(ownerData as User)
+    ownerUserId = savedOwner.userId
+
+    await rbacService.assignRole('owner', [savedOwner])
+
+    // Mark the server as claimed to prevent MaybeTriggerClaim middleware from
+    // firing outbound HTTP requests during subsequent requests.
+    await databaseService.saveOption(OPTIONS.CLAIM_ID.name, 'test-claim-id')
+  })
+
+  afterAll(async () => {
+    const userRepository = testApp.moduleRef.get<Repository<User>>(getRepositoryToken(User))
+    await userRepository.delete({ userId: ownerUserId })
+  })
+
+  it('subscription reflects the cloud owner pro tier', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/licensing/subscription')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.slug).toBe('pro')
+  })
+
+  it('total seats reflects the pro tier limit', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/licensing/seats')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.total).toBe(20)
+  })
+
+  it('used seats counts the cloud owner', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/licensing/seats')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.used).toBe(1)
   })
 })
