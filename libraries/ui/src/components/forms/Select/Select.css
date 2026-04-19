@@ -53,6 +53,7 @@
     }
 
     .upper {
+      width: 100%;
       height: 46px;
       padding: 10px 50px 10px 20px;
       display: flex;
@@ -73,6 +74,7 @@
     .selected {
       cursor: pointer;
       user-select: none;
+      width: 100%;
 
       span {
         width: 100%;
