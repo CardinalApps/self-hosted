@@ -18,7 +18,7 @@ import {
   ScannerFoundFilesPayload,
 } from './events'
 
-import { RunStates, IndexingStates, FileOnDiskIndexingOperation } from './enums'
+import { RunStates, RunType, IndexingStates, FileOnDiskIndexingOperation } from './enums'
 import { InMemoryRun, InMemoryRunMediaCounts, FileToIndexInQueue, NewRunOptions, InMemoryRunPublic } from './types'
 
 import { ScannerService, ScanResults } from './scanner.service'
@@ -288,6 +288,7 @@ export class IndexingService {
     this.runEntity = await this.runRepository.save({
       runId: uuid(),
       status: RunStates.NOT_STARTED,
+      type: options.runType ?? RunType.FULL,
     })
 
     const { runId } = this.runEntity
@@ -531,16 +532,18 @@ export class IndexingService {
       return FileOnDiskIndexingOperation.ADD
     }
 
-    try {
-      const stats = fs.statSync(absolutePath)
-      const sizeChanged = stats.size !== indexedReference.size
-      const mtimeChanged = indexedReference.mtime == null || stats.mtime.getTime() !== indexedReference.mtime.getTime()
+    if (this.currentRun.options.runType === RunType.FULL) {
+      try {
+        const stats = fs.statSync(absolutePath)
+        const sizeChanged = stats.size !== indexedReference.size
+        const mtimeChanged = indexedReference.mtime == null || stats.mtime.getTime() !== indexedReference.mtime.getTime()
 
-      if (sizeChanged || mtimeChanged) {
-        return FileOnDiskIndexingOperation.UPDATE
+        if (sizeChanged || mtimeChanged) {
+          return FileOnDiskIndexingOperation.UPDATE
+        }
+      } catch (error) {
+        Logger.error(`Could not stat file for change detection: ${absolutePath}`, 'Indexing')
       }
-    } catch (error) {
-      Logger.error(`Could not stat file for change detection: ${absolutePath}`, 'Indexing')
     }
 
     return FileOnDiskIndexingOperation.SKIP

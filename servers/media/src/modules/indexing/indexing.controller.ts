@@ -182,6 +182,7 @@ export class IndexingController {
   ): Promise<Run> {
     const run = await this.indexingService.start({
       user: user,
+      runType: options.type,
       mediaTypes: {
         music: options.indexMusic,
         photos: options.indexPhotos,

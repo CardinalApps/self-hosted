@@ -1,3 +1,8 @@
+export enum RunType {
+  QUICK = 'quick',
+  FULL = 'full',
+}
+
 export enum RunStates {
   NOT_STARTED = 'not_started',
   STARTED = 'started',
