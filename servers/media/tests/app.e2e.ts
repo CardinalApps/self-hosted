@@ -18,16 +18,16 @@
 // Auth (tests/integration/auth/login.integration.ts)
 //   [x] POST   /api/v1/login                       - Log into a Cardinal app
 //
-// Users
-//   [ ] GET    /api/v1/users                       - Get all users in this server
-//   [ ] POST   /api/v1/users                       - Create a new local Media Server user
-//   [ ] GET    /api/v1/users/active                - Get active Media Server users
-//   [ ] GET    /api/v1/users/current               - Get the currently logged in user
-//   [ ] PATCH  /api/v1/users/current               - Update your own user
-//   [ ] GET    /api/v1/users/owner                 - Returns the server owner
-//   [ ] GET    /api/v1/users/public                - Get a list of users for the login screen
-//   [ ] GET    /api/v1/users/{id}                  - Get a specific user
-//   [ ] PATCH  /api/v1/users/{id}                  - Update a user
+// Users (tests/integration/user/users.spec.ts)
+//   [x] GET    /api/v1/users                       - Get all users in this server
+//   [x] POST   /api/v1/users                       - Create a new local Media Server user
+//   [x] GET    /api/v1/users/active                - Get active Media Server users
+//   [x] GET    /api/v1/users/current               - Get the currently logged in user
+//   [x] PATCH  /api/v1/users/current               - Update your own user
+//   [x] GET    /api/v1/users/owner                 - Returns the server owner
+//   [x] GET    /api/v1/users/public                - Get a list of users for the login screen
+//   [x] GET    /api/v1/users/{id}                  - Get a specific user
+//   [x] PATCH  /api/v1/users/{id}                  - Update a user
 //
 // Roles
 //   [ ] GET    /api/v1/roles/assignments            - Get role assignments
