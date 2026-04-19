@@ -24,12 +24,12 @@
     "start:bin:dev": "DEBUG_PKG=1 PHOTOS_DIR=/home/brian/Pictures ./bin/dev/@cardinalapps/media-server",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "NODE_ENV=development RELEASE_CHANNEL=development jest --verbose --detectOpenHandles --forceExit",
+    "test": "pnpm test:unit && pnpm test:integration",
+    "test:unit": "NODE_ENV=development RELEASE_CHANNEL=development jest --verbose --detectOpenHandles --forceExit",
+    "test:integration": "NODE_ENV=development jest --config ./tests/jest.integration.json --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "NODE_ENV=development jest --config ./tests/jest.e2e.json --runInBand",
-    "test:integration": "NODE_ENV=development jest --config ./tests/jest.integration.json --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
     "@cardinalapps/access-control": "workspace:*",

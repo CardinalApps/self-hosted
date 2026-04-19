@@ -30,7 +30,7 @@ export class JobQueueService implements QueueService {
   ) {
     this.eventService.subscribePrivate(this, JobEvents.START, this.start.bind(this))
 
-    setInterval(this.updatePublicProgress.bind(this), 500)
+    this.progressInterval = setInterval(this.updatePublicProgress.bind(this), 500)
 
     this.queue = new Queue(this.tick.bind(this), { concurrent: this.maxConcurrentJobs })
     this.queue.on('task_finish', this.onTickSuccess.bind(this))
@@ -40,6 +40,14 @@ export class JobQueueService implements QueueService {
 
   readonly maxConcurrentJobs = envVar('MAX_CONCURRENT_JOBS', 3) as number
   readonly queue = null
+  private progressInterval: NodeJS.Timeout
+
+  /**
+   * When Nest shuts down.
+   */
+  onModuleDestroy(): void {
+    clearInterval(this.progressInterval)
+  }
 
   /**
    * When Nest starts up.

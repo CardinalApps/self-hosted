@@ -1,7 +1,7 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": "../",
-  "testRegex": "tests/.*\\.integration\\.ts$",
+  "testRegex": "tests/integration/.*\\.spec\\.ts$",
   "testEnvironment": "node",
   "silent": true,
   "verbose": true,
