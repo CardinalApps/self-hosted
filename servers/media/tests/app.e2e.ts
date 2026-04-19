@@ -40,9 +40,9 @@
 //   [x] GET    /api/v1/invitations/{id}             - Get data about an invitation
 //   [x] DELETE /api/v1/invitations/{id}             - Delete an invitation
 //
-// Settings
-//   [ ] GET    /api/v1/settings/{app}               - Get app settings
-//   [ ] PATCH  /api/v1/settings                     - Save app settings
+// Settings (tests/integration/settings/settings.spec.ts)
+//   [x] GET    /api/v1/settings/{app}               - Get app settings
+//   [x] PATCH  /api/v1/settings                     - Save app settings
 //
 // Licensing
 //   [ ] GET    /api/v1/licensing/seats              - Get information about seat usage
