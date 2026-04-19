@@ -11,9 +11,9 @@
 //   [x] GET  /api/v1/events/subscribe              - Subscribe to real time events
 //   [x] GET  /api/v1/ls                            - List the contents of a directory
 //
-// Setup & Reset
-//   [ ] POST   /api/v1/setup                       - Initial setup
-//   [ ] POST   /api/v1/reset                       - Reset server state
+// Setup & Reset (tests/integration/app/setup-reset.spec.ts)
+//   [x] POST   /api/v1/setup                       - Initial setup
+//   [x] POST   /api/v1/reset                       - Reset server state
 //
 // Auth (tests/integration/auth/login.integration.ts)
 //   [x] POST   /api/v1/login                       - Log into a Cardinal app
