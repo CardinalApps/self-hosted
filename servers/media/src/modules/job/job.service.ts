@@ -43,6 +43,10 @@ export class JobService {
     }, this.autoProcessQueueInterval)
   }
 
+  onModuleDestroy(): void {
+    clearInterval(this.autoProcessQueueIntervalId)
+  }
+
   /**
    * Creates a new job.
    */

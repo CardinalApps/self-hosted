@@ -18,7 +18,7 @@
 // Auth (tests/integration/auth/login.integration.ts)
 //   [x] POST   /api/v1/login                       - Log into a Cardinal app
 //
-// Users (tests/integration/user/users.spec.ts)
+// Users (tests/integration/users/)
 //   [x] GET    /api/v1/users                       - Get all users in this server
 //   [x] POST   /api/v1/users                       - Create a new local Media Server user
 //   [x] GET    /api/v1/users/active                - Get active Media Server users
@@ -29,16 +29,16 @@
 //   [x] GET    /api/v1/users/{id}                  - Get a specific user
 //   [x] PATCH  /api/v1/users/{id}                  - Update a user
 //
-// Roles (tests/integration/user/roles.spec.ts)
+// Roles (tests/integration/roles/)
 //   [x] GET    /api/v1/roles/assignments            - Get role assignments
 //   [x] POST   /api/v1/roles/{role}/assignments     - Assign roles
 //   [x] DELETE /api/v1/roles/{role}/assignments     - Revoke roles
 //
-// Invitations
-//   [ ] GET    /api/v1/invitations                  - Query invitations
-//   [ ] POST   /api/v1/invitations                  - Create a new invitation
-//   [ ] GET    /api/v1/invitations/{id}             - Get data about an invitation
-//   [ ] DELETE /api/v1/invitations/{id}             - Delete an invitation
+// Invitations (tests/integration/invitations/)
+//   [x] GET    /api/v1/invitations                  - Query invitations
+//   [x] POST   /api/v1/invitations                  - Create a new invitation
+//   [x] GET    /api/v1/invitations/{id}             - Get data about an invitation
+//   [x] DELETE /api/v1/invitations/{id}             - Delete an invitation
 //
 // Settings
 //   [ ] GET    /api/v1/settings/{app}               - Get app settings

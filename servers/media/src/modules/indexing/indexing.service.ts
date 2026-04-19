@@ -122,6 +122,10 @@ export class IndexingService {
    */
   private pauseAfterCurrentFileIndexingComplete = false
 
+  onModuleDestroy(): void {
+    clearInterval(this.broadcaster)
+  }
+
   /**
    * Create a new run object.
    * 
