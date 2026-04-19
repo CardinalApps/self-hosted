@@ -58,7 +58,8 @@ export type ENV_VAR =
   'TV_DIR' |
   'SIGNING_SECRET' |
   'RESET_LOCAL_USER_PW' |
-  'SQLITE_WAL'
+  'SQLITE_WAL' |
+  'SQLITE_PATH'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.
@@ -225,8 +226,13 @@ export function getMediaDirs(): MediaDirsType {
 
 /**
  * Returns the path to the SQLite database, which is in the environment's
- * filesystem.
+ * filesystem. Can be overridden with the SQLITE_PATH environment variable.
+ * Set SQLITE_PATH=:memory: to use an in-memory database.
  */
 export function getSQLiteDatabaseLocation(): string {
+  const override = envVar('SQLITE_PATH', null)
+  if (override) {
+    return override as string
+  }
   return getAppDir('db', 'cardinal-media-server.sqlite3.db')
 }
