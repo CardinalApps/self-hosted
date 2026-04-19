@@ -1,9 +1,10 @@
-import { IndexingStates } from './enums'
+import { IndexingStates, RunType } from './enums'
 import { MediaType } from '../../utils/media'
 import { User } from '../user/user.entity'
 
 export type NewRunOptions = {
   user: Partial<User>,
+  runType: RunType,
   mediaTypes: {
     [key in MediaType]: boolean
   }

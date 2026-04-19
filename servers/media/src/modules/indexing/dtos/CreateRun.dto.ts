@@ -1,4 +1,5 @@
-import { IsBoolean } from 'class-validator'
+import { IsBoolean, IsEnum } from 'class-validator'
+import { RunType } from '../enums'
 
 export class CreateRunDto {
   @IsBoolean()
@@ -12,4 +13,7 @@ export class CreateRunDto {
 
   @IsBoolean()
   indexTV: true
+
+  @IsEnum(RunType)
+  type: RunType
 }

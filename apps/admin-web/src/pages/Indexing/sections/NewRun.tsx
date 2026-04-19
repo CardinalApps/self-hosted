@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import Loading from '@cardinalapps/ui/src/components/layout/Loading'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
+import Select from '@cardinalapps/ui/src/components/forms/Select'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
@@ -21,6 +22,7 @@ function Indexer() {
   const dispatch = useDispatch()
   const { lang } = useSelector(settingsSelectors.current)
   const indexingServiceState = useSelector(indexingSelectors.serverState)
+  const [runType, setRunType] = useState<'quick' | 'full'>('quick')
   const [indexMusic, setIndexMusic] = useState(true)
   const [indexPhotos, setIndexPhotos] = useState(true)
   const [indexMovies, setIndexMovies] = useState(false)
@@ -34,6 +36,7 @@ function Indexer() {
   const handlePowerButtonClick = () => {
     if (indexingServiceState === 'idle' || indexingServiceState === 'completed') {
       createRun({
+        type: runType,
         indexMusic,
         indexPhotos,
         indexMovies,
@@ -113,8 +116,24 @@ function Indexer() {
       </div>
       <div className={'info'}>
         <div className={'indexingRow'}>
+          <strong>{i18n['options.run-type'][lang]}</strong>
+          <span className="run-control">
+            <Select
+              name="run_type"
+              value={runType}
+              multi={false}
+              size="s"
+              onChange={(val) => setRunType(val)}
+              options={[
+                { value: 'quick', label: i18n['options.run-type.quick'][lang] },
+                { value: 'full', label: i18n['options.run-type.full'][lang] },
+              ]}
+            />
+          </span>
+        </div>
+        <div className={'indexingRow'}>
           <strong>{i18n['options.index-music'][lang]}</strong>
-          <span>
+          <span className="run-control">
             <ToggleSwitch
               name="index_music"
               value={indexMusic}
@@ -125,7 +144,7 @@ function Indexer() {
         </div>
         <div className={'indexingRow'}>
           <strong>{i18n['options.index-photos'][lang]}</strong>
-          <span>
+          <span className="run-control">
             <ToggleSwitch
               name="index_photos"
               value={indexPhotos}
@@ -136,7 +155,7 @@ function Indexer() {
         </div>
         <div className={'indexingRow'} title="Coming soon">
           <strong>{i18n['options.index-movies'][lang]}</strong>
-          <span>
+          <span className="run-control">
             <ToggleSwitch
               name="index_movies"
               value={indexMovies}
@@ -147,7 +166,7 @@ function Indexer() {
         </div>
         <div className={'indexingRow'} title="Coming soon">
           <strong>{i18n['options.index-tv'][lang]}</strong>
-          <span>
+          <span className="run-control">
             <ToggleSwitch
               name="index_tv"
               value={indexTV}

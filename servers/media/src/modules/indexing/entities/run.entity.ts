@@ -7,6 +7,7 @@ import {
 
 import { BaseEntity } from '../../../entities/base.entity'
 import { File } from './file.entity'
+import { RunType } from '../enums'
 
 @Entity()
 export class Run extends BaseEntity {
@@ -19,4 +20,7 @@ export class Run extends BaseEntity {
 
   @Column()
   status: string
+
+  @Column({ default: RunType.FULL })
+  type: string
 }

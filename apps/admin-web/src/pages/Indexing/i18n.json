@@ -59,6 +59,9 @@
   "status.progress.movies": {
     "en": "Movies"
   },
+  "options.run-type": {
+    "en": "Type"
+  },
   "options.index-music": {
     "en": "Index music"
   },
@@ -145,6 +148,12 @@
   },
   "run.status.success": {
     "en": "Completed"
+  },
+  "options.run-type.quick": {
+    "en": "Quick"
+  },
+  "options.run-type.full": {
+    "en": "Full"
   },
   "run.error.cannot-start": {
     "en": "Couldn't start the indexing run"
