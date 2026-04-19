@@ -16,7 +16,7 @@
 
   &.size-s {
     .typing-area .upper {
-      height: auto;
+      height: 34px;
       font-size: 13px;
       padding: 7px 45px 7px 14px;
     }
@@ -136,6 +136,8 @@
     max-height: 300px;
     margin-top: 8px;
     padding: 8px;
+    display: flex;
+    flex-direction: column;
     position: absolute;
     left: 0;
     right: 0;

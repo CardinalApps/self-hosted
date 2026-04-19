@@ -47,7 +47,7 @@
     }
 
     .importerButton {
-      margin-bottom: 20px;
+      margin-bottom: 17px;
       display: flex;
       justify-content: center;
 
@@ -73,7 +73,7 @@
     }
 
     .controlLabel {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       text-align: center;
     }
 
@@ -152,9 +152,9 @@
           margin-bottom: 0;
         }
 
-        span {
+        .run-control {
+          height: 42px;
           padding: 3px;
-          overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           display: inline-flex;
