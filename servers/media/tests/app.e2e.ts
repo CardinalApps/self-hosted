@@ -29,10 +29,10 @@
 //   [x] GET    /api/v1/users/{id}                  - Get a specific user
 //   [x] PATCH  /api/v1/users/{id}                  - Update a user
 //
-// Roles
-//   [ ] GET    /api/v1/roles/assignments            - Get role assignments
-//   [ ] POST   /api/v1/roles/{role}/assignments     - Assign roles
-//   [ ] DELETE /api/v1/roles/{role}/assignments     - Revoke roles
+// Roles (tests/integration/user/roles.spec.ts)
+//   [x] GET    /api/v1/roles/assignments            - Get role assignments
+//   [x] POST   /api/v1/roles/{role}/assignments     - Assign roles
+//   [x] DELETE /api/v1/roles/{role}/assignments     - Revoke roles
 //
 // Invitations
 //   [ ] GET    /api/v1/invitations                  - Query invitations
