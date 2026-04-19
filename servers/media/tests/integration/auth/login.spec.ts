@@ -3,10 +3,10 @@ import { TestingModule } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { UserService } from '../../src/modules/user/user.service'
-import { CloudUserService } from '../../src/modules/user/cloud-user.service'
-import { User } from '../../src/modules/user/user.entity'
-import { TestApp, createTestApp, destroyTestApp } from '../helpers/create-app'
+import { UserService } from '../../../src/modules/user/user.service'
+import { CloudUserService } from '../../../src/modules/user/cloud-user.service'
+import { User } from '../../../src/modules/user/user.entity'
+import { TestApp, createTestApp, destroyTestApp } from '../../helpers/create-app'
 
 /**
  * Creates a minimal JWT-shaped string that jwtDecode can parse. The cloud auth
