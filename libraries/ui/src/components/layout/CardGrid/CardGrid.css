@@ -78,6 +78,11 @@
       height: 420px;
     }
   }
+  &.row-height-xl {
+    .card {
+      height: 460px;
+    }
+  }
 
   .card-grid-layout {
     gap: var(--gutter);

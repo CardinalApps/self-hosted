@@ -13,7 +13,7 @@ type CardGridProps = {
   title?: string,
   layout?: 'flex' | 'grid',
   wrap?: boolean,
-  rowHeight?: 's' | 'm' | 'l' | 'auto'
+  rowHeight?: 's' | 'm' | 'l' | 'xl' | 'auto'
   children?: ReactNode,
 }
 

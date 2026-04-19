@@ -41,7 +41,7 @@ function Indexing() {
         />
       )}
     >
-      <CardGrid rowHeight='l' className='indexing'>
+      <CardGrid rowHeight='xl' className='indexing'>
         <NewRun />
         <OverallProgress />
         <MediaProgress />
