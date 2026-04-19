@@ -44,9 +44,9 @@
 //   [x] GET    /api/v1/settings/{app}               - Get app settings
 //   [x] PATCH  /api/v1/settings                     - Save app settings
 //
-// Licensing
-//   [ ] GET    /api/v1/licensing/seats              - Get information about seat usage
-//   [ ] GET    /api/v1/licensing/subscription       - Get the subscription tier
+// Licensing (tests/integration/licensing/licensing.spec.ts)
+//   [x] GET    /api/v1/licensing/seats              - Get information about seat usage
+//   [x] GET    /api/v1/licensing/subscription       - Get the subscription tier
 //
 // Libraries
 //   [ ] GET    /api/v1/libraries                    - Get the current user's all libraries
