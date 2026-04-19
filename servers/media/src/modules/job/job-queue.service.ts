@@ -41,12 +41,14 @@ export class JobQueueService implements QueueService {
   readonly maxConcurrentJobs = envVar('MAX_CONCURRENT_JOBS', 3) as number
   readonly queue = null
   private progressInterval: NodeJS.Timeout
+  private progressPromise: Promise<void> = Promise.resolve()
 
   /**
    * When Nest shuts down.
    */
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     clearInterval(this.progressInterval)
+    await this.progressPromise
   }
 
   /**
@@ -60,7 +62,11 @@ export class JobQueueService implements QueueService {
   /**
    * Broadcasts information about active job progress every x seconds.
    */
-  async updatePublicProgress() {
+  updatePublicProgress(): void {
+    this.progressPromise = this._updatePublicProgress()
+  }
+
+  private async _updatePublicProgress(): Promise<void> {
     const [runningJobs, numRunningJobs] = await this.jobService.getJobs({ status: [JobStatus.RUNNING] })
     const progress = {}
 
