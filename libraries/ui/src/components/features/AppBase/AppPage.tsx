@@ -54,7 +54,7 @@ function AppPage({
 }: PropsWithChildren<AppPageProps>) {
   useScrollPointRestoration('.main-col', !restoreScrollPoint)
   const dispatch = useDispatch()
-  const [toolbarPortalIsReady, setToolbarPortalIsReady] = useState(false)
+  const [toolbarPortalIsReady, setToolbarPortalIsReady] = useState(() => !!document.querySelector('#toolbar-portal'))
   const userSelectedSidebarMode = useSelector(layoutSelectors.userSelectedSidebarMode)
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const sidebarIsCollapsed = sidebarMode === SIDEBAR_MODE.collapsed
