@@ -96,10 +96,10 @@
 //   [x] POST   /api/v1/playback-queues/{id}/extend  - Add items to a dynamic queue
 //   [x] GET    /api/v1/playback-queues/{id}/items   - Query queue items
 //
-// Ratings
-//   [ ] GET    /api/v1/ratings                      - Query ratings for the current user
-//   [ ] PUT    /api/v1/ratings                      - Set a rating for a media item
-//   [ ] DELETE /api/v1/ratings/{mediaType}/{mediaId} - Remove a rating for a media item
+// Ratings (tests/integration/ratings/ratings.spec.ts)
+//   [x] GET    /api/v1/ratings                      - Query ratings for the current user
+//   [x] PUT    /api/v1/ratings                      - Set a rating for a media item
+//   [x] DELETE /api/v1/ratings/{mediaType}/{mediaId} - Remove a rating for a media item
 //
 // Photos
 //   [ ] GET    /api/v1/photos                       - Get your photos
