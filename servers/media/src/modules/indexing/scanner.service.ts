@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
-import { globStream } from 'glob'
+import { globStream, escape as globEscape } from 'glob'
 import { PathPosix } from 'path-scurry'
 
 import { File } from './entities/file.entity'
@@ -122,7 +122,7 @@ export class ScannerService {
     const mediaDirs = getMediaDirs()
     const mediaDirPaths = []
 
-    mediaDirPaths.push(`${mediaDirs.music}/**/*.{${Object.values(SupportedMusicFileExtensions).join()}}`)
+    mediaDirPaths.push(`${globEscape(mediaDirs.music)}/**/*.{${Object.values(SupportedMusicFileExtensions).join()}}`)
 
     Object.keys(mediaDirs).forEach((type) => {
       if (mediaDirs[type]) {
@@ -183,7 +183,7 @@ export class ScannerService {
     // We need to know all the Google Photos albums on the disk before we start
     this.googlePhotosAlbumsOnDisk = await this.photoService.readGooglePhotosAlbumsOnDisk(mediaDirs.photos)
 
-    mediaDirPaths.push(`${mediaDirs.photos}/**/*.{${Object.values(SupportedPhotoFileExtensions).join()}}`)
+    mediaDirPaths.push(`${globEscape(mediaDirs.photos)}/**/*.{${Object.values(SupportedPhotoFileExtensions).join()}}`)
 
     Object.keys(mediaDirs).forEach((type) => {
       if (mediaDirs[type]) {
