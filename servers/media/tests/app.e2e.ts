@@ -88,13 +88,13 @@
 //   [ ] GET    /api/v1/music/history                - Query playback history
 //   [ ] PATCH  /api/v1/music/history                - Save playback history
 //
-// Playback Queues
-//   [ ] GET    /api/v1/playback-queues              - Query queues
-//   [ ] POST   /api/v1/playback-queues              - Create a new queue
-//   [ ] GET    /api/v1/playback-queues/{id}         - Get a queue
-//   [ ] DELETE /api/v1/playback-queues/{id}         - Delete a queue
-//   [ ] POST   /api/v1/playback-queues/{id}/extend  - Add items to a dynamic queue
-//   [ ] GET    /api/v1/playback-queues/{id}/items   - Query queue items
+// Playback Queues (tests/integration/playback-queues/playback-queues.spec.ts)
+//   [x] GET    /api/v1/playback-queues              - Query queues
+//   [x] POST   /api/v1/playback-queues              - Create a new queue
+//   [x] GET    /api/v1/playback-queues/{id}         - Get a queue
+//   [x] DELETE /api/v1/playback-queues/{id}         - Delete a queue
+//   [x] POST   /api/v1/playback-queues/{id}/extend  - Add items to a dynamic queue
+//   [x] GET    /api/v1/playback-queues/{id}/items   - Query queue items
 //
 // Ratings
 //   [ ] GET    /api/v1/ratings                      - Query ratings for the current user
