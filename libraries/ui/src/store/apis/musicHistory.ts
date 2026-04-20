@@ -73,7 +73,7 @@ export const musicHistoryApi = baseHomeServerApi
           method: 'PATCH',
           body,
         }),
-        invalidatesTags: ['MusicHistoryList'],
+        invalidatesTags: ['MusicHistoryList', 'MusicTracks'],
       }),
     }),
   })
