@@ -1,6 +1,13 @@
 import { IndexingStates, RunType } from './enums'
 import { MediaType } from '../../utils/media'
 import { User } from '../user/user.entity'
+import { Run } from './entities/run.entity'
+
+export type RunWithCounts = Run & {
+  indexed: number,
+  deleted: number,
+  skipped: number,
+}
 
 export type NewRunOptions = {
   user: Partial<User>,

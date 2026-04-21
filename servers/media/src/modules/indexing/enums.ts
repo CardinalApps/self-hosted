@@ -27,3 +27,13 @@ export enum IndexingFallbacks {
   UNKNOWN_RELEASE = 'Unknown Album',
   UNKNOWN_TRACK = 'Unknown Track',
 }
+
+export enum RunLogEvent {
+  RUN_STARTED = 'run_started',
+  FILE_INDEXED = 'file_indexed',
+  FILE_UPDATED = 'file_updated',
+  FILE_SKIPPED = 'file_skipped',
+  FILE_DELETED = 'file_deleted',
+  FILE_ERRORED = 'file_errored',
+  RUN_NO_CHANGE = 'run_no_change',
+}

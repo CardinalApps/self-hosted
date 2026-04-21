@@ -140,12 +140,6 @@
   "run.history.load-more": {
     "en": "Load More"
   },
-  "run.file-count.0": {
-    "en": "No change"
-  },
-  "run.file-count.added": {
-    "en": "+{num}"
-  },
   "run.status.success": {
     "en": "Completed"
   },
@@ -196,5 +190,62 @@
   },
   "run.history.no-change": {
     "en": "No change"
+  },
+  "run.logs.drawer-title": {
+    "en": "Logs for Run #{num}"
+  },
+  "run.logs.col.action": {
+    "en": "Action"
+  },
+  "run.logs.col.file": {
+    "en": "File"
+  },
+  "run.logs.col.media-type": {
+    "en": "Type"
+  },
+  "run.logs.col.time": {
+    "en": "Time"
+  },
+  "run.logs.event.file_indexed": {
+    "en": "Indexed"
+  },
+  "run.logs.event.file_updated": {
+    "en": "Updated"
+  },
+  "run.logs.event.file_skipped": {
+    "en": "Skipped"
+  },
+  "run.logs.event.file_deleted": {
+    "en": "Deleted"
+  },
+  "run.logs.event.file_errored": {
+    "en": "Errored"
+  },
+  "run.logs.event.run_started": {
+    "en": "Run started"
+  },
+  "run.logs.event.run_no_change": {
+    "en": "No change"
+  },
+  "run.summary.indexed": {
+    "en": "Indexed"
+  },
+  "run.summary.deleted": {
+    "en": "Deindexed"
+  },
+  "run.summary.skipped": {
+    "en": "Skipped"
+  },
+  "run.logs.summary.indexed": {
+    "en": "{num} added"
+  },
+  "run.logs.summary.updated": {
+    "en": "{num} updated"
+  },
+  "run.logs.summary.skipped": {
+    "en": "{num} skipped"
+  },
+  "run.logs.summary.errored": {
+    "en": "{num} errored"
   }
 }

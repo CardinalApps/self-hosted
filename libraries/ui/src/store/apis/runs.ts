@@ -2,6 +2,17 @@ import queryParams from '../../lib/net/queryParams'
 
 import { baseHomeServerApi } from './baseHomeServerApi'
 
+export type RunType = {
+  id: number,
+  runId: string,
+  status: string,
+  type: string,
+  createdAt: string,
+  indexed: number,
+  deleted: number,
+  skipped: number,
+}
+
 export const runsApi = baseHomeServerApi
   .enhanceEndpoints({
     addTagTypes: ['Runs'],

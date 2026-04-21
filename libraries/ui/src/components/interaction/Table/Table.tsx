@@ -15,8 +15,9 @@ import './Table.css'
 type TableColumnProps = {
   className?: string,
   index?: number,
-  align?: 'left' | 'right',
+  align?: 'left' | 'right' | 'center',
   width?: number | string,
+  title?: string,
   onMouseEnter?: () => void,
   onMouseLeave?: () => void,
 }
@@ -72,6 +73,7 @@ const Table = ({
         <table className="table">
           <thead className="thead">
             <tr className={clsx('tr', headerRowClassName)}>
+              {/* FIXME we need a Table.Header component for <th> */}
               {!!header.length && header.map((head, index) => (
                 <th
                   key={`th-${index}`}
@@ -145,6 +147,7 @@ Table.Col = (props: PropsWithChildren<TableColumnProps>) => {
     align,
     index = 0,
     width,
+    title,
     onMouseEnter,
     onMouseLeave,
     children,
@@ -154,7 +157,9 @@ Table.Col = (props: PropsWithChildren<TableColumnProps>) => {
       key={`col-${index}`}
       width={width}
       className={className}
-      align={align}
+      align={align !== 'center' ? align : undefined}
+      title={title}
+      style={align === 'center' ? { textAlign: 'center' } : {}}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
