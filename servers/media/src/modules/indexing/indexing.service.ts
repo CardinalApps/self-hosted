@@ -7,6 +7,7 @@ import * as fileType from 'file-type'
 
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
+import { RunLog } from './entities/run-log.entity'
 
 import { Pagination } from '../../dtos/pagination.dto'
 
@@ -18,8 +19,8 @@ import {
   ScannerFoundFilesPayload,
 } from './events'
 
-import { RunStates, RunType, IndexingStates, FileOnDiskIndexingOperation } from './enums'
-import { InMemoryRun, InMemoryRunMediaCounts, FileToIndexInQueue, NewRunOptions, InMemoryRunPublic } from './types'
+import { RunStates, RunType, IndexingStates, FileOnDiskIndexingOperation, RunLogEvent } from './enums'
+import { InMemoryRun, InMemoryRunMediaCounts, FileToIndexInQueue, NewRunOptions, InMemoryRunPublic, RunWithCounts } from './types'
 
 import { ScannerService, ScanResults } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
@@ -53,6 +54,8 @@ export class IndexingService {
     private runRepository: Repository<Run>,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
+    @InjectRepository(RunLog)
+    private runLogRepository: Repository<RunLog>,
     @InjectRepository(MusicArtist)
     private musicArtistRepository: Repository<MusicArtist>,
     @InjectRepository(MusicRelease)
@@ -218,9 +221,10 @@ export class IndexingService {
   }
 
   /**
-   * Returns all indexing runs in order from newest to oldest.
+   * Returns all indexing runs in order from newest to oldest, augmented with
+   * per-run event counts from RunLog.
    */
-  async getRuns(pagination: Pagination, includeEmptyRuns = true): Promise<[Run[], number]> {
+  async getRuns(pagination: Pagination, includeEmptyRuns = true): Promise<[RunWithCounts[], number]> {
     const { take, skip } = pagination
     const qb = this.dataSource
       .getRepository(Run)
@@ -241,11 +245,54 @@ export class IndexingService {
       })
     }
 
-    return qb
+    const [runs, count] = await qb
       .orderBy('run.createdAt', 'DESC')
       .take(take)
       .skip(skip)
       .getManyAndCount()
+
+    const countMap = await this.getRunLogCounts(runs.map((r) => r.id))
+    const runsWithCounts: RunWithCounts[] = runs.map((run) => ({
+      ...run,
+      indexed: countMap[run.id]?.indexed ?? 0,
+      deleted: countMap[run.id]?.deleted ?? 0,
+      skipped: countMap[run.id]?.skipped ?? 0,
+    }))
+
+    return [runsWithCounts, count]
+  }
+
+  private async getRunLogCounts(runIds: number[]): Promise<Record<number, { indexed: number, deleted: number, skipped: number }>> {
+    if (!runIds.length) return {}
+
+    const rows = await this.runLogRepository
+      .createQueryBuilder('log')
+      .innerJoin('log.run', 'run')
+      .select('run.id', 'runId')
+      .addSelect(
+        `COUNT(CASE WHEN log.event IN ('${RunLogEvent.FILE_INDEXED}', '${RunLogEvent.FILE_UPDATED}') THEN 1 END)`,
+        'indexed',
+      )
+      .addSelect(
+        `COUNT(CASE WHEN log.event = '${RunLogEvent.FILE_DELETED}' THEN 1 END)`,
+        'deleted',
+      )
+      .addSelect(
+        `COUNT(CASE WHEN log.event = '${RunLogEvent.FILE_SKIPPED}' THEN 1 END)`,
+        'skipped',
+      )
+      .where('run.id IN (:...runIds)', { runIds })
+      .groupBy('run.id')
+      .getRawMany()
+
+    return rows.reduce((acc, row) => {
+      acc[Number(row.runId)] = {
+        indexed: parseInt(row.indexed) || 0,
+        deleted: parseInt(row.deleted) || 0,
+        skipped: parseInt(row.skipped) || 0,
+      }
+      return acc
+    }, {} as Record<number, { indexed: number, deleted: number, skipped: number }>)
   }
 
   /**
@@ -414,6 +461,14 @@ export class IndexingService {
 
     Logger.log(`Indexed ${totalAdded} files this run`, 'Indexing')
     Logger.log(`Skipped ${totalSkipped} files this run; files are skipped when they have not changed since the last run`, 'Indexing')
+
+    if (totalAdded === 0 && totalSkipped > 0) {
+      await this.runLogRepository.save({
+        run: this.runEntity,
+        event: RunLogEvent.RUN_NO_CHANGE,
+        details: { indexed: totalAdded, skipped: totalSkipped },
+      })
+    }
 
     const endingRunStatus = stoppedByUser
       ? RunStates.STOPPED_BY_USER
@@ -696,6 +751,13 @@ export class IndexingService {
 
       this.currentRun[mediaType].indexed++
 
+      await this.runLogRepository.save({
+        run: this.runEntity,
+        event: RunLogEvent.FILE_INDEXED,
+        filePath: relativePath,
+        mediaType,
+      })
+
       this.eventService.emitPrivate(IndexingEvents.FILE_INDEXED, {
         mediaType,
       })
@@ -704,6 +766,15 @@ export class IndexingService {
       Logger.error(error?.stack, 'Indexing')
       await queryRunner.rollbackTransaction()
       this.currentRun[mediaType].errored++
+
+      await this.runLogRepository.save({
+        run: this.runEntity,
+        event: RunLogEvent.FILE_ERRORED,
+        filePath: relativePath,
+        mediaType,
+        details: { message: error?.message },
+      })
+
       this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
         mediaType,
       })
@@ -715,8 +786,17 @@ export class IndexingService {
   /**
    * Handles skipping a file.
    */
-  private async skipFile(_absolutePath: string, mediaType: MediaType): Promise<void> {
+  private async skipFile(absolutePath: string, mediaType: MediaType): Promise<void> {
+    const relativePath = makeMediaFilePathRelative(absolutePath)
     this.currentRun[mediaType].skipped++
+
+    await this.runLogRepository.save({
+      run: this.runEntity,
+      event: RunLogEvent.FILE_SKIPPED,
+      filePath: relativePath,
+      mediaType,
+    })
+
     this.eventService.emitPrivate(IndexingEvents.FILE_SKIPPED, {
       mediaType,
     })
@@ -780,6 +860,13 @@ export class IndexingService {
 
       this.currentRun[mediaType].indexed++
 
+      await this.runLogRepository.save({
+        run: this.runEntity,
+        event: RunLogEvent.FILE_UPDATED,
+        filePath: relativePath,
+        mediaType,
+      })
+
       this.eventService.emitPrivate(IndexingEvents.FILE_UPDATED, {
         mediaType,
       })
@@ -788,6 +875,15 @@ export class IndexingService {
       Logger.error(error?.stack, 'Indexing')
       await queryRunner.rollbackTransaction()
       this.currentRun[mediaType].errored++
+
+      await this.runLogRepository.save({
+        run: this.runEntity,
+        event: RunLogEvent.FILE_ERRORED,
+        filePath: relativePath,
+        mediaType,
+        details: { message: error?.message },
+      })
+
       this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
         mediaType,
       })
@@ -808,12 +904,13 @@ export class IndexingService {
       if (this.dataSource.options.type === 'postgres') {
         // Truncate all tables in one statement so PostgreSQL can resolve
         // FK constraints between them without erroring
-        const tables = [MusicHistory, MusicTrackMetadata, MusicArtistMetadata, MusicReleaseMetadata, MusicReleaseThumbnail, MusicTrack, File, MusicRelease, MusicArtist, MusicGenre]
+        const tables = [RunLog, MusicHistory, MusicTrackMetadata, MusicArtistMetadata, MusicReleaseMetadata, MusicReleaseThumbnail, MusicTrack, File, MusicRelease, MusicArtist, MusicGenre, Run]
           .map((e) => `"${this.dataSource.getMetadata(e).tableName}"`)
           .join(', ')
         await queryRunner.query(`TRUNCATE ${tables} RESTART IDENTITY CASCADE`)
       } else {
         // SQLite: clear() uses DELETE internally; order matters for FK checks
+        await queryRunner.manager.clear(RunLog)
         await queryRunner.manager.clear(MusicHistory)
         await queryRunner.manager.clear(MusicTrackMetadata)
         await queryRunner.manager.clear(MusicArtistMetadata)
@@ -824,6 +921,7 @@ export class IndexingService {
         await queryRunner.manager.clear(MusicRelease)
         await queryRunner.manager.clear(MusicArtist)
         await queryRunner.manager.clear(MusicGenre)
+        await queryRunner.manager.clear(Run)
       }
 
       await queryRunner.commitTransaction()

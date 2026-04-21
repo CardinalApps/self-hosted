@@ -19,7 +19,7 @@ import Card from '../Card'
 import './Drawer.css'
 
 type DrawerProps = {
-  width?: number,
+  width?: number | 'm' | 'l' | 'xl',
   title?: string | React.ReactNode,
   subtitle?: string,
   loading?: boolean,
@@ -29,7 +29,7 @@ type DrawerProps = {
 }
 
 const Drawer = ({
-  width,
+  width = 'm',
   title,
   subtitle,
   loading = false,
@@ -74,8 +74,8 @@ const Drawer = ({
     createPortal(
       (
         <motion.div
-          className={clsx('drawer-pane', className)}
-          style={{ ...(width && { width: width }) }}
+          className={clsx('drawer-pane', className, typeof width === 'string' && `width-${width}`)}
+          style={{ ...(typeof width === 'number' && { width: width }) }}
           initial={{
             transform: 'translateX(0%)',
           }}
@@ -91,14 +91,16 @@ const Drawer = ({
             <Card className="drawer-content" shadow={2}>
               {loading
                 ? <Loading className="drawer-loading" />
-                : <>
+                : <div className="drawer-card-inner">
                     {typeof title === 'string'
                       ? <H3 className="drawer-title">{title}</H3>
                       : title
                     }
                     {!!subtitle && <p className="drawer-subtitle">{subtitle}</p>}
-                    {children}
-                  </>
+                    <div className="drawer-body">
+                      {children}
+                    </div>
+                  </div>
               }
             </Card>
           </div>

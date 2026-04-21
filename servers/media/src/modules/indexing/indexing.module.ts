@@ -12,6 +12,7 @@ import { MusicIndexingService } from './media/music/indexing.music.service'
 
 import { File } from './entities/file.entity'
 import { Run } from './entities/run.entity'
+import { RunLog } from './entities/run-log.entity'
 
 import { EventModule } from '../event/event.module'
 import { MusicTrackModule } from '../music-track/music-track.module'
@@ -23,7 +24,7 @@ import { UserModule } from '../user/user.module'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Run, File]),
+    TypeOrmModule.forFeature([Run, File, RunLog]),
     EventModule,
     MusicTrackModule,
     MusicReleaseModule,

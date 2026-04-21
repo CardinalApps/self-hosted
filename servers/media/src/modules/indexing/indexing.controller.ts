@@ -25,11 +25,13 @@ import { IndexingSeedLargeService } from './indexing-seed.service'
 import { IndexingSeedFsService } from './indexing-seed-fs.service'
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
+import { RunLog } from './entities/run-log.entity'
 import { User } from '../user/user.entity'
 
 import { StateChangeActionDto } from './dtos/StateChangeAction.dto'
 import { GetFilesDto } from './dtos/GetFiles.dto'
 import { GetRunsDto } from './dtos/GetRuns.dto'
+import { GetRunLogsDto } from './dtos/GetRunLogs.dto'
 import { DeleteFilesDto } from './dtos/DeleteFiles.dto'
 import { CreateRunDto } from './dtos/CreateRun.dto'
 
@@ -51,6 +53,8 @@ export class IndexingController {
     private readonly indexingSeedFsService: IndexingSeedFsService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
+    @InjectRepository(RunLog)
+    private runLogRepository: Repository<RunLog>,
   ) {}
 
   /**
@@ -142,6 +146,25 @@ export class IndexingController {
   })
   async getFileCounts() {
     return await this.indexingService.countIndexedFiles()
+  }
+
+  /**
+   * Get logs for a specific indexing run.
+   */
+  @Get('/index/run/logs')
+  @StandardEndpoint({
+    summary: 'Get logs for an indexing run.',
+    capabilities: ['Indexing.Read'],
+  })
+  async getRunLogs(@Query() query: GetRunLogsDto): Promise<[RunLog[], number]> {
+    return this.runLogRepository
+      .createQueryBuilder('runLog')
+      .innerJoin('runLog.run', 'run')
+      .where('run.runId = :runId', { runId: query.runId })
+      .orderBy('runLog.createdAt', 'ASC')
+      .take(query.take)
+      .skip(query.skip)
+      .getManyAndCount()
   }
 
   /**
