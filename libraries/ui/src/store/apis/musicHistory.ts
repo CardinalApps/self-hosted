@@ -22,7 +22,7 @@ export type UpsertMusicHistoryEntryType = {
 
 export const musicHistoryApi = baseHomeServerApi
   .enhanceEndpoints({
-    addTagTypes: ['MusicHistoryList'],
+    addTagTypes: ['MusicHistoryList', 'MusicTracks'],
   })
   .injectEndpoints({
     endpoints: (builder) => ({
