@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
-import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
 import Modal from '@cardinalapps/ui/src/components/layout/Modal'
 import Drawer from '@cardinalapps/ui/src/components/layout/Drawer'
 import Table from '@cardinalapps/ui/src/components/interaction/Table'
@@ -22,12 +21,12 @@ import { useGetRunsQuery } from '@cardinalapps/ui/src/store/apis/runs'
 import type { RunType as RunRecord } from '@cardinalapps/ui/src/store/apis/runs'
 import { useGetRunLogsQuery } from '@cardinalapps/ui/src/store/apis/runLogs'
 import { indexingSelectors } from '@cardinalapps/ui/src/store/slices/indexing'
+import Span from '@cardinalapps/ui/src/components/typography/Span'
 
 import { formatTimeAgo, formatDate } from '@cardinalapps/ui/src/lib/formatting/time'
 import { formatWithCommas } from '@cardinalapps/ui/src/lib/formatting/number'
 
 import i18n from '../i18n.json'
-import Span from '@cardinalapps/ui/src/components/typography/Span'
 
 const LOGS_PER_PAGE = 12
 
@@ -48,9 +47,8 @@ function RunsHistory() {
   const serverState = useSelector(indexingSelectors.serverState)
   const initialTake = 5
   const [take, setTake] = useState(initialTake)
-  const [includeEmptyRuns, setIncludeEmptyRuns] = useState(false)
   const [importedFilesModalContent, setImportedFilesModalContent] = useState<ReactNode>()
-  const { data, isLoading, refetch } = useGetRunsQuery({ take, skip: 0, includeEmptyRuns })
+  const { data, isLoading, refetch } = useGetRunsQuery({ take, skip: 0, includeEmptyRuns: true })
   const [pagedRuns, totalRuns] = data || []
 
   const [showDeindexConfirm, setShowDeindexConfirm] = useState(false)
@@ -66,8 +64,6 @@ function RunsHistory() {
   )
   const [logs, totalLogs] = logsData || []
   const logsMaxPages = Math.ceil((totalLogs ?? 0) / LOGS_PER_PAGE)
-
-  console.log(pagedRuns)
 
   const handleOpenLogs = (id: number, runId: string) => {
     setLogsPage(1)
@@ -149,18 +145,6 @@ function RunsHistory() {
       header={
         <>
           <H5>{i18n['run.history.title'][lang]}</H5>
-        </>
-      }
-      headerRight={
-        <>
-          <ToggleSwitch
-            label={i18n['run.history.show-empty-runs'][lang]}
-            labelAlign="left"
-            value={includeEmptyRuns}
-            value1={false}
-            value2={true}
-            onChange={(value) => setIncludeEmptyRuns(value)}
-          />
         </>
       }
       footer={

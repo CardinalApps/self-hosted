@@ -59,6 +59,7 @@
   .drawer-body {
     padding-right: 30px;
     overflow-y: auto;
+    flex-grow: 1;
   }
 
   .drawer-tabs {

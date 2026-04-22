@@ -270,7 +270,7 @@
     "en": "Username"
   },
   "create-user.password": {
-    "en": "Password"
+    "en": "Password (optional)"
   },
   "create-user.role": {
     "en": "Roles"
