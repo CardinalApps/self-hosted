@@ -134,9 +134,6 @@
   "run.history.title": {
     "en": "History"
   },
-  "run.history.show-empty-runs": {
-    "en": "Include empty runs"
-  },
   "run.history.load-more": {
     "en": "Load More"
   },
