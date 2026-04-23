@@ -40,11 +40,11 @@ export const getFields = (app, lang) => {
           fields: [
             adminServerFields.serverName,
             ...defaults.general,
+            adminServerFields.inactiveSessionTimeout,
             adminServerFields.openAppsInNewTab,
             adminServerFields.autoCheckForUpdates,
             adminServerFields.maxRating,
             adminServerFields.enableHalfRatings,
-            adminServerFields.inactiveSessionTimeout,
           ],
         },
         // Theme settings tab

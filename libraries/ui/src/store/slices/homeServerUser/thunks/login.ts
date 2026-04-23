@@ -57,6 +57,7 @@ const homeServerLogin = createAsyncThunk<
   let homeServerJWT
   let cloudUser
   let cloudUserJWT
+  let scope: 'local' | 'session' | 'memory' = 'local'
   const store = thunkAPI.getState()
 
   try {
@@ -70,11 +71,12 @@ const homeServerLogin = createAsyncThunk<
         password,
         cardinalJWT: cardinalSSOToken,
       },
-    }) as { user, JWT, cloudUser, cloudJWT }
+    }) as { user, JWT, cloudUser, cloudJWT, scope: 'local' | 'session' | 'memory' }
     user = loginResponse?.user
     homeServerJWT = loginResponse?.JWT
     cloudUser = loginResponse?.cloudUser
     cloudUserJWT = loginResponse?.cloudJWT
+    scope = loginResponse?.scope ?? 'local'
   } catch(error) {
     console.error(error)
     const lang = thunkAPI.getState()?.settings?.current?.lang || 'en'
@@ -90,7 +92,7 @@ const homeServerLogin = createAsyncThunk<
     throw new Error()
   }
 
-  setJWT(homeServerJWT, JWT_TYPE.HOME_SERVER_USER)
+  setJWT(homeServerJWT, JWT_TYPE.HOME_SERVER_USER, scope)
 
   if (cloudUser) {
     thunkAPI.dispatch(cloudUserActions.setUserData(cloudUser))

@@ -11,9 +11,11 @@ const inactiveSessionTimeout = (app?, lang?) => {
     render: ({ value, onChange }) => {
       return (
         <Select
+          name={fieldObj.slug}
           options={fieldObj.options as Record<string, string>}
           value={value}
           onChange={onChange}
+          multi={false}
         />
       )
     },
