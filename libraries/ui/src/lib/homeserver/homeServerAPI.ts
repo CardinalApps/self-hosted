@@ -71,11 +71,11 @@ const defaults: HomeServerAPIProps = {
 
 export type HomeServerAPIResponse = unknown
 
-const homeServerAPI = <T>(
+const homeServerAPI = async <T>(
   endpoint: string,
   method: Method = 'GET',
   options: HomeServerAPIProps = {},
-) => new Promise<T>(async (resolve, reject) => {
+): Promise<T> => {
   options = { ...defaults, ...options }
 
   // Proactively refresh the access tolkien if it expires within 10 seconds
@@ -132,7 +132,7 @@ const homeServerAPI = <T>(
     ? JSON.stringify(options.body)
     : undefined
 
-  fetch(url, {
+  const res = await fetch(url, {
     method: method,
     headers: options.headers as HeadersInit,
     body: body,
@@ -141,42 +141,35 @@ const homeServerAPI = <T>(
     // returned on any endpoint)
     //cache: 'no-cache',
   })
-    .then(async (res) => {
-      await triggerMiddleware(res, endpoint, method, body)
 
-      if (options.returnRaw) {
-        return resolve(res as T)
-      }
+  await triggerMiddleware(res, endpoint, method, body)
 
-      if (res.ok) {
-        // Handle binary (blob) response type
-        if (options.blob) {
-          res.blob()
-            .then((blobby) => {
-              const urlCreator = window.URL || window.webkitURL
-              const blobUrl = urlCreator.createObjectURL(blobby)
-              resolve({ blobUrl, response: res } as T)
-            })
-            .catch((error) => {
-              console.error(error)
-              resolve(null)
-            })
-        }
-        // Otherwise, expect JSON
-        else {
-          res.json()
-            .then((thing) => resolve(thing))
-            .catch(() => resolve({} as T)) // No action needed if the server did not return a valid JSON body
-        }
-      } else {
-        res.json()
-          .then((thing) => reject(thing))
-          .catch((e) => reject(e))
+  if (options.returnRaw) {
+    return res as T
+  }
+
+  if (res.ok) {
+    // Handle binary (blob) response type
+    if (options.blob) {
+      try {
+        const blobby = await res.blob()
+        const urlCreator = window.URL || window.webkitURL
+        const blobUrl = urlCreator.createObjectURL(blobby)
+        return { blobUrl, response: res } as T
+      } catch (error) {
+        console.error(error)
+        return null
       }
-    })
-    .catch((e) => {
-      reject(e)
-    })
-})
+    }
+    // Otherwise, expect JSON
+    try {
+      return await res.json()
+    } catch {
+      return {} as T // No action needed if the server did not return a valid JSON body
+    }
+  } else {
+    throw await res.json().catch((e) => e)
+  }
+}
 
 export default homeServerAPI
