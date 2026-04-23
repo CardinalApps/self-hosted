@@ -19,7 +19,7 @@ beforeAll(async () => {
   guestUserId = guestAccount.userId
 
   const loginRes = await request(testApp.app.getHttpServer())
-    .post('/api/v1/login')
+    .post('/api/v1/auth/login')
     .set('cardinal-app', 'admin')
     .send({ userId: guestAccount.userId })
     .expect(201)

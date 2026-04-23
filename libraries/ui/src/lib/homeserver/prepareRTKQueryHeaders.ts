@@ -1,4 +1,5 @@
 import { JWT_TYPE, authorizedFetchHeaders } from '../auth/jwt'
+import { CARDINAL_APP_HEADER } from './homeServerAPI'
 
 /**
  * Sets the headers needed in RTK Query for Media Server auth.
@@ -11,7 +12,7 @@ export const prepareRTKQueryHeaders = (headers, { getState }) => {
     headers.set(key, authHeaders[key])
   })
 
-  headers.set('Cardinal-App', store?.app?.app)
+  headers.set(CARDINAL_APP_HEADER, store?.app?.app)
 
   return headers
 }

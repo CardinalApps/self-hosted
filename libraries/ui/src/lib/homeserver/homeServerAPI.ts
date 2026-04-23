@@ -1,13 +1,13 @@
-import { JWT_TYPE, getJWT, authorizedFetchHeaders } from '../auth/jwt'
+import { JWT_TYPE, getJWT, authorizedFetchHeaders, isJwtExpiringSoon } from '../auth/jwt'
 
 import { HOME_SERVER_HOST } from '../../../env'
 
 export type Method = 'GET' | 'POST' | 'HEAD' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'PUT'
-export type HomeServerAPIMiddleware = {
-  [name: string]: (res: string, endpoint: string, method: Method, body: Record<string, unknown>) => void,
-}
 
 export const CARDINAL_APP_HEADER = 'cardinal-app'
+export type HomeServerAPIMiddleware = {
+  [name: string]: (res: string, endpoint: string, method: Method, body: Record<string, unknown>) => void | Promise<void>,
+}
 
 /**
  * Holds all registered middleware functions.
@@ -32,6 +32,17 @@ export const removeHomeServerAPIMiddleware = (name) => {
   if (name in registeredMiddleware) {
     delete registeredMiddleware[name]
   }
+}
+
+/**
+ * A callback that returns a fresh access tolkien. Registered by AppBase after
+ * the Redux store is ready so homeServerAPI can proactively refresh before a
+ * request when the stored token is about to expire.
+ */
+let tokenRefreshProvider: (() => Promise<string>) | null = null
+
+export const registerTokenRefreshProvider = (fn: () => Promise<string>) => {
+  tokenRefreshProvider = fn
 }
 
 export type HomeServerAPIProps = {
@@ -64,8 +75,21 @@ const homeServerAPI = <T>(
   endpoint: string,
   method: Method = 'GET',
   options: HomeServerAPIProps = {},
-) => new Promise<T>((resolve, reject) => {
+) => new Promise<T>(async (resolve, reject) => {
   options = { ...defaults, ...options }
+
+  // Proactively refresh the access tolkien if it expires within 10 seconds
+  if (options.sendJWT && options.JWT === JWT_TYPE.HOME_SERVER_USER && tokenRefreshProvider) {
+    const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
+    if (token && isJwtExpiringSoon(token, 10)) {
+      try {
+        await tokenRefreshProvider()
+      } catch {
+        // If proactive refresh fails, let the request proceed and rely on the
+        // reactive 401 handler to deal with it
+      }
+    }
+  }
 
   // Local user JWT
   if (options.sendJWT) {
@@ -94,9 +118,13 @@ const homeServerAPI = <T>(
     }
   }
 
-  // Calls all registered middleware synchronously
-  const triggerMiddleware = (res, endpoint, method, body) => {
-    Object.values(registeredMiddleware).forEach((cb) => cb(res, endpoint, method, body))
+  // Calls all registered middleware sequentially and awaits each one so that
+  // async handlers (e.g. the 401 refresh handler) complete before the caller's
+  // catch block fires
+  const triggerMiddleware = async (res, endpoint, method, body) => {
+    for (const cb of Object.values(registeredMiddleware)) {
+      await cb(res, endpoint, method, body)
+    }
   }
 
   const url = `${HOME_SERVER_HOST}/api/v${options.version}${endpoint}`
@@ -108,12 +136,13 @@ const homeServerAPI = <T>(
     method: method,
     headers: options.headers as HeadersInit,
     body: body,
+    credentials: 'include',
     // TODO disable caching of the 410 Gone response server-side (it can be
     // returned on any endpoint)
     //cache: 'no-cache',
   })
-    .then((res) => {
-      triggerMiddleware(res, endpoint, method, body)
+    .then(async (res) => {
+      await triggerMiddleware(res, endpoint, method, body)
 
       if (options.returnRaw) {
         return resolve(res as T)

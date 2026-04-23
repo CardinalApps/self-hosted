@@ -124,6 +124,17 @@ export function isJwtExpired(token) {
 export const isJWTExpired = isJwtExpired
 
 /**
+ * Checks if the given JWT expires within `secondsBuffer` seconds from now.
+ */
+export function isJwtExpiringSoon(token: string, secondsBuffer = 60): boolean {
+  const { exp } = readJwt(token)
+  return new Date((exp - secondsBuffer) * 1000) < new Date()
+}
+
+// Alias
+export const isJWTExpiringSoon = isJwtExpiringSoon
+
+/**
  * Returns the header(s) needed for a fetch to the auth servers using these
  * JWTs.
  *

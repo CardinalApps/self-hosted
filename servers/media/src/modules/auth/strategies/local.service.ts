@@ -58,12 +58,14 @@ export class LocalAuthStrategy {
       throw new Error('Cannot log into Guest Account because it is disabled')
     }
 
-    const JWT = await this.tokenService.createJWT(localUserId)
+    const accessTolkien = await this.tokenService.createAccessToken(localUserId)
+    const refreshTolkien = await this.tokenService.createRefreshToken(localUserId)
 
     Logger.log(`Guest account logged in`, 'Auth')
 
     return {
-      JWT,
+      JWT: accessTolkien,
+      refreshTolkien,
       user: this.userService.cleanseUserObject(user),
     }
   }
@@ -86,12 +88,14 @@ export class LocalAuthStrategy {
 
     this.throwIfFailedLoginRBAC(user, app)
 
-    const JWT = await this.tokenService.createJWT(user.userId)
+    const accessTolkien = await this.tokenService.createAccessToken(user.userId)
+    const refreshTolkien = await this.tokenService.createRefreshToken(user.userId)
 
     Logger.log(`Local user ${user.userId} logged in`, 'Auth')
 
     return {
-      JWT,
+      JWT: accessTolkien,
+      refreshTolkien,
       user: this.userService.cleanseUserObject(user),
     }
   }

@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, Logger, GoneException } from '@nestjs/common'
+import { Injectable, NestMiddleware, Logger, GoneException, UnauthorizedException } from '@nestjs/common'
 import { NextFunction } from 'express'
 
 import { UserService } from '../modules/user/user.service'
@@ -10,10 +10,14 @@ import { getJWTFromHeaders } from '../utils/jwt'
  * This middleware reads the JWT in the Authorization header and verifies the
  * token if one is present. If the token is valid, the associated local user
  * will be loaded from the database and attached to the request object.
- * 
+ *
  * If the client app is sending a legit token, but it doesn't map to an existing
  * user, assume that the user was deleted server-side and the client app now has
  * a stale session. This can easily happen during a factory reset.
+ *
+ * Expired tokens return 401 so the client can attempt a refresh. Tokens that
+ * fail signature verification return 410 to force a full logout (signing secret
+ * was rotated or the token was tampered with).
  */
 @Injectable()
 export class AttachLocalUserToRequest implements NestMiddleware {
@@ -30,12 +34,16 @@ export class AttachLocalUserToRequest implements NestMiddleware {
       return next()
     }
 
-    const tokenIsValid = this.tokenService.verifyJWT(localUserJWT)
+    const tokenStatus = this.tokenService.verifyAccessToken(localUserJWT)
 
-    // The token will become invalid when the server secret is changed
-    if (!tokenIsValid) {
+    if (tokenStatus === 'expired') {
+      // Tell the client to refresh — do not force a full logout
+      throw new UnauthorizedException('Token expired')
+    }
+
+    if (tokenStatus === 'invalid') {
+      // Signing secret changed or token tampered — force client logout
       Logger.warn(`Invalid JWT: ${localUserJWT}`)
-      // Force the client app to log out
       throw new GoneException()
     }
 

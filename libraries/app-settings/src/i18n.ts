@@ -191,4 +191,10 @@ export default {
   "settings.enable-half-ratings.desc": {
     "en": "Allow ratings in half-star increments.",
   },
+  "settings.inactive-session-timeout.label": {
+    "en": "Session timeout",
+  },
+  "settings.inactive-session-timeout.desc": {
+    "en": "How long users stay logged in for after their last activity. Changing this setting takes up to 15 minutes to apply. Reducing the timeout will not immediately expire existing sessions.",
+  },
 }

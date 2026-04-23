@@ -4,6 +4,7 @@ import telemetry from './telemetry'
 import openAppsInNewTab from './openAppsInNewTab'
 import maxRating from './maxRating'
 import enableHalfRatings from './enableHalfRatings'
+import inactiveSessionTimeout from './inactiveSessionTimeout'
 
 export default {
   autoCheckForUpdates,
@@ -12,4 +13,5 @@ export default {
   openAppsInNewTab,
   maxRating,
   enableHalfRatings,
+  inactiveSessionTimeout,
 }

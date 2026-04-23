@@ -44,6 +44,7 @@ export const getFields = (app, lang) => {
             adminServerFields.autoCheckForUpdates,
             adminServerFields.maxRating,
             adminServerFields.enableHalfRatings,
+            adminServerFields.inactiveSessionTimeout,
           ],
         },
         // Theme settings tab

@@ -1,11 +1,13 @@
 import { useContext, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import { motion, useDragControls } from 'framer-motion'
 
 import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import { cloudUserSelectors } from '../../../store/slices/cloudUser'
 import { globalActions } from '../../../store/constants/actions'
 import { getJwt, JWT_TYPE } from '../../../lib/auth/jwt'
+import refreshTolkien from '../../../store/slices/homeServerUser/thunks/refreshTolkien'
 
 import Select from '../../forms/Select'
 import Button from '../../interaction/Button'
@@ -19,7 +21,7 @@ import './AppBase.css'
 
 export default function AppLoading() {
   const { location, navigate } = useContext(RouterContext)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const dragControls = useDragControls()
   const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
   const cloudUserLoggedIn = useSelector(cloudUserSelectors.loggedIn)
@@ -79,6 +81,7 @@ export default function AppLoading() {
           </p>
           <Button onClick={() => navigator.clipboard.writeText(getJwt(JWT_TYPE.HOME_SERVER_USER))}>{i18n['dev-tools.copy-local-tolkien.button']['en']}</Button>
           <Button onClick={() => navigator.clipboard.writeText(getJwt(JWT_TYPE.CLOUD_USER))}>{i18n['dev-tools.copy-cloud-tolkien.button']['en']}</Button>
+          <Button onClick={() => dispatch(refreshTolkien())}>{i18n['dev-tools.refresh-tolkien.button']['en']}</Button>
           <Button onClick={() => dispatch({ type: globalActions.RESET })}>{i18n['dev-tools.reset.button']['en']}</Button>
         </div>
       </div>

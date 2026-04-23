@@ -59,7 +59,8 @@ export type ENV_VAR =
   'SIGNING_SECRET' |
   'RESET_LOCAL_USER_PW' |
   'SQLITE_WAL' |
-  'SQLITE_PATH'
+  'SQLITE_PATH' |
+  'SECURE_COOKIES'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.

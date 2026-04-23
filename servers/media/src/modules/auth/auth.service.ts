@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common'
 
 import { UserService } from '../user/user.service'
 
-import { LoginResponse } from './dtos/LoginResponse.dto'
 import { CardinalSSOStrategy } from './strategies/cardinal-sso.service'
 import { LocalAuthStrategy } from './strategies/local.service'
+import { LoginResponse } from './dtos/LoginResponse.dto'
 import { CardinalApp } from '../../utils/apps'
 
 type LoginOptions = {
