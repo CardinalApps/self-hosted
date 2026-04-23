@@ -6,6 +6,7 @@
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,
   "type": "module",
+  "types": "./src/index.ts",
   "scripts": {
     "dev": "pnpm build && tsc --watch",
     "lint": "eslint src",
