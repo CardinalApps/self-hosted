@@ -66,7 +66,7 @@ export class LoginController {
 
   /**
    * Logs a user into this server. Sets the cardinal_refresh_tolkien httpOnly
-   * cookie and returns a short-lived access tolkien in the response body.
+   * cookie and returns a short-lived access token in the response body.
    */
   @Post('/auth/login')
   @StandardEndpoint({
@@ -96,11 +96,13 @@ export class LoginController {
         throw new ForbiddenException('Login was not successful.')
       }
 
+      const sessionTimeout = await this.tokenService.getSessionTimeout()
       const maxAge = await this.tokenService.getRefreshCookieMaxAge()
       const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-      res.cookie(REFRESH_TOLKIEN_COOKIE, loginResult.refreshTolkien, cookieOptions)
+      res.cookie(REFRESH_TOLKIEN_COOKIE, loginResult.refreshToken, cookieOptions)
 
-      delete loginResult.refreshTolkien
+      delete loginResult.refreshToken
+      loginResult.scope = sessionTimeout === 'session' ? 'session' : 'local'
       return loginResult
     } catch (error) {
       Logger.error(`Login error: ${error}`, 'Auth')
@@ -109,29 +111,29 @@ export class LoginController {
   }
 
   /**
-   * Issues a new short-lived access tolkien using the httpOnly refresh tolkien
-   * cookie. Also rotates the refresh tolkien.
+   * Issues a new short-lived access token using the httpOnly refresh token
+   * cookie. Also rotates the refresh token.
    */
   @Post('/auth/refresh')
   @StandardEndpoint({
     auth: false,
-    summary: 'Refresh access tolkien using the httpOnly cookie.',
+    summary: 'Refresh access token using the httpOnly cookie.',
   })
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<{ JWT: string }> {
-    const tolkien = req.cookies?.[REFRESH_TOLKIEN_COOKIE]
+  ): Promise<{ JWT: string, scope: 'local' | 'session' | 'memory' }> {
+    const refreshToken = req.cookies?.[REFRESH_TOLKIEN_COOKIE]
 
-    if (!tolkien) {
-      throw new UnauthorizedException('No refresh tolkien')
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token')
     }
 
-    const payload = this.tokenService.verifyRefreshToken(tolkien)
+    const payload = this.tokenService.verifyRefreshToken(refreshToken)
 
     if (!payload) {
       res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })
-      throw new UnauthorizedException('Invalid or expired refresh tolkien')
+      throw new UnauthorizedException('Invalid or expired refresh token')
     }
 
     const user = await this.userService.get(payload.uid)
@@ -156,21 +158,22 @@ export class LoginController {
       throw new UnauthorizedException('Could not create new access token')
     }
 
-    const newRefreshTolkien = await this.tokenService.createRefreshToken(payload.uid)
+    const sessionTimeout = await this.tokenService.getSessionTimeout()
+    const newRefreshToken = await this.tokenService.createRefreshToken(payload.uid)
     const maxAge = await this.tokenService.getRefreshCookieMaxAge()
     const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-    res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshTolkien, cookieOptions)
+    res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshToken, cookieOptions)
 
-    return { JWT: newAccessToken }
+    return { JWT: newAccessToken, scope: sessionTimeout === 'session' ? 'session' : 'local' }
   }
 
   /**
-   * Clears the httpOnly refresh tolkien cookie, ending the long-lived session.
+   * Clears the httpOnly refresh token cookie, ending the long-lived session.
    */
   @Post('/auth/logout')
   @StandardEndpoint({
     auth: false,
-    summary: 'Clear the refresh tolkien cookie.',
+    summary: 'Clear the refresh token cookie.',
   })
   logout(@Res({ passthrough: true }) res: Response): { success: true } {
     res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })

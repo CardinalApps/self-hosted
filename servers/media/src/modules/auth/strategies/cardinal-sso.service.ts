@@ -159,10 +159,10 @@ export class CardinalSSOStrategy {
    * Creates the login success object.
    */
   private async loginSuccess(user: User, cloudJWT: string): Promise<LoginResponse> {
-    const accessTolkien = await this.tokenService.createAccessToken(user.userId)
+    const accessToken = await this.tokenService.createAccessToken(user.userId)
     return {
-      JWT: accessTolkien,
-      refreshTolkien: await this.tokenService.createRefreshToken(user.userId),
+      JWT: accessToken,
+      refreshToken: await this.tokenService.createRefreshToken(user.userId),
       user: this.userService.cleanseUserObject(user),
       cloudJWT: cloudJWT,
       cloudUser: user.cachedCloudUser,

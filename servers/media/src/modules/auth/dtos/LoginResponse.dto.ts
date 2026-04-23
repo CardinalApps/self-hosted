@@ -23,5 +23,8 @@ export class LoginResponse {
 
   @IsOptional()
   @IsString()
-  refreshTolkien?: string
+  refreshToken?: string
+
+  @IsOptional()
+  scope?: 'local' | 'session' | 'memory'
 }

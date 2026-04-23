@@ -6,7 +6,7 @@ import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
 import { STORE_KEY } from '../constants'
 import { AppDispatch, RootState } from '../../../'
 
-const refreshTolkien = createAsyncThunk<
+const refreshToken = createAsyncThunk<
   string,
   void,
   {
@@ -14,20 +14,20 @@ const refreshTolkien = createAsyncThunk<
     state: RootState
     rejectValue: { error: string }
   }
->(`${STORE_KEY}/refreshTolkien`, async (): Promise<string> => {
-  const response = await homeServerAPI<{ JWT: string }>('/auth/refresh', 'POST', {
+>(`${STORE_KEY}/refreshToken`, async (): Promise<string> => {
+  const response = await homeServerAPI<{ JWT: string, scope: 'local' | 'session' | 'memory' }>('/auth/refresh', 'POST', {
     sendJWT: false,
     sendCloudUserJWT: true,
   })
 
-  const jwt = (response as { JWT: string })?.JWT
+  const { JWT: jwt, scope = 'local' } = response as { JWT: string, scope: 'local' | 'session' | 'memory' }
 
   if (!jwt) {
     throw new Error('Refresh response missing JWT')
   }
 
-  setJWT(jwt, JWT_TYPE.HOME_SERVER_USER)
+  setJWT(jwt, JWT_TYPE.HOME_SERVER_USER, scope)
   return jwt
 })
 
-export default refreshTolkien
+export default refreshToken

@@ -1,6 +1,6 @@
 import healthCheck from '../../../../store/slices/homeServer/thunks/healthCheck'
 import { toastActions } from '../../../../store/slices/toast'
-import refreshTolkien from '../../../../store/slices/homeServerUser/thunks/refreshTolkien'
+import refreshToken from '../../../../store/slices/homeServerUser/thunks/refreshToken'
 
 import { globalActions } from '../../../../store/constants/actions'
 
@@ -49,10 +49,10 @@ export default async function handle401(res, endpoint, method, body, dispatch, l
   isRefreshing = true
 
   try {
-    await dispatch(refreshTolkien()).unwrap()
-    // Refresh succeeded — new access tolkien is now in localStorage.
+    await dispatch(refreshToken()).unwrap()
+    // Refresh succeeded — new access token is now in storage.
     // The in-flight request that got the 401 has already failed; the next
-    // request from the UI will use the fresh tolkien automatically.
+    // request from the UI will use the fresh token automatically.
   } catch {
     fullLogout(dispatch, lang, serverErrorMessage)
   } finally {

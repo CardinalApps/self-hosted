@@ -20,7 +20,7 @@ import
   removeHomeServerAPIMiddleware,
   registerTokenRefreshProvider,
 } from '../../../lib/homeserver/homeServerAPI'
-import refreshTolkien from '../../../store/slices/homeServerUser/thunks/refreshTolkien'
+import refreshToken from '../../../store/slices/homeServerUser/thunks/refreshToken'
 import handle401 from './middleware/handle401'
 import handle410 from './middleware/handle410'
 
@@ -143,7 +143,7 @@ function AppBase({
   useEffect(() => {
     registerHomeServerAPIMiddleware('handle_401', (...args) => handle401(args[0], args[1], args[2], args[3], dispatch, lang))
     registerHomeServerAPIMiddleware('handle_410', (...args) => handle410(args[0], args[1], args[2], args[3], dispatch, lang))
-    registerTokenRefreshProvider(() => dispatch(refreshTolkien()).unwrap())
+    registerTokenRefreshProvider(() => dispatch(refreshToken()).unwrap())
     return () => {
       removeHomeServerAPIMiddleware('handle_401')
       removeHomeServerAPIMiddleware('handle_410')
@@ -152,13 +152,12 @@ function AppBase({
 
   /**
    * On app init, if the stored access tolkien is expired, attempt a silent
-   * refresh before rendering the app. This prevents a half-rendered state where
-   * AppPrivate mounts and fires API calls that all 401.
+   * refresh before rendering the app.
    */
   useEffect(() => {
     const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
     if (token && isJwtExpired(token)) {
-      dispatch(refreshTolkien()).finally(() => setTokenReady(true))
+      dispatch(refreshToken()).finally(() => setTokenReady(true))
     } else {
       setTokenReady(true)
     }

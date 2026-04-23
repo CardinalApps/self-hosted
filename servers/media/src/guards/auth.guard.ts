@@ -2,6 +2,7 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
+  UnauthorizedException,
 } from '@nestjs/common'
 
 /**
@@ -21,7 +22,7 @@ export class AuthGuard implements CanActivate {
     const attachedUser = request?.user?.userId
 
     if (!attachedUser) {
-      return false
+      throw new UnauthorizedException()
     }
 
     // Verify offline user
