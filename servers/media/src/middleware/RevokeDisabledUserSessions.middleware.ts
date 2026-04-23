@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common'
+import { Injectable, NestMiddleware, GoneException } from '@nestjs/common'
 import { NextFunction, Response } from 'express'
 
 /**
@@ -11,7 +11,7 @@ export class RevokeDisabledUserSessions implements NestMiddleware {
   async use(request, response: Response, next: NextFunction): Promise<void> {
     if (request.user && request.user?.enabled === false) {
       response.header('Cardinal-Extra-Message', 'Your account has been disabled on this server, contact the server owner for help.')
-      throw new UnauthorizedException()
+      throw new GoneException()
     }
 
     next()

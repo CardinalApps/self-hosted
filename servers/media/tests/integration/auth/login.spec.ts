@@ -18,7 +18,7 @@ function buildFakeCloudJWT(payload: object): string {
   return `${header}.${body}.fakesig`
 }
 
-describe('POST /api/v1/login', () => {
+describe('POST /api/v1/auth/login', () => {
   let testApp: TestApp
   let moduleRef: TestingModule
 
@@ -38,7 +38,7 @@ describe('POST /api/v1/login', () => {
   describe('no credentials provided', () => {
     it('returns 403 when request body is empty', () => {
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({})
         .expect(403)
@@ -55,7 +55,7 @@ describe('POST /api/v1/login', () => {
       const guestAccount = await userService.getGuestAccount()
 
       const response = await request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ userId: guestAccount.userId })
         .expect(201)
@@ -66,19 +66,60 @@ describe('POST /api/v1/login', () => {
       expect(response.body.JWT.length).toBeGreaterThan(0)
     })
 
+    it('sets the httpOnly cardinal_refresh_tolkien cookie on successful login', async () => {
+      const userService = moduleRef.get(UserService)
+      const guestAccount = await userService.getGuestAccount()
+
+      const response = await request(testApp.app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .set('cardinal-app', 'admin')
+        .send({ userId: guestAccount.userId })
+        .expect(201)
+
+      const rawCookies = response.headers['set-cookie']
+      const cookies: string[] = Array.isArray(rawCookies) ? rawCookies : rawCookies ? [rawCookies] : []
+      const refreshCookie = cookies.find((c) => c.startsWith('cardinal_refresh_tolkien='))
+      expect(refreshCookie).toBeDefined()
+      expect(refreshCookie).toContain('HttpOnly')
+      expect(refreshCookie).toContain('Path=/api/v1/auth')
+    })
+
+    it('returns a short-lived JWT with exp in seconds (not milliseconds)', async () => {
+      const userService = moduleRef.get(UserService)
+      const guestAccount = await userService.getGuestAccount()
+
+      const response = await request(testApp.app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .set('cardinal-app', 'admin')
+        .send({ userId: guestAccount.userId })
+        .expect(201)
+
+      const payloadBase64 = response.body.JWT.split('.')[1]
+      const payload = JSON.parse(Buffer.from(payloadBase64, 'base64url').toString())
+
+      // exp should be Unix seconds, not ms — a value > year 2100 in seconds
+      // (which would be ~4102444800) means it was set in ms by mistake
+      expect(payload.exp).toBeLessThan(4102444800)
+
+      // The access tolkien should expire roughly 15 minutes from now
+      const nowSeconds = Math.floor(Date.now() / 1000)
+      expect(payload.exp).toBeGreaterThan(nowSeconds)
+      expect(payload.exp).toBeLessThan(nowSeconds + 1800) // must be under 30 minutes
+    })
+
     it('returns 403 when cardinal-app header is missing', async () => {
       const userService = moduleRef.get(UserService)
       const guestAccount = await userService.getGuestAccount()
 
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .send({ userId: guestAccount.userId })
         .expect(403)
     })
 
     it('returns 403 when userId does not exist', () => {
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ userId: 'non-existent-user-id' })
         .expect(403)
@@ -94,7 +135,7 @@ describe('POST /api/v1/login', () => {
       if (!localUser) throw new Error('Test setup failed: could not create local user')
 
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ userId: localUser.userId })
         .expect(403)
@@ -110,7 +151,7 @@ describe('POST /api/v1/login', () => {
 
       try {
         await request(testApp.app.getHttpServer())
-          .post('/api/v1/login')
+          .post('/api/v1/auth/login')
           .set('cardinal-app', 'admin')
           .send({ userId: guestAccount.userId })
           .expect(403)
@@ -134,7 +175,7 @@ describe('POST /api/v1/login', () => {
 
     it('returns 201 with JWT and user on valid credentials', async () => {
       const response = await request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ username: 'localuser', password: 'correctpassword' })
         .expect(201)
@@ -146,7 +187,7 @@ describe('POST /api/v1/login', () => {
 
     it('returns 403 on an incorrect password', () => {
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ username: 'localuser', password: 'wrongpassword' })
         .expect(403)
@@ -154,7 +195,7 @@ describe('POST /api/v1/login', () => {
 
     it('returns 403 on an unknown username', () => {
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ username: 'nobody', password: 'correctpassword' })
         .expect(403)
@@ -162,7 +203,7 @@ describe('POST /api/v1/login', () => {
 
     it('returns 403 when cardinal-app header is missing', () => {
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .send({ username: 'localuser', password: 'correctpassword' })
         .expect(403)
     })
@@ -196,7 +237,7 @@ describe('POST /api/v1/login', () => {
       jest.spyOn(cloudUserService, 'getCardinalCloudUser').mockResolvedValue(mockCloudUser)
 
       const response = await request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ cardinalJWT: fakeCloudJWT })
         .expect(201)
@@ -211,7 +252,7 @@ describe('POST /api/v1/login', () => {
       jest.spyOn(cloudUserService, 'getCardinalCloudUser').mockResolvedValue(mockCloudUser)
 
       const response = await request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ cardinalJWT: fakeCloudJWT })
         .expect(201)
@@ -226,7 +267,7 @@ describe('POST /api/v1/login', () => {
       )
 
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .set('cardinal-app', 'admin')
         .send({ cardinalJWT: 'invalid.jwt.token' })
         .expect(403)
@@ -237,7 +278,7 @@ describe('POST /api/v1/login', () => {
       jest.spyOn(cloudUserService, 'getCardinalCloudUser').mockResolvedValue(mockCloudUser)
 
       return request(testApp.app.getHttpServer())
-        .post('/api/v1/login')
+        .post('/api/v1/auth/login')
         .send({ cardinalJWT: fakeCloudJWT })
         .expect(403)
     })

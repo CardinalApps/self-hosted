@@ -60,8 +60,7 @@ header.`,
     @Query() query: SubscribeDto,
     @Res() response: Response,
   ) {
-    const tokenIsValid = this.tokenService.verifyJWT(query.authorization)
-    if (!tokenIsValid) throw new UnauthorizedException()
+    if (this.tokenService.verifyAccessToken(query.authorization) !== 'valid') throw new UnauthorizedException()
 
     const user = await this.userService.getUserByLocalJWT(query.authorization)
     if (!user) throw new UnauthorizedException()

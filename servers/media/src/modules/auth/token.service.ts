@@ -1,28 +1,56 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import * as ms from 'ms'
 
 import { getJWTPayload } from '../../utils/jwt'
 
 import { UserService } from '../user/user.service'
+import { SettingsService } from '../settings/settings.service'
+import { CardinalApp } from '../../utils/apps'
 
-/**
- * The CardinalToken service issues and verifies tokens for this server. It uses
- * the Nest JWT service for this.
- */
+const SESSION_TIMEOUT_TO_MS: Record<string, number | null> = {
+  'session': null,
+  '15m': ms('15m'),
+  '1h': ms('1h'),
+  '12h': ms('12h'),
+  '1d': ms('1d'),
+  '3d': ms('3d'),
+  '7d': ms('7d'),
+  '14d': ms('14d'),
+  '30d': ms('30d'),
+}
+
 @Injectable()
 export class TokenService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   /**
-   * Creates a new JWT for a local user account.
-   * 
-   * If a Cardinal JWT is given, then some data from it will be copied into the
-   * Media Server JWT.
+   * Returns the current inactive_session_timeout setting value (e.g. '7d').
+   * Falls back to '7d' if the setting is missing or unrecognised.
    */
-  async createJWT(userId: string, cardinalJWT?: string): Promise<string | null> {
+  async getSessionTimeout(): Promise<string> {
+    const value = await this.settingsService.get(CardinalApp.ADMIN, 'inactive_session_timeout') as string
+    return value in SESSION_TIMEOUT_TO_MS ? value : '7d'
+  }
+
+  /**
+   * Returns the cookie maxAge in milliseconds for the current session timeout
+   * setting. Returns null for the 'session' option (session cookie — no maxAge).
+   */
+  async getRefreshCookieMaxAge(): Promise<number | null> {
+    const timeout = await this.getSessionTimeout()
+    return SESSION_TIMEOUT_TO_MS[timeout]
+  }
+
+  /**
+   * Issues a short-lived access token (15 minutes). This is the token clients
+   * store in localStorage and attach to every API request.
+   */
+  async createAccessToken(userId: string, cardinalAccessTolkien?: string): Promise<string | null> {
     const user = await this.userService.get(userId)
 
     if (!user) {
@@ -30,26 +58,81 @@ export class TokenService {
       return null
     }
 
-    const cardinalJWTPayload = cardinalJWT ? getJWTPayload(cardinalJWT) : null
+    const cardinalJWTPayload = cardinalAccessTolkien ? getJWTPayload(cardinalAccessTolkien) : null
 
-    return this.jwtService.sign({
-      uid: user.userId,
-      role: user.role,
-      designation: user.designation,
-      cardinalId: cardinalJWTPayload ? cardinalJWTPayload.userId : null,
-      exp: Date.now() + 315360000000, // 10 years
-    })
+    return this.jwtService.sign(
+      {
+        uid: user.userId,
+        role: user.role,
+        designation: user.designation,
+        cardinalId: cardinalJWTPayload ? cardinalJWTPayload.userId : null,
+        type: 'access',
+      },
+      { expiresIn: '15m' },
+    )
   }
 
   /**
-   * Checks whether the given JWT was signed by this server.
+   * Issues a long-lived refresh token whose lifetime matches the
+   * inactive_session_timeout admin setting.
    */
-  verifyJWT(JWT): boolean {
+  async createRefreshToken(userId: string): Promise<string | null> {
+    const user = await this.userService.get(userId)
+
+    if (!user) {
+      Logger.warn('Invalid user ID', 'Auth')
+      return null
+    }
+
+    const timeout = await this.getSessionTimeout()
+    const expiresIn = timeout === 'session' ? '30d' : timeout
+
+    return this.jwtService.sign(
+      {
+        uid: user.userId,
+        type: 'refresh',
+      },
+      { expiresIn },
+    )
+  }
+
+  /**
+   * Alias for createAccessToken. Retained for backwards compatibility with
+   * callers that predate the dual-token auth upgrade.
+   */
+  async createJWT(userId: string, cardinalAccessTolkien?: string): Promise<string | null> {
+    return this.createAccessToken(userId, cardinalAccessTolkien)
+  }
+
+  /**
+   * Distinguishes expired tokens from tampered ones so the middleware can
+   * return the right status code: 401 for expired (client should refresh),
+   * 410 for invalid (force logout — signing secret changed or token was forged).
+   */
+  verifyAccessToken(JWT: string): 'valid' | 'expired' | 'invalid' {
     try {
       const result = this.jwtService.verify(JWT)
-      return typeof result === 'object' && 'uid' in result
+      if (typeof result === 'object' && 'uid' in result) return 'valid'
+      return 'invalid'
     } catch (error) {
-      return false
+      if (error?.name === 'TokenExpiredError') return 'expired'
+      return 'invalid'
+    }
+  }
+
+  /**
+   * Verifies a refresh token and returns its payload. Returns null for anything
+   * invalid or expired.
+   */
+  verifyRefreshToken(tolkien: string): { uid: string } | null {
+    try {
+      const result = this.jwtService.verify(tolkien)
+      if (typeof result === 'object' && result.type === 'refresh' && 'uid' in result) {
+        return result as { uid: string }
+      }
+      return null
+    } catch {
+      return null
     }
   }
 }

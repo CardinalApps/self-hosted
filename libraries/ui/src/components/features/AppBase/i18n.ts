@@ -37,6 +37,9 @@ const i18n: StringList = {
   "dev-tools.reset.button": {
     "en": "Reset web app",
   },
+  "dev-tools.refresh-tolkien.button": {
+    "en": "Force token refresh",
+  },
   "health.network-error.title": {
     "en": "Network error",
   },
@@ -62,7 +65,7 @@ const i18n: StringList = {
     "en": "Use not authorized.",
   },
   "login.error.410.title": {
-    "en": "409 - User Gone",
+    "en": "410 - User Gone",
   },
   "login.error.410.body": {
     "en": "<p>Your user was no longer recognized, so you'll need to log back in.</p>",

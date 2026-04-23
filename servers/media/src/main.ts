@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import * as cookieParser from 'cookie-parser'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
 import { Logger, VersioningType, ValidationPipe } from '@nestjs/common'
@@ -80,6 +81,8 @@ async function startup() {
    */
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
+  app.use(cookieParser())
+
   /**
    * Register global pipes.
    */
@@ -111,6 +114,7 @@ async function startup() {
     exposedHeaders: [
       'Cardinal-Extra-Message',
     ],
+    credentials: true,
   })
 
   /**

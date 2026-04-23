@@ -20,4 +20,8 @@ export class LoginResponse {
   @IsOptional()
   @IsString()
   cloudUser?: object
+
+  @IsOptional()
+  @IsString()
+  refreshTolkien?: string
 }

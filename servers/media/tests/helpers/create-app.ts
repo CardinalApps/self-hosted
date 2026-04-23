@@ -1,3 +1,4 @@
+import * as cookieParser from 'cookie-parser'
 import * as os from 'os'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -31,6 +32,7 @@ export async function createTestApp(): Promise<TestApp> {
 
   const app = moduleRef.createNestApplication({ logger: false })
 
+  app.use(cookieParser())
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.setGlobalPrefix('api')
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' })

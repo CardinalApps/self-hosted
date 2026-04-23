@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
@@ -18,7 +18,9 @@ import
 {
   registerHomeServerAPIMiddleware,
   removeHomeServerAPIMiddleware,
+  registerTokenRefreshProvider,
 } from '../../../lib/homeserver/homeServerAPI'
+import refreshTolkien from '../../../store/slices/homeServerUser/thunks/refreshTolkien'
 import handle401 from './middleware/handle401'
 import handle410 from './middleware/handle410'
 
@@ -45,7 +47,7 @@ import { useGetInstanceQuery } from '../../../store/apis/instance'
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
 
-import { getJWT, JWT_TYPE } from '../../../lib/auth/jwt'
+import { getJWT, isJwtExpired, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
 
 import { routes } from './routes'
@@ -107,6 +109,7 @@ function AppBase({
   useServerSideEvents()
   useHowler()
   const dispatch = useAppDispatch()
+  const [tokenReady, setTokenReady] = useState(false)
   const { navigate, location } = router
   const appRef = useRef(null)
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
@@ -140,9 +143,24 @@ function AppBase({
   useEffect(() => {
     registerHomeServerAPIMiddleware('handle_401', (...args) => handle401(args[0], args[1], args[2], args[3], dispatch, lang))
     registerHomeServerAPIMiddleware('handle_410', (...args) => handle410(args[0], args[1], args[2], args[3], dispatch, lang))
+    registerTokenRefreshProvider(() => dispatch(refreshTolkien()).unwrap())
     return () => {
       removeHomeServerAPIMiddleware('handle_401')
       removeHomeServerAPIMiddleware('handle_410')
+    }
+  }, [])
+
+  /**
+   * On app init, if the stored access tolkien is expired, attempt a silent
+   * refresh before rendering the app. This prevents a half-rendered state where
+   * AppPrivate mounts and fires API calls that all 401.
+   */
+  useEffect(() => {
+    const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
+    if (token && isJwtExpired(token)) {
+      dispatch(refreshTolkien()).finally(() => setTokenReady(true))
+    } else {
+      setTokenReady(true)
     }
   }, [])
 
@@ -272,7 +290,7 @@ function AppBase({
               <PhotoViewerLayer />
               <DrawerLayer />
               {!!developer_mode && <DevTools />}
-              {health
+              {health && tokenReady
                 ? homeServerUserLoggedIn
                   ? <AppPrivate
                       header={header || defaultHeader}

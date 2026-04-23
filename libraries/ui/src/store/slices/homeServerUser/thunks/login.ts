@@ -60,7 +60,7 @@ const homeServerLogin = createAsyncThunk<
   const store = thunkAPI.getState()
 
   try {
-    const loginResponse = await homeServerAPI(`/login`, 'POST', {
+    const loginResponse = await homeServerAPI(`/auth/login`, 'POST', {
       headers: {
         [CARDINAL_APP_HEADER]: store?.app?.app,
       },
