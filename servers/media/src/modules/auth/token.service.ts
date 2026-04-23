@@ -50,7 +50,7 @@ export class TokenService {
    * Issues a short-lived access token (15 minutes). This is the token clients
    * store in localStorage and attach to every API request.
    */
-  async createAccessToken(userId: string, cardinalAccessTolkien?: string): Promise<string | null> {
+  async createAccessToken(userId: string, cardinalAccessToken?: string): Promise<string | null> {
     const user = await this.userService.get(userId)
 
     if (!user) {
@@ -58,7 +58,7 @@ export class TokenService {
       return null
     }
 
-    const cardinalJWTPayload = cardinalAccessTolkien ? getJWTPayload(cardinalAccessTolkien) : null
+    const cardinalJWTPayload = cardinalAccessToken ? getJWTPayload(cardinalAccessToken) : null
 
     return this.jwtService.sign(
       {
@@ -100,8 +100,8 @@ export class TokenService {
    * Alias for createAccessToken. Retained for backwards compatibility with
    * callers that predate the dual-token auth upgrade.
    */
-  async createJWT(userId: string, cardinalAccessTolkien?: string): Promise<string | null> {
-    return this.createAccessToken(userId, cardinalAccessTolkien)
+  async createJWT(userId: string, cardinalAccessToken?: string): Promise<string | null> {
+    return this.createAccessToken(userId, cardinalAccessToken)
   }
 
   /**
@@ -112,7 +112,7 @@ export class TokenService {
   verifyAccessToken(JWT: string): 'valid' | 'expired' | 'invalid' {
     try {
       const result = this.jwtService.verify(JWT)
-      if (typeof result === 'object' && 'uid' in result) return 'valid'
+      if (typeof result === 'object' && result.type === 'access' && 'uid' in result) return 'valid'
       return 'invalid'
     } catch (error) {
       if (error?.name === 'TokenExpiredError') return 'expired'
@@ -124,9 +124,9 @@ export class TokenService {
    * Verifies a refresh token and returns its payload. Returns null for anything
    * invalid or expired.
    */
-  verifyRefreshToken(tolkien: string): { uid: string } | null {
+  verifyRefreshToken(token: string): { uid: string } | null {
     try {
-      const result = this.jwtService.verify(tolkien)
+      const result = this.jwtService.verify(token)
       if (typeof result === 'object' && result.type === 'refresh' && 'uid' in result) {
         return result as { uid: string }
       }

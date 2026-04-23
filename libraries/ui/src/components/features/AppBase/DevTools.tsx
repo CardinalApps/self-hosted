@@ -7,7 +7,7 @@ import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import { cloudUserSelectors } from '../../../store/slices/cloudUser'
 import { globalActions } from '../../../store/constants/actions'
 import { getJwt, JWT_TYPE } from '../../../lib/auth/jwt'
-import refreshTolkien from '../../../store/slices/homeServerUser/thunks/refreshTolkien'
+import refreshToken from '../../../store/slices/homeServerUser/thunks/refreshToken'
 
 import Select from '../../forms/Select'
 import Button from '../../interaction/Button'
@@ -81,7 +81,7 @@ export default function AppLoading() {
           </p>
           <Button onClick={() => navigator.clipboard.writeText(getJwt(JWT_TYPE.HOME_SERVER_USER))}>{i18n['dev-tools.copy-local-tolkien.button']['en']}</Button>
           <Button onClick={() => navigator.clipboard.writeText(getJwt(JWT_TYPE.CLOUD_USER))}>{i18n['dev-tools.copy-cloud-tolkien.button']['en']}</Button>
-          <Button onClick={() => dispatch(refreshTolkien())}>{i18n['dev-tools.refresh-tolkien.button']['en']}</Button>
+          <Button onClick={() => dispatch(refreshToken())}>{i18n['dev-tools.refresh-tolkien.button']['en']}</Button>
           <Button onClick={() => dispatch({ type: globalActions.RESET })}>{i18n['dev-tools.reset.button']['en']}</Button>
         </div>
       </div>
