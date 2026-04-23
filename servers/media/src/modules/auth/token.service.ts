@@ -9,6 +9,7 @@ import { SettingsService } from '../settings/settings.service'
 import { CardinalApp } from '../../utils/apps'
 
 const SESSION_TIMEOUT_TO_MS: Record<string, number | null> = {
+  'memory': null,
   'session': null,
   '15m': ms('15m'),
   '1h': ms('1h'),
@@ -85,7 +86,7 @@ export class TokenService {
     }
 
     const timeout = await this.getSessionTimeout()
-    const expiresIn = timeout === 'session' ? '30d' : timeout
+    const expiresIn = (timeout === 'session' || timeout === 'memory') ? '30d' : timeout
 
     return this.jwtService.sign(
       {

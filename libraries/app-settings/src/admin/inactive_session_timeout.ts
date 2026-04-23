@@ -4,6 +4,7 @@ import i18n from '../i18n'
 export const INACTIVE_SESSION_TIMEOUT_SLUG = 'inactive_session_timeout'
 
 const options = [
+  { value: 'memory', label: 'Memory' },
   { value: 'session', label: 'Session' },
   { value: '15m', label: '15 minutes' },
   { value: '1h', label: '1 hour' },

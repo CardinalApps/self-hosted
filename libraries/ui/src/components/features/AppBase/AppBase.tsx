@@ -151,12 +151,13 @@ function AppBase({
   }, [])
 
   /**
-   * On app init, if the stored access tolkien is expired, attempt a silent
-   * refresh before rendering the app.
+   * On app init, attempt a silent token refresh if the access token is missing
+   * or expired. User's with their session timeout set to "memory" will lose
+   * their access token on every reload.
    */
   useEffect(() => {
     const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
-    if (token && isJwtExpired(token)) {
+    if (!token || isJwtExpired(token)) {
       dispatch(refreshToken()).finally(() => setTokenReady(true))
     } else {
       setTokenReady(true)
