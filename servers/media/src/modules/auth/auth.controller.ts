@@ -2,7 +2,6 @@ import {
   Controller,
   Logger,
   ForbiddenException,
-  GoneException,
   UnauthorizedException,
   Post,
   Body,
@@ -145,7 +144,7 @@ export class LoginController {
     if (user.cardinalId) {
       const cloudJWT = getCardinalTolkienFromHeaders(req.headers)
       if (!cloudJWT) {
-        throw new GoneException('Cloud-linked account must present a cloud token')
+        throw new UnauthorizedException('Cloud-linked account must present a cloud token')
       }
       const cloudUser = await this.cloudUserService.getCardinalCloudUser(cloudJWT)
       this.cloudUserService.throwIfInvalidCardinalAccount(cloudUser)
