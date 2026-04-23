@@ -102,7 +102,7 @@ export class LoginController {
       res.cookie(REFRESH_TOLKIEN_COOKIE, loginResult.refreshToken, cookieOptions)
 
       delete loginResult.refreshToken
-      loginResult.scope = sessionTimeout === 'session' ? 'session' : 'local'
+      loginResult.scope = (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local'
       return loginResult
     } catch (error) {
       Logger.error(`Login error: ${error}`, 'Auth')
@@ -164,7 +164,7 @@ export class LoginController {
     const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
     res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshToken, cookieOptions)
 
-    return { JWT: newAccessToken, scope: sessionTimeout === 'session' ? 'session' : 'local' }
+    return { JWT: newAccessToken, scope: (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local' }
   }
 
   /**

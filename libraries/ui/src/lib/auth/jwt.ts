@@ -6,6 +6,9 @@
 export const CLOUD_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/cloud_user_tolkien'
 export const HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/home_server_user_tolkien'
 
+// In-memory store for scope === 'memory'. Intentionally cleared on page reload.
+let memoryToken: string | null = null
+
 export enum JWT_TYPE {
   CLOUD_USER = 'cloud_user',
   HOME_SERVER_USER = 'home_server_user',
@@ -17,14 +20,28 @@ export enum JWT_TYPE {
  * @param {string} token
  * @returns {void}
  */
-export function setJwt(token, type = JWT_TYPE.CLOUD_USER) {
+export type JwtScope = 'local' | 'session' | 'memory'
+
+export function setJwt(token, type = JWT_TYPE.CLOUD_USER, scope: JwtScope = 'local') {
   switch (type) {
-    case JWT_TYPE.CLOUD_USER:
-      localStorage.setItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY, token)
+    case JWT_TYPE.CLOUD_USER: {
+      const storage = scope === 'session' ? sessionStorage : localStorage
+      storage.setItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY, token)
       break
+    }
 
     case JWT_TYPE.HOME_SERVER_USER:
-      localStorage.setItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY, token)
+      // Clear all storage locations so only one holds the token at a time
+      localStorage.removeItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      sessionStorage.removeItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      memoryToken = null
+
+      if (scope === 'memory') {
+        memoryToken = token
+      } else {
+        const storage = scope === 'session' ? sessionStorage : localStorage
+        storage.setItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY, token)
+      }
       break
 
     default:
@@ -46,7 +63,9 @@ export function getJwt(type = JWT_TYPE.CLOUD_USER) {
       return localStorage.getItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY)
 
     case JWT_TYPE.HOME_SERVER_USER:
-      return localStorage.getItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      return memoryToken
+        ?? sessionStorage.getItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+        ?? localStorage.getItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
 
     default:
       console.error('Invalid token type, use a JWT_TYPE.')
@@ -67,7 +86,10 @@ export function deleteJwt(type = JWT_TYPE.CLOUD_USER) {
       return localStorage.removeItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY)
 
     case JWT_TYPE.HOME_SERVER_USER:
-      return localStorage.removeItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      localStorage.removeItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      sessionStorage.removeItem(HOME_SERVER_USER_JWT_LOCALSTORAGE_KEY)
+      memoryToken = null
+      break
 
     default:
       console.error('Invalid token type, use a JWT_TYPE.')
