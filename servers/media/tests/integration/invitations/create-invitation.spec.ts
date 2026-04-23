@@ -79,6 +79,6 @@ describe('POST /api/v1/invitations', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/invitations')
       .send({ type: 'link' })
-      .expect(403)
+      .expect(401)
   })
 })

@@ -78,7 +78,7 @@ describe('GET /api/v1/index/state', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/index/state')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -100,7 +100,7 @@ describe('GET /api/v1/index/directories', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/index/directories')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -123,7 +123,7 @@ describe('GET /api/v1/index/counts', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/index/counts')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -147,7 +147,7 @@ describe('GET /api/v1/index/runs', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/index/runs')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -163,7 +163,7 @@ describe('POST /api/v1/index/run', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/index/run')
       .send({ type: RunType.FULL, indexMusic: true, indexPhotos: false, indexMovies: false, indexTV: false })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -271,7 +271,7 @@ describe('GET /api/v1/index/file', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/index/file')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -302,7 +302,7 @@ describe('DELETE /api/v1/index/files', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .delete('/api/v1/index/files?ids=some-id')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -323,6 +323,6 @@ describe('PATCH /api/v1/index/state', () => {
     return request(testApp.app.getHttpServer())
       .patch('/api/v1/index/state')
       .send({ action: 'pause' })
-      .expect(403)
+      .expect(401)
   })
 })

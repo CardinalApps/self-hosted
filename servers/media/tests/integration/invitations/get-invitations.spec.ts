@@ -70,7 +70,7 @@ describe('GET /api/v1/invitations', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/invitations')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -100,6 +100,6 @@ describe('GET /api/v1/invitations/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/invitations/${createdInvitationId}`)
-      .expect(403)
+      .expect(401)
   })
 })

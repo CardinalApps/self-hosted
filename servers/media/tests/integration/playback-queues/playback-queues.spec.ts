@@ -49,7 +49,7 @@ describe('GET /api/v1/playback-queues', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/playback-queues')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -92,7 +92,7 @@ describe('POST /api/v1/playback-queues', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/playback-queues')
       .send({ type: 'static' })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -131,7 +131,7 @@ describe('GET /api/v1/playback-queues/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/playback-queues/${queueId}`)
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -166,7 +166,7 @@ describe('DELETE /api/v1/playback-queues/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .delete(`/api/v1/playback-queues/${queueId}`)
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -198,7 +198,7 @@ describe('POST /api/v1/playback-queues/:id/extend', () => {
     return request(testApp.app.getHttpServer())
       .post(`/api/v1/playback-queues/${queueId}/extend`)
       .send({})
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -233,6 +233,6 @@ describe('GET /api/v1/playback-queues/:id/items', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/playback-queues/${queueId}/items`)
-      .expect(403)
+      .expect(401)
   })
 })

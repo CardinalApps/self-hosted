@@ -65,7 +65,7 @@ describe('GET /api/v1/licensing/subscription', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/licensing/subscription')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -107,7 +107,7 @@ describe('GET /api/v1/licensing/seats', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/licensing/seats')
-      .expect(403)
+      .expect(401)
   })
 })
 

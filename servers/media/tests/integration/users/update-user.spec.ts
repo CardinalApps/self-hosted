@@ -61,7 +61,7 @@ describe('PATCH /api/v1/users/current', () => {
     return request(testApp.app.getHttpServer())
       .patch('/api/v1/users/current')
       .send({ password: 'newpassword123' })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -96,6 +96,6 @@ describe('PATCH /api/v1/users/:id', () => {
     return request(testApp.app.getHttpServer())
       .patch(`/api/v1/users/${targetUserId}`)
       .send({ enabled: true })
-      .expect(403)
+      .expect(401)
   })
 })

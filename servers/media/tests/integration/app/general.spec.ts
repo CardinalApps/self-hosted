@@ -41,7 +41,7 @@ describe('GET /api/v1/instance', () => {
 
 describe('GET /api/v1/versions', () => {
   it('returns 403 on a not_setup server', () => {
-    return request(testApp.app.getHttpServer()).get('/api/v1/versions').expect(403)
+    return request(testApp.app.getHttpServer()).get('/api/v1/versions').expect(401)
   })
 })
 
@@ -68,10 +68,10 @@ describe('GET /api/v1/ls', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/ls')
       .query({ rootDir: 'music' })
-      .expect(403)
+      .expect(401)
   })
 
   it('returns 403 on a not_setup server even without a rootDir', () => {
-    return request(testApp.app.getHttpServer()).get('/api/v1/ls').expect(403)
+    return request(testApp.app.getHttpServer()).get('/api/v1/ls').expect(401)
   })
 })

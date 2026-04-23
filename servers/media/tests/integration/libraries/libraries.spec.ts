@@ -46,7 +46,7 @@ describe('GET /api/v1/libraries', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/libraries')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -87,7 +87,7 @@ describe('POST /api/v1/library', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/library')
       .send({ name: 'My Music', paths: ['/music'] })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -120,7 +120,7 @@ describe('GET /api/v1/library/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/library/${libraryId}`)
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -180,7 +180,7 @@ describe('PATCH /api/v1/library/:id', () => {
     return request(testApp.app.getHttpServer())
       .patch(`/api/v1/library/${libraryId}`)
       .send({ name: 'Updated Library' })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -210,7 +210,7 @@ describe('DELETE /api/v1/library/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .delete(`/api/v1/library/${libraryId}`)
-      .expect(403)
+      .expect(401)
   })
 
   it('returns 200 and removes the library', async () => {
