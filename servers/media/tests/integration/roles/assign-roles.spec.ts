@@ -72,6 +72,6 @@ describe('POST /api/v1/roles/:role/assignments', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/roles/administrator/assignments')
       .send({ userIds: [regularUserId] })
-      .expect(403)
+      .expect(401)
   })
 })

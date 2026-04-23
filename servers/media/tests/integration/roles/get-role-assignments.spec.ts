@@ -72,6 +72,6 @@ describe('GET /api/v1/roles/assignments', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/roles/assignments')
-      .expect(403)
+      .expect(401)
   })
 })

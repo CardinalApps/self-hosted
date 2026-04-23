@@ -48,7 +48,7 @@ describe('GET /api/v1/jobs/types', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/jobs/types')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -72,7 +72,7 @@ describe('GET /api/v1/jobs', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/jobs')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -105,7 +105,7 @@ describe('POST /api/v1/job', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/job')
       .send({ type: JobType.ALBUM_ART_THUMBNAILS })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -138,7 +138,7 @@ describe('GET /api/v1/job/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/job/${jobId}`)
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -172,7 +172,7 @@ describe('PATCH /api/v1/job/:id', () => {
     return request(testApp.app.getHttpServer())
       .patch(`/api/v1/job/${jobId}`)
       .send({ status: JobStatus.CANCELED })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -207,6 +207,6 @@ describe('GET /api/v1/job/:id/tasks', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/job/${jobId}/tasks`)
-      .expect(403)
+      .expect(401)
   })
 })

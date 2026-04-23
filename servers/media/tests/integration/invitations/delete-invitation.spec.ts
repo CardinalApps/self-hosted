@@ -67,6 +67,6 @@ describe('DELETE /api/v1/invitations/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .delete(`/api/v1/invitations/${createdInvitationId}`)
-      .expect(403)
+      .expect(401)
   })
 })

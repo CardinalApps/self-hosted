@@ -78,6 +78,6 @@ describe('DELETE /api/v1/roles/:role/assignments', () => {
     return request(testApp.app.getHttpServer())
       .delete('/api/v1/roles/administrator/assignments')
       .query({ userIds: regularUserId })
-      .expect(403)
+      .expect(401)
   })
 })

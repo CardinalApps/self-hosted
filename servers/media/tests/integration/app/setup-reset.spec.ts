@@ -78,7 +78,7 @@ describe('POST /api/v1/reset', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/reset')
       .send({ type: 'media', validationString: 'Deindex media' })
-      .expect(403)
+      .expect(401)
   })
 
   // -------------------------------------------------------------------------

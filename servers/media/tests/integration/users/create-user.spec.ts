@@ -50,6 +50,6 @@ describe('POST /api/v1/users', () => {
     return request(testApp.app.getHttpServer())
       .post('/api/v1/users')
       .send({ username: 'unauthorized', password: 'password123', role: 'administrator' })
-      .expect(403)
+      .expect(401)
   })
 })

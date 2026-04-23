@@ -91,7 +91,7 @@ describe('GET /api/v1/users', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/users')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -112,7 +112,7 @@ describe('GET /api/v1/users/active', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/users/active')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -135,7 +135,7 @@ describe('GET /api/v1/users/current', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/users/current')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -157,7 +157,7 @@ describe('GET /api/v1/users/owner', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/users/owner')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -187,6 +187,6 @@ describe('GET /api/v1/users/:id', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get(`/api/v1/users/${guestUserId}`)
-      .expect(403)
+      .expect(401)
   })
 })

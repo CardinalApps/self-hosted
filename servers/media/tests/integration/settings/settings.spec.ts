@@ -88,7 +88,7 @@ describe('GET /api/v1/settings/:app', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/settings/admin')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -159,7 +159,7 @@ describe('PATCH /api/v1/settings', () => {
     return request(testApp.app.getHttpServer())
       .patch('/api/v1/settings')
       .send({ app: 'admin', settings: { theme: 'light' } })
-      .expect(403)
+      .expect(401)
   })
 })
 

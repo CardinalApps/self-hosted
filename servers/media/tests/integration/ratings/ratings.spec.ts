@@ -50,7 +50,7 @@ describe('GET /api/v1/ratings', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/ratings')
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -115,7 +115,7 @@ describe('PUT /api/v1/ratings', () => {
     return request(testApp.app.getHttpServer())
       .put('/api/v1/ratings')
       .send({ mediaType: RatingMediaType.MUSIC_TRACK, mediaId: 'test-track-1', rating: 1 })
-      .expect(403)
+      .expect(401)
   })
 })
 
@@ -150,6 +150,6 @@ describe('DELETE /api/v1/ratings/:mediaType/:mediaId', () => {
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .delete(`/api/v1/ratings/${RatingMediaType.MUSIC_TRACK}/${mediaId}`)
-      .expect(403)
+      .expect(401)
   })
 })
