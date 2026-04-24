@@ -50,8 +50,8 @@ const fetchCloudUser = createAsyncThunk<
   // Try to get the user's public and private data
   try {
     responses = await Promise.all([
-      authAPI('/user', 'GET', { returnRawResponse: true }),
-      authAPI('/user/pii', 'GET', { returnRawResponse: true }),
+      authAPI('/user', 'GET', { returnRawResponse: true, skipMiddleware: true }),
+      authAPI('/user/pii', 'GET', { returnRawResponse: true, skipMiddleware: true }),
     ])
   } catch (error) {
     console.warn('No response from backend.')

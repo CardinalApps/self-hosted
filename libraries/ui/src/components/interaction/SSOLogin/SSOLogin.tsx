@@ -26,15 +26,12 @@ export const IPC_HANDSHAKE_READY_SIGNAL = 'CARDINAL_SSO_READY' as const
 export const IPC_HANDSHAKE_SUCCESS_SIGNAL = 'CARDINAL_POPUP_TRUSTS_PARENT' as const
 export const IPC_SSO_DONE_SIGNAL = 'CARDINAL_SSO_DONE' as const
 
-type TokenType = 'JWT' | 'cookie'
-
 export type IPCHandshakeMessageData = {
   appId: string,
   nonce: string,
   instanceId?: string,
   serverName: string,
   userAgentString: string,
-  tokenType: TokenType,
   debug: boolean,
 }
 
@@ -53,7 +50,6 @@ type SSOLoginProps = {
   ssoUrl?: string,
   enableNewSSOFlow?: boolean | undefined,
   serverName?: string,
-  tokenType?: TokenType,
   style?: CSSProperties,
 }
 
@@ -73,7 +69,6 @@ const SSOLogin = ({
   ssoUrl,
   enableNewSSOFlow = true,
   serverName = '(Not set)',
-  tokenType = 'JWT',
   style,
 }: PropsWithChildren<SSOLoginProps>) => {
   const dispatch = useAppDispatch()
@@ -132,7 +127,6 @@ const SSOLogin = ({
         instanceId,
         serverName: serverName as string,
         userAgentString: navigator.userAgent,
-        tokenType,
         debug,
         /**
          * @deprecated USER-22
@@ -214,7 +208,6 @@ const SSOLogin = ({
           appId,
           nonce,
           instanceId,
-          tokenType,
           serverName: serverName,
         },
       })
