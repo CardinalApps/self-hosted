@@ -152,8 +152,7 @@ function AppBase({
 
   /**
    * On app init, attempt a silent token refresh if the access token is missing
-   * or expired. User's with their session timeout set to "memory" will lose
-   * their access token on every reload.
+   * or expired.
    */
   useEffect(() => {
     const token = getJWT(JWT_TYPE.HOME_SERVER_USER)

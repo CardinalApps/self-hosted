@@ -16,6 +16,7 @@ const inactiveSessionTimeout = (app?, lang?) => {
           value={value}
           onChange={onChange}
           multi={false}
+          min={1}
         />
       )
     },
