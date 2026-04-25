@@ -11,7 +11,7 @@ on:
 jobs:
   discover:
     name: Discover packages
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       lint-packages: ${{ steps.discover.outputs.lint-packages }}
       typecheck-packages: ${{ steps.discover.outputs.typecheck-packages }}
@@ -68,7 +68,7 @@ jobs:
 
   lint:
     name: "Lint (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: discover
     strategy:
       fail-fast: false
@@ -86,7 +86,7 @@ jobs:
 
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: discover
     strategy:
       fail-fast: false
@@ -104,7 +104,7 @@ jobs:
 
   validate:
     name: Code Validation
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: [lint, typecheck]
     if: always()
     steps:
