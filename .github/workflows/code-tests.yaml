@@ -51,7 +51,7 @@ jobs:
 
   test:
     name: "Test (${{ matrix.package.label }})"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: discover
     strategy:
       fail-fast: false
@@ -69,7 +69,7 @@ jobs:
 
   validate:
     name: Code Tests
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: test
     if: always()
     steps:
