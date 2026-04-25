@@ -11,7 +11,7 @@ on:
 jobs:
   discover:
     name: Discover packages
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       lint-packages: ${{ steps.discover.outputs.lint-packages }}
       typecheck-packages: ${{ steps.discover.outputs.typecheck-packages }}
