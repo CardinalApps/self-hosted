@@ -68,7 +68,7 @@ jobs:
 
   lint:
     name: "Lint (${{ matrix.package.label }})"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: discover
     strategy:
       fail-fast: false
@@ -86,7 +86,7 @@ jobs:
 
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: discover
     strategy:
       fail-fast: false
@@ -104,7 +104,7 @@ jobs:
 
   validate:
     name: Code Validation
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [lint, typecheck]
     if: always()
     steps:
