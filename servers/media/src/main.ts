@@ -166,7 +166,11 @@ async function startup() {
   }
 
   if (isContainerEnv()) {
-    printWelcome(!!globalThis?.host?.docker?.internal || '<computer-ip>')
+    // host.docker.internal resolves to the host machine's IP on Mac/Windows automatically,
+    // and on Linux when the container is run with --add-host=host.docker.internal:host-gateway.
+    const dns = await import('dns/promises')
+    const hostIp = await dns.lookup('host.docker.internal').then((r) => r.address).catch(() => ip.address())
+    printWelcome(hostIp)
   } else {
     printWelcome(ip.address())
   }
