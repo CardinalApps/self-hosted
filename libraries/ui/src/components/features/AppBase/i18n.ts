@@ -40,6 +40,9 @@ const i18n: StringList = {
   "dev-tools.refresh-tolkien.button": {
     "en": "Force token refresh",
   },
+  "dev-tools.refresh-cloud-tolkien.button": {
+    "en": "Force cloud token refresh",
+  },
   "health.network-error.title": {
     "en": "Network error",
   },

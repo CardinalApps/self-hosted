@@ -44,7 +44,7 @@ type SSOLoginProps = {
   permissions?: string,
   saveJWTInLocalStorage?: boolean,
   onPopupOpened?: () => void,
-  onSSOSuccess?: (JWT?: string) => void,
+  onSSOSuccess?: (JWT?: string, exchangeToken?: string) => void,
   onPopupClosed?: () => void,
   label?: string,
   ssoUrl?: string,
@@ -160,8 +160,9 @@ const SSOLogin = ({
     // New SSO flow uses this property with the JWT attached
     if (e.origin === ssoUrl && e?.data?.[IPC_SSO_DONE_SIGNAL]) {
       const JWT = e?.data?.JWT
+      const exchangeToken = e?.data?.exchangeToken
       setJwt(JWT, JWT_TYPE.CLOUD_USER)
-      onSSOSuccess(JWT)
+      onSSOSuccess(JWT, exchangeToken)
     }
   }
 

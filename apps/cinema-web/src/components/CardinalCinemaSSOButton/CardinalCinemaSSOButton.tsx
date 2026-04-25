@@ -4,6 +4,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
+import redeemExchangeToken from '@cardinalapps/ui/src/store/slices/cloudUser/thunks/redeemExchangeToken'
 import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
 
 import * as routes from '../../routes'
@@ -13,7 +14,7 @@ import { CARDINAL_PUBLIC_APP_ID } from '../../env'
 type LoginWithCardinalProps = {
   automaticallyLogin?: boolean,
   saveJWTInLocalStorage?: boolean,
-  onSSOSuccess?: (JWT: string) => void,
+  onSSOSuccess?: (JWT: string, exchangeToken?: string) => void,
 }
 
 export default function CardinalAdminSSOButton({
@@ -31,7 +32,10 @@ export default function CardinalAdminSSOButton({
    * When the user logs into a Cardinal cloud account, try to log into the local
    * server owner account with the SSO token.
    */
-  const handleSSOSuccess = (JWT: string) => {
+  const handleSSOSuccess = (JWT: string, exchangeToken?: string) => {
+    if (exchangeToken && instanceData?.instanceId) {
+      dispatch(redeemExchangeToken({ exchangeToken, instanceId: instanceData.instanceId }))
+    }
     if (automaticallyLogin) {
       dispatch(homeServerLogin({
         cardinalSSOToken: JWT,
