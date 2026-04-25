@@ -11,11 +11,14 @@ type ApiErrorPayload = {
 }
 
 /**
- * Sends the reset action to all reducers.
+ * Automatically dispatches toasts with error messages from the API.
  */
 logHTTPErrorMiddleware.startListening({
   predicate: (action) => {
-    return isRejectedWithValue(action)
+    if (!isRejectedWithValue(action)) return false
+    const statusCode = (action.payload as ApiErrorPayload)?.data?.statusCode
+    // 401s are handled by the token refresh middleware; no toast needed
+    return statusCode !== 401
   },
   effect: async (action, store) => {
     const error = action.payload as ApiErrorPayload
