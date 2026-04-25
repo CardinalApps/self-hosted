@@ -11,7 +11,7 @@ on:
 jobs:
   discover:
     name: Discover packages
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       packages: ${{ steps.discover.outputs.packages }}
     steps:
