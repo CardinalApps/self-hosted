@@ -117,7 +117,14 @@ const authAPI = async <T>(
       return {} as T
     }
   } else {
-    throw await res.json().catch((e) => e)
+    const text = await res.text().catch(() => `${res.status} ${res.statusText}`)
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(text)
+    } catch {
+      throw new Error(text)
+    }
+    throw parsed
   }
 }
 
