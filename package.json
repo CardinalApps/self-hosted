@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev --ui=tui --concurrency=25",
-    "dev:wos": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/media-server",
+    "dev:wos": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/feedback-server --filter=!@cardinalapps/media-server",
     "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
     "dev:woas": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server",
     "lint": "turbo run lint --continue -- --max-warnings 0",
@@ -18,9 +18,12 @@
     "build:cms:image": "docker build -f ./servers/cms/Dockerfile -t cardinalapps/cms:latest .",
     "build:auth-server:image": "docker build -f Dockerfile.auth-server -t cardinalapps/auth-server:latest .",
     "build:status:image": "docker build -f Dockerfile.status-app -t cardinalapps/status:latest .",
+    "build:feedback-server:image": "docker build -f Dockerfile.feedback-server -t cardinalapps/feedback-server:latest .",
     "build:website:image": "docker build -f Dockerfile.website -t cardinalapps/website:latest .",
     "serve": "turbo run serve",
-    "test": "turbo run test --force --concurrency=1"
+    "test": "turbo run test --force --concurrency=1",
+    "e2e": "pnpm --filter @cardinalapps/e2e test",
+    "e2e:install": "pnpm --filter @cardinalapps/e2e install:browsers"
   },
   "devDependencies": {
     "turbo": "^2.4.2",
