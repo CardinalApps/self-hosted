@@ -26,6 +26,12 @@
     "serve": {
       "dependsOn": ["^serve"]
     },
+    "@cardinalapps/feedback-server#dev": {
+      "dependsOn": [
+        "@cardinalapps/topology#build"
+      ],
+      "cache": false
+    },
     "@cardinalapps/auth-server#dev": {
       "dependsOn": [
         "@cardinalapps/access-control#build",
