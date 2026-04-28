@@ -21,6 +21,7 @@ export enum CloudService {
   AUTH = "auth",
   BEV = "bev",
   CMS = "cms",
+  FEEDBACK = "feedback",
   HELP = "help",
   STATUS = "status",
   WEBSITE = "website",
@@ -39,6 +40,14 @@ export const CloudEdge = {
     entry: {
       dev: 'http://localhost:4013',
       prod: 'https://auth.cardinalcloud.io',
+    },
+  },
+  feedback: {
+    provider: InfrastructureProvider.AZURE,
+    name: 'Feedback',
+    entry: {
+      dev: 'http://localhost:4024',
+      prod: 'https://feedback.cardinalcloud.io',
     },
   },
 } as const
