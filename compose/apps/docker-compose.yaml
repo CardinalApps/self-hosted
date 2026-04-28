@@ -30,3 +30,11 @@ services:
     env_file:
       - ../../servers/cms/.env
     network_mode: host
+
+  feedback-server:
+    container_name: cardinal-feedback-server
+    env_file:
+      - ../../servers/feedback/.env
+    image: cardinalapps/feedback-server:latest
+    restart: always
+    network_mode: host
