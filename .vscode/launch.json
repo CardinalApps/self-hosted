@@ -26,6 +26,12 @@
       "type": "node-terminal"
     },
     {
+      "name": "Feedback Server",
+      "command": "cd ./servers/feedback && pnpm dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "name": "Status App",
       "command": "cd ./apps/status-web && pnpm dev",
       "request": "launch",
