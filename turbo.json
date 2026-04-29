@@ -43,7 +43,6 @@
       "dependsOn": [
         "@cardinalapps/access-control#build",
         "@cardinalapps/app-settings#build",
-        "@cardinalapps/types#build",
         "@cardinalapps/products#build",
         "@cardinalapps/topology#build"
       ],
