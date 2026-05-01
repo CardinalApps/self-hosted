@@ -146,26 +146,28 @@ const resolvePostgresHost = () => {
     ClaimModule,
     TranscodingModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public'),
-      serveRoot: '/',
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public', 'admin'),
-      serveRoot: '/admin',
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public', 'photos'),
-      serveRoot: '/photos',
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public', 'music'),
-      serveRoot: '/music',
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', 'public', 'cinema'),
-      serveRoot: '/cinema',
-    }),
+    ...(getCurrentMode() !== Mode.DEVELOPMENT ? [
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '..', '..', '..', 'public'),
+        serveRoot: '/',
+      }),
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '..', '..', '..', 'public', 'admin'),
+        serveRoot: '/admin',
+      }),
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '..', '..', '..', 'public', 'photos'),
+        serveRoot: '/photos',
+      }),
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '..', '..', '..', 'public', 'music'),
+        serveRoot: '/music',
+      }),
+      ServeStaticModule.forRoot({
+        rootPath: join(__dirname, '..', '..', '..', 'public', 'cinema'),
+        serveRoot: '/cinema',
+      }),
+    ] : []),
   ],
   controllers: [AppController],
   providers: [

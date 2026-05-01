@@ -26,7 +26,7 @@ import { AppEvents } from './events'
 
 import { OPTIONS } from '../../utils/options'
 import { CardinalApp } from '../../utils/apps'
-import { envVar, getPublicDir } from '../../utils/env'
+import { envVar, getPublicDir, getCurrentMode, Mode } from '../../utils/env'
 import { websiteAPI, LatestRelease } from '../../utils/cloud'
 import { ReleaseChannels } from '../../utils/releaseChannels'
 
@@ -115,6 +115,10 @@ export class AppService {
    * Returns the version of one of the web apps.
    */
   getWebAppVersion(app: CardinalApp): string {
+    if (getCurrentMode() === Mode.DEVELOPMENT) {
+      return '0.0.0-dev'
+    }
+
     let publicDir: string = app
 
     if (app === CardinalApp.ADMIN) {
