@@ -72,8 +72,12 @@ const AudioPlayer = ({
     dispatch(audioActions.pause(player.id))
   }
 
-  const handlePrevClick = () => {
-    dispatch(previous({ playerId: player.id }))
+  const handlePrevClick = async () => {
+    const seek = typeof howl?.seek() === 'number' ? (howl.seek() as number) : 0
+    const result = await dispatch(previous({ playerId: player.id, seek }))
+    if (result.payload && 'resetSeek' in result.payload && result.payload.resetSeek) {
+      howl?.seek(0)
+    }
   }
 
   const handleNextClick = () => {
