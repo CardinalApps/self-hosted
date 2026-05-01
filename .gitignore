@@ -9,6 +9,7 @@ out
 dist
 build
 bin
+*.tsbuildinfo
 
 .vercel
 .turbo
