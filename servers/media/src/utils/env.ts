@@ -11,7 +11,7 @@ import { MediaType, MediaDirsType } from './media'
 export enum Env {
   CONTAINER = 'container',
   LINUX = 'linux',
-  //darwin = 'darwin',
+  DARWIN = 'darwin',
   //win32 = 'win32',
 }
 
@@ -135,6 +135,13 @@ export function getAppDir(...args): string {
         return path.join(osenv.home(), '.config', 'cardinal-media-server-dev', ...args)
       } else {
         return path.join(osenv.home(), '.config', 'cardinal-media-server', ...args)
+      }
+
+    case Env.DARWIN:
+      if (getCurrentMode() === Mode.DEVELOPMENT) {
+        return path.join(osenv.home(), 'Library', 'Application Support', 'cardinal-media-server-dev', ...args)
+      } else {
+        return path.join(osenv.home(), 'Library', 'Application Support', 'cardinal-media-server', ...args)
       }
 
     default:
