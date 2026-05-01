@@ -7,15 +7,23 @@ import { PLAYBACK_STATE, STORE_KEY } from '../constants'
 import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
 import queryParams from '../../../../lib/net/queryParams'
 
-import { getHowl } from '../../../../hooks/useHowler'
-
 export type PrevArgs = {
   playerId?: string,
+  seek?: number,
 }
 
 export type PrevReturn = {
   playerId: string,
   update?: Partial<Player>,
+
+  /**
+   * The logic for whether we should reset the seek to 0 or actually go 
+   * back a track must execute outside of this file beacuse this file is 
+   * used by both regular React (web) and React Native, and they use different
+   * audio drivers (Howler vs react-native-audio-player), and these drivers are
+   * where the current seek value is stored.
+   */
+  resetSeek?: boolean,
 }
 
 /**
@@ -30,7 +38,7 @@ const previous = createAsyncThunk<
     rejectValue: { error: string },
   }
 >(`${STORE_KEY}/previous`, async (args, thunkAPI): Promise<PrevReturn> => {
-  const { playerId } = args
+  const { playerId, seek = 0 } = args
   const state = thunkAPI.getState()
 
   const workToDo: PrevReturn = {
@@ -50,12 +58,9 @@ const previous = createAsyncThunk<
     return workToDo
   }
 
-  const howl = getHowl(playerId)
-
-  // Reset current track
-  if (howl.seek() > 8) {
-    howl.seek(0)
-    return workToDo
+  // Reset current track when clicking before a certain threshold
+  if (seek > 8) {
+    return { ...workToDo, resetSeek: true }
   }
 
   const [prevQueueItems] = await homeServerAPI<[QueueItem[], number]>(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
@@ -66,10 +71,8 @@ const previous = createAsyncThunk<
 
   const prevQueueItem = prevQueueItems?.[0]
 
-  // Restart first track
   if (!prevQueueItem) {
-    howl.seek(0)
-    return workToDo
+    return { ...workToDo, resetSeek: true }
   }
 
   // New (previous) track, same queue.
