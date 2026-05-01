@@ -2,6 +2,7 @@
 
 services:
   cardinal-media-server-beta-postgres:
+    platform: linux/x86_64
     image: cardinalapps/media-server:beta
     container_name: cardinal-media-server-beta-postgres
     ports:
