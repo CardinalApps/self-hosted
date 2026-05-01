@@ -20,6 +20,8 @@ services:
     restart: always
     volumes:
       - cardinal-auth-server:/data/db
+    ports:
+      - "27017:27017"
     networks:
       database-network:
         ipv4_address: 172.20.0.3
