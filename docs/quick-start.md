@@ -25,7 +25,10 @@ Before beginning, your machine will need:
 ## 3. Run the development apps
 
   ```bash
-  # Back in the monorepo root, start all apps in development mode
+  # Back in the monorepo root, run the builds
+  pnpm build
+
+  # Then start all apps in development mode
   pnpm dev
   ```
 
