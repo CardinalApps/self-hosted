@@ -11,6 +11,7 @@
     "./express": "./express.json",
     "./library": "./library.json",
     "./nest": "./nest.json",
+    "./react-native": "./react-native.json",
     "./vite": "./vite.json"
   }
 }
