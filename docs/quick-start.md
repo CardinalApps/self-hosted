@@ -11,25 +11,29 @@ Before beginning, your machine will need:
 3. pnpm
     1. Install it by running `npm i -g pnpm@10` after installing Node.js
 
-## 2. Install the monorepo dependencies
+## 2. Start the dev databases
 
   ```bash
-  # In the monorepo root
-  pnpm i
-
-  # Then start the development databases
   cd compose/databases/
   docker compose up -d
   ```
 
-## 3. Run the development apps
+## 3. Run the dev env
+
+Run these in the root of the monorepo.
 
   ```bash
-  # Back in the monorepo root, run the builds
+  # Install all dependencies
+  pnpm i
+
+  # Build all packages
   pnpm build
 
-  # Then start all apps in development mode
+  # Interactive launch
   pnpm dev
+
+  # Optional: launch shortcuts
+  pnpm dev -yyn
   ```
 
   Some apps may require environment variables. Those apps will have a
