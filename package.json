@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "turbo run dev --ui=tui --concurrency=25",
+    "dev:web": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/music-rn --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/feedback-server --filter=!@cardinalapps/media-server",
     "dev:wos": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server --filter=!@cardinalapps/feedback-server --filter=!@cardinalapps/media-server",
     "dev:woms": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/media-server",
     "dev:woas": "turbo run dev --ui=tui --concurrency=25 --filter=!@cardinalapps/auth-server",
