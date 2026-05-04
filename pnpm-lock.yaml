@@ -462,13 +462,13 @@ importers:
         version: 2.2.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))
       '@react-navigation/bottom-tabs':
         specifier: ^7.15.11
-        version: 7.15.11(@react-navigation/native@7.2.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-screens@4.16.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
+        version: 7.15.11(@react-navigation/native@7.2.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.7.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-screens@4.24.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
       '@react-navigation/native':
         specifier: ^7.2.2
         version: 7.2.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
       '@react-navigation/native-stack':
         specifier: ^7.14.12
-        version: 7.14.12(@react-navigation/native@7.2.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-screens@4.16.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
+        version: 7.14.12(@react-navigation/native@7.2.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.7.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native-screens@4.24.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
       '@reduxjs/toolkit':
         specifier: ^2.11.2
         version: 2.11.2(react-redux@9.2.0(@types/react@19.1.5)(react@19.1.0)(redux@5.0.1))(react@19.1.0)
@@ -486,10 +486,10 @@ importers:
         version: 0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0)
       react-native-safe-area-context:
         specifier: ^5.6.2
-        version: 5.6.2(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
+        version: 5.7.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
       react-native-screens:
         specifier: ^4.16.0
-        version: 4.16.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
+        version: 4.24.0(react-native@0.81.5(@babel/core@7.27.1)(@react-native-community/cli@13.6.9)(@types/react@19.1.5)(react@19.1.0))(react@19.1.0)
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.1.5)(react@19.1.0)(redux@5.0.1)
