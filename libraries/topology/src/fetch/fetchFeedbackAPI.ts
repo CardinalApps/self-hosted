@@ -43,25 +43,28 @@ export function fetchFeedbackAPI<T>(
             .then((data) => resolve(data))
             .catch((e) => resolve(e))
         } else {
+          const rateLimitReset = res.headers.get('RateLimit-Reset')
+          const retryAfterSeconds = rateLimitReset ? parseInt(rateLimitReset, 10) : undefined
+
           const textBackup = res.clone()
           res.json()
             .then((data) => {
               if (data) {
-                reject(data)
+                reject({ message: data, retryAfterSeconds })
               } else {
-                reject(res.statusText)
+                reject({ message: res.statusText, retryAfterSeconds })
               }
             })
             .catch(() => {
               textBackup.text()
                 .then((msg) => {
                   if (msg) {
-                    reject(msg)
+                    reject({ message: msg, retryAfterSeconds })
                   } else {
-                    reject(res.statusText)
+                    reject({ message: res.statusText, retryAfterSeconds })
                   }
                 })
-                .catch(() => reject(res.statusText))
+                .catch(() => reject({ message: res.statusText, retryAfterSeconds }))
             })
         }
       })
