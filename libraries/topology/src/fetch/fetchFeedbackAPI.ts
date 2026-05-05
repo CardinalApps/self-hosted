@@ -1,8 +1,11 @@
 import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../cloudEdge'
 
+const CLOUD_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/cloud_user_tolkien'
+
 type FetchFeedbackAPIOptions = {
   headers?: HeadersInit,
   body?: Record<string, unknown>,
+  accessToken?: boolean,
 }
 
 const defaultOptions: FetchFeedbackAPIOptions = {
@@ -21,6 +24,17 @@ export function fetchFeedbackAPI<T>(
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     options = { ...defaultOptions, ...options }
+
+    if (options.accessToken) {
+      const token = localStorage.getItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY)
+
+      if (token) {
+        options.headers = {
+          'Authorization': `Bearer ${token}`,
+          ...options.headers,
+        }
+      }
+    }
 
     if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {
       options.headers = {
