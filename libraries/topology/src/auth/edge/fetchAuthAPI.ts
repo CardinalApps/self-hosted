@@ -1,4 +1,4 @@
-import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../cloudEdge'
+import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../../cloudEdge'
 
 type FetchAuthAPIOptions = {
   headers?: HeadersInit,
@@ -12,9 +12,6 @@ const defaultsOptions = {
   returnRawResponse: false,
 }
 
-/**
- * A function for fetching from the auth API.
- */
 export function fetchAuthAPI<T>(
   endpoint: Endpoint,
   method: HTTPMethod = 'GET',

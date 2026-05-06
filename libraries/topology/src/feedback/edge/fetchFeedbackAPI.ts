@@ -1,4 +1,4 @@
-import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../cloudEdge'
+import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../../cloudEdge'
 
 const CLOUD_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/cloud_user_tolkien'
 
@@ -13,9 +13,6 @@ const defaultOptions: FetchFeedbackAPIOptions = {
   body: {},
 }
 
-/**
- * A function for fetching from the feedback API.
- */
 export function fetchFeedbackAPI<T>(
   endpoint: Endpoint,
   method: HTTPMethod = 'GET',
