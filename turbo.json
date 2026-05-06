@@ -26,6 +26,34 @@
     "serve": {
       "dependsOn": ["^serve"]
     },
+    "@cardinalapps/access-control#dev": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
+    },
+    "@cardinalapps/topology#dev": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
+    },
+    "@cardinalapps/app-settings#dev": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
+    },
+    "@cardinalapps/products#dev": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
+    },
+    "@cardinalapps/cloud-entry#dev": {
+      "dependsOn": [
+        "@cardinalapps/access-control#build",
+        "@cardinalapps/topology#build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
     "@cardinalapps/feedback-server#dev": {
       "dependsOn": [
         "@cardinalapps/topology#build"
