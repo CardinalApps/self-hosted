@@ -2,11 +2,17 @@ name: 🛁 Code Validation
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'apps/**'
       - 'config/**'
       - 'libraries/**'
       - 'servers/**'
+      - '!**/*.md'
+      - '!**/README*'
+      - '!**/.gitignore'
+      - '!**/LICENSE*'
 
 jobs:
   discover:
