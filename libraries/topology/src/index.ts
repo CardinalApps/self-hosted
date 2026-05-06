@@ -1,3 +1,3 @@
 export * from './cloudEdge'
-export * from './fetch/fetchAuthAPI'
-export * from './fetch/fetchFeedbackAPI'
+export * from './auth/edge/fetchAuthAPI'
+export * from './feedback/edge/fetchFeedbackAPI'

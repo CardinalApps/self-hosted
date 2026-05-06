@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "dev:pg": "CARDINAL_POSTGRES=true nest start --watch",
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf dist tsconfig.build.tsbuildinfo",
     "build": "nest build",
     "build:bin": "pkg --config ./package.json --out-path ./bin/prod ./dist/main.js",
     "build:bin:dev": "pkg --debug --config ./package.json --out-path ./bin/dev ./dist/main.js",
