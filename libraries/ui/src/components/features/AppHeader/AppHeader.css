@@ -138,8 +138,6 @@
   }
 
   .cloud-status-icon {
-    position: relative;
-    top: 1px;
 
     .status-dots {
       display: flex;
