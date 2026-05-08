@@ -75,7 +75,7 @@ const MenuButton = ({
   return (
     <div ref={ref} className={`menu-button align-${align} ${className ? className : ''}`}>
       <button
-        className={`size-${size} ${solid ? 'solid': ''} ${isOpen ? 'open' : ''}`}
+        className={`size-${size} ${solid ? 'solid' : ''} ${isOpen ? 'open' : ''}`}
         type="button"
         onClick={handleOnClick}
         style={overrideButtonStyle}
