@@ -11,6 +11,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common'
 import {
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger'
 import type { Response } from 'express'
@@ -27,6 +28,7 @@ import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
 import { TranscodingService } from '../transcoding/transcoding.service'
 import { EventService } from '../event/event.service'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { ApiSecurityTypes } from '../../guards/types'
 
 @Controller()
 @ApiTags('Music')
@@ -76,6 +78,7 @@ export class MusicTrackController {
     description: 'Stream a music track using either direct stream or transcoding.',
     capabilities: ['MusicTracks.Play'],
   })
+  @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT_QUERY)
   async streamMusicTrack(
     @Param() { id }: StreamMusicTrackDto,
     @Query() query: StreamMusicTrackQueryDto,
@@ -88,14 +91,51 @@ export class MusicTrackController {
       throw new NotFoundException()
     }
 
-    // On-the-fly transcoding
-    if (query.transcode) {
-      const stream = this.transcodingService.transcodeAudioToMp3(musicTrack.file.absolutePath, query.bitrate)
+    // On-the-fly transcoding — skip if the source is already MP3
+    if (query.transcode && musicTrack.file.extension !== 'mp3') {
+      // CBR MP3 byte-time mapping. Used to estimate total size and to translate
+      // Range requests in bytes into FFmpeg seek positions in seconds.
+      const bytesPerSecond = query.bitrate * 1000 / 8
+      const totalBytes = musicTrack.duration
+        ? Math.ceil(musicTrack.duration * bytesPerSecond)
+        : 0
 
-      res.set({
-        'Content-Type': 'audio/mpeg',
-        'Accept-Ranges': 'none',
-      })
+      const range = req.header('range') as unknown as string
+
+      let start = 0
+      let end = totalBytes ? totalBytes - 1 : 0
+
+      if (range && totalBytes) {
+        const parts = range.replace(/bytes=/, '').split('-')
+        start = parseInt(parts[0], 10) || 0
+        end = parts[1] ? parseInt(parts[1], 10) : totalBytes - 1
+      }
+
+      const startSeconds = start / bytesPerSecond
+      const stream = this.transcodingService.transcodeAudioToMp3(
+        musicTrack.file.absolutePath,
+        query.bitrate,
+        startSeconds,
+      )
+
+      if (range && totalBytes) {
+        res.status(206)
+        res.set({
+          'Content-Type': 'audio/mpeg',
+          'Accept-Ranges': 'bytes',
+          'Content-Range': `bytes ${start}-${end}/${totalBytes}`,
+          'Content-Length': end - start + 1,
+        })
+      } else {
+        const headers: Record<string, string | number> = {
+          'Content-Type': 'audio/mpeg',
+          'Accept-Ranges': totalBytes ? 'bytes' : 'none',
+        }
+        if (totalBytes) {
+          headers['Content-Length'] = totalBytes
+        }
+        res.set(headers)
+      }
 
       return new StreamableFile(stream)
     }

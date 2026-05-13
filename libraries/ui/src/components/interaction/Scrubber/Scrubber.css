@@ -12,6 +12,17 @@
     position: relative;
     background-color: var(--bg-5);
 
+    .scrubber-bar-buffered {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      border-radius: 4px;
+      pointer-events: none;
+      background-color: var(--accent-color);
+      opacity: 0.3;
+    }
+
     .scrubber-bar-fill {
       position: absolute;
       left: 0;

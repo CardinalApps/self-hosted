@@ -13,6 +13,7 @@ export const setupOpenApiDoc = () => {
         <li><code>@cardinal/cloud_user_tolkien</code>: Token for a Cardinal cloud account. Some endpoints require this in addition to the other token.</li>
       </ul>
       <p>Use the <code>home_server_user_tolkien</code> as the main authorization token in this API. Use the <code>cloud_user_tolkien</code> for endpoints that require the <code>CardinalTolkien</code> parameter or header.</p>
+      <p>Some endpoints (e.g. audio streaming) accept the local user JWT as a <code>token</code> query parameter instead of the <code>Authorization</code> header, for contexts where custom request headers cannot be set (such as the browser's native <code>&lt;audio&gt;</code> element). The query parameter takes lower priority than the header; use the header wherever possible.</p>
       <h2>Deleting Things</h2>
       <p>None of the deletion endpoints in this API will delete your source media files. The only files that Cardinal will delete are the ones from its own cache. Rest assured that you can delete things from your database and your original files will stay safe.</p>
     `)
@@ -26,6 +27,15 @@ export const setupOpenApiDoc = () => {
         in: 'Header',
       },
       'Local User JWT',
+    )
+    .addApiKey(
+      {
+        name: 'token',
+        description: 'Alternative to the Authorization header for contexts where custom headers cannot be set (e.g. browser native audio/video elements). Pass the local user JWT as the `token` query parameter. Use the Authorization header instead whenever possible.',
+        type: 'apiKey',
+        in: 'query',
+      },
+      'Local User JWT (Query Parameter)',
     )
     .build()
 }

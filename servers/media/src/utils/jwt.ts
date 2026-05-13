@@ -44,6 +44,24 @@ export const getJWTFromHeaders = (headers): string | undefined | null => {
 }
 
 /**
+ * Returns the *unverified* token given as the `token` query parameter.
+ * Used for HTML5 Audio requests where the browser cannot set custom headers.
+ */
+export const getJWTFromQuery = (query): string | undefined | null => {
+  const token = query?.['token']
+
+  if (token === 'null') {
+    return null
+  }
+
+  if (token === 'undefined') {
+    return undefined
+  }
+
+  return token
+}
+
+/**
  * Returns the *unverified* token given in the CardinalTolkien header.
  */
 export const getCardinalTolkienFromHeaders = (headers): string | undefined | null => {
