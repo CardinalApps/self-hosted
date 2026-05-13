@@ -39,6 +39,10 @@
       gap: 3px;
     }
   }
+
+  .total-time {
+    white-space: nowrap;
+  }
 }
 
 .audio-player[data-size="mini"] {

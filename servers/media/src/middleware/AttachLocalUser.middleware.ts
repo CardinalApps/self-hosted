@@ -4,7 +4,7 @@ import { NextFunction } from 'express'
 import { UserService } from '../modules/user/user.service'
 import { TokenService } from '../modules/auth/token.service'
 
-import { getJWTFromHeaders } from '../utils/jwt'
+import { getJWTFromHeaders, getJWTFromQuery } from '../utils/jwt'
 
 /**
  * This middleware reads the JWT in the Authorization header and verifies the
@@ -27,7 +27,7 @@ export class AttachLocalUserToRequest implements NestMiddleware {
   ) {}
 
   async use(request, response, next: NextFunction): Promise<void> {
-    const localUserJWT = getJWTFromHeaders(request.headers)
+    const localUserJWT = getJWTFromHeaders(request.headers) ?? getJWTFromQuery(request.query)
 
     // The token is optional
     if (!localUserJWT) {

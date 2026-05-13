@@ -14,6 +14,7 @@ type ScrubberProps = {
   value?: number,
   min?: number,
   max?: number,
+  buffered?: number,
   isPlaying?: boolean,
   rate?: number,
   className?: string,
@@ -30,6 +31,7 @@ const Scrubber = ({
   value,
   min = 0,
   max = 100,
+  buffered = 0,
   onChangeStart = () => {},
   onChange = () => {},
   onChangeEnd = () => {},
@@ -151,6 +153,12 @@ const Scrubber = ({
       onTouchStart={handleTouchStart}
     >
       <div className="scrubber-bar">
+        <div
+          className="scrubber-bar-buffered"
+          style={{
+            width: `${max > 0 ? Math.min(100, (buffered / max) * 100) : 0}%`,
+          }}
+        />
         <div
           className="scrubber-bar-fill"
           style={{

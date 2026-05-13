@@ -7,7 +7,7 @@ import { getSetting } from '@cardinalapps/app-settings/src'
 import { SupportedLang } from '@cardinalapps/app-settings/src/types'
 import { audioSelectors, audioActions, Player } from '../../store/slices/music'
 import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../store/slices/music/constants'
-import { authorizedFetchHeaders, JWT_TYPE } from '../../lib/auth/jwt'
+import { authorizedFetchHeaders, getJwt, JWT_TYPE } from '../../lib/auth/jwt'
 import { settingsSelectors } from '../../store/slices/settings'
 import { useUpsertHistoryEntryMutation } from '../../store/apis/musicHistory'
 import next from '../../store/slices/music/thunks/next'
@@ -18,7 +18,10 @@ import { toastActions } from '../../store/slices/toast'
 import i18n from './i18n'
 
 const howls = {}
-const streamUrl = (id) => `${HOME_SERVER_HOST}/api/v1/music/stream/${id}?transcode&bitrate=320`
+const streamUrl = (id) => {
+  const token = getJwt(JWT_TYPE.HOME_SERVER_USER)
+  return `${HOME_SERVER_HOST}/api/v1/music/stream/${id}?transcode&bitrate=320${token ? `&token=${token}` : ''}`
+}
 
 export const getHowl = (playerId) => howls?.[playerId]
 export const hasHowl = (playerId) => !!howls?.[playerId]
@@ -69,8 +72,8 @@ export default function useHowler() {
     const howl = new Howl({
       src: [streamUrl(player.trackId)],
       format: ['mp3'],
+      html5: true,
       preload: true,
-      buffer: true,
       autoplay: player.state === PLAYBACK_STATE.PLAYING,
       xhr: {
         method: 'GET',

@@ -55,6 +55,7 @@ const AudioPlayer = ({
   const isPaused = player.state === PLAYBACK_STATE.PAUSED
   const musicBlobLoading = player.state === PLAYBACK_STATE.LOADING
   const [playbackSeconds, setPlaybackSeconds] = useState(0)
+  const [bufferedSeconds, setBufferedSeconds] = useState(0)
   const {
     data: musicTrackResponse,
     isLoading: musicTrackLoading,
@@ -116,6 +117,28 @@ const AudioPlayer = ({
         const seek = howl.seek()
         setPlaybackSeconds(seek)
         cacheSeekPosition(playerId, seek)
+
+        try {
+          const audioEl = howl._sounds[0]?._node as HTMLAudioElement
+          const ranges = audioEl?.buffered
+          if (ranges?.length) {
+            const currentTime = audioEl.currentTime ?? 0
+            let end = 0
+            for (let i = 0; i < ranges.length; i++) {
+              if (currentTime >= ranges.start(i) && currentTime <= ranges.end(i)) {
+                end = ranges.end(i)
+                break
+              }
+            }
+            // Fall back to the last range's end if currentTime isn't inside any range yet
+            if (end === 0) {
+              end = ranges.end(ranges.length - 1)
+            }
+            setBufferedSeconds(end)
+          }
+        } catch {
+          // buffered ranges can throw if the index changes between length check and access
+        }
       }, 250)
     }
 
@@ -211,19 +234,28 @@ const AudioPlayer = ({
         </div>
       </div>
       <div className="scrubber-row">
-        <Scrubber
-          className="no-collapse"
-          value={playbackSeconds}
-          min={0}
-          max={howl?.duration?.() || 0}
-          onChangeEnd={({ value }) => {
-            howl.seek(value)
-          }}
-        />
-        <div className="scrubber-time">
-          <time className="current-time">{secondsToMMSS(playbackSeconds)}</time> <span className="no-collapse">/</span>
-          <time className="total-time no-collapse">{secondsToMMSS(howl?.duration?.() || 0)}</time>
-        </div>
+        {(() => {
+          const rawDuration = howl?.duration?.()
+          const duration = Number.isFinite(rawDuration) ? rawDuration : (track?.duration ?? 0)
+          return (
+            <>
+              <Scrubber
+                className="no-collapse"
+                value={playbackSeconds}
+                buffered={bufferedSeconds}
+                min={0}
+                max={duration}
+                onChangeEnd={({ value }) => {
+                  howl.seek(value)
+                }}
+              />
+              <div className="scrubber-time">
+                <time className="current-time">{secondsToMMSS(playbackSeconds)}</time> <span className="no-collapse">/</span>
+                <time className="total-time no-collapse">{duration ? secondsToMMSS(duration) : '--:--'}</time>
+              </div>
+            </>
+          )
+        })()}
       </div>
     </div>
   )
