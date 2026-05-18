@@ -15,7 +15,6 @@ function HomeServerSettingsPanel() {
   return (
     <SettingsPanel
       app={CardinalApp.PHOTOS}
-      onClose={() => window.history.back()}
       lang={lang}
     />
   )

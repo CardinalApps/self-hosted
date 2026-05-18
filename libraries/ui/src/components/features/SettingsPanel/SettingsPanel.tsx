@@ -12,6 +12,7 @@ import Card from '../../layout/Card'
 import { settingsSelectors } from '../../../store/slices/settings'
 import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import { modalSelectors } from '../../../store/slices/modal'
+import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 import set from '../../../store/slices/settings/thunks/set'
 import sync from '../../../store/slices/settings/thunks/sync'
 import Field from './Field'
@@ -46,8 +47,27 @@ const SettingsPanel = ({
   const syncError = useSelector(settingsSelectors.syncError)
   const currentUser = useSelector(homeServerUserSelectors.current)
   const modalIsOpen = useSelector(modalSelectors.isOpen)
+  const settingsPanelTop = useSelector(layoutSelectors.settingsPanelTop)
   const [tabs] = useState(getFields(app, settings?.lang))
   const [activeTabIndex, setActiveTabIndex] = useState(0)
+
+  // Close the settings panel and notify the caller.
+  const handleClose = () => {
+    dispatch(layoutActions.setSettingsPanelOpen(false))
+    onClose?.()
+  }
+
+  // Step the panel's vertical position through these landing zones.
+  const positionStops = ['50px', '45vh', 'calc(-110px + 100vh)']
+  const currentStopIdx = positionStops.indexOf(settingsPanelTop)
+  const stepUp = () => {
+    const idx = Math.max(0, (currentStopIdx === -1 ? 1 : currentStopIdx) - 1)
+    dispatch(layoutActions.setSettingsPanelTop(positionStops[idx]))
+  }
+  const stepDown = () => {
+    const idx = Math.min(positionStops.length - 1, (currentStopIdx === -1 ? 1 : currentStopIdx) + 1)
+    dispatch(layoutActions.setSettingsPanelTop(positionStops[idx]))
+  }
 
   /**
    * Inject all custom tabs after the default tabs.
@@ -85,12 +105,8 @@ const SettingsPanel = ({
    */
   useEffect(() => {
     const onEsc = (e) => {
-      if (e.key === 'Escape') {
-        if (typeof onClose === 'function') {
-          if (!modalIsOpen) {
-            onClose()
-          }
-        }
+      if (e.key === 'Escape' && !modalIsOpen) {
+        handleClose()
       }
     }
 
@@ -100,6 +116,17 @@ const SettingsPanel = ({
 
   return (
     <section className="settings-panel" data-app={app}>
+      <aside className="settings-panel-position-controls">
+        <button type="button" className="close" aria-label="Close settings" onClick={handleClose}>
+          <i className="fas fa-times" />
+        </button>
+        <button type="button" aria-label="Expand panel" onClick={stepUp}>
+          <i className="fas fa-chevron-up" />
+        </button>
+        <button type="button" aria-label="Collapse panel" onClick={stepDown}>
+          <i className="fas fa-chevron-down" />
+        </button>
+      </aside>
       <div className="panel">
         <aside className="sidebar">
           <div className="title">
@@ -124,12 +151,7 @@ const SettingsPanel = ({
         </aside>
         <div className="panel-content">
           <H2 className="panel-title">
-            <>
-              {withCustomTabs(tabs)[activeTabIndex].tabName}
-              <button className="close" type="button" onClick={onClose}>
-                <i className="fas fa-times-circle" />
-              </button>
-            </>
+            {withCustomTabs(tabs)[activeTabIndex].tabName}
           </H2>
           <form onSubmit={(e) => e.preventDefault()}>
             {withCustomTabs(tabs).map((tab, tabIndex) => {

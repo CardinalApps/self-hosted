@@ -15,7 +15,6 @@ function HomeServerSettingsPanel() {
   return (
     <SettingsPanel
       app={CardinalApp.MUSIC}
-      onClose={() => window.history.back()}
       lang={lang}
     />
   )

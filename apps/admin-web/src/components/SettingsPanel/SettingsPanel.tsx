@@ -19,7 +19,6 @@ function HomeServerSettingsPanel() {
   return (
     <SettingsPanel
       app={CardinalApp.ADMIN}
-      onClose={() => window.history.back()}
       lang="en"
       customTabs={[
         {

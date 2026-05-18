@@ -1,12 +1,82 @@
 .settings-panel {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
   padding: 40px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  margin: 0 20px;
+  overflow-y: auto;
+  pointer-events: all;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -12px 80px rgba(0, 0, 0, 0.15);
   background-color: var(--bg-2);
-  z-index: 10000;
+
+  &::-webkit-scrollbar {
+    width: 11px;
+  }
+  &::-webkit-scrollbar-track {
+    margin-top: 16px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-right: 1px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .settings-panel-position-controls {
+    position: fixed;
+    top: 16px;
+    right: calc(50vw - 550px);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    button {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border-color-3);
+      background-color: var(--bg-1);
+      color: var(--text-color-2);
+      cursor: pointer;
+      transition: transform 75ms, background-color 125ms;
+
+      &:hover {
+        transform: scale(1.06);
+
+        i {
+          color: var(--accent-color);
+        }
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      i {
+        font-size: 13px;
+      }
+
+      &.close {
+        margin-bottom: 6px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      top: -42px;
+      right: max(20px, calc(50vw - 500px));
+      flex-direction: row;
+
+      button.close {
+        margin-bottom: 0;
+        margin-right: 6px;
+      }
+    }
+  }
 
   .build-tag {
     padding: 5px 0 0 23px;
@@ -70,6 +140,7 @@
   }
 
   .panel-content {
+    padding-bottom: 30px;
 
     .panel-title {
       user-select: none;
@@ -253,31 +324,6 @@
     }
   }
 
-  .close {
-    padding: 0;
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    cursor: pointer;
-    border-radius: 100%;
-    background: none;
-    border: none;
-    transition: all 75ms;
-
-    &:hover {
-      transform: scale(1.06);
-    }
-
-    &:active {
-      transform: scale(1.02);
-    }
-
-    i {
-      font-size: 23px;
-      color: var(--text-color-2);
-    }
-  }
-
   @media (max-width: 768px) {
     padding: 40px var(--gutter) var(--gutter);
     overflow-y: auto;;
@@ -289,17 +335,13 @@
       }
     }
 
-    .close {
-      top: 4px;
-    }
-
     .sidebar {
 
       .title {
         display: none;
       }
     }
-    
+
     .panel {
       padding-left: 0;
     }
