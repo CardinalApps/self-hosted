@@ -32,6 +32,8 @@ export type LayoutSliceState = {
   },
   showLibrarySwitcher: boolean,
   pageDocLink: string,
+  settingsPanelOpen: boolean,
+  settingsPanelTop: string,
 
   // The actual current mode of the sidebar
   sidebarMode: SIDEBAR_MODE,
@@ -50,6 +52,8 @@ const initialState: LayoutSliceState = {
   actionButtons: {},
   showLibrarySwitcher: false,
   pageDocLink: '',
+  settingsPanelOpen: false,
+  settingsPanelTop: '45vh',
   sidebarMode: SIDEBAR_MODE.expanded,
   userSelectedSidebarMode: SIDEBAR_MODE.expanded,
 }
@@ -86,6 +90,15 @@ const layoutSlice = createSlice({
     },
     setShowLibrarySwitcher: (state, action: PayloadAction<boolean>) => {
       state.showLibrarySwitcher = action.payload
+    },
+    setSettingsPanelOpen: (state, action: PayloadAction<boolean>) => {
+      state.settingsPanelOpen = action.payload
+      if (!action.payload) {
+        state.settingsPanelTop = initialState.settingsPanelTop
+      }
+    },
+    setSettingsPanelTop: (state, action: PayloadAction<string>) => {
+      state.settingsPanelTop = action.payload
     },
     setUserSelectedSidebarMode: (state, action: PayloadAction<SIDEBAR_MODE>) => {
       state.userSelectedSidebarMode = action.payload
@@ -159,6 +172,8 @@ const layoutSlice = createSlice({
     virtualViews: (state) => state.virtualViews,
     scrollPoints: (state) => state.scrollPoints,
     showLibrarySwitcher: (state) => state.showLibrarySwitcher,
+    settingsPanelOpen: (state) => state.settingsPanelOpen,
+    settingsPanelTop: (state) => state.settingsPanelTop,
   },
 })
 

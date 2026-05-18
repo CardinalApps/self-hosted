@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import { RouterContext, RouterContextType } from '../../../context/router'
 import clsx from 'clsx'
@@ -114,6 +115,12 @@ function AppBase({
   const appRef = useRef(null)
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
+  const settingsPanelOpen = useSelector(layoutSelectors.settingsPanelOpen)
+  const settingsPanelTop = useSelector(layoutSelectors.settingsPanelTop)
+  // If the panel is already open at first render (hydrated from cached store),
+  // skip the slide-in animation. Cleared after the first commit so subsequent
+  // opens animate normally.
+  const skipSettingsPanelEnter = useRef(settingsPanelOpen)
   const appVersionInStore = useSelector(appSelectors.version)
   const health = useSelector(homeServerSelectors.health)
   const latestHealthResponse = useSelector(homeServerSelectors.latestHealthResponse)
@@ -208,6 +215,13 @@ function AppBase({
   }, [])
 
   /**
+   * Consume the "skip settings panel enter animation" flag after first commit.
+   */
+  useEffect(() => {
+    skipSettingsPanelEnter.current = false
+  }, [])
+
+  /**
    * Handle changes to the home server health.
    */
   useEffect(() => {
@@ -294,7 +308,6 @@ function AppBase({
                   ? <AppPrivate
                       header={header || defaultHeader}
                       sidebarOptions={sidebarOptions}
-                      settingsPanel={settingsPanel}
                       privateRoutes={privateRoutes}
                       publicRoutes={publicRoutes}
                       privateScaffoldRoutes={privateScaffoldRoutes}
@@ -307,6 +320,21 @@ function AppBase({
                     />
                 : <AppLoading />
               }
+              <AnimatePresence>
+                {settingsPanelOpen && settingsPanel && (
+                  <motion.div
+                    key="settings-panel-layer"
+                    className="settings-panel-layer"
+                    style={{ top: settingsPanelTop }}
+                    initial={skipSettingsPanelEnter.current ? false : { y: '100%' }}
+                    animate={{ y: 0 }}
+                    exit={{ y: '100%' }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+                  >
+                    {settingsPanel}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </>
           </ContextMenuDOMLayer>
         </ContextMenuRightClickSurface>

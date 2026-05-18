@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
@@ -11,14 +11,13 @@ import Button from '../Button'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { SupportedLang } from '@cardinalapps/app-settings/src/types'
-import { RouterContext } from '../../../context/router'
 import { cloudUserSelectors } from '../../../store/slices/cloudUser'
 import { appSelectors } from '../../../store/slices/app'
+import { layoutActions } from '../../../store/slices/layout'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import set from '../../../store/slices/settings/thunks/set'
 import UserTag from '../UserTag'
 import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
-import { routes } from '../../features/AppBase/routes'
 import Select from '../../forms/Select'
 
 import i18n from './i18n'
@@ -46,7 +45,11 @@ const UserMenu = ({
   const currentCloudUser = useSelector(cloudUserSelectors.current)
   const { lang, theme } = useSelector(settingsSelectors.current)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
-  const { navigate } = useContext(RouterContext)
+
+  const handleSettingsClick = () => {
+    setMenuIsOpen(false)
+    dispatch(layoutActions.setSettingsPanelOpen(true))
+  }
 
   const themeFieldFactory = getSetting('theme')
   const themeField = themeFieldFactory(app, lang as SupportedLang)
@@ -189,7 +192,7 @@ const UserMenu = ({
                           <div className="user-dropdown-button-group">
                             <ul>
                               <li>
-                                <Button onClick={() => navigate(routes.SETTINGS)} icon="fas fa-cog">
+                                <Button onClick={handleSettingsClick} icon="fas fa-cog">
                                   {i18n['user-menu.app-settings']['en']}
                                 </Button>
                               </li>
