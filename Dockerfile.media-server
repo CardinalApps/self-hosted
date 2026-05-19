@@ -1,6 +1,6 @@
 # We cannot use Alpine because Alpine uses musl instead of glibc, and we need
 # glibc because the binary is built on a glibc system.
-FROM node:18
+FROM node:22
 
 ARG BUILD_TAG
 ENV BUILD_TAG ${BUILD_TAG}
@@ -15,6 +15,11 @@ ENV CARDINAL_HOME_SERVER_PORT 24900
 
 ARG RELEASE_CHANNEL
 ENV RELEASE_CHANNEL ${RELEASE_CHANNEL}
+
+# Honored by `ffmpeg-static`; points at the binary copied next to media-server.
+# The bundled ffmpeg can't run from yao-pkg's virtual snapshot, so it ships
+# alongside on real disk.
+ENV FFMPEG_BIN /home/node/bin/ffmpeg
 
 WORKDIR /home/node
 

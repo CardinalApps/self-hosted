@@ -23,7 +23,7 @@
     "build:website:image": "docker build -f Dockerfile.website -t cardinalapps/website:latest .",
     "serve": "turbo run serve",
     "test": "turbo run test --force --concurrency=1",
-    "e2e": "pnpm --filter @cardinalapps/e2e test",
+    "e2e": "pnpm --filter @cardinalapps/e2e e2e",
     "e2e:install": "pnpm --filter @cardinalapps/e2e install:browsers"
   },
   "devDependencies": {

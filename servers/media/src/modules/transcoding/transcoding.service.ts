@@ -2,10 +2,15 @@ import { spawn } from 'child_process'
 import { PassThrough } from 'stream'
 import { Injectable, Logger } from '@nestjs/common'
 
+import { envVar } from '../../utils/env'
 import { log, LogModule, LogLevel } from '../../utils/logging'
 
+// FFMPEG_PATH lets the user point at any ffmpeg build. Otherwise fall back to
+// `ffmpeg-static`, which in the bundled binary resolves via FFMPEG_BIN (set in
+// the Dockerfile to the ffmpeg copy shipped next to the executable, since
+// yao-pkg's virtual snapshot can't be spawn()'d directly).
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const ffmpegPath: string = require('ffmpeg-static')
+const ffmpegPath: string = (envVar('FFMPEG_PATH', null) as string) || require('ffmpeg-static')
 
 @Injectable()
 export class TranscodingService {
