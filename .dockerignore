@@ -1,7 +1,13 @@
-npm-debug.log
-.dockerignore
 .git
 .gitignore
-
-// Not sure if needed for pkg
-//node_modules
+.dockerignore
+**/node_modules
+**/dist
+**/.turbo
+**/.next
+**/build
+**/coverage
+**/.env
+**/.env.*
+!**/.env.example
+npm-debug.log
