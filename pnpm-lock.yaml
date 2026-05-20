@@ -1724,12 +1724,18 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
       mongoose:
         specifier: ^7.8.8
         version: 7.8.8(@aws-sdk/credential-providers@3.817.0)
       pino-http:
         specifier: ^10.5.0
         version: 10.5.0
+      swagger-ui-express:
+        specifier: ^5.0.1
+        version: 5.0.1(express@5.2.1)
       ws:
         specifier: ^8.18.0
         version: 8.18.2
@@ -1746,12 +1752,18 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       '@types/node':
         specifier: ^22.13.4
         version: 22.15.21
       '@types/supertest':
         specifier: ^2.0.11
         version: 2.0.16
+      '@types/swagger-ui-express':
+        specifier: ^4.1.6
+        version: 4.1.8
       '@types/ws':
         specifier: ^8.5.13
         version: 8.18.1
@@ -7115,6 +7127,9 @@ packages:
 
   '@types/jest@30.0.0':
     resolution: {integrity: sha512-XTYugzhuwqWjws0CVz8QpM36+T+Dz5mTEBKhNs/esGLnCIlGdRy+Dq78NRjd7ls7r8BC8ZRMOrKlkO1hU0JOwA==}
+
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -25492,6 +25507,8 @@ snapshots:
     dependencies:
       expect: 30.3.0
       pretty-format: 30.3.0
+
+  '@types/js-yaml@4.0.9': {}
 
   '@types/json-schema@7.0.15': {}
 
