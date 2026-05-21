@@ -24,6 +24,7 @@
     "serve": "turbo run serve",
     "test": "turbo run test --force --concurrency=1",
     "e2e": "pnpm --filter @cardinalapps/e2e e2e",
+    "e2e:ui": "pnpm --filter @cardinalapps/e2e e2e:ui",
     "e2e:install": "pnpm --filter @cardinalapps/e2e install:browsers"
   },
   "devDependencies": {
