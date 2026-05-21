@@ -32,6 +32,18 @@
       "type": "node-terminal"
     },
     {
+      "name": "Remote Access Server",
+      "command": "cd ./servers/remote-access && pnpm dev",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Test Remote Access Server",
+      "command": "cd ./servers/remote-access && pnpm test",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
       "name": "Status App",
       "command": "cd ./apps/status-web && pnpm dev",
       "request": "launch",
