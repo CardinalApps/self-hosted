@@ -124,7 +124,13 @@ const authAPI = async <T>(
     } catch {
       throw new Error(text)
     }
-    throw parsed
+    // Normalize server JSON errors of the form { message: "..." } to a real
+    // Error instance so callers can rely on `err instanceof Error` and
+    // `err.message` regardless of whether the server returned text or JSON.
+    if (parsed && typeof parsed === 'object' && typeof (parsed as { message?: unknown }).message === 'string') {
+      throw new Error((parsed as { message: string }).message)
+    }
+    throw new Error(text)
   }
 }
 
