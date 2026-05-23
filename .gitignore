@@ -18,6 +18,10 @@ bin
 
 storybook-static
 
+# Playwright e2e suite artifacts
+**/e2e/test-results
+**/playwright-report
+
 servers/media/public/admin
 servers/media/public/cinema
 servers/media/public/music
