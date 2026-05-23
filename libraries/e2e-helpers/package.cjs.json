@@ -1,0 +1,8 @@
+{
+  "name": "@cardinalapps/e2e-helpers",
+  "description": "Shared Playwright + auth-server helpers for end-to-end test suites across Cardinal apps.",
+  "license": "Elastic License 2.0 (ELv2)",
+  "version": "0.1.0",
+  "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+  "private": true
+}

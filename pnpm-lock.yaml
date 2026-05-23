@@ -63,6 +63,9 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
     devDependencies:
+      '@cardinalapps/e2e-helpers':
+        specifier: workspace:*
+        version: link:../../libraries/e2e-helpers
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
@@ -166,6 +169,9 @@ importers:
         specifier: ^11.0.5
         version: 11.1.0
     devDependencies:
+      '@cardinalapps/e2e-helpers':
+        specifier: workspace:*
+        version: link:../../libraries/e2e-helpers
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
@@ -175,6 +181,9 @@ importers:
       '@eslint/js':
         specifier: 9.20.0
         version: 9.20.0
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.59.1
       '@types/ms':
         specifier: ^2.1.0
         version: 2.1.0
@@ -927,6 +936,24 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  libraries/e2e-helpers:
+    devDependencies:
+      '@cardinalapps/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.59.1
+      '@types/node':
+        specifier: ^22.13.4
+        version: 22.15.21
+      eslint:
+        specifier: 9.20.1
+        version: 9.20.1(jiti@1.21.7)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
   libraries/logger:
     dependencies:
       pino:
@@ -1250,6 +1277,18 @@ importers:
       vite:
         specifier: ^6.1.0
         version: 6.3.5(@types/node@25.6.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.89.0)(terser@5.39.2)(tsx@4.21.0)(yaml@2.8.0)
+
+  scripts/screenshots:
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.59.1
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
 
   servers/auth:
     dependencies:
@@ -1733,6 +1772,9 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
+      express-rate-limit:
+        specifier: ^7.5.1
+        version: 7.5.1(express@5.2.1)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
@@ -7325,6 +7367,9 @@ packages:
 
   '@types/node@17.0.45':
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
+
+  '@types/node@20.19.41':
+    resolution: {integrity: sha512-ECymXOukMnOoVkC2bb1Vc/w/836DXncOg5m8Xj1RH7xSHZJWNYY6Zh7EH477vcnD5egKNNfy2RpNOmuChhFPgQ==}
 
   '@types/node@22.15.21':
     resolution: {integrity: sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==}
@@ -25959,6 +26004,10 @@ snapshots:
   '@types/node@16.18.126': {}
 
   '@types/node@17.0.45': {}
+
+  '@types/node@20.19.41':
+    dependencies:
+      undici-types: 6.21.0
 
   '@types/node@22.15.21':
     dependencies:
