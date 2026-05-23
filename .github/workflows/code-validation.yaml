@@ -81,6 +81,7 @@ jobs:
     needs: discover
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         package: ${{ fromJson(needs.discover.outputs.lint-packages) }}
     steps:
@@ -96,9 +97,13 @@ jobs:
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
     runs-on: self-hosted
-    needs: discover
+    # Serialize after lint so only one matrix job runs at a time on the shared
+    # self-hosted VM. Runs regardless of lint outcome as long as discover succeeded.
+    needs: [discover, lint]
+    if: ${{ needs.discover.result == 'success' }}
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         package: ${{ fromJson(needs.discover.outputs.typecheck-packages) }}
     steps:
