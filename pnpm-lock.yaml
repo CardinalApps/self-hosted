@@ -925,10 +925,16 @@ importers:
       '@cardinalapps/topology':
         specifier: workspace:*
         version: link:../topology
+      jsonwebtoken:
+        specifier: ^8.5.1
+        version: 8.5.1
     devDependencies:
       '@types/express':
         specifier: ^4.17.22
         version: 4.17.22
+      '@types/jsonwebtoken':
+        specifier: ^8.5.9
+        version: 8.5.9
       '@types/node':
         specifier: ^25.0.3
         version: 25.6.0
@@ -7298,6 +7304,9 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  '@types/jsonwebtoken@8.5.9':
+    resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}
 
   '@types/jsonwebtoken@9.0.5':
     resolution: {integrity: sha512-VRLSGzik+Unrup6BsouBeHsf4d1hOEgYWTm/7Nmw1sXoN1+tRly/Gy/po3yeahnP4jfnQWWAhQAqcNfH7ngOkA==}
@@ -25924,6 +25933,10 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
+
+  '@types/jsonwebtoken@8.5.9':
+    dependencies:
+      '@types/node': 25.6.0
 
   '@types/jsonwebtoken@9.0.5':
     dependencies:
