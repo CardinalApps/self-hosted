@@ -17,7 +17,7 @@ on:
 jobs:
   discover:
     name: Discover packages
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       lint-packages: ${{ steps.discover.outputs.lint-packages }}
       typecheck-packages: ${{ steps.discover.outputs.typecheck-packages }}
@@ -25,17 +25,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install workspace deps
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
 
       - name: Discover packages
         id: discover
@@ -74,7 +71,7 @@ jobs:
 
   lint:
     name: "Lint (${{ matrix.package.label }})"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: discover
     strategy:
       fail-fast: false
@@ -92,7 +89,7 @@ jobs:
 
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: discover
     strategy:
       fail-fast: false
@@ -110,7 +107,7 @@ jobs:
 
   validate:
     name: Code Validation
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [lint, typecheck]
     if: always()
     steps:

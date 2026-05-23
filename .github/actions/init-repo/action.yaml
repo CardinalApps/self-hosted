@@ -5,21 +5,18 @@ description: Initialize the workspace for CI tasks by installing dependencies of
 runs:
   using: composite
   steps:
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version-file: .nvmrc
         cache: 'pnpm'
-        
+
     - name: Install Turborepo
       run: npm i -g turbo
       shell: bash
 
     - name: Install workspace deps
-      run: pnpm i
+      run: pnpm install --frozen-lockfile
       shell: bash
 
     - name: Build library packages
