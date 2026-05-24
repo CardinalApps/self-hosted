@@ -10,6 +10,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { DevController } from './dev.controller'
 
 import { AuthModule } from '../auth/auth.module'
 import { DatabaseModule } from '../database/database.module'
@@ -169,7 +170,7 @@ const resolvePostgresHost = () => {
       }),
     ] : []),
   ],
-  controllers: [AppController],
+  controllers: [AppController, DevController],
   providers: [
     AppService,
     // Interceptors
