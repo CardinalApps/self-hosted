@@ -21,6 +21,7 @@ storybook-static
 # Playwright e2e suite artifacts
 **/e2e/test-results
 **/playwright-report
+.playwright-cli
 
 servers/media/public/admin
 servers/media/public/cinema
