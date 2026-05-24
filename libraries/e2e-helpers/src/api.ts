@@ -1,3 +1,7 @@
+import type { Page } from '@playwright/test'
+
+import { JWT_STORAGE_KEY } from './sso'
+
 // Use explicit IPv4 — Node 18+ resolves 'localhost' to ::1 (IPv6) which the auth server doesn't bind
 const AUTH_BASE = 'http://127.0.0.1:4013'
 
@@ -170,6 +174,34 @@ export async function deleteSelfHostedClaim(instanceId: string): Promise<void> {
     method: 'DELETE',
     headers: { 'User-Agent': BROWSER_UA },
   })
+}
+
+// Register a fresh user and seed the page's localStorage with their cloud JWT,
+// so the next navigation under the app's origin starts already logged in.
+// Skips the SSO popup. Caller must `deleteTestUser(jwt)` in a finally block.
+export async function seedLoggedInUser(
+  page: Page,
+  email: string,
+  password: string,
+  options: { confirmed?: boolean, mfa?: boolean } = {},
+): Promise<{ jwt: string, userId: string, email: string }> {
+  const jwt = await registerUser(email, password)
+  const userId = getUserIdFromJwt(jwt)
+
+  if (options.confirmed) await confirmUserEmail(userId)
+  if (options.mfa) await enableEmailMfa(jwt)
+
+  // Land on the app origin and wait for bootstrap to settle before writing the
+  // token. Writing into localStorage while the cloud SDK is still initializing
+  // races with its own JWT init, which silently clobbers the value we wrote.
+  await page.goto('/')
+  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
+  await page.evaluate(
+    ([key, value]) => localStorage.setItem(key, value),
+    [JWT_STORAGE_KEY, jwt] as const,
+  )
+
+  return { jwt, userId, email }
 }
 
 // Mark a user's email as confirmed via the dev-only endpoint. Most apps with
