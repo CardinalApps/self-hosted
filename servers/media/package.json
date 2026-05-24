@@ -24,7 +24,6 @@
     "start:bin:dev": "DEBUG_PKG=1 PHOTOS_DIR=/home/brian/Pictures FFMPEG_BIN=./bin/dev/@cardinalapps/ffmpeg ./bin/dev/@cardinalapps/media-server",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "NODE_ENV=development RELEASE_CHANNEL=development jest --verbose --detectOpenHandles --forceExit",
     "test:integration": "NODE_ENV=development jest --config ./tests/jest.integration.json --runInBand",
     "test:watch": "jest --watch",
