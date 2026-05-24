@@ -14,8 +14,8 @@ on:
       - '!**/.gitignore'
       - '!**/LICENSE*'
 
-# Shared group serializes against code-tests on the same ref so two large pnpm
-# installs don't run concurrently on the self-hosted pool.
+# Per-branch concurrency group. Serializes runs of this workflow per ref so two
+# pushes don't have overlapping installs on the shared self-hosted pool.
 concurrency:
   group: redwood-ci-${{ github.ref }}
   cancel-in-progress: false
@@ -27,6 +27,8 @@ jobs:
     outputs:
       lint-packages: ${{ steps.discover.outputs.lint-packages }}
       typecheck-packages: ${{ steps.discover.outputs.typecheck-packages }}
+      unit-packages: ${{ steps.discover.outputs.unit-packages }}
+      integration-packages: ${{ steps.discover.outputs.integration-packages }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,36 +46,30 @@ jobs:
         id: discover
         run: |
           PKGS=$(pnpm ls -r --depth -1 --json)
-          LINT=$(echo "$PKGS" | node -e "
-            const fs = require('fs');
-            const pkgs = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
-            const result = pkgs
-              .filter(p => p.path !== process.cwd())
-              .filter(p => {
-                try {
-                  const s = JSON.parse(fs.readFileSync(p.path + '/package.json', 'utf8')).scripts || {};
-                  return 'lint' in s;
-                } catch { return false; }
-              })
-              .map(p => ({ name: p.name, label: p.name.replace(/^[^/]+\//, '') }));
-            process.stdout.write(JSON.stringify(result));
-          ")
-          TYPECHECK=$(echo "$PKGS" | node -e "
-            const fs = require('fs');
-            const pkgs = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
-            const result = pkgs
-              .filter(p => p.path !== process.cwd())
-              .filter(p => {
-                try {
-                  const s = JSON.parse(fs.readFileSync(p.path + '/package.json', 'utf8')).scripts || {};
-                  return 'typecheck' in s;
-                } catch { return false; }
-              })
-              .map(p => ({ name: p.name, label: p.name.replace(/^[^/]+\//, '') }));
-            process.stdout.write(JSON.stringify(result));
-          ")
-          echo "lint-packages=$LINT" >> $GITHUB_OUTPUT
-          echo "typecheck-packages=$TYPECHECK" >> $GITHUB_OUTPUT
+          # Emit a JSON array of {name, label} for every workspace package whose
+          # package.json declares the given script. Used to drive matrix jobs.
+          discover() {
+            local SCRIPT="$1"
+            echo "$PKGS" | SCRIPT="$SCRIPT" node -e "
+              const fs = require('fs');
+              const script = process.env.SCRIPT;
+              const pkgs = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+              const result = pkgs
+                .filter(p => p.path !== process.cwd())
+                .filter(p => {
+                  try {
+                    const s = JSON.parse(fs.readFileSync(p.path + '/package.json', 'utf8')).scripts || {};
+                    return script in s;
+                  } catch { return false; }
+                })
+                .map(p => ({ name: p.name, label: p.name.replace(/^[^/]+\//, '') }));
+              process.stdout.write(JSON.stringify(result));
+            "
+          }
+          echo "lint-packages=$(discover lint)" >> $GITHUB_OUTPUT
+          echo "typecheck-packages=$(discover typecheck)" >> $GITHUB_OUTPUT
+          echo "unit-packages=$(discover test:unit)" >> $GITHUB_OUTPUT
+          echo "integration-packages=$(discover test:integration)" >> $GITHUB_OUTPUT
 
   lint:
     name: "Lint (${{ matrix.package.label }})"
@@ -97,8 +93,7 @@ jobs:
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
     runs-on: self-hosted
-    # Serialize after lint so only one matrix job runs at a time on the shared
-    # self-hosted VM. Runs regardless of lint outcome as long as discover succeeded.
+    # Serialize after lint so only one matrix runs at a time on the shared VM.
     needs: [discover, lint]
     if: ${{ needs.discover.result == 'success' }}
     strategy:
@@ -116,14 +111,59 @@ jobs:
       - name: Typecheck
         run: pnpm --filter="${{ matrix.package.name }}" typecheck
 
+  unit:
+    name: "Unit (${{ matrix.package.label }})"
+    runs-on: self-hosted
+    # Serialize after typecheck.
+    needs: [discover, typecheck]
+    if: ${{ needs.discover.result == 'success' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        package: ${{ fromJson(needs.discover.outputs.unit-packages) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Init repo
+        uses: ./.github/actions/init-repo
+
+      - name: Unit tests
+        run: pnpm --filter="${{ matrix.package.name }}" test:unit
+
+  integration:
+    name: "Integration (${{ matrix.package.label }})"
+    runs-on: self-hosted
+    # Serialize after unit.
+    needs: [discover, unit]
+    if: ${{ needs.discover.result == 'success' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        package: ${{ fromJson(needs.discover.outputs.integration-packages) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Init repo
+        uses: ./.github/actions/init-repo
+
+      - name: Integration tests
+        run: pnpm --filter="${{ matrix.package.name }}" test:integration
+
   validate:
     name: Code Validation
     runs-on: self-hosted
-    needs: [lint, typecheck]
+    needs: [lint, typecheck, unit, integration]
     if: always()
     steps:
       - name: Check results
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.typecheck.result }}" != "success" ]]; then
+          if [[ "${{ needs.lint.result }}" != "success" \
+             || "${{ needs.typecheck.result }}" != "success" \
+             || "${{ needs.unit.result }}" != "success" \
+             || "${{ needs.integration.result }}" != "success" ]]; then
             exit 1
           fi
