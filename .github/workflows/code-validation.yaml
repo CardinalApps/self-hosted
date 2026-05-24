@@ -79,7 +79,7 @@ jobs:
     runs-on: self-hosted
     needs: discover
     strategy:
-      fail-fast: false
+      fail-fast: true
       max-parallel: 3
       matrix:
         package: ${{ fromJson(needs.discover.outputs.lint-packages) }}
@@ -98,9 +98,8 @@ jobs:
     runs-on: self-hosted
     # Serialize after lint so only one matrix runs at a time on the shared VM.
     needs: [discover, lint]
-    if: ${{ needs.discover.result == 'success' }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       max-parallel: 3
       matrix:
         package: ${{ fromJson(needs.discover.outputs.typecheck-packages) }}
@@ -119,9 +118,8 @@ jobs:
     runs-on: self-hosted
     # Serialize after typecheck.
     needs: [discover, typecheck]
-    if: ${{ needs.discover.result == 'success' }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       max-parallel: 2
       matrix:
         package: ${{ fromJson(needs.discover.outputs.unit-packages) }}
@@ -140,9 +138,8 @@ jobs:
     runs-on: self-hosted
     # Serialize after unit.
     needs: [discover, unit]
-    if: ${{ needs.discover.result == 'success' }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       max-parallel: 2
       matrix:
         package: ${{ fromJson(needs.discover.outputs.integration-packages) }}
