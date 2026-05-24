@@ -26,20 +26,51 @@ Add to `apps/admin-web/e2e/journeys.ts`:
 
 - `first-time-setup` — Complete the first-time setup wizard on a fresh server
 - `factory-reset` — Reset the server back to a fresh state
+- `guest-login` — Sign in as the built-in Guest admin account (and disable/re-enable it)
+- `local-login` — Sign in with a local-account username + password
 - `view-overview` — View the overview dashboard widgets
 - `change-release-channel` — Switch release channel on the server widget
 - `manage-local-users` — Create / update / disable local users
 - `invite-cloud-user` — Generate and manage user invitations
 - `manage-roles` — View capabilities per role, assign roles to users
-- `manage-libraries` — Create / edit / delete media libraries, multi-path
+- `manage-libraries` — Create / configure / delete media libraries, multi-path, access control
+- `deindex-media` — Wipe the indexed-media catalog via the Indexing page
 - `run-indexing` — Start / pause / resume / stop an indexing run
 - `view-indexing-history` — View past indexing runs and their stats
-- `start-job` — Start a background job from the Jobs page
-- `manage-jobs` — Pause / resume / stop a running job; view history
+- `manage-jobs` — Observe automatic jobs; start/cancel a job manually if the UI exposes it
 - `access-control-gating` — Capability-gated UI hides/disables features for under-privileged roles
 - `change-app-settings` — Change theme / language / telemetry from the global settings panel
 
-(15 new admin-feature journeys + 5 existing SSO ones = 20 total declared.)
+(16 new admin-feature journeys + 5 existing SSO ones = 21 total declared.)
+
+## Key facts about the admin UI (verified via `playwright-cli` against running dev servers)
+
+These shaped the test areas below; the implementation should treat them as load-bearing assumptions, not guesses.
+
+- **Three login methods** at `/admin/login`: "Sign in with Cardinal Cloud" (popup, covered by existing tests), "Sign in with local account" (button — flow not yet inspected), and **"Sign in as Guest"** (clicks straight through to the dashboard).
+- **Guest account is a full Administrator** local account. It can be disabled from the Users page (documented in the help app). Disabling it removes the button from `/admin/login`. Tests that just need an admin-logged-in browser should prefer guest login over the SSO popup — it's vastly faster and skips the whole Cardinal Cloud round-trip.
+- **Indexing folders are NOT configured through the UI.** The `/admin/indexing` page renders the line "Folders are set in your docker-compose.yaml file." Indexing source folders and library-access groupings are two separate concepts: docker-compose owns the source paths, and `/admin/libraries` owns user-facing access scoping. Tests should not assert that the UI can add an indexing folder.
+- **Library row action button is labeled "Configure"**, not "Edit". The drawer opened by it edits name / paths / access.
+- **Indexing page has a "Deindex Media" button** — a destructive action that wipes the indexed catalog without rescanning. Worth its own test.
+- **Jobs page describes jobs as automatic**: "Jobs run automatically when needed." Manual start may be a power-user affordance, not the primary flow. The test plan reflects this — observation tests come first, manual-start tests are secondary.
+- **`/admin/setup` on a configured server renders the login form**, it does not redirect or 404. The original plan asserted a redirect; this has been corrected.
+
+## Selector strategy — never assert on user-visible text
+
+Every component in `apps/admin-web/src/` ships with an `i18n.json`; the app is being localized soon. **No new spec may assert against user-facing strings** — that includes `getByText`, `getByRole({ name: ... })` keyed on copy, heading-name regexes, button-name matchers, and empty-state copy matchers. Localization will silently break any such assertion.
+
+Use these patterns instead, in roughly this order of preference:
+
+1. **DOM IDs** — confirmed-stable IDs in this app: `#login-email`, `#login-pw`, plus whatever IDs exist on the wizard inputs (verify with `playwright-cli` before writing). When an element needs a stable selector and has no ID, add one rather than scraping text.
+2. **`data-testid` attributes** — the codebase does not use these today (grep returns zero hits). When a meaningful UI element doesn't already have an ID or a uniquely-identifying class, **propose adding a `data-testid` as a testing seam** rather than reaching for copy. Adding test seams is preferable to brittle tests.
+3. **Structural / class selectors** — table rows by index, drawer containers by class (e.g. `.drawer.is-open`), error alerts by container class (e.g. `.alert.error`). Reasonable when the structural shape is stable.
+4. **ARIA roles by structure (not by name)** — `page.getByRole('button')` to scope a query is fine; `{ name: 'Configure' }` is not. `page.getByRole('row')` to enumerate table rows is fine; matching a row by its text contents is not.
+5. **URL, localStorage, and element-shape assertions** — did the URL change to `/admin`, did `localStorage[JWT_STORAGE_KEY]` appear, did the popup close, did a known-class drawer become visible.
+6. **Network-level assertions** — `page.waitForRequest` / `page.context().on('request')` / response status codes. When the meaningful behavior is "the right request fired with the right payload" or "the response was 4xx," prefer asserting on the request rather than the rendered text that resulted.
+
+Each spec area below has been worded to comply with this rule. When implementing, if a spec needs to assert that *some* error happened and the only visible signal is copy, the right move is to (a) add a structural marker (`data-testid="error-alert"` or an `aria-invalid` attribute) to the component, or (b) assert on the network response that produced the error. **Never reach for the copy.**
+
+The existing 8 tests under `e2e/tests/sso/` violate this rule today (e.g. `getByRole('heading', { name: /Claim This Self-Hosted App/i })`); cleaning them up is a separate ticket and out of scope for this plan.
 
 ## Required prereqs
 
@@ -118,10 +149,25 @@ Path convention: `apps/admin-web/e2e/tests/<area>/<file>.spec.ts`.
   - Cancelling SSO mid-wizard (closing the popup) returns the wizard to the login step without losing earlier input.
   - Reloading the page in the middle of the wizard restarts from step 1 (or resumes — match whatever the UI does; assert that behavior).
 - **`first-time-setup-skipped-when-done.spec.ts`** — `@journey:first-time-setup`
-  - On a server that's already set up, visiting `/admin/setup` redirects to `/admin/` (or 404).
+  - On a server that's already set up, visiting `/admin/setup` **redirects the URL to `/admin/login`** (verified via `playwright-cli`). Assert with `page.waitForURL(/\/admin\/login$/)`, regardless of auth state. URL-based assertion is i18n-safe.
 - **`factory-reset.spec.ts`** — `@journey:factory-reset`
   - From a settings/server menu (verify exact location), the owner can trigger factory reset; confirmation modal appears; confirming wipes data and redirects back to `/admin/setup`.
   - Non-owner roles do not see the factory-reset action at all.
+
+### `login/` — non-SSO login methods *(new area)*
+
+Architecture note: three login buttons map to **two IDPs** — Cloud SSO uses the Cardinal Cloud auth server; both "Sign in with local account" and "Sign in as Guest" are backed by the **Local IDP** on the media server. Guest is a built-in Local administrator account. Helpers should treat these as one IDP family with two UI entry points.
+
+- **`guest-login.spec.ts`** — `@journey:guest-login`
+  - Guest sign-in button on `/admin/login` (verify with `playwright-cli generate-locator` for a stable, copy-free selector; the button is the third in the login stack — likely identifiable by a `data-*` attribute or by position within the login card).
+  - Clicking it lands the user at `/admin` (assert via URL), with the Guest Account row appearing on `/admin/users` (assert structurally — that one row in the users table is marked as the current user with `[data-current-user]` or equivalent — not by text).
+  - Disabling the guest account from `/admin/users` removes the guest button from `/admin/login` (assert button selector resolves to zero elements after reload).
+  - Re-enabling the guest account makes the button reappear.
+- **`local-login.spec.ts`** — `@journey:local-login`
+  - "Sign in with local account" button opens the local-auth UI — popup or inline form (verify with `playwright-cli` before writing; do not assume).
+  - Correct username + password lands the user at `/admin` (URL assertion).
+  - Wrong password keeps the user on the login URL and the error alert element is visible (assert by container class, not by error string).
+  - Disabled local user is rejected — assert via the POST response's status code or response body shape, not the rendered error copy.
 
 ### `overview/` — dashboard *(new area)*
 
@@ -169,52 +215,67 @@ Path convention: `apps/admin-web/e2e/tests/<area>/<file>.spec.ts`.
 
 ### `libraries/` — media library configuration *(new area)*
 
+Reminder: libraries scope **user access**, not indexing source folders. Indexing folders are docker-compose-defined and read-only in the UI.
+
 - **`view-libraries.spec.ts`** — `@journey:manage-libraries`
   - Empty state on a freshly-set-up server (no libraries yet).
   - Seeded libraries via `seedLibrary` render with name, path list, and allowed-user avatars.
 - **`create-library.spec.ts`** — `@journey:manage-libraries`
-  - Open create-library drawer → enter name → pick a directory from the tree picker pointing at `fixturePath('music')` → save → library appears in the list and on the backend.
+  - Click "Create library" → drawer opens → enter name → pick a directory from the tree picker pointing at `fixturePath('music')` → save → library appears in the list and on the backend.
   - Cancel button closes the drawer without persisting.
   - Saving without selecting a path shows an error.
-- **`edit-library.spec.ts`** — `@journey:manage-libraries`
-  - Add a second path to a library (`fixturePath('movies')`) → backend reflects both paths.
+- **`configure-library.spec.ts`** — `@journey:manage-libraries`
+  - Click the row's **Configure** button to open the configure drawer.
+  - Add a second path (`fixturePath('movies')`) → backend reflects both paths.
   - Remove a path → backend has only the remaining one.
   - Change user access list → backend reflects the new allow-list.
 - **`delete-library.spec.ts`** — `@journey:manage-libraries`
   - Confirmation modal appears; confirming removes the library and its row; cancelling keeps it.
 - **`libraries-capability-gating.spec.ts`** — `@journey:access-control-gating`, `@journey:manage-libraries`
   - Without `Libraries.Create`: create button hidden.
-  - Without `Libraries.Update`: edit drawer is read-only / disabled.
+  - Without `Libraries.Update`: configure drawer is read-only / disabled.
   - Without `Libraries.Delete`: delete button hidden.
 
 ### `indexing/` — library indexing *(new area)*
 
+Reminder: source folders are docker-compose-configured and shown read-only on this page ("Folders are set in your docker-compose.yaml file."). The indexing **action** (scan / pause / stop / deindex) is in the UI; the **source paths** are not. Tests must drive the media server's docker-compose-equivalent env, or seed via `/dev/*`, to point at fixture paths.
+
 - **`view-indexing.spec.ts`** — `@journey:run-indexing`
-  - Indexing page renders with the power button in idle state when no run is active.
-  - Seeding a completed run via `seedIndexingRun` populates the history section.
+  - Indexing page renders with per-media-type folder rows (Music / Photos / Movies / TV), each showing the configured path or "Not set".
+  - Power button is in idle state when no run is active.
+  - Seeding a completed run via `seedIndexingRun` populates the history section with the right add/modify/remove counts (UI renders them as e.g. "+1,413 / ~0 / -0").
 - **`run-quick-scan.spec.ts`** — `@journey:run-indexing`
-  - With a library pointing at `fixturePath('music')`, select Quick scan + Music media-type → click power → run starts → progress widget updates → run completes → history grows by one.
+  - With the Music source pointed at `fixturePath('music')`, select Quick scan + Music media-type → click power → run starts → progress widget updates → run completes → history grows by one.
   - The indexed-file count matches the number of MP3 fixtures.
 - **`pause-resume-stop.spec.ts`** — `@journey:run-indexing`
   - With a long-running scan (point at a larger seeded path or use `seedIndexingRun` mid-flight), pause → status shows paused → resume → status shows running → stop → status shows stopped and a final history row is recorded.
 - **`indexing-error.spec.ts`** — `@journey:run-indexing`
-  - Indexing a library that points at a path the process cannot read surfaces the error in the progress widget and the run is recorded with status=errored.
-- **`indexing-capability-gating.spec.ts`** — `@journey:access-control-gating`, `@journey:run-indexing`
+  - Pointing a source at a path the process cannot read surfaces the error in the progress widget and the run is recorded with status=errored.
+- **`deindex-media.spec.ts`** — `@journey:deindex-media`
+  - Click "Deindex Media" → confirmation modal → confirm → catalog is wiped (per-media-type counts go to 0; verify via UI and via `/dev/options` or a media-server count endpoint).
+  - Cancel button keeps the catalog intact.
+- **`indexing-capability-gating.spec.ts`** — `@journey:access-control-gating`, `@journey:run-indexing`, `@journey:deindex-media`
   - Without `Indexing.Read`: page is inaccessible (403 / redirect).
+  - Without the destructive capability (whichever role gates Deindex — verify via the access-control library): the Deindex Media button is hidden or disabled.
 
 ### `jobs/` — background jobs *(new area)*
 
-- **`view-jobs.spec.ts`** — `@journey:start-job`, `@journey:manage-jobs`
-  - Empty state on a fresh server (no jobs).
+The Jobs page describes jobs as primarily automatic ("Jobs run automatically when needed.") The job types visible today are "Album art thumbnails", "Photo variations", "Photo thumbnails" — buttons that expand into job-type detail. Tests focus on **observation first**, then manual-control where it exists.
+
+- **`view-jobs.spec.ts`** — `@journey:manage-jobs`
+  - Empty state on a fresh server: "No active jobs." copy renders for the queue card.
   - Seeded jobs in each state render in the right section (active vs. history) with the right status badge.
-- **`start-job.spec.ts`** — `@journey:start-job`
-  - Open a job type → click Start → job appears in the active list → SSE event drives the progress bar to completion → job moves to history with status=completed.
+- **`auto-job.spec.ts`** — `@journey:manage-jobs`
+  - Trigger an action that causes the server to enqueue an automatic job (e.g. indexing photos triggers Photo thumbnails). Observe it move from queue → active → history via SSE.
+  - If no UI trigger exists, seed via `seedJob` and assert the SSE-driven transitions still render correctly.
+- **`manual-start-job.spec.ts`** — `@journey:manage-jobs`
+  - Conditional on a manual-start affordance existing — confirm via `playwright-cli` before writing. If a job-type button opens an expander with a Start control, exercise it; if not, mark this spec as `test.skip` with a note pointing at the UI gap.
 - **`pause-stop-job.spec.ts`** — `@journey:manage-jobs`
-  - Start a long-running job (seeded if needed) → pause → status updates via SSE → resume → status updates → stop → job ends in history with status=canceled.
+  - Conditional on the same; seed a long-running job → pause via UI → resume → stop. Each transition observable through SSE.
 - **`failed-job-history.spec.ts`** — `@journey:manage-jobs`
   - Seeded errored job shows in history with the error message expanded on click.
-- **`jobs-capability-gating.spec.ts`** — `@journey:access-control-gating`, `@journey:start-job`
-  - Without `Jobs.Create`: start buttons are disabled, job-type expand reveals read-only info.
+- **`jobs-capability-gating.spec.ts`** — `@journey:access-control-gating`, `@journey:manage-jobs`
+  - Without `Jobs.Create`: manual-start affordances (if present) are disabled.
   - Without `Jobs.Read`: page is inaccessible.
 
 ### `settings/` — global app settings *(new area)*
@@ -296,12 +357,26 @@ The 8 existing tests stay as-is. They cover all 4 SSO entry-point journeys and a
 
 1. **Media-server `/dev/*` endpoints** — without these, every authenticated admin test has to walk through the entire first-time-setup wizard. Land prereq A first as its own PR.
 2. **Fixture expansion** — add the movies/TV/photos/empty subdirs (prereq B) so library + indexing tests have content to point at.
-3. **Helper expansion** — add `libraries/e2e-helpers/src/media-server.ts` and `loginAsClaimedOwner` (prereq C).
+3. **Helper expansion** — add `libraries/e2e-helpers/src/media-server.ts`, `loginAsClaimedOwner`, **and `loginAsGuest`** (prereq C). Guest login is the fastest path to an admin-logged-in browser for the bulk of admin-feature tests.
 4. **`global-setup.ts` + `setup/` tests** — exercises factory-reset and the wizard, which are the foundation for everything else.
-5. **`overview/`, `users/`, `roles/`, `libraries/`** — straightforward CRUD + capability-gating coverage.
-6. **`indexing/`** — depends on libraries existing and on `seedIndexingRun`; trickier because of SSE.
-7. **`jobs/`** — also SSE-driven; depends on `seedJob`.
-8. **`settings/` + `surfaces/`** — lightest-touch coverage, last.
+5. **`login/` (guest + local)** — small, fast, exercises the alternative login paths and unlocks the guest-login helper for downstream specs.
+6. **`overview/`, `users/`, `roles/`, `libraries/`** — straightforward CRUD + capability-gating coverage.
+7. **`indexing/` (incl. deindex)** — trickier because of SSE-driven progress; deindex is destructive and benefits from running after the indexing happy path.
+8. **`jobs/`** — also SSE-driven; depends on `seedJob`.
+9. **`settings/` + `surfaces/`** — lightest-touch coverage, last.
+
+## Implementation tooling
+
+`playwright-cli` (already installed at `/home/brian/.nvm/versions/node/v22.22.2/bin/playwright-cli`) and the `playwright` MCP server (registered, available after session reload) provide an **interactive browser session** that should be the first thing reached for when starting a new spec:
+
+- `playwright-cli open http://localhost:3090/admin/login` → walk to the page the spec covers.
+- `playwright-cli snapshot` → assigns refs (`e1`, `e2`, …) to every visible element, so the test author can see what's actually rendered before guessing at selectors.
+- `playwright-cli generate-locator e15` → produces the exact Playwright locator (`page.getByRole('button', { name: 'Configure' })`, etc.) to bake into the spec — no string-matching guesswork.
+- `playwright-cli requests` → lists every network call the page made; `request <n>` shows the exact endpoint + payload. Use this to verify API contracts the spec depends on without reading server source.
+- `playwright-cli route '**/api/v1/health' --status=500` → quickly mock a backend response to discover how the UI renders an error state, before writing a test that asserts that state.
+- `playwright-cli eval "el => el.id" e15` → read DOM attributes the snapshot omits (IDs, data-testid, classes).
+
+This shortcut applies for every new spec below, but is especially valuable for: the indexing source-folder rendering (rows depend on docker-compose env), the job-type expander UI, library configure-drawer field IDs, and capability-gated affordance presence checks.
 
 ## Verification
 
