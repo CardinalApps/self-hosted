@@ -11,10 +11,6 @@ runs:
         node-version-file: .nvmrc
         cache: 'pnpm'
 
-    - name: Install Turborepo
-      run: npm i -g turbo
-      shell: bash
-
     - name: Install workspace deps
       run: pnpm install --frozen-lockfile
       shell: bash
