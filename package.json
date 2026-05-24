@@ -47,7 +47,9 @@
       "core-js-pure",
       "esbuild",
       "sharp",
-      "ffmpeg-static"
+      "ffmpeg-static",
+      "mongodb-memory-server",
+      "unrs-resolver"
     ]
   }
 }
