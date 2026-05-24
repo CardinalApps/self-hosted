@@ -13,9 +13,9 @@
     "typecheck": "tsc --noEmit",
     "build": "vite build && cp ./serve.json ./dist/serve.json",
     "serve": "serve dist",
-    "e2e": "playwright test --config e2e/playwright.config.ts",
-    "e2e:ui": "playwright test --config e2e/playwright.config.ts --ui",
-    "e2e:install": "playwright install chromium --with-deps"
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config e2e/playwright.config.ts --ui",
+    "test:e2e:install": "playwright install chromium --with-deps"
   },
   "dependencies": {
     "@cardinalapps/access-control": "workspace:*",
