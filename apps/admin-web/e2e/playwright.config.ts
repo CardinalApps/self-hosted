@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests',
+  globalSetup: require.resolve('./global-setup.ts'),
   // 120s = up to ~60s POST /user rate-limit backoff + ~60s of headroom for the
   // flow under parallel load. Set DISABLE_RATE_LIMIT=true in the auth server's
   // env to drop suite runtime from ~2min to ~10s.
