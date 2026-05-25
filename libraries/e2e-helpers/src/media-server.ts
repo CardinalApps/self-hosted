@@ -1,4 +1,5 @@
 import * as path from 'node:path'
+import type { Page } from '@playwright/test'
 
 /*
   Helpers for tests that need to seed or read state on the local media server.
@@ -95,6 +96,20 @@ export async function deleteLibrary(libraryId: string): Promise<void> {
 export async function getMediaServerOption(name: string): Promise<unknown> {
   const result = await devCall<{ value: unknown }>('GET', `/dev/options/${encodeURIComponent(name)}`)
   return result.value
+}
+
+// Drive the guest-login button on /admin/login. Use as the default
+// "I just need an admin-logged-in browser" path for admin-feature specs —
+// it's the fastest route to a logged-in admin (no Cardinal Cloud popup,
+// no local-user seeding).
+//
+// Requires the server to have completed first-time-setup; the guest button
+// only renders once the guest account exists. Pair with
+// completeFirstTimeSetup() in beforeEach.
+export async function loginAsGuest(page: Page): Promise<void> {
+  await page.goto('/admin/login')
+  await page.click('[data-testid="login-with-guest-button"]')
+  await page.waitForURL((url) => url.pathname === '/admin' || url.pathname === '/admin/' || (url.pathname.startsWith('/admin') && url.pathname !== '/admin/login'), { timeout: 10_000 })
 }
 
 // Resolve a path relative to `servers/media/tests/fixtures/` to an absolute
