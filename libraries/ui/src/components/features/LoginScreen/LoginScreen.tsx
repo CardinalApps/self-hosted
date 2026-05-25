@@ -166,7 +166,10 @@ const LoginScreen = ({
                 {cardinalSSOLoginButton}
                 {!!allowLocalAccount &&
                   <>
-                    <Button onClick={() => setShowLocalAccountForm(!showLocalAccountForm)}>
+                    <Button
+                      data-testid="login-with-local-account-button"
+                      onClick={() => setShowLocalAccountForm(!showLocalAccountForm)}
+                    >
                       {i18n['login.local-user'][lang]}
                     </Button>
                     <AnimatePresence>
@@ -179,13 +182,13 @@ const LoginScreen = ({
                         >
                           <Form onSubmit={handleLocalAccountLogin}>
                             <FormField label={i18n['login.local-user.username'][lang]}>
-                              <TextInput type="text" name="username" />
+                              <TextInput type="text" name="username" data-testid="login-local-username" />
                             </FormField>
                             <FormField label={i18n['login.local-user.password'][lang]}>
-                              <TextInput type="password" name="password" />
+                              <TextInput type="password" name="password" data-testid="login-local-password" />
                             </FormField>
                             <footer>
-                              <Button type="submit" textual>{i18n['login.local-user.login'][lang]}</Button>
+                              <Button type="submit" textual data-testid="login-local-submit">{i18n['login.local-user.login'][lang]}</Button>
                             </footer>
                           </Form>
                         </motion.div>
@@ -194,7 +197,11 @@ const LoginScreen = ({
                   </>
                 }
                 {!!allowGuestAccount && currentUser?.designation !== 'guest_account' &&
-                  <Button onClick={handleGuestAccountClick} disabled={!allowGuestAccount}>
+                  <Button
+                    data-testid="login-with-guest-button"
+                    onClick={handleGuestAccountClick}
+                    disabled={!allowGuestAccount}
+                  >
                     {i18n['guest-account.use'][lang]}
                   </Button>
                 }
