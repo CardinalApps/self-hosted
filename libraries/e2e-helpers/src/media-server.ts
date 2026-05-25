@@ -103,13 +103,20 @@ export async function getMediaServerOption(name: string): Promise<unknown> {
 // it's the fastest route to a logged-in admin (no Cardinal Cloud popup,
 // no local-user seeding).
 //
+// Caveat: guest auth is memory-scoped — the JWT never reaches localStorage,
+// so any subsequent page.goto() loses the login. To land on a specific
+// admin route, pass it as `targetUrl`: this helper navigates there first
+// (which redirects to /admin/login on an unauthed session), clicks guest,
+// and waits for the URL to leave /admin/login. Subsequent SPA-internal
+// navigation (Link clicks) preserves the session; full page reloads do not.
+//
 // Requires the server to have completed first-time-setup; the guest button
 // only renders once the guest account exists. Pair with
 // completeFirstTimeSetup() in beforeEach.
-export async function loginAsGuest(page: Page): Promise<void> {
-  await page.goto('/admin/login')
+export async function loginAsGuest(page: Page, targetUrl = '/admin'): Promise<void> {
+  await page.goto(targetUrl)
   await page.click('[data-testid="login-with-guest-button"]')
-  await page.waitForURL((url) => url.pathname === '/admin' || url.pathname === '/admin/' || (url.pathname.startsWith('/admin') && url.pathname !== '/admin/login'), { timeout: 10_000 })
+  await page.waitForURL((url) => url.pathname.startsWith('/admin') && url.pathname !== '/admin/login', { timeout: 10_000 })
 }
 
 // Resolve a path relative to `servers/media/tests/fixtures/` to an absolute
