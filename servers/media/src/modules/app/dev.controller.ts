@@ -8,6 +8,7 @@ import { UserService } from '../user/user.service'
 import { RBACService } from '../rbac/rbac.service'
 import { LibraryService } from '../library/library.service'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { envVar } from '../../utils/env'
 
 /*
   Dev-only helpers for end-to-end tests. Every handler short-circuits with a
@@ -20,7 +21,7 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 */
 
 function devEndpointsEnabled(): boolean {
-  return process.env.CARDINAL_ENABLE_DEV_ENDPOINTS === 'true'
+  return envVar('CARDINAL_ENABLE_DEV_ENDPOINTS', false) === true
 }
 
 @Controller('dev')
