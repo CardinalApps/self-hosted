@@ -1,10 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { TargetAndTransition, motion } from 'framer-motion'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import CardinalAdminSSOButton from '../../../components/CardinalAdminSSOButton'
 
@@ -19,7 +19,6 @@ import '../styles.css'
 type LoginProps = {
   next: () => void,
   prev: () => void,
-  cardAnimation: TargetAndTransition,
   userObjectOfFutureOwner: Record<string, unknown>,
   setUserObjectOfFutureOwner: (user: Record<string, unknown>) => void,
   setSsoJWTOfFutureOwner: React.Dispatch<React.SetStateAction<string>>,
@@ -29,7 +28,6 @@ type LoginProps = {
 function Login({
   next,
   prev,
-  cardAnimation,
   userObjectOfFutureOwner,
   setUserObjectOfFutureOwner,
   setSsoJWTOfFutureOwner,
@@ -57,10 +55,7 @@ function Login({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={cardAnimation}
-      >
+      <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
           padding="thick"
@@ -96,7 +91,7 @@ function Login({
             }
           </div>
         </Card>
-      </motion.div>
+      </I11nFadeIn>
     </>
   )
 }

@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
-import { TargetAndTransition, motion } from 'framer-motion'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import TextInput from '@cardinalapps/ui/src/components/forms/TextInput'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 
@@ -17,7 +17,6 @@ type ServerNameProps = {
   prev: () => void,
   serverName: string,
   setServerName: (name: string) => void,
-  cardAnimation: TargetAndTransition,
 }
 
 function ServerName({
@@ -25,7 +24,6 @@ function ServerName({
   prev,
   serverName,
   setServerName,
-  cardAnimation,
 }: ServerNameProps) {
   const { lang } = useSelector(settingsSelectors.current)
 
@@ -40,10 +38,7 @@ function ServerName({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={cardAnimation}
-      >
+      <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
           padding="thick"
@@ -87,7 +82,7 @@ function ServerName({
             />
           </form>
         </Card>
-      </motion.div>
+      </I11nFadeIn>
     </>
   )
 }

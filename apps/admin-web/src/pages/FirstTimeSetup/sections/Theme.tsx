@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { TargetAndTransition, motion } from 'framer-motion'
 
 import H1 from '@cardinalapps/ui/src/components/typography/H1'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import { settingsSelectors, settingsActions } from '@cardinalapps/ui/src/store/slices/settings'
 
@@ -12,13 +12,11 @@ import '../styles.css'
 type ThemeProps = {
   next: () => void,
   setTheme: (theme: string) => void,
-  cardAnimation: TargetAndTransition,
 }
 
 function Theme({
   next,
   setTheme,
-  cardAnimation,
 }: ThemeProps) {
   const dispatch = useDispatch()
   const { lang } = useSelector(settingsSelectors.current)
@@ -33,10 +31,7 @@ function Theme({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={cardAnimation}
-      >
+      <I11nFadeIn duration={0.3}>
         <H1 className={'title center'}>{i18n['theme.title'][lang]}</H1>
         <div className={'themeSwatches'}>
           <button
@@ -58,7 +53,7 @@ function Theme({
             <p>{i18n['theme.name.dark'][lang]}</p>
           </button>
         </div>
-      </motion.div>
+      </I11nFadeIn>
     </>
   )
 }
