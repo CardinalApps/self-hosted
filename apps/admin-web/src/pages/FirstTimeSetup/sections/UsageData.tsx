@@ -1,10 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { motion, TargetAndTransition } from 'framer-motion'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
@@ -16,7 +16,6 @@ import '../styles.css'
 type UsageDataProps = {
   next: () => void,
   prev: () => void,
-  cardAnimation: TargetAndTransition,
   agreeToAnonymousUsageData: boolean,
   setAgreeToAnonymousUsageData: React.Dispatch<React.SetStateAction<boolean>>,
 }
@@ -24,7 +23,6 @@ type UsageDataProps = {
 function UsageData({
   next,
   prev,
-  cardAnimation,
   agreeToAnonymousUsageData,
   setAgreeToAnonymousUsageData,
 }: UsageDataProps) {
@@ -32,10 +30,7 @@ function UsageData({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={cardAnimation as TargetAndTransition}
-      >
+      <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
           padding="thick"
@@ -66,7 +61,7 @@ function UsageData({
             />
           </div>
         </Card>
-      </motion.div>
+      </I11nFadeIn>
     </>
   )
 }

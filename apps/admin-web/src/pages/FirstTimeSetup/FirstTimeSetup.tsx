@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence, TargetAndTransition } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 
 import BrandLogo from '@cardinalapps/ui/src/components/layout/BrandLogo'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
 import { homeServerSelectors, homeServerActions } from '@cardinalapps/ui/src/store/slices/homeServer'
@@ -49,7 +50,6 @@ function FirstTimeSetup() {
   const [ssoJWTOfFutureOwner, setSsoJWTOfFutureOwner] = useState()
 
   const fadeOutDuration = 0.4
-  const cardAnimation: TargetAndTransition = { opacity: 1, transition: { duration: 0.3, type: 'tween' } }
 
   /**
    * Set next step after allowing enough time for current step to animate out.
@@ -136,11 +136,7 @@ function FirstTimeSetup() {
   return (
     <div className={'firstTimeSetup'}>
       {(step >= 2 || step === null) &&
-        <motion.div
-          className={'header logo'}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { delay: 0.6, duration: 0.8, type: 'tween' } }}
-        >
+        <I11nFadeIn className={'header logo'} delay={0.6} duration={0.8}>
           <div>
             <BrandLogo icon="birb" />
           </div>
@@ -150,7 +146,7 @@ function FirstTimeSetup() {
               <span>{visibleStepNum - 1} {i18n['progress.sep'][lang]} 7</span>
             </div>
           </div>
-        </motion.div>
+        </I11nFadeIn>
       }
       <AnimatePresence>
         {step === 1 &&
@@ -171,7 +167,6 @@ function FirstTimeSetup() {
             <Theme
               next={next}
               setTheme={setTheme}
-              cardAnimation={cardAnimation}
             />
           </motion.section>
         }
@@ -186,7 +181,6 @@ function FirstTimeSetup() {
               prev={prev}
               serverName={serverName}
               setServerName={setServerName}
-              cardAnimation={cardAnimation}
             />
           </motion.section>
         }
@@ -199,7 +193,6 @@ function FirstTimeSetup() {
             <Login
               next={next}
               prev={prev}
-              cardAnimation={cardAnimation}
               userObjectOfFutureOwner={userObjectOfFutureOwner}
               setUserObjectOfFutureOwner={setUserObjectOfFutureOwner}
               setSsoJWTOfFutureOwner={setSsoJWTOfFutureOwner}
@@ -216,7 +209,6 @@ function FirstTimeSetup() {
             <UsageData
               next={next}
               prev={prev}
-              cardAnimation={cardAnimation}
               agreeToAnonymousUsageData={agreeToAnonymousUsageData}
               setAgreeToAnonymousUsageData={setAgreeToAnonymousUsageData}
             />
@@ -231,7 +223,6 @@ function FirstTimeSetup() {
             <Privacy
               next={next}
               prev={prev}
-              cardAnimation={cardAnimation}
             />
           </motion.section>
         }
@@ -241,7 +232,7 @@ function FirstTimeSetup() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: fadeOutDuration } }}
           >
-            <Help next={next} prev={prev} cardAnimation={cardAnimation} />
+            <Help next={next} prev={prev} />
           </motion.section>
         }
         {step === 8 &&
@@ -253,7 +244,6 @@ function FirstTimeSetup() {
             <Finish
               handleFinishSetup={handleFinishSetup}
               prev={prev}
-              cardAnimation={cardAnimation}
               finishButtonState={finishButtonState}
             />
           </motion.section>

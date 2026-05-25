@@ -3,10 +3,6 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './tests',
   globalSetup: require.resolve('./global-setup.ts'),
-  // Playwright artifacts (traces, screenshots, error contexts) go to /tmp so
-  // they don't clutter the repo. The journey-coverage reporter still writes
-  // its JSON to e2e/test-results/ (it owns that path independently).
-  outputDir: '/tmp/playwright-results/admin-web',
   // 120s = up to ~60s POST /user rate-limit backoff + ~60s of headroom for the
   // flow under parallel load. Set DISABLE_RATE_LIMIT=true in the auth server's
   // env to drop suite runtime from ~2min to ~10s.
@@ -22,6 +18,14 @@ export default defineConfig({
     // makes the Playwright UI's per-step preview pane accurate for passing
     // tests too.
     trace: 'on',
+    screenshot: 'on',
+    // Has to go through `contextOptions`, not top-level `reducedMotion`:
+    // Playwright Test's `_combinedContextOptions` builder has a hardcoded
+    // allowlist of fields it forwards to `browser.newContext()`, and
+    // `reducedMotion` is NOT on it — so a top-level value is silently
+    // dropped. The raw `contextOptions` object is spread in last, so anything
+    // in here reaches the browser.
+    contextOptions: { reducedMotion: 'reduce' },
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

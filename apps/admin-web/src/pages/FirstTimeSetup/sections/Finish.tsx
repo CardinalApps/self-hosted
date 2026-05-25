@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux'
-import { TargetAndTransition, motion } from 'framer-motion'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
+import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 
@@ -14,25 +14,19 @@ import '../styles.css'
 type FinishProps = {
   handleFinishSetup: () => void,
   prev: () => void,
-  cardAnimation: TargetAndTransition,
   finishButtonState: string,
 }
 
 function Finish({
   handleFinishSetup,
   prev,
-  cardAnimation,
   finishButtonState,
 }: FinishProps) {
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
     <>
-      <motion.div
-        className={'finish'}
-        initial={{ opacity: 0 }}
-        animate={cardAnimation}
-      >
+      <I11nFadeIn className={'finish'} duration={0.3}>
         <Card
           className={'card'}
           padding="thick"
@@ -52,7 +46,7 @@ function Finish({
         >
           <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['finish.message-p1'][lang] }} />
         </Card>
-      </motion.div>
+      </I11nFadeIn>
     </>
   )
 }
