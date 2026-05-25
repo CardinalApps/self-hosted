@@ -179,6 +179,12 @@ export async function deleteSelfHostedClaim(instanceId: string): Promise<void> {
 // Register a fresh user and seed the page's localStorage with their cloud JWT,
 // so the next navigation under the app's origin starts already logged in.
 // Skips the SSO popup. Caller must `deleteTestUser(jwt)` in a finally block.
+//
+// Sequence: navigate to /, let the no-JWT bootstrap settle, write the token,
+// then reload. The reload is the key under parallel load — without it, the
+// handle_cloud_401 middleware from the initial unauth /user call can fire a
+// logout dispatch AFTER our setItem and wipe the JWT we just wrote. Reloading
+// ensures fetchUser runs once, cleanly, with the JWT already in place.
 export async function seedLoggedInUser(
   page: Page,
   email: string,
@@ -191,15 +197,14 @@ export async function seedLoggedInUser(
   if (options.confirmed) await confirmUserEmail(userId)
   if (options.mfa) await enableEmailMfa(jwt)
 
-  // Land on the app origin and wait for bootstrap to settle before writing the
-  // token. Writing into localStorage while the cloud SDK is still initializing
-  // races with its own JWT init, which silently clobbers the value we wrote.
   await page.goto('/')
   await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
   await page.evaluate(
     ([key, value]) => localStorage.setItem(key, value),
     [JWT_STORAGE_KEY, jwt] as const,
   )
+  await page.reload()
+  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
 
   return { jwt, userId, email }
 }
@@ -232,12 +237,15 @@ export async function loginViaApi(
   if (!data.JWT) throw new Error('loginViaApi: response did not include a JWT')
   if (!data.exchangeToken) throw new Error('loginViaApi: response did not include an exchangeToken')
 
+  // Same race avoidance as seedLoggedInUser — see comment there.
   await page.goto('/')
   await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
   await page.evaluate(
     ([key, value]) => localStorage.setItem(key, value),
     [JWT_STORAGE_KEY, data.JWT] as const,
   )
+  await page.reload()
+  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
 
   return { jwt: data.JWT, exchangeToken: data.exchangeToken }
 }
