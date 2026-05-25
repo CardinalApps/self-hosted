@@ -222,11 +222,14 @@ export class DevController {
     if (!paths || !paths.length) {
       throw new BadRequestException('paths must be a non-empty array')
     }
+    // Resolve owner: explicit userId → server owner → guest account. The
+    // guest fallback lets tests seed libraries on a server that hasn't been
+    // claimed yet (the most common dev-mode shape).
     const owner = ownerUserId
       ? await this.userService.get(ownerUserId)
-      : await this.userService.getServerOwner()
+      : (await this.userService.getServerOwner()) ?? (await this.userService.getGuestAccount())
     if (!owner) {
-      throw new BadRequestException('No owner user available — pass ownerUserId or run first-time-setup first.')
+      throw new BadRequestException('No owner user available — pass ownerUserId, run first-time-setup, or ensure a guest account exists.')
     }
     try {
       const library = await this.libraryService.createLibrary(name || 'e2e-library', owner, paths)
