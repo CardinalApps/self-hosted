@@ -81,7 +81,7 @@ function CreateLibraryDrawer({ selectedDirectories, onClose }: CreateLibraryDraw
             <TextInput type="text" name="name" id="create-library-name" />
           </FormField>
           <footer>
-            <Button type="submit" textual>{i18n['libraries.create.submit'][lang]}</Button>
+            <Button data-testid="library-create-submit" type="submit" textual>{i18n['libraries.create.submit'][lang]}</Button>
           </footer>
         </Form>
       </Drawer.Section>

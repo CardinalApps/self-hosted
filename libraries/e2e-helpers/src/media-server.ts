@@ -82,7 +82,7 @@ export async function seedLibrary(args: {
   name?: string,
   paths: string[],
   ownerUserId?: string,
-}): Promise<{ libraryId: string }> {
+}): Promise<{ id: number, libraryId: string }> {
   return devCall('POST', '/dev/libraries', args)
 }
 

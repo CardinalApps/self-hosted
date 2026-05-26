@@ -131,7 +131,11 @@ function Libraries() {
         ),
         (
           <Table.Col key="controls">
-            <Button onClick={() => setOpenLibrary(library)}>
+            <Button
+              data-testid="library-row-options"
+              data-library-id={library.id}
+              onClick={() => setOpenLibrary(library)}
+            >
               {i18n['libraries.table.options-button'][lang]}
             </Button>
           </Table.Col>
@@ -216,6 +220,7 @@ function Libraries() {
             controls={
               <>
                 <Button
+                  data-testid="library-drawer-save"
                   type="submit"
                   onClick={() => {}}
                   disabled={!userCanUpdateLibrary}
@@ -223,6 +228,7 @@ function Libraries() {
                   {i18n['libraries.edit.save'][lang]}
                 </Button>
                 <Button
+                  data-testid="library-drawer-delete"
                   animation={deleteLibrartResult.isLoading ? 'success' : ''}
                   color="danger"
                   onClick={() => setShowConfirmDelete(true)}
@@ -308,6 +314,7 @@ function Libraries() {
           footer={(
             <>
               <Button
+                data-testid="library-create-button"
                 onClick={() => setShowCreateLibraryDrawer(true)}
                 type="button"
               >

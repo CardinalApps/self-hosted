@@ -138,7 +138,12 @@ function Users() {
   const controlsCol = (user) => {
     return (
       <Table.Col key="controls" align='right' width={140}>
-        <Button icon="fas fa-users-cog" onClick={() => setConfiguringUser(user)}>
+        <Button
+          data-testid="user-row-settings"
+          data-user-id={user.userId}
+          icon="fas fa-users-cog"
+          onClick={() => setConfiguringUser(user)}
+        >
           {i18n['users.table.controls.settings'][lang]}
         </Button>
       </Table.Col>
@@ -251,6 +256,7 @@ function Users() {
           footer={(
             <>
               <Button
+                data-testid="user-create-button"
                 onClick={() => setShowCreateUserDrawer(true)}
                 type="button"
                 disabled={!canUserCreateUsers}
