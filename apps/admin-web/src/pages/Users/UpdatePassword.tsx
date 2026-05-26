@@ -50,6 +50,7 @@ function UpdatePassword({ user }: UpdatePasswordProps) {
   return (
     <>
       <Button
+        data-testid="user-update-password-trigger"
         onClick={() => setShowUpdatePasswordModal(true)}
         icon={"fas fa-key"}
       >
@@ -63,7 +64,7 @@ function UpdatePassword({ user }: UpdatePasswordProps) {
           <Form
             onSubmit={handleUpdatePassword}
             controls={
-              <Button type="submit">{i18n['users.updated.password.submit'][lang]}</Button>
+              <Button data-testid="user-update-password-submit" type="submit">{i18n['users.updated.password.submit'][lang]}</Button>
             }
           >
             <FormField labelFor="password" label={i18n['users.updated.password.success'][lang]}>

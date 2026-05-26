@@ -214,7 +214,7 @@ export class DevController {
   })
   async createLibrary(
     @Body() body: { name?: string, paths?: string[], ownerUserId?: string },
-  ): Promise<{ libraryId: string }> {
+  ): Promise<{ id: number, libraryId: string }> {
     if (!devEndpointsEnabled()) {
       throw new NotFoundException()
     }
@@ -233,7 +233,7 @@ export class DevController {
     }
     try {
       const library = await this.libraryService.createLibrary(name || 'e2e-library', owner, paths)
-      return { libraryId: library.libraryId }
+      return { id: library.id, libraryId: library.libraryId }
     } catch (error) {
       Logger.error(error, 'DevController.createLibrary')
       throw error

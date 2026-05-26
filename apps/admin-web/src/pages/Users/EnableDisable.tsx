@@ -55,6 +55,8 @@ function EnableDisableUser({ user }: EnableDisableUserProps) {
     if (isServerOwner) {
       return (
         <Button
+          data-testid="user-disable-button"
+          data-disabled-reason="owner"
           onClick={onClick}
           icon={icon}
           disabled={true}
@@ -68,6 +70,8 @@ function EnableDisableUser({ user }: EnableDisableUserProps) {
     if (isCurrentUser) {
       return (
         <Button
+          data-testid="user-disable-button"
+          data-disabled-reason="self"
           onClick={onClick}
           icon={icon}
           disabled={true}
@@ -79,6 +83,7 @@ function EnableDisableUser({ user }: EnableDisableUserProps) {
     } else {
       return (
         <Button
+          data-testid="user-disable-button"
           onClick={onClick}
           icon={icon}
         >
@@ -115,7 +120,11 @@ function EnableDisableUser({ user }: EnableDisableUserProps) {
     <>
       {!!user?.enabled && getDisableButton()}
       {!user?.enabled && (
-        <Button onClick={() => setShowConfirmEnableUser(true)} icon="fas fa-door-open">
+        <Button
+          data-testid="user-enable-button"
+          onClick={() => setShowConfirmEnableUser(true)}
+          icon="fas fa-door-open"
+        >
           {i18n['users.settings.actions.enable'][lang]}
         </Button>
       )}

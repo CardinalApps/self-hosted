@@ -78,7 +78,7 @@ function CreateUserDrawer({ onClose }: UserManagementDrawerProps) {
             />
           </FormField>
           <footer>
-            <Button type="submit" textual>{i18n['create-user.submit'][lang]}</Button>
+            <Button data-testid="user-create-submit" type="submit" textual>{i18n['create-user.submit'][lang]}</Button>
           </footer>
         </Form>
       </Drawer.Section>

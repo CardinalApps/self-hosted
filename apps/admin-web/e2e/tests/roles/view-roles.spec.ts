@@ -9,6 +9,21 @@ import {
 // /admin/roles renders two cards: .roles-list (system roles) and
 // .capabilities-list (capabilities per role).
 
+/*
+ * TODO: assign-roles spec is deferred.
+ *
+ * The plan calls for an `assign-roles.spec.ts` that grants / revokes a role
+ * on an existing user and verifies the change persists. No admin-web UI
+ * does this today — the Roles page is read-only, and UserManagementDrawer
+ * shows a user's roles as a non-editable list. Role grant/revoke happens
+ * either at user creation (the role Select in CreateUserDrawer) or via
+ * the dev-only /dev/users/grant-role and /revoke-role endpoints.
+ *
+ * Write the spec when role mutation lands as a real product flow — likely
+ * an editable list inside UserManagementDrawer (next to EnableDisable and
+ * UpdatePassword).
+ */
+
 test.beforeEach(async () => {
   await factoryResetMediaServer()
   await completeFirstTimeSetup({ serverName: 'e2e-roles' })
