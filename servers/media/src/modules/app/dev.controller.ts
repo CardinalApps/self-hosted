@@ -99,7 +99,7 @@ export class DevController {
     }
     try {
       const result = await this.appService.initialSetup({
-        theme: body.theme ?? 'Light',
+        theme: body.theme ?? 'light',
         serverName: body.serverName ?? 'e2e-server',
         sendAnonymousUsageData: body.sendAnonymousUsageData ?? false,
         userCardinalJWT: body.userCardinalJWT,

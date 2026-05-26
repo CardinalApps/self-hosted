@@ -96,6 +96,8 @@ function Indexer() {
         <div className={'buttonBox'}>
           <button
             type="button"
+            data-testid="indexing-power-button"
+            data-state={indexingServiceState ?? 'unknown'}
             className={clsx(
               'importButton',
               indexingServiceState === 'indexing' ? 'running' : '',

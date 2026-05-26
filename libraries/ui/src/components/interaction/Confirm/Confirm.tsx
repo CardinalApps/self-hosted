@@ -72,12 +72,13 @@ const Confirm = ({
               <Icon fa="fas fa-exclamation-circle" />
               <span dangerouslySetInnerHTML={{ __html: i18n['confirm.enter-text'][lang].replace('{text}', mustEnterText) }} />
             </p>
-            <TextInput onChange={(v) => setEnteredText(v)} />
+            <TextInput data-testid="confirm-input" onChange={(v) => setEnteredText(v)} />
           </div>
         }
         <div className="confirmation-dialogue-controls">
-          <Button textual onClick={() => maybeClose(false)}>{i18n['confirm.button.cancel'][lang]}</Button>
+          <Button data-testid="confirm-cancel" textual onClick={() => maybeClose(false)}>{i18n['confirm.button.cancel'][lang]}</Button>
           <Button
+            data-testid="confirm-confirm"
             textual
             disabled={loading}
             animation={loading ? 'loading' : undefined}

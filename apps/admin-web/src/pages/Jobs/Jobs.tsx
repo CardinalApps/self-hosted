@@ -99,6 +99,8 @@ function Jobs() {
           return (
             <button
               key={job}
+              data-testid="job-type-tag"
+              data-job-type={job}
               className={clsx('jobTag', configuring && 'configuring')}
               onClick={() => handleJobTypeClick(job)}
             >

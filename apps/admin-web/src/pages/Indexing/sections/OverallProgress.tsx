@@ -84,7 +84,10 @@ function Indexer() {
           {
             name: i18n['status.current-status'][lang],
             label: (
-              <>
+              <span
+                data-testid="indexing-state-indicator"
+                data-state={indexingServiceState ?? 'unknown'}
+              >
                 {indexingServiceState === 'idle' &&
                   <span>{i18n['state.idle'][lang]}</span>
                 }
@@ -95,6 +98,7 @@ function Indexer() {
                   <span>
                     {i18n['state.paused'][lang]}
                     <button
+                      data-testid="indexing-stop-button"
                       className={'stopRun'}
                       title={i18n['stop-run.title-attr'][lang]}
                       onClick={handleStopButtonClick}
@@ -114,7 +118,7 @@ function Indexer() {
                     {i18n['state.completed.no-files-found'][lang]}
                   </span>
                 }
-              </>
+              </span>
             ),
           },
           {
