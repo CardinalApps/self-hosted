@@ -21,7 +21,7 @@ function Welcome({
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="welcome">
       <I11nFadeIn className={'logo'} duration={1} delay={0.2}>
         <BrandLogo icon="birb" size="l" />
       </I11nFadeIn>
@@ -32,11 +32,11 @@ function Welcome({
         {i18n['welcome.subtitle'][lang]}
       </I11nFadeIn>
       <I11nFadeIn duration={1.3} delay={3.6}>
-        <Button onClick={next}>
+        <Button data-testid="setup-step-next" onClick={next}>
           {i18n['welcome.start-button'][lang]}
         </Button>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 

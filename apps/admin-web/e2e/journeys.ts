@@ -17,6 +17,11 @@ export const JOURNEYS: Journey[] = [
 
   // Non-SSO admin-feature journeys (covered by the new spec batches).
   { id: 'first-time-setup', name: 'Complete the first-time-setup wizard on a fresh server' },
+  { id: 'first-time-setup-claim-side-effect', name: 'FTS Finish writes the self-hosted-app claim to the auth server' },
+  { id: 'first-time-setup-theme-choice', name: 'FTS persists the theme the user picked during the wizard' },
+  { id: 'first-time-setup-telemetry-choice', name: 'FTS persists the anonymous-usage-data preference the user picked' },
+  { id: 'first-time-setup-server-name-validation', name: 'FTS server-name step rejects empty + invalid input' },
+  { id: 'first-time-setup-reload-resets', name: 'Reloading mid-wizard restarts FTS from step 1' },
   { id: 'factory-reset', name: 'Reset the server back to a fresh state' },
   { id: 'guest-login', name: 'Sign in as the built-in Guest admin account' },
   { id: 'local-login', name: 'Sign in with a local username + password' },

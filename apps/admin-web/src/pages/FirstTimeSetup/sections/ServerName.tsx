@@ -37,7 +37,7 @@ function ServerName({
   }
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="server-name">
       <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
@@ -47,10 +47,11 @@ function ServerName({
           header={<H2 className={'title'}>{i18n['server-name.title'][lang]}</H2>}
           footer={
             <>
-              <Button onClick={prev} textual={true}>
+              <Button data-testid="setup-step-prev" onClick={prev} textual={true}>
                 {i18n['prev'][lang]}
               </Button>
               <Button
+                data-testid="setup-step-next"
                 textual={true}
                 onClick={() => {
                   if (serverName) {
@@ -74,6 +75,7 @@ function ServerName({
             }}
           >
             <TextInput
+              data-testid="setup-server-name-input"
               type="text"
               name="sever-name"
               maxLength={64}
@@ -83,7 +85,7 @@ function ServerName({
           </form>
         </Card>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 

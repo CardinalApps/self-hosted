@@ -176,6 +176,31 @@ export async function deleteSelfHostedClaim(instanceId: string): Promise<void> {
   })
 }
 
+export type SelfHostedClaimRecord = {
+  claimId: string,
+  instanceId: string,
+  userId: string,
+  appId: string,
+  appNameSetByUser: string,
+  createdAt: string,
+}
+
+// Fetch the self-hosted-app claim for an instance, or `null` if none
+// exists. Used by FTS specs to assert the deferred claim write that POST
+// /setup performs on Finish.
+export async function getSelfHostedClaim(instanceId: string): Promise<SelfHostedClaimRecord | null> {
+  const res = await fetch(`${AUTH_BASE}/dev/sso/claim/${encodeURIComponent(instanceId)}`, {
+    method: 'GET',
+    headers: { 'User-Agent': BROWSER_UA },
+  })
+  if (res.status === 404) return null
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`getSelfHostedClaim failed (${res.status}): ${text}`)
+  }
+  return res.json() as Promise<SelfHostedClaimRecord>
+}
+
 // Register a fresh user and seed the page's localStorage with their cloud JWT,
 // so the next navigation under the app's origin starts already logged in.
 // Skips the SSO popup. Caller must `deleteTestUser(jwt)` in a finally block.

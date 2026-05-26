@@ -23,7 +23,7 @@ function Privacy({
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="privacy">
       <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
@@ -33,10 +33,10 @@ function Privacy({
           header={<H2 className={'title'}>{i18n['privacy.title'][lang]}</H2>}
           footer={
             <>
-              <Button onClick={prev} textual={true}>
+              <Button data-testid="setup-step-prev" onClick={prev} textual={true}>
                 {i18n['prev'][lang]}
               </Button>
-              <Button onClick={next} textual={true}>
+              <Button data-testid="setup-step-next" onClick={next} textual={true}>
                 {i18n['privacy.next'][lang]}
               </Button>
             </>
@@ -45,7 +45,7 @@ function Privacy({
           <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['privacy.message-p1'][lang] }} />
         </Card>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 

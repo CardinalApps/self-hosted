@@ -54,7 +54,7 @@ function Login({
   }
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="login" data-logged-in={loggedIn ? 'true' : 'false'}>
       <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
@@ -65,10 +65,10 @@ function Login({
           footer={
             <>
               <div>
-                <Button onClick={prev} textual={true}>
+                <Button data-testid="setup-step-prev" onClick={prev} textual={true}>
                   {i18n['prev'][lang]}
                 </Button>
-                <Button onClick={next} textual={true}>
+                <Button data-testid="setup-step-next" onClick={next} textual={true}>
                   {i18n['next'][lang]}
                 </Button>
               </div>
@@ -80,7 +80,7 @@ function Login({
           <div className={'loginButton'}>
             {loggedIn
               ?
-                <p className={'currentUser'}>
+                <p className={'currentUser'} data-testid="setup-login-confirmed">
                   <i className="fas fa-check" /> {i18n['login.logged-in-as']['en'].replace('{name}', userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang])}
                 </p>
               : <CardinalAdminSSOButton
@@ -92,7 +92,7 @@ function Login({
           </div>
         </Card>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 

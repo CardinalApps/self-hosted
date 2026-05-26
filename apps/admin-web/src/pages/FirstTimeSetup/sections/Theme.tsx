@@ -30,11 +30,13 @@ function Theme({
   }
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="theme">
       <I11nFadeIn duration={0.3}>
         <H1 className={'title center'}>{i18n['theme.title'][lang]}</H1>
         <div className={'themeSwatches'}>
           <button
+            data-testid="setup-theme-swatch"
+            data-theme-value="light"
             className={'themeSwatch lightSwatch'}
             onFocus={() => handleThemeChange('light')}
             onMouseEnter={() => handleThemeChange('light')}
@@ -44,6 +46,8 @@ function Theme({
             <p>{i18n['theme.name.light'][lang]}</p>
           </button>
           <button
+            data-testid="setup-theme-swatch"
+            data-theme-value="dark"
             className={'themeSwatch darkSwatch'}
             onFocus={() => handleThemeChange('dark')}
             onMouseEnter={() => handleThemeChange('dark')}
@@ -54,7 +58,7 @@ function Theme({
           </button>
         </div>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 
