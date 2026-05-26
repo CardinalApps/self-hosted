@@ -29,7 +29,7 @@ function UsageData({
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="usage-data">
       <I11nFadeIn duration={0.3}>
         <Card
           className={'card'}
@@ -39,10 +39,10 @@ function UsageData({
           header={<H2 className={'title'}>{i18n['usage-data.title'][lang]}</H2>}
           footer={
             <>
-              <Button onClick={prev} textual={true}>
+              <Button data-testid="setup-step-prev" onClick={prev} textual={true}>
                 {i18n['prev'][lang]}
               </Button>
-              <Button onClick={next} textual={true}>
+              <Button data-testid="setup-step-next" onClick={next} textual={true}>
                 {i18n['usage-data.next'][lang]}
               </Button>
             </>
@@ -62,7 +62,7 @@ function UsageData({
           </div>
         </Card>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 

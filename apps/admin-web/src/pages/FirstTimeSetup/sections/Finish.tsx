@@ -25,7 +25,7 @@ function Finish({
   const { lang } = useSelector(settingsSelectors.current)
 
   return (
-    <>
+    <div data-testid="setup-step" data-step-name="finish">
       <I11nFadeIn className={'finish'} duration={0.3}>
         <Card
           className={'card'}
@@ -35,10 +35,10 @@ function Finish({
           header={<H2 className={'title'}>{i18n['finish.title'][lang]}</H2>}
           footer={
             <>
-              <Button onClick={prev} textual={true}>
+              <Button data-testid="setup-step-prev" onClick={prev} textual={true}>
                 {i18n['prev'][lang]}
               </Button>
-              <Button animation={finishButtonState} onClick={handleFinishSetup} textual={true}>
+              <Button data-testid="setup-step-submit" animation={finishButtonState} onClick={handleFinishSetup} textual={true}>
                 {i18n['finish.next'][lang]}
               </Button>
             </>
@@ -47,7 +47,7 @@ function Finish({
           <p className={'message'} dangerouslySetInnerHTML={{ __html: i18n['finish.message-p1'][lang] }} />
         </Card>
       </I11nFadeIn>
-    </>
+    </div>
   )
 }
 
