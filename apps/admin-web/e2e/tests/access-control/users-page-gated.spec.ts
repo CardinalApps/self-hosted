@@ -13,6 +13,37 @@ import {
 // the credentials) before they can see any admin page. Assert that
 // rejection via the response status — i18n-safe.
 
+/*
+ * TODO: per-action capability-gating tests are deferred.
+ *
+ * The e2e plan calls for these specs, none of which are writable today:
+ *   - tests/users/users-capability-gating.spec.ts
+ *   - tests/libraries/libraries-capability-gating.spec.ts
+ *   - tests/indexing/indexing-capability-gating.spec.ts
+ *   - tests/jobs/jobs-capability-gating.spec.ts
+ *   - tests/surfaces/access-denied.spec.ts
+ *
+ * Blocker: every role in `MediaServerRoles` that grants `AdminApp.Login`
+ * (owner, administrator) has wildcard `*.*` capabilities, and every role
+ * that lacks some capabilities also lacks `AdminApp.Login`. There's no
+ * "admin who can read but not mutate" role today, so any UI-side gate
+ * (e.g. hide the Create button when Users.Create is missing) is
+ * untestable — every assertion would be "the button is visible".
+ *
+ * Unblock when one of these lands:
+ *   1. A real product role with AdminApp.Login + a constrained capability
+ *      set (e.g. `technical_support`, scoped admin, read-only admin).
+ *      Preferred — drives both the feature and the tests at once.
+ *   2. Custom-role support, so a test can construct an arbitrary role at
+ *      seed time without polluting the shared registry.
+ *
+ * When that happens, the gating specs all follow the same pattern: seed a
+ * local user with the constrained role, log in, navigate to the gated page,
+ * and assert the affordance is absent (data-testid count === 0) or
+ * disabled. The existing data-testid seams on Create / Configure / Deindex
+ * / Pause / Resume / Cancel are already wired for this.
+ */
+
 test.beforeEach(async () => {
   await factoryResetMediaServer()
   await completeFirstTimeSetup({ serverName: 'e2e-gating' })
