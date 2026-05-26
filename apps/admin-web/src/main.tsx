@@ -6,6 +6,13 @@ import AppRoot from './components/AppRoot'
 
 import { store } from '@cardinalapps/ui/src/store'
 
+// E2E test seam: lets Playwright drive Redux directly (mainly to replay `sse/*`
+// events without standing up a real server-side EventSource). Gated on
+// `VITE_E2E=true` so the symbol is absent from normal dev/prod builds.
+if (import.meta.env.VITE_E2E === 'true') {
+  (window as unknown as { __testDispatch: typeof store.dispatch }).__testDispatch = store.dispatch
+}
+
 import '@cardinalapps/ui/public/styles/global.css'
 import '@cardinalapps/ui/public/styles/fonts.css'
 import '@cardinalapps/ui/public/styles/reset.css'

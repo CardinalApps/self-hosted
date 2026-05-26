@@ -54,7 +54,7 @@ function Indexer() {
         </>
       }
     >
-      <div className={'progressBar'}>
+      <div className={'progressBar'} data-testid="media-progress-music">
         <p>{i18n['status.progress.music'][lang]}</p>
         <ProgressBar
           current={(musicIndexed + musicSkipped + musicErrored) || 0}
@@ -62,7 +62,7 @@ function Indexer() {
           showCount={true}
         />
       </div>
-      <div className={'progressBar'}>
+      <div className={'progressBar'} data-testid="media-progress-photos">
         <p>{i18n['status.progress.photos'][lang]}</p>
         <ProgressBar
           current={(photosIndexed + photosSkipped + photosErrored) || 0}
@@ -70,7 +70,7 @@ function Indexer() {
           showCount={true}
         />
       </div>
-      <div className={'progressBar'}>
+      <div className={'progressBar'} data-testid="media-progress-movies">
         <p>{i18n['status.progress.movies'][lang]}</p>
         <ProgressBar
           current={(moviesIndexed + moviesSkipped + moviesErrored) || 0}
@@ -78,7 +78,7 @@ function Indexer() {
           showCount={true}
         />
       </div>
-      <div className={'progressBar'}>
+      <div className={'progressBar'} data-testid="media-progress-tv">
         <p>{i18n['status.progress.tv'][lang]}</p>
         <ProgressBar
           current={(tvIndexed + tvSkipped + tvErrored) || 0}

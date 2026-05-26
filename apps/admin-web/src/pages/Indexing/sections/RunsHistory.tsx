@@ -150,6 +150,7 @@ function RunsHistory() {
       footer={
         <>
           <Button
+            data-testid="deindex-media-button"
             onClick={() => setShowDeindexConfirm(true)}
             disabled={!userCanDeindex}
           >

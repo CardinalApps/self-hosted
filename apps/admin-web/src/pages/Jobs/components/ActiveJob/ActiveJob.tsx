@@ -89,7 +89,13 @@ function ActiveJob({
   }, [controlActiveJobResult.isError])
 
   return (
-    <div className={'activeJob'}>
+    <div
+      className={'activeJob'}
+      data-testid="active-job"
+      data-job-id={job.id}
+      data-job-type={job.type}
+      data-job-status={job.status}
+    >
       <div className={'info'}>
         <p className="active-job-name">{i18n[`job.${job.type}.title`]?.[lang]}</p>
         <JobStatusComponent status={job.status as JobStatus} />
@@ -118,6 +124,7 @@ function ActiveJob({
           {/* Show cancel button when paused or not yet started */}
           {(job.status === 'paused' || job.status === 'in_queue' || job.status === 'preparing') &&
             <Button
+              data-testid="active-job-cancel"
               onClick={handleCancel}
               animation={controlActiveJobResult.isLoading ? 'loading' : undefined}
             >
@@ -128,6 +135,7 @@ function ActiveJob({
           {/* Show resume button when paused */}
           {job.status === 'paused' &&
             <Button
+              data-testid="active-job-resume"
               onClick={handleResume}
             >
               {i18n[`job.button.resume`][lang]}
@@ -137,6 +145,7 @@ function ActiveJob({
           {/* Show pause button when running */}
           {job.status === 'running' &&
             <Button
+              data-testid="active-job-pause"
               onClick={handlePause}
             >
               {i18n[`job.button.pause`][lang]}

@@ -76,7 +76,7 @@ function ActiveJobs() {
             />
           )
         })
-        : <p className="card-empty-text">{i18n['active-jobs.no-active-jobs'][lang]}</p>
+        : <p className="card-empty-text" data-testid="active-jobs-empty">{i18n['active-jobs.no-active-jobs'][lang]}</p>
       }
     </CardGrid.Card>
   )
