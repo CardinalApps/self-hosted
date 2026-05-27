@@ -57,6 +57,42 @@ export async function completeFirstTimeSetup(options: {
   return devCall('POST', '/dev/first-time-setup', options)
 }
 
+// True iff the media server has completed first-time-setup. Reads the
+// `first_time_setup_done` option directly; returns false when the option is
+// absent (the not_setup state) without throwing.
+export async function isFirstTimeSetupDone(): Promise<boolean> {
+  const res = await fetch(`${MEDIA_BASE}/dev/options/first_time_setup_done`, {
+    headers: DEFAULT_HEADERS,
+  })
+  if (res.status === 404) return false
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`GET /dev/options/first_time_setup_done failed (${res.status}): ${text}`)
+  }
+  const data = await res.json() as { value: unknown }
+  return data.value === true || data.value === 'true' || data.value === 1
+}
+
+// Idempotent counterpart to `completeFirstTimeSetup` — runs FTS only if the
+// server isn't already set up. Lets the regular (non-FTS) e2e suite assume a
+// configured server without wiping the developer's local state on every test.
+export async function ensureFirstTimeSetup(options: {
+  serverName?: string,
+  theme?: string,
+  sendAnonymousUsageData?: boolean,
+  userCardinalJWT?: string,
+} = {}): Promise<void> {
+  if (await isFirstTimeSetupDone()) return
+  await completeFirstTimeSetup(options)
+}
+
+// Delete a user by its userId UUID. Used by tests that seed users via
+// `seedLocalUser` and need to clean up in `afterEach` without resetting the
+// whole server.
+export async function deleteLocalUser(userId: string): Promise<void> {
+  await devCall('DELETE', `/dev/users/${encodeURIComponent(userId)}`)
+}
+
 // Create a local user with the given role. Returns the userId.
 export async function seedLocalUser(args: {
   username: string,
@@ -115,6 +151,15 @@ export async function getMediaServerOption(name: string): Promise<unknown> {
 // completeFirstTimeSetup() in beforeEach.
 export async function loginAsGuest(page: Page, targetUrl = '/admin'): Promise<void> {
   await page.goto(targetUrl)
+  // Wait for the SPA bootstrap to settle before clicking. On a fresh page,
+  // AppBase fires a silent token-refresh that 401s; handle401 then calls
+  // fullLogout which dispatches RESET, clearing the user list (including
+  // the guest account). If we click the Guest button before that cycle
+  // completes, getGuestAccount() returns null mid-click and the login is
+  // silently dropped with an ERR_CHS_0017 toast. Waiting for `.app-loading`
+  // to hide guarantees the refresh + RESET have already happened, so the
+  // user list is repopulated by the time we click.
+  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
   await page.click('[data-testid="login-with-guest-button"]')
   await page.waitForURL((url) => url.pathname.startsWith('/admin') && url.pathname !== '/admin/login', { timeout: 10_000 })
 }

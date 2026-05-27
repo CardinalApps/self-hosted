@@ -3,19 +3,12 @@ import type { Page, Route } from '@playwright/test'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
 // `useGetJobsQuery` powers both the active-jobs and history cards. We mock
 // the `/jobs` endpoint with `page.route` so we can render arbitrary queue
 // states without doing actual server-side work.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-jobs' })
-})
 
 type MockJob = {
   id: number,

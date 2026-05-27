@@ -1,8 +1,9 @@
+import { randomUUID } from 'node:crypto'
+
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLibrary,
   loginAsGuest,
   seedLibrary,
   fixturePath,
@@ -15,19 +16,23 @@ import {
 // surface — leaving the granular form-driving to a focused spec when the
 // AddRemove component gains stable seams of its own.
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-configure-library' })
+const seededLibraryIds: string[] = []
+
+test.afterEach(async () => {
+  for (const libraryId of seededLibraryIds.splice(0)) {
+    await deleteLibrary(libraryId).catch(() => {})
+  }
 })
 
 test(
   'options-button on a seeded library opens the configure drawer with save and delete enabled',
   { tag: '@journey:manage-libraries' },
   async ({ page }) => {
-    const { id } = await seedLibrary({
-      name: 'e2e-configurable',
+    const { id, libraryId } = await seedLibrary({
+      name: `e2e-configurable-${randomUUID().slice(0, 8)}`,
       paths: [fixturePath('music')],
     })
+    seededLibraryIds.push(libraryId)
 
     await loginAsGuest(page)
     await page.click('a[href="/admin/libraries"]')

@@ -201,15 +201,25 @@ export async function getSelfHostedClaim(instanceId: string): Promise<SelfHosted
   return res.json() as Promise<SelfHostedClaimRecord>
 }
 
+// Sentinel key recorded in localStorage after the JWT-seeding init script
+// has run once. Lets the script no-op on subsequent navigations so tests
+// that intentionally tamper with or remove the JWT (session-expiry, etc.)
+// aren't fighting an auto-restore.
+const JWT_SEEDED_SENTINEL = '__e2e_jwt_seeded__'
+
 // Register a fresh user and seed the page's localStorage with their cloud JWT,
 // so the next navigation under the app's origin starts already logged in.
 // Skips the SSO popup. Caller must `deleteTestUser(jwt)` in a finally block.
 //
-// Sequence: navigate to /, let the no-JWT bootstrap settle, write the token,
-// then reload. The reload is the key under parallel load — without it, the
-// handle_cloud_401 middleware from the initial unauth /user call can fire a
-// logout dispatch AFTER our setItem and wipe the JWT we just wrote. Reloading
-// ensures fetchUser runs once, cleanly, with the JWT already in place.
+// JWT is injected via `addInitScript` so it lands in localStorage BEFORE any
+// app scripts run on the first navigation. The old goto-setItem-reload dance
+// had a race: under parallel load, a 401 from the no-JWT bootstrap /user call
+// could fire AFTER setItem and trigger handle_cloud_401 to wipe the token.
+// addInitScript eliminates the no-JWT window entirely.
+//
+// The sentinel makes the script effectively one-shot: tests that mutate the
+// JWT afterwards (set a tampered value, remove it entirely) won't have their
+// change clobbered on the next navigation.
 export async function seedLoggedInUser(
   page: Page,
   email: string,
@@ -222,13 +232,15 @@ export async function seedLoggedInUser(
   if (options.confirmed) await confirmUserEmail(userId)
   if (options.mfa) await enableEmailMfa(jwt)
 
-  await page.goto('/')
-  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
-  await page.evaluate(
-    ([key, value]) => localStorage.setItem(key, value),
-    [JWT_STORAGE_KEY, jwt] as const,
+  await page.addInitScript(
+    ([key, value, sentinel]) => {
+      if (localStorage.getItem(sentinel)) return
+      localStorage.setItem(key, value)
+      localStorage.setItem(sentinel, '1')
+    },
+    [JWT_STORAGE_KEY, jwt, JWT_SEEDED_SENTINEL] as const,
   )
-  await page.reload()
+  await page.goto('/')
   await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
 
   return { jwt, userId, email }
@@ -263,13 +275,15 @@ export async function loginViaApi(
   if (!data.exchangeToken) throw new Error('loginViaApi: response did not include an exchangeToken')
 
   // Same race avoidance as seedLoggedInUser — see comment there.
-  await page.goto('/')
-  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
-  await page.evaluate(
-    ([key, value]) => localStorage.setItem(key, value),
-    [JWT_STORAGE_KEY, data.JWT] as const,
+  await page.addInitScript(
+    ([key, value, sentinel]) => {
+      if (localStorage.getItem(sentinel)) return
+      localStorage.setItem(key, value)
+      localStorage.setItem(sentinel, '1')
+    },
+    [JWT_STORAGE_KEY, data.JWT, JWT_SEEDED_SENTINEL] as const,
   )
-  await page.reload()
+  await page.goto('/')
   await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
 
   return { jwt: data.JWT, exchangeToken: data.exchangeToken }

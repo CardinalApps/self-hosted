@@ -146,6 +146,30 @@ export class DevController {
     }
   }
 
+  // Delete a user by its userId UUID. Counterpart to `createLocalUser` — lets
+  // tests clean up the data they seeded without a full factory reset.
+  @Delete('/users/:userId')
+  @StandardEndpoint({
+    auth: false,
+    summary: 'Dev-only: delete a user by userId.',
+  })
+  async deleteLocalUser(@Param('userId') userId: string): Promise<{ ok: boolean }> {
+    if (!devEndpointsEnabled()) {
+      throw new NotFoundException()
+    }
+    const user = await this.userService.get(userId)
+    if (!user) {
+      throw new NotFoundException('No such user')
+    }
+    try {
+      const ok = await this.userService.deleteUser(user.id, false)
+      return { ok }
+    } catch (error) {
+      Logger.error(error, 'DevController.deleteLocalUser')
+      throw error
+    }
+  }
+
   // Grant an additional role to an existing user (cloud or local).
   @Post('/users/grant-role')
   @StandardEndpoint({

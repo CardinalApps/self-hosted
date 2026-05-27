@@ -1,8 +1,9 @@
+import { randomUUID } from 'node:crypto'
+
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLibrary,
   loginAsGuest,
   seedLibrary,
   fixturePath,
@@ -11,9 +12,12 @@ import {
 // /admin/libraries shows a `.librariesTable` with one row per library.
 // Empty state is the table's emptyMessage row.
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-libraries' })
+const seededLibraryIds: string[] = []
+
+test.afterEach(async () => {
+  for (const libraryId of seededLibraryIds.splice(0)) {
+    await deleteLibrary(libraryId).catch(() => {})
+  }
 })
 
 test(
@@ -31,20 +35,21 @@ test(
   'a seeded library renders as a row in the table',
   { tag: '@journey:manage-libraries' },
   async ({ page }) => {
-    await seedLibrary({
-      name: 'e2e-music',
+    const { id, libraryId } = await seedLibrary({
+      name: `e2e-music-${randomUUID().slice(0, 8)}`,
       paths: [fixturePath('music')],
     })
+    seededLibraryIds.push(libraryId)
 
     await loginAsGuest(page)
     await page.click('a[href="/admin/libraries"]')
     await page.waitForURL((url) => url.pathname === '/admin/libraries', { timeout: 10_000 })
     await expect(page.locator('.librariesTable')).toBeVisible({ timeout: 10_000 })
 
-    // Each library row is a `<tr>` inside the table body.
-    await expect.poll(
-      async () => page.locator('.librariesTable tbody tr').count(),
-      { timeout: 5_000 },
-    ).toBeGreaterThanOrEqual(1)
+    // Match the row by the just-seeded library's numeric id — isolates this
+    // assertion from any unrelated libraries that might exist in the table.
+    await expect(
+      page.locator(`[data-testid="library-row-options"][data-library-id="${id}"]`),
+    ).toBeVisible({ timeout: 5_000 })
   },
 )

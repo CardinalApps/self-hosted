@@ -3,17 +3,20 @@ import { randomUUID } from 'node:crypto'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLocalUser,
   seedLocalUser,
 } from '@cardinalapps/e2e-helpers'
 
 // Local users authenticate against the media server's Local IDP (no Cardinal
 // Cloud round-trip). The login button is the second in the stack; tapping it
 // expands an inline form with username + password inputs.
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-local' })
+
+const seededUserIds: string[] = []
+
+test.afterEach(async () => {
+  for (const userId of seededUserIds.splice(0)) {
+    await deleteLocalUser(userId).catch(() => {})
+  }
 })
 
 test(
@@ -22,7 +25,8 @@ test(
   async ({ page }) => {
     const username = `local-${randomUUID()}`
     const password = 'TestPass123!'
-    await seedLocalUser({ username, password, role: 'administrator' })
+    const { userId } = await seedLocalUser({ username, password, role: 'administrator' })
+    seededUserIds.push(userId)
 
     await page.goto('/admin/login')
     await expect(page.locator('[data-testid="login-with-local-account-button"]')).toBeVisible({ timeout: 10_000 })
@@ -43,7 +47,8 @@ test(
   async ({ page }) => {
     const username = `local-${randomUUID()}`
     const password = 'TestPass123!'
-    await seedLocalUser({ username, password, role: 'administrator' })
+    const { userId } = await seedLocalUser({ username, password, role: 'administrator' })
+    seededUserIds.push(userId)
 
     await page.goto('/admin/login')
     await page.click('[data-testid="login-with-local-account-button"]')

@@ -25,6 +25,7 @@
     "test:unit": "turbo run test:unit --force --concurrency=1",
     "test:integration": "turbo run test:integration --force --concurrency=1",
     "test:e2e": "turbo run test:e2e --force --concurrency=1",
+    "test:e2e:fts": "turbo run test:e2e:fts --force --concurrency=1",
     "test:e2e:ui": "turbo run test:e2e:ui",
     "test:e2e:install": "turbo run test:e2e:install"
   },

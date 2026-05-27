@@ -1,8 +1,6 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
@@ -23,11 +21,6 @@ import {
  * an editable list inside UserManagementDrawer (next to EnableDisable and
  * UpdatePassword).
  */
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-roles' })
-})
 
 test(
   'the roles page renders the roles + capabilities cards',

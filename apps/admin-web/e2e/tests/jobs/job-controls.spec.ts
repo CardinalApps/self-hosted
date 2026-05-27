@@ -3,19 +3,12 @@ import type { Page, Route } from '@playwright/test'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
 // The pause/resume/cancel controls all fire `PATCH /api/v1/job/:id` via
 // `useControlActiveJobMutation`. Mock the list with a job in each status,
 // click the control, assert the PATCH body.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-job-controls' })
-})
 
 type MockJob = {
   id: number,

@@ -1,8 +1,6 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
@@ -11,11 +9,6 @@ import {
 // visible signal. Drive the validation path without DirectoryTree
 // interaction; the seed-and-render path is exercised by seedLibrary in
 // view-libraries.spec.ts.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-create-library' })
-})
 
 test(
   'opening the create drawer with no directories selected shows the warning alert and no POST /library fires',

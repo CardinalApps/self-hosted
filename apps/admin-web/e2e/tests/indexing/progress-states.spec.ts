@@ -3,8 +3,6 @@ import type { Page } from '@playwright/test'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
   dispatchSseEvent,
 } from '@cardinalapps/e2e-helpers'
@@ -15,8 +13,6 @@ import {
 // to a real run — without standing up the indexer.
 
 test.beforeEach(async ({ page }) => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-indexing-states' })
   // NewRun, OverallProgress, and MediaProgress all call /index/state on
   // mount and dispatch setServerState with the response, which races our
   // SSE dispatch and resets serverState to whatever the server returned
