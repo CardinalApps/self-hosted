@@ -12,9 +12,21 @@ import { getCardinalTolkienFromHeaders } from '../utils/jwt'
 /**
  * This middleware checks if the server has an owner, but has not been claimed.
  * This can happen if the claim fails for any reason during First Time Setup.
- * 
+ *
  * When this state is detected, the claim will be retried. This is done in with
  * a middleware because we need to forward the owners JWT.
+ *
+ * FIXME: this races the CREATE_OWNER event handler that fires during POST
+ * /setup. Both call `ClaimService.claimServerWithCloudIfNotClaimed`; the
+ * `if (!opt)` check below reads CLAIM_ID before the event handler's
+ * .then(saveClaim) has written it, so two concurrent POST /user/claims hit
+ * the auth server. One wins and creates the claim; the other gets
+ * `400 "This instance has already been claimed"`. The claim still lands
+ * because the winner persists it, but the loser's error is noisy and
+ * pollutes ClaimService.lastClaimAttempt (visible via the dev endpoint).
+ * Two ways out: (a) take a per-request promise lock on
+ * claimServerWithCloudIfNotClaimed so callers serialize, or (b) re-read
+ * CLAIM_ID inside ClaimService AFTER waiting for any in-flight POST.
  */
 @Injectable()
 export class MaybeTriggerClaim implements NestMiddleware {

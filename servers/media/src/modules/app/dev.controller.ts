@@ -7,6 +7,9 @@ import { DatabaseService } from '../database/database.service'
 import { UserService } from '../user/user.service'
 import { RBACService } from '../rbac/rbac.service'
 import { LibraryService } from '../library/library.service'
+import { ClaimService, ClaimAttemptResult } from '../claim/claim.service'
+import { SettingsService } from '../settings/settings.service'
+import { CardinalApp } from '../../utils/apps'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 import { envVar } from '../../utils/env'
 
@@ -33,7 +36,48 @@ export class DevController {
     private readonly userService: UserService,
     private readonly rbacService: RBACService,
     private readonly libraryService: LibraryService,
+    private readonly claimService: ClaimService,
+    private readonly settingsService: SettingsService,
   ) {}
+
+  // Read a per-app setting (theme, server_name, telemetry, etc.). Distinct
+  // from the options table that /dev/options/:name reads — settings live
+  // on `settingsService.set(CardinalApp.X, {...})`. Pass `app` as one of
+  // 'admin' | 'music' | 'photos' | 'cinema' (raw enum value).
+  @Get('/settings/:app/:key')
+  @StandardEndpoint({
+    auth: false,
+    summary: 'Dev-only: read a settings value for the given app.',
+  })
+  async getSetting(
+    @Param('app') app: string,
+    @Param('key') key: string,
+  ): Promise<{ value: unknown }> {
+    if (!devEndpointsEnabled()) {
+      throw new NotFoundException()
+    }
+    // SettingsService.get takes a narrowly-typed setting slug; the dev
+    // endpoint accepts any string and casts. Wrong slugs return null,
+    // which is informative enough for tests.
+    const value = await this.settingsService.get(app as CardinalApp, key as never)
+    return { value }
+  }
+
+  // Returns the result of the most recent ClaimService attempt — success or
+  // failure — for FTS specs that need to diagnose a missing claim without
+  // tailing the media server's stdout. `null` if no attempt has been made
+  // since process start.
+  @Get('/last-claim-attempt')
+  @StandardEndpoint({
+    auth: false,
+    summary: 'Dev-only: read the in-memory record of the most recent claim attempt.',
+  })
+  async lastClaimAttempt(): Promise<{ attempt: ClaimAttemptResult | null }> {
+    if (!devEndpointsEnabled()) {
+      throw new NotFoundException()
+    }
+    return { attempt: this.claimService.lastClaimAttempt }
+  }
 
   // Reset the server to a fresh, unconfigured state. Wraps the existing
   // AppService.factoryReset which the production /reset endpoint also uses,

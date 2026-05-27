@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid'
+import { randomUUID } from 'node:crypto'
 
 import {
   test,
@@ -8,9 +8,9 @@ import {
   confirmUserEmail,
   getUserIdFromJwt,
   deleteSelfHostedClaim,
-  mockHomeServerInstance,
   factoryResetMediaServer,
   getMediaServerOption,
+  getMediaServerSetting,
   clickWelcomeStart,
   pickTheme,
   setServerNameAndContinue,
@@ -29,17 +29,21 @@ import {
   sendAnonymousUsageData, ssoToken } (see FirstTimeSetup.tsx
   handleFinishSetup) — these choices live on settings options at the
   database layer.
+
+  Like the happy-path spec, the claim is keyed by the media-server's
+  real instance_id, so we look that up after factoryReset and use it for
+  cleanup on both ends.
 */
 
 test(
   'picking dark theme + opting out of telemetry persists both options',
   { tag: ['@journey:first-time-setup-theme-choice', '@journey:first-time-setup-telemetry-choice'] },
   async ({ page, testEmail, testPassword }) => {
-    const instanceId = uuid()
-    const serverName = `e2e-${instanceId.slice(0, 8)}`
+    const serverName = `e2e-${randomUUID().slice(0, 8)}`
 
     await factoryResetMediaServer()
-    await mockHomeServerInstance(page, { instanceId, serverName })
+    const instanceId = await getMediaServerOption('instance_id') as string
+    await deleteSelfHostedClaim(instanceId)
 
     const jwt = await registerUser(testEmail, testPassword)
     await confirmUserEmail(getUserIdFromJwt(jwt))
@@ -59,10 +63,13 @@ test(
 
       await page.waitForURL((url) => !url.pathname.includes('/admin/setup'), { timeout: 15_000 })
 
-      const theme = await getMediaServerOption('theme')
+      // theme + telemetry both live in the per-app settings table (see
+      // app.service.ts initialSetup → settingsService.set(...)). The
+      // telemetry key in the wizard's payload (`sendAnonymousUsageData`)
+      // maps to the `telemetry` setting on the admin app.
+      const theme = await getMediaServerSetting('admin', 'theme')
       expect(theme).toBe('dark')
-      const telemetry = await getMediaServerOption('send_anonymous_usage_data')
-      // Stored as a string at the DB layer; coerce for the comparison.
+      const telemetry = await getMediaServerSetting('admin', 'telemetry')
       expect(String(telemetry)).toBe('false')
     } finally {
       await deleteSelfHostedClaim(instanceId)
