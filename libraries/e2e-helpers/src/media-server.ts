@@ -134,6 +134,33 @@ export async function getMediaServerOption(name: string): Promise<unknown> {
   return result.value
 }
 
+// Read a per-app setting. Settings live in a different table from options —
+// theme, server_name, telemetry, language live here.
+export async function getMediaServerSetting(app: 'admin' | 'music' | 'photos' | 'cinema', key: string): Promise<unknown> {
+  const result = await devCall<{ value: unknown }>('GET', `/dev/settings/${encodeURIComponent(app)}/${encodeURIComponent(key)}`)
+  return result.value
+}
+
+// In-memory record of the most recent attempt the media server made to
+// register a self-hosted claim against the auth server. `null` until at
+// least one attempt has run since process start. Use this in FTS specs to
+// surface why a claim is missing — fire-and-forget logic in ClaimService
+// swallows the response otherwise.
+export type ClaimAttemptResult = {
+  ok: boolean,
+  at: number,
+  endpoint: string,
+  serverName?: string,
+  instanceId?: string,
+  claimId?: string,
+  error?: { kind: 'object' | 'string' | 'unknown', value: unknown },
+}
+
+export async function getLastClaimAttempt(): Promise<ClaimAttemptResult | null> {
+  const result = await devCall<{ attempt: ClaimAttemptResult | null }>('GET', '/dev/last-claim-attempt')
+  return result.attempt
+}
+
 // Drive the guest-login button on /admin/login. Use as the default
 // "I just need an admin-logged-in browser" path for admin-feature specs —
 // it's the fastest route to a logged-in admin (no Cardinal Cloud popup,

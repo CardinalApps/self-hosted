@@ -9,6 +9,10 @@ export default defineConfig({
   globalSetup: require.resolve('./global-setup-fts.ts'),
   timeout: 120_000,
   retries: 0,
+  // FTS specs all factory-reset the same media server; running in parallel
+  // means one test's reset clobbers another's wizard mid-flight. Pin to a
+  // single worker so the destructive setup is sequential.
+  workers: 1,
   reporter: [
     ['list'],
     ['./reporters/journey-coverage-reporter.ts'],

@@ -276,6 +276,19 @@ export class AppService {
       return !!await this.databaseService.saveOption(OPTIONS.FIRST_TIME_SETUP_DONE.name, false)
     }
 
+    // Drop the cached claim pointer so the next FTS run (or any future
+    // owner-claim attempt via MaybeTriggerClaim) actually tries to claim
+    // again — otherwise ClaimService.claimServerWithCloudIfNotClaimed
+    // short-circuits on the stale CLAIM_ID, pointing at an auth-server
+    // claim that belonged to the now-deleted owner.
+    const clearClaim = async () => {
+      const saved = await Promise.all([
+        this.databaseService.saveOption(OPTIONS.CLAIM_ID.name, ''),
+        this.databaseService.saveOption(OPTIONS.CLAIMED_AT.name, ''),
+      ])
+      return saved.every((opt) => !!opt)
+    }
+
     const recreateGuestAccount = async () => {
       return !!await this.userService.recreateGuestAccount()
     }
@@ -284,6 +297,7 @@ export class AppService {
       this.resetMediaData(),
       unlinkServerOwner(),
       resetFirstTimeSetupFlag(),
+      clearClaim(),
       recreateGuestAccount(),
     ])
 
