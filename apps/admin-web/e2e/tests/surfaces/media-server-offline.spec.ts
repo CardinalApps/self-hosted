@@ -1,19 +1,12 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
 } from '@cardinalapps/e2e-helpers'
 
 // When the periodic health check can't reach the server, AppBase's health
 // effect dispatches a danger toast. Asserting on the toast's i18n-safe
 // `data-type="danger"` attribute is the cheapest robust signal that the
 // app reacted to the connection failure.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-offline' })
-})
 
 test(
   'aborted /health surfaces a danger toast on the login page',
@@ -24,7 +17,17 @@ test(
 
     await page.goto('/admin/login')
 
-    // Default toast TTL is 5s, so give the assertion a tight upper bound.
-    await expect(page.locator('.toast[data-type="danger"]')).toBeVisible({ timeout: 4_500 })
+    // Scope to the network-error toast by its help-code link rather than
+    // `.toast[data-type="danger"]` — other unrelated danger toasts (e.g. a
+    // 401 from an unauth bootstrap request) can also appear, and we only
+    // care that the health-check failure produced its own toast. `.first()`
+    // because the heartbeat keeps re-firing health checks every 5s and can
+    // stack multiple identical toasts while we're asserting. Default toast
+    // TTL is 5s.
+    await expect(
+      page.locator('.toast[data-type="danger"]').filter({
+        has: page.locator('a[href*="ERR_CHS_0015"]'),
+      }).first(),
+    ).toBeVisible({ timeout: 4_500 })
   },
 )

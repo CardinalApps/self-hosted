@@ -1,8 +1,6 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
   dispatchSseEvent,
 } from '@cardinalapps/e2e-helpers'
@@ -12,8 +10,6 @@ import {
 // reflect distinct payload slices and don't bleed into one another.
 
 test.beforeEach(async ({ page }) => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-indexing-progress' })
   // Three on-mount /index/state fetches race our SSE dispatches and can
   // overwrite the counters back to zero. Failing the request leaves the
   // slice at initial state so SSE events are the sole writer.

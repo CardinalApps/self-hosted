@@ -3,8 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLocalUser,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
@@ -14,9 +13,12 @@ import {
 // option clicks to it and pick the option by its `value` attribute (set
 // from the role enum, i18n-safe).
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-create-user' })
+const createdUserIds: string[] = []
+
+test.afterEach(async () => {
+  for (const userId of createdUserIds.splice(0)) {
+    await deleteLocalUser(userId).catch(() => {})
+  }
 })
 
 test(
@@ -39,22 +41,33 @@ test(
     await page.click('.custom-select[data-name="role"] .selected.upper')
     await page.click('.custom-select[data-name="role"] [value="administrator"]')
 
-    const createPromise = page.waitForRequest(
+    const createRequest = page.waitForRequest(
       (req) => req.url().endsWith('/api/v1/users') && req.method() === 'POST',
       { timeout: 10_000 },
     )
+    const createResponse = page.waitForResponse(
+      (res) => res.url().endsWith('/api/v1/users') && res.request().method() === 'POST',
+      { timeout: 10_000 },
+    )
     await page.click('[data-testid="user-create-submit"]')
-    const req = await createPromise
+    const req = await createRequest
     const body = req.postDataJSON() as { username?: string, password?: string, role?: string }
     expect(body.username).toBe(username)
     expect(body.password).toBe(password)
     expect(body.role).toBe('administrator')
 
+    // Capture the new userId so afterEach can delete it — without this the
+    // user would accumulate across runs against a shared dev server.
+    const res = await createResponse
+    const resBody = await res.json() as { userId?: string }
+    if (resBody.userId) createdUserIds.push(resBody.userId)
+
     // The Users.List RTK Query tag invalidation triggers a refetch; the new
-    // row eventually shows up. Match by the data-user-id we know the server
-    // will mint (look up the row by username via its row settings button).
-    await expect.poll(async () => {
-      return page.locator('.server-user-list tbody tr').count()
-    }, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+    // row eventually shows up under the just-minted userId.
+    if (resBody.userId) {
+      await expect(
+        page.locator(`[data-testid="user-row-settings"][data-user-id="${resBody.userId}"]`),
+      ).toBeVisible({ timeout: 10_000 })
+    }
   },
 )

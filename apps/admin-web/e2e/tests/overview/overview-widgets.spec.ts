@@ -1,8 +1,6 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
@@ -13,8 +11,6 @@ import {
 //   .active-users-widget — active-users widget root
 
 test.beforeEach(async ({ page }) => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-overview' })
   await loginAsGuest(page)
 })
 

@@ -3,8 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLocalUser,
   loginAsGuest,
   seedLocalUser,
 } from '@cardinalapps/e2e-helpers'
@@ -12,9 +11,12 @@ import {
 // /admin/users renders a `.server-user-list` table. Each row carries a
 // `current-user-badge` for the logged-in row.
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-users' })
+const seededUserIds: string[] = []
+
+test.afterEach(async () => {
+  for (const userId of seededUserIds.splice(0)) {
+    await deleteLocalUser(userId).catch(() => {})
+  }
 })
 
 test(
@@ -36,12 +38,15 @@ test(
   { tag: '@journey:manage-local-users' },
   async ({ page }) => {
     // Seed 3 extra users via the dev endpoint before navigating.
+    const seededRowIds: string[] = []
     for (let i = 0; i < 3; i++) {
-      await seedLocalUser({
+      const { userId } = await seedLocalUser({
         username: `seeded-${randomUUID().slice(0, 8)}`,
         password: 'TestPass123!',
         role: 'standard',
       })
+      seededUserIds.push(userId)
+      seededRowIds.push(userId)
     }
 
     await loginAsGuest(page)
@@ -49,10 +54,12 @@ test(
     await page.waitForURL((url) => url.pathname === '/admin/users', { timeout: 10_000 })
     await expect(page.locator('.server-user-list')).toBeVisible({ timeout: 10_000 })
 
-    // Guest row + 3 seeded users + (possibly server owner) = at least 4 rows.
-    await expect.poll(
-      async () => page.locator('.server-user-list tbody tr').count(),
-      { timeout: 5_000 },
-    ).toBeGreaterThanOrEqual(4)
+    // Match by the just-seeded userIds — robust against any other users that
+    // happen to exist in the table.
+    for (const userId of seededRowIds) {
+      await expect(
+        page.locator(`[data-testid="user-row-settings"][data-user-id="${userId}"]`),
+      ).toBeVisible({ timeout: 5_000 })
+    }
   },
 )

@@ -1,19 +1,12 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
 // /admin/indexing renders six cards (NewRun + OverallProgress + MediaProgress
 // + Files + Folders + RunsHistory). The data-testid seams on the power button
 // and state indicator are i18n-safe and confirm both rendered.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-indexing' })
-})
 
 test(
   'the indexing page renders its primary sections',

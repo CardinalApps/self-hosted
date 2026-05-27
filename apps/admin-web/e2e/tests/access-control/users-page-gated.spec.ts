@@ -3,8 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLocalUser,
   seedLocalUser,
 } from '@cardinalapps/e2e-helpers'
 
@@ -44,9 +43,12 @@ import {
  * / Pause / Resume / Cancel are already wired for this.
  */
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-gating' })
+const seededUserIds: string[] = []
+
+test.afterEach(async () => {
+  for (const userId of seededUserIds.splice(0)) {
+    await deleteLocalUser(userId).catch(() => {})
+  }
 })
 
 test(
@@ -55,7 +57,8 @@ test(
   async ({ page }) => {
     const username = `newcomer-${randomUUID().slice(0, 8)}`
     const password = 'TestPass123!'
-    await seedLocalUser({ username, password, role: 'newcomer' })
+    const { userId } = await seedLocalUser({ username, password, role: 'newcomer' })
+    seededUserIds.push(userId)
 
     await page.goto('/admin/login')
     await page.click('[data-testid="login-with-local-account-button"]')
@@ -85,7 +88,8 @@ test(
   async ({ page }) => {
     const username = `admin-${randomUUID().slice(0, 8)}`
     const password = 'TestPass123!'
-    await seedLocalUser({ username, password, role: 'administrator' })
+    const { userId } = await seedLocalUser({ username, password, role: 'administrator' })
+    seededUserIds.push(userId)
 
     await page.goto('/admin/login')
     await page.click('[data-testid="login-with-local-account-button"]')

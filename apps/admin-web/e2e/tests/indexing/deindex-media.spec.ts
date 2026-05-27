@@ -3,19 +3,12 @@ import type { Page } from '@playwright/test'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
 // Deindex Media wipes the indexed catalog (POST /api/v1/reset with type=media
 // and validationString="Deindex media"). We assert on the network call rather
 // than UI copy — both are i18n-safe.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-deindex' })
-})
 
 async function openDeindexConfirm(page: Page) {
   await loginAsGuest(page)

@@ -88,7 +88,11 @@ test(
         .toBeVisible({ timeout: 10_000 })
 
       const closed = popup.waitForEvent('close', { timeout: 5_000 })
-      await popup.getByRole('button', { name: 'Close', exact: true }).click()
+      // noWaitAfter: the click triggers window.close() — Playwright's default
+      // post-click waits race with the page tear-down and surface as "Target
+      // page, context or browser has been closed". The `closed` event below
+      // is the real signal that the click did its job.
+      await popup.getByRole('button', { name: 'Close', exact: true }).click({ noWaitAfter: true })
       await closed
 
       const cloudJwt = await page.evaluate((key) => localStorage.getItem(key), JWT_STORAGE_KEY)

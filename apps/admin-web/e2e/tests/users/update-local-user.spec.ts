@@ -5,8 +5,7 @@ import type { Page } from '@playwright/test'
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
+  deleteLocalUser,
   loginAsGuest,
   seedLocalUser,
 } from '@cardinalapps/e2e-helpers'
@@ -16,9 +15,12 @@ import {
 // (body.enabled=true), and update-password (body.password=...).
 // Each spec drives one of them and asserts on the outgoing request.
 
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-update-user' })
+const seededUserIds: string[] = []
+
+test.afterEach(async () => {
+  for (const userId of seededUserIds.splice(0)) {
+    await deleteLocalUser(userId).catch(() => {})
+  }
 })
 
 async function openSettingsDrawerFor(page: Page, userId: string) {
@@ -41,6 +43,7 @@ test(
       password: 'DisableMe123!',
       role: 'administrator',
     })
+    seededUserIds.push(userId)
     await openSettingsDrawerFor(page, userId)
 
     const patchPromise = page.waitForRequest(
@@ -65,6 +68,7 @@ test(
       password: 'OldPass123!',
       role: 'administrator',
     })
+    seededUserIds.push(userId)
     await openSettingsDrawerFor(page, userId)
 
     await page.click('[data-testid="user-update-password-trigger"]')
@@ -82,18 +86,21 @@ test(
 )
 
 test(
-  'the disable button is disabled on the owner row (with a data-disabled-reason marker)',
+  'the disable button is disabled on the owner / current-user row (with a data-disabled-reason marker)',
   { tag: '@journey:manage-local-users' },
   async ({ page }) => {
     await loginAsGuest(page)
     await page.click('a[href="/admin/users"]')
     await page.waitForURL((url) => url.pathname === '/admin/users', { timeout: 10_000 })
 
-    // Owner is always the first row in the ordering (Users.tsx sorts:
-    // owner → others → guest). Click its settings button.
-    const ownerSettings = page.locator('.server-user-list tbody tr').first().locator('[data-testid="user-row-settings"]')
-    await expect(ownerSettings).toBeVisible({ timeout: 10_000 })
-    await ownerSettings.click()
+    // Find the row marked with .current-user-badge — that's the guest we just
+    // logged in as. The disable button on this row should be disabled with
+    // reason "self" (or "owner" if the guest also holds the owner role).
+    // Targeting by badge — rather than "first row" — is robust to whatever
+    // other users happen to exist in the shared dev DB.
+    const currentUserRow = page.locator('.server-user-list tbody tr').filter({ has: page.locator('.current-user-badge') })
+    await expect(currentUserRow).toHaveCount(1, { timeout: 10_000 })
+    await currentUserRow.locator('[data-testid="user-row-settings"]').click()
 
     const disable = page.locator('[data-testid="user-disable-button"]')
     await expect(disable).toBeVisible()

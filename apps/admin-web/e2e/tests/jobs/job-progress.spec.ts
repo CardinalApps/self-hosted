@@ -1,8 +1,6 @@
 import {
   test,
   expect,
-  completeFirstTimeSetup,
-  factoryResetMediaServer,
   loginAsGuest,
   dispatchSseEvent,
 } from '@cardinalapps/e2e-helpers'
@@ -11,11 +9,6 @@ import {
 // which is exclusively populated by the `sse/job.current_progress`
 // extraReducer. Dispatching that action lets us drive the bar deterministically
 // without a real running job.
-
-test.beforeEach(async () => {
-  await factoryResetMediaServer()
-  await completeFirstTimeSetup({ serverName: 'e2e-job-progress' })
-})
 
 test(
   'sse/job.current_progress overrides the seeded completed/total counts on a running row',

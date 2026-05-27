@@ -1,7 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
 
+// Default config: the regular suite excludes first-time-setup specs. FTS
+// specs factory-reset the media server, which is too disruptive to run on
+// every save during local iteration — they live behind `pnpm test:e2e:fts`
+// and `playwright.fts.config.ts`.
 export default defineConfig({
   testDir: './tests',
+  testIgnore: ['**/setup/**'],
   globalSetup: require.resolve('./global-setup.ts'),
   // 120s = up to ~60s POST /user rate-limit backoff + ~60s of headroom for the
   // flow under parallel load. Set DISABLE_RATE_LIMIT=true in the auth server's
