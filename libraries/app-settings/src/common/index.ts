@@ -1,4 +1,3 @@
-import { ENABLE_OIDC_BETA, enableOidcBetaFactory } from './enable_oidc_beta'
 import { ACCENT_COLOR_SLUG, accentColorFactory } from './accent_color'
 import { AUTO_CHECK_FOR_UPDATES_SLUG, autoCheckForUpdateFactory } from './auto_check_for_updates'
 import { CUSTOM_CSS_SLUG, customCSSFactory } from './custom_css'
@@ -13,7 +12,6 @@ import { TELEMETRY_SLUG, telemetryFactory } from '../common/telemetry'
 import { OPEN_APPS_IN_NEW_TAB_SLUG, openAppsInNewTabFactory } from '../common/open_apps_in_new_tab'
 
 export const commonFields = {
-  [ENABLE_OIDC_BETA]: enableOidcBetaFactory,
   [ACCENT_COLOR_SLUG]: accentColorFactory,
   [CUSTOM_CSS_SLUG]: customCSSFactory,
   [AUTO_CHECK_FOR_UPDATES_SLUG]: autoCheckForUpdateFactory,

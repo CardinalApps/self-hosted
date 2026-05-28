@@ -1,15 +1,13 @@
 import SSOLogin from '@cardinalapps/ui/src/components/interaction/SSOLogin'
 
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
-import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
-import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
 import redeemExchangeToken from '@cardinalapps/ui/src/store/slices/cloudUser/thunks/redeemExchangeToken'
 import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
 
 import * as routes from '../../routes'
 
-import { CARDINAL_PUBLIC_APP_ID, CARDINAL_PUBLIC_APP_PERMISSIONS } from '../../env'
+import { CARDINAL_PUBLIC_APP_ID } from '../../env'
 
 type LoginWithCardinalProps = {
   automaticallyLogin?: boolean,
@@ -25,7 +23,6 @@ export default function CardinalAdminSSOButton({
   onSSOSuccess,
 }: LoginWithCardinalProps) {
   const dispatch = useAppDispatch()
-  const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
 
   const instanceQuery = useGetInstanceQuery()
   const { data: instanceData } = instanceQuery
@@ -54,10 +51,8 @@ export default function CardinalAdminSSOButton({
         appId={CARDINAL_PUBLIC_APP_ID}
         instanceId={instanceData?.instanceId}
         serverName={overrideServerName || instanceData?.serverName}
-        permissions={CARDINAL_PUBLIC_APP_PERMISSIONS}
         saveJWTInLocalStorage={saveJWTInLocalStorage}
         onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
-        enableNewSSOFlow={enable_oidc_beta as boolean | undefined}
       />
     </>
   )

@@ -1,8 +1,6 @@
 import SSOLogin from '@cardinalapps/ui/src/components/interaction/SSOLogin'
 
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
-import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
-import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import homeServerLogin from '@cardinalapps/ui/src/store/slices/homeServerUser/thunks/login'
 import redeemExchangeToken from '@cardinalapps/ui/src/store/slices/cloudUser/thunks/redeemExchangeToken'
 import { useGetInstanceQuery } from '@cardinalapps/ui/src/store/apis/instance'
@@ -23,7 +21,6 @@ export default function CardinalPhotosSSOButton({
   onSSOSuccess,
 }: LoginWithCardinalProps) {
   const dispatch = useAppDispatch()
-  const { enable_oidc_beta } = useAppSelector(settingsSelectors.current)
 
   const instanceQuery = useGetInstanceQuery()
   const { data: instanceData } = instanceQuery
@@ -54,7 +51,6 @@ export default function CardinalPhotosSSOButton({
         serverName={instanceData?.serverName}
         saveJWTInLocalStorage={saveJWTInLocalStorage}
         onSSOSuccess={onSSOSuccess ? onSSOSuccess : handleSSOSuccess}
-        enableNewSSOFlow={enable_oidc_beta as boolean | undefined}
       />
     </>
   )

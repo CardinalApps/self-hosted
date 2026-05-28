@@ -33,7 +33,6 @@ export const Default = () => {
         loginButton={
           <SSOLogin
             appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-            permissions="*"
             saveJWTInLocalStorage={false}
             onSSOSuccess={(JWT) => setJWT(JWT)}
           />

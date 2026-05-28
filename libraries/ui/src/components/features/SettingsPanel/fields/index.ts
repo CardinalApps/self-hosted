@@ -19,7 +19,6 @@ export const getFields = (app, lang) => {
     general: [
       //commonFields.lang,
       //commonFields.startPage,
-      commonFields.oidcBeta,
       commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
