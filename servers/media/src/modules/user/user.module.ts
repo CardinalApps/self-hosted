@@ -7,7 +7,6 @@ import { EventModule } from '../event/event.module'
 
 import { UserService } from './user.service'
 import { SeatsService } from './seats.service'
-import { LocalUserService } from './local-user.service'
 import { CloudUserService } from './cloud-user.service'
 import { UserController } from './user.controller'
 import { User } from './user.entity'
@@ -27,14 +26,12 @@ import { UpdateUserService } from './update-user.service'
     TypeOrmModule,
     UserService,
     SeatsService,
-    LocalUserService,
     UpdateUserService,
     CloudUserService,
   ],
   providers: [
     UserService,
     UpdateUserService,
-    LocalUserService,
     CloudUserService,
     SeatsService,
   ],

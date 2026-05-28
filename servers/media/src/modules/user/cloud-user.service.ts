@@ -4,7 +4,6 @@ import { Repository } from 'typeorm'
 import * as ms from 'ms'
 
 import { authAPI } from '../../utils/cloud'
-import { getJWTPayload } from '../../utils/jwt'
 
 import { User } from './user.entity'
 
@@ -26,36 +25,6 @@ export class CloudUserService {
    * FIXME We should probably decouple the remote logout from this check.
    */
   private cloudUserCacheLifetime = ms('8s')
-
-  /**
-   * Checks the payload of a JWT issued by the Cardinal cloud auth servers to
-   * see if all the required properties are there, and if it's expired.
-   * 
-   * This does not validate the authenticity of the JWT - only the cloud auth
-   * servers can do that for you. It also does not validate the headers or
-   * signature of the JWT.
-   */
-  validateJWTPayload(JWT: string) {
-    const payload = getJWTPayload(JWT)
-
-    if (!payload?.exp || payload.exp as number < Date.now() / 1000) {
-      return false
-    }
-
-    if (!payload?.sso) {
-      return false
-    }
-
-    if (!payload?.role) {
-      return false
-    }
-
-    if (!payload?.userId) {
-      return false
-    }
-
-    return true
-  }
 
   /**
    * Checks a user object that was returned from the auth servers to see if it
@@ -95,23 +64,6 @@ export class CloudUserService {
     }
 
     return response
-  }
-
-  /**
-   * Sends the JWT to the auth servers to validate the authenticity of it. This
-   * only checks if the *JWT* is valid, not if the returned user account is
-   * valid for use (e.g., not banned). You may also want to use this
-   * throwIfInvalidCardinalAccount().
-   */
-  async validateJWTAuthenticity(JWT): Promise<boolean> {
-    const trueAccountFromAuthServers = await this.getCardinalCloudUser(JWT)
-    const localAccount = await this.getLocalUserByCardinalJWT(JWT)
-
-    if (trueAccountFromAuthServers?.userId !== localAccount.cardinalId) {
-      return false
-    }
-
-    return true
   }
 
   /**
@@ -198,11 +150,4 @@ export class CloudUserService {
     return await this.userRepository.findOneBy({ cardinalId })
   }
 
-  /**
-   * Returns the local user that is associated with the given Cardinal JWT.
-   */
-  async getLocalUserByCardinalJWT(cardinalJWT: string): Promise<User | null> {
-    const payload = getJWTPayload(cardinalJWT)
-    return await this.userRepository.findOneBy({ cardinalId: payload?.userId as string })
-  }
 }
