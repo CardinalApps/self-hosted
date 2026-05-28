@@ -18,8 +18,8 @@ export function getUserIdFromJwt(jwt: string): string {
   const parts = jwt.split('.')
   if (parts.length !== 3) throw new Error('Malformed JWT')
   const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8'))
-  if (typeof payload?.userId !== 'string') throw new Error('JWT does not carry a userId')
-  return payload.userId
+  if (typeof payload?.sub !== 'string') throw new Error('JWT does not carry a sub claim')
+  return payload.sub
 }
 
 // Create a fresh test user and return their cloud JWT. POST /user is rate-limited
