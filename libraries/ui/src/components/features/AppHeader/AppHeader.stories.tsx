@@ -38,7 +38,6 @@ export const Admin = () => {
         loginButton={
           <SSOLogin
             appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-            permissions="*"
             saveJWTInLocalStorage={false}
             onSSOSuccess={(JWT) => setJWT(JWT)}
           />
@@ -72,7 +71,6 @@ export const Music = () => {
         loginButton={
           <SSOLogin
             appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-            permissions="*"
             saveJWTInLocalStorage={false}
             onSSOSuccess={(JWT) => setJWT(JWT)}
           />
@@ -106,7 +104,6 @@ export const Photos = () => {
         loginButton={
           <SSOLogin
             appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-            permissions="*"
             saveJWTInLocalStorage={false}
             onSSOSuccess={(JWT) => setJWT(JWT)}
           />
@@ -140,7 +137,6 @@ export const Cinema = () => {
         loginButton={
           <SSOLogin
             appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-            permissions="*"
             saveJWTInLocalStorage={false}
             onSSOSuccess={(JWT) => setJWT(JWT)}
           />

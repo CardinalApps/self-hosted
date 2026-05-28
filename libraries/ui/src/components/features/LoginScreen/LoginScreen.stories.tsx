@@ -42,7 +42,6 @@ export const Admin = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />
@@ -74,7 +73,6 @@ export const Music = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />
@@ -106,7 +104,6 @@ export const Photos = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />
@@ -138,7 +135,6 @@ export const Cinema = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />
@@ -170,7 +166,6 @@ export const GuestAccountDisabled = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />
@@ -203,7 +198,6 @@ export const OnlyCloudAccount = () => {
       cardinalSSOLoginButton={
         <SSOLogin
           appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-          permissions="*"
           saveJWTInLocalStorage={false}
           onSSOSuccess={(JWT) => setJWT(JWT)}
         />

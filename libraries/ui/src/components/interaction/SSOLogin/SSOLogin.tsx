@@ -13,10 +13,7 @@ import Loading from '../../layout/Loading'
 
 import './SSOLogin.css'
 
-/**
- * Use topology package
- * @deprecated USER-22
- */
+// TODO use topology package
 const SSO_URL_DEV = 'http://localhost:3077'
 const SSO_URL_PROD = 'https://account.cardinalapps.io'
 
@@ -38,17 +35,12 @@ export type IPCHandshakeMessageData = {
 type SSOLoginProps = {
   appId: string,
   instanceId?: string,
-  /**
-   * @deprecated USER-22
-   */
-  permissions?: string,
   saveJWTInLocalStorage?: boolean,
   onPopupOpened?: () => void,
   onSSOSuccess?: (JWT?: string, exchangeToken?: string) => void,
   onPopupClosed?: () => void,
   label?: string,
   ssoUrl?: string,
-  enableNewSSOFlow?: boolean | undefined,
   serverName?: string,
   style?: CSSProperties,
 }
@@ -60,14 +52,11 @@ type SSOLoginProps = {
 const SSOLogin = ({
   appId,
   instanceId,
-  permissions = '*',
-  saveJWTInLocalStorage = true,
   onPopupOpened,
   onSSOSuccess,
   onPopupClosed,
   label = 'Sign in with Cardinal Cloud',
   ssoUrl,
-  enableNewSSOFlow = true,
   serverName = '(Not set)',
   style,
 }: PropsWithChildren<SSOLoginProps>) => {
@@ -89,26 +78,6 @@ const SSOLogin = ({
   }
 
   /**
-   * TODO remove
-   * 
-   * @deprecated USER-22
-   */
-  const handleLegacySSOClick = () => {
-    if (ssoFlowWindow.current) {
-      ssoFlowWindow.current.focus()
-    } else {
-      const popupWidth = 525
-      const popupHeight = 670
-      const popupLeft = (window.outerWidth / 2) - (popupWidth / 2)
-      const popupright = (window.outerHeight / 2) - (popupHeight / 2)
-
-      ssoFlowWindow.current = window.open(`${ssoUrl}/login?sso`, '_blank', `popup=true, width=${popupWidth}, height=${popupHeight}, left=${popupLeft}, top=${popupright}`)
-
-      setSSOFlowIsOpen(true)
-    }
-  }
-
-  /**
    * Handle all incoming IPC messages from the child window that is running the
    * SSO flow.
    */
@@ -119,7 +88,7 @@ const SSOLogin = ({
       throw new Error('Got untrusted message')
     }
 
-    // Popup says it's ready - send our app ID and permissions
+    // Popup says it's ready - send our app ID
     if (e.origin === ssoUrl && e?.data?.CARDINAL_SSO_READY) {
       const dataToSend: IPCHandshakeMessageData = {
         appId,
@@ -128,11 +97,6 @@ const SSOLogin = ({
         serverName: serverName as string,
         userAgentString: navigator.userAgent,
         debug,
-        /**
-         * @deprecated USER-22
-         */
-        // @ts-expect-error remove this with the old SSO
-        requestedPermissions: permissions,
       }
       ssoFlowWindow.current.postMessage(dataToSend, ssoUrl)
       if (debug) console.log('Sent initial postMessage', dataToSend)
@@ -141,20 +105,6 @@ const SSOLogin = ({
     // Popup got the app ID - handshake complete
     if (e.origin === ssoUrl && e?.data?.[IPC_HANDSHAKE_SUCCESS_SIGNAL]) {
       if (debug) console.log('Cardinal SSO popup initial handshake complete')
-    }
-
-    /**
-     * Popup says the SSO flow was completed successfully
-     * @deprecated USER-22
-     */
-    if (e.origin === ssoUrl && e?.data?.CARDINAL_USER_JWT) {
-      if (debug) console.log('Cardinal SSO login success')
-      if (saveJWTInLocalStorage) {
-        setJwt(e.data.CARDINAL_USER_JWT, JWT_TYPE.CLOUD_USER)
-      }
-      if (typeof onSSOSuccess === 'function') {
-        onSSOSuccess(e.data.CARDINAL_USER_JWT)
-      }
     }
 
     // New SSO flow uses this property with the JWT attached
@@ -255,13 +205,7 @@ const SSOLogin = ({
         target="_blank"
         rel="noreferrer"
         style={style}
-        onClick={() => {
-          if (enableNewSSOFlow === false) {
-            handleLegacySSOClick()
-          } else {
-            handleSSOClick()
-          }
-        }}
+        onClick={handleSSOClick}
       >
         <Loading size="s" />
         <BrandLogo size="xs" icon="birb"/>

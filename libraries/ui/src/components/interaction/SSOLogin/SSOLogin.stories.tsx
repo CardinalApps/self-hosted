@@ -38,7 +38,6 @@ export const Default = () => {
     <>
       <SSOLogin
         appId="59068b7c-2c67-4d98-aef7-44d37914b86f"
-        permissions="*"
         saveJWTInLocalStorage={false}
         onPopupOpened={() => setPopupIsOpen(true)}
         onSSOSuccess={(JWT) => setJWT(JWT)}
