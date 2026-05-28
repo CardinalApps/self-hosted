@@ -42,14 +42,6 @@ export class AttachCloudUserToRequest implements NestMiddleware {
       return next()
     }
 
-    //const payload = getJWTPayload(cloudUserJWT)
-
-    // It must be a SSO token
-    // if (payload?.sso !== true) {
-    //   Logger.error(`Invalid Cardinal token. ${helpCode('0012')}`, 'CloudUserMiddleware')
-    //   return next()
-    // }
-
     const linkedLocalUser = await this.userService.getUserByCardinalJWT(cloudUserJWT)
 
     // There is no local account with this JWT

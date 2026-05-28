@@ -13,7 +13,6 @@ import { getJWTPayload, CloudUserJWTPayload, LocalUserJWTPayload } from '../../u
 import { envVar } from '../../utils/env'
 import { SettingsService } from '../settings/settings.service'
 
-import { LocalUserService } from './local-user.service'
 import { CloudUserService } from './cloud-user.service'
 import { User } from './user.entity'
 import { Designations } from './types'
@@ -42,7 +41,6 @@ export class UserService {
     private dataSource: DataSource,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private readonly localUserService: LocalUserService,
     private readonly cloudUserService: CloudUserService,
     private readonly settingsService: SettingsService,
     private readonly seatsService: SeatsService,
@@ -358,7 +356,7 @@ export class UserService {
     const payload = getJWTPayload(cardinalJWT) as CloudUserJWTPayload
     return await this.userRepository.findOne({
       where: {
-        cardinalId: payload?.userId,
+        cardinalId: payload?.sub,
       },
       relations: {
         roles: true,

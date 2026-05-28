@@ -17,10 +17,12 @@ export type LocalUserJWTPayload = {
 }
 
 export type CloudUserJWTPayload = {
-  userId: string,
+  sub: string,
   role: string,
   sid: string,
-  sso?: boolean,
+  scope: string,
+  type: 'access' | 'refresh',
+  tap?: boolean,
   iat: number,
   exp: number,
   [key: string]: string | boolean | number | null,
