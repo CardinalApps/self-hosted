@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -9,7 +9,7 @@ import H3 from '../../typography/H3'
 import SidebarNav from '../../interaction/SidebarNav'
 import Card from '../../layout/Card'
 
-import { settingsSelectors } from '../../../store/slices/settings'
+import { settingsActions, settingsSelectors } from '../../../store/slices/settings'
 import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import { modalSelectors } from '../../../store/slices/modal'
 import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
@@ -81,10 +81,17 @@ const SettingsPanel = ({
   }
 
   /**
-   * Updates one or more settings.
+   * Updates a setting. Client-stored settings (eg. theme) stay in the local
+   * store and never round-trip to the server; home_server settings are synced.
    */
-  const save = (changedFieldKey, changedFieldValue, app) => {
+  const save = (changedFieldKey, changedFieldValue, app, storage) => {
     onChange(changedFieldKey, changedFieldValue)
+
+    if (storage === 'client') {
+      dispatch(settingsActions.set({ key: changedFieldKey, value: changedFieldValue }))
+      return
+    }
+
     dispatch(set({
       settings: {
         [changedFieldKey]: changedFieldValue,
@@ -139,12 +146,15 @@ const SettingsPanel = ({
           <SidebarNav size="thin" overrideAppLayout="standard" showCollapseButton={false} overrideIsCollapsed={false}>
             {withCustomTabs(tabs).map((tab, index) => {
               return (
-                <li className={`${index === activeTabIndex ? 'active' : ''}`} key={index}>
-                  <button type="button" onClick={() => setActiveTabIndex(index)}>
-                    <i className={tab?.tabIcon}></i>
-                    <span>{tab?.tabName}</span>
-                  </button>
-                </li>
+                <Fragment key={index}>
+                  {tab?.section && <li className="section">{tab.section}</li>}
+                  <li className={`${index === activeTabIndex ? 'active' : ''}`}>
+                    <button type="button" onClick={() => setActiveTabIndex(index)}>
+                      <i className={tab?.tabIcon}></i>
+                      <span>{tab?.tabName}</span>
+                    </button>
+                  </li>
+                </Fragment>
               )
             })}
           </SidebarNav>
@@ -176,7 +186,7 @@ const SettingsPanel = ({
                             : typeof field?.app !== 'undefined'
                               ? field.app
                               : app
-                          save(field.slug, value, appNamespace)
+                          save(field.slug, value, appNamespace, field.storage)
                         }
                         return (
                           <Field key={field.slug || fieldIndex} field={field}>

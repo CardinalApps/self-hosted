@@ -103,7 +103,7 @@ export const startPageFactory: SettingsFieldFactory = (app: SupportedCardinalApp
   slug: START_PAGE_SLUG,
   label: i18n?.['settings.start-page.title']?.[lang],
   type: 'select',
-  storage: 'home_server',
+  storage: 'client',
   defaultValue: getStartPages(app, lang)[0].value,
   options: getStartPages(app, lang),
 })

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
+import { getStoredSlugs } from '@cardinalapps/app-settings/src'
 
 import homeServerAPI, { CARDINAL_APP_HEADER } from '../../../../lib/homeserver/homeServerAPI'
 import { toastActions } from '../../toast'
@@ -38,7 +39,13 @@ const sync = createAsyncThunk<
         [CARDINAL_APP_HEADER]: store?.app?.app,
       },
     }) as { settings: Record<string, unknown> }
-    settings = res?.settings || {}
+
+    // Never let server values overwrite client-stored settings (eg. theme),
+    // which may still have stale rows in older databases.
+    const clientSlugs = getStoredSlugs(app, 'en', 'client')
+    settings = Object.fromEntries(
+      Object.entries(res?.settings || {}).filter(([key]) => !clientSlugs.includes(key)),
+    )
   } catch (error) {
     console.log(error)
     onError()

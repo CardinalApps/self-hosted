@@ -2,6 +2,7 @@ import {
   SettingsFieldFactory,
   SupportedLang,
   SupportedCardinalApp,
+  StorageLocation,
 } from './types'
 
 import { commonFields } from './common'
@@ -34,37 +35,60 @@ export const getSetting = (slug: AllSettingsSlugs): SettingsFieldFactory | undef
 }
 
 /**
- * Returns an object of all fields and their default values for the given app
- * settings.
+ * Returns the map of field factories that apply to the given app.
  */
-export const getDefaultSettings = (app: SupportedCardinalApp, lang: SupportedLang) => {
-  const defaults: Record<string, unknown> = {}
-  let fields: Record<string, SettingsFieldFactory> = {}
-
+const getFieldsForApp = (app: SupportedCardinalApp): Record<string, SettingsFieldFactory> => {
   switch (app) {
     case 'admin':
-      fields = { ...commonFields, ...adminFields }
-      break
+      return { ...commonFields, ...adminFields }
 
     case 'music':
-      fields = { ...commonFields, ...musicFields }
-      break
+      return { ...commonFields, ...musicFields }
 
     case 'photos':
-      fields = { ...commonFields, ...photosFields }
-      break
+      return { ...commonFields, ...photosFields }
 
     case 'cinema':
-      fields = { ...commonFields }
-      break
-  }
+      return { ...commonFields }
 
-  Object.values(fields).forEach((fieldFactory) => {
+    default:
+      return { ...commonFields }
+  }
+}
+
+/**
+ * Returns an object of all fields and their default values for the given app
+ * settings. Pass `storage` to only include settings persisted in that location.
+ */
+export const getDefaultSettings = (
+  app: SupportedCardinalApp,
+  lang: SupportedLang,
+  storage?: StorageLocation,
+) => {
+  const defaults: Record<string, unknown> = {}
+
+  Object.values(getFieldsForApp(app)).forEach((fieldFactory) => {
     const field = fieldFactory(app, lang)
+    if (storage && field.storage !== storage) return
     defaults[field.slug] = field.defaultValue
   })
 
   return defaults
+}
+
+/**
+ * Returns the slugs of the given app's settings that are persisted in the given
+ * storage location.
+ */
+export const getStoredSlugs = (
+  app: SupportedCardinalApp,
+  lang: SupportedLang,
+  storage: StorageLocation,
+): string[] => {
+  return Object.values(getFieldsForApp(app))
+    .map((fieldFactory) => fieldFactory(app, lang))
+    .filter((field) => field.storage === storage)
+    .map((field) => field.slug)
 }
 
 /**
