@@ -43,7 +43,6 @@ describe('GET /api/v1/settings/:app', () => {
 
     expect(res.body).toHaveProperty('settings')
     expect(typeof res.body.settings).toBe('object')
-    expect(res.body.settings).toHaveProperty('theme')
   })
 
   it('returns 200 with a settings object for music', async () => {
@@ -76,15 +75,6 @@ describe('GET /api/v1/settings/:app', () => {
     expect(typeof res.body.settings).toBe('object')
   })
 
-  it('reflects the theme set during setup', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .get('/api/v1/settings/admin')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body.settings.theme).toBe('dark')
-  })
-
   it('returns 403 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/settings/admin')
@@ -101,7 +91,7 @@ describe('PATCH /api/v1/settings', () => {
     const res = await request(testApp.app.getHttpServer())
       .patch('/api/v1/settings')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'admin', settings: { theme: 'light' } })
+      .send({ app: 'admin', settings: { server_name: 'Updated Server' } })
       .expect(200)
 
     expect(res.body).toHaveProperty('updated')
@@ -112,21 +102,27 @@ describe('PATCH /api/v1/settings', () => {
     await request(testApp.app.getHttpServer())
       .patch('/api/v1/settings')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'admin', settings: { theme: 'light' } })
+      .send({ app: 'admin', settings: { server_name: 'Read Back Server' } })
 
     const res = await request(testApp.app.getHttpServer())
       .get('/api/v1/settings/admin')
       .set('Authorization', `Bearer ${authToken}`)
       .expect(200)
 
-    expect(res.body.settings.theme).toBe('light')
+    expect(res.body.settings.server_name).toBe('Read Back Server')
+
+    // Restore so later default-value assertions see the setup value.
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ app: 'admin', settings: { server_name: 'Settings Test Server' } })
   })
 
   it('applies the update to all apps when app is omitted', async () => {
     await request(testApp.app.getHttpServer())
       .patch('/api/v1/settings')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({ settings: { theme: 'dark' } })
+      .send({ settings: { open_apps_in_new_tab: false } })
       .expect(200)
 
     for (const app of ['admin', 'music', 'photos', 'cinema']) {
@@ -135,8 +131,14 @@ describe('PATCH /api/v1/settings', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(res.body.settings.theme).toBe('dark')
+      expect(res.body.settings.open_apps_in_new_tab).toBe(false)
     }
+
+    // Restore the default so later default-value assertions still hold.
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ settings: { open_apps_in_new_tab: true } })
   })
 
   it('returns 400 when settings object is empty', () => {
@@ -167,10 +169,13 @@ describe('PATCH /api/v1/settings', () => {
 // Default values per setting.
 //
 // Only settings that are stored in the server database are tested here.
+// Client-stored settings (theme, enable_glass, start_page) live in the browser
+// and never round-trip through the server, so they are not asserted on.
 //
 // The setup call sends { theme: 'dark', serverName: 'Settings Test Server',
-// sendAnonymousUsageData: false }, so theme, server_name, and telemetry
-// intentionally deviate from their package defaults.
+// sendAnonymousUsageData: false }; theme is client-stored and ignored by the
+// server, while server_name and telemetry intentionally deviate from their
+// package defaults.
 // -------------------------------------------------------------------------
 
 const defaults = getAllDefaultSettings('en')
@@ -179,7 +184,6 @@ const defaults = getAllDefaultSettings('en')
 describe('default values — common settings', () => {
   const commonCases: Array<{ slug: string; expected: unknown }> = [
     { slug: 'auto_check_for_updates', expected: defaults.admin.auto_check_for_updates },
-    { slug: 'enable_glass', expected: defaults.admin.enable_glass },
     { slug: 'lang', expected: defaults.admin.lang },
     { slug: 'open_apps_in_new_tab', expected: defaults.admin.open_apps_in_new_tab },
   ]
@@ -205,47 +209,6 @@ describe('default values — common settings', () => {
 
     expect(res.body.settings).toHaveProperty('telemetry')
     expect(res.body.settings.telemetry).toBe(false)
-  })
-
-  // start_page default differs per app — test each independently
-  it('start_page exists in admin with default value', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .get('/api/v1/settings/admin')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body.settings).toHaveProperty('start_page')
-    expect(res.body.settings.start_page).toBe(defaults.admin.start_page)
-  })
-
-  it('start_page exists in music with default value', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .get('/api/v1/settings/music')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body.settings).toHaveProperty('start_page')
-    expect(res.body.settings.start_page).toBe(defaults.music.start_page)
-  })
-
-  it('start_page exists in photos with default value', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .get('/api/v1/settings/photos')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body.settings).toHaveProperty('start_page')
-    expect(res.body.settings.start_page).toBe(defaults.photos.start_page)
-  })
-
-  it('start_page exists in cinema with default value', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .get('/api/v1/settings/cinema')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200)
-
-    expect(res.body.settings).toHaveProperty('start_page')
-    expect(res.body.settings.start_page).toBe(defaults.cinema.start_page)
   })
 })
 
@@ -364,16 +327,6 @@ describe('updating individual settings', () => {
     expect(res.body.updated.some((r: { name: string }) => r.name === 'auto_check_for_updates')).toBe(true)
   })
 
-  it('can update enable_glass', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .patch('/api/v1/settings')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'admin', settings: { enable_glass: false } })
-      .expect(200)
-
-    expect(res.body.updated.some((r: { name: string }) => r.name === 'enable_glass')).toBe(true)
-  })
-
   it('can update lang', async () => {
     const res = await request(testApp.app.getHttpServer())
       .patch('/api/v1/settings')
@@ -402,36 +355,6 @@ describe('updating individual settings', () => {
       .expect(200)
 
     expect(res.body.updated.some((r: { name: string }) => r.name === 'open_apps_in_new_tab')).toBe(true)
-  })
-
-  it('can update start_page in admin', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .patch('/api/v1/settings')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'admin', settings: { start_page: 'media' } })
-      .expect(200)
-
-    expect(res.body.updated.some((r: { name: string }) => r.name === 'start_page')).toBe(true)
-  })
-
-  it('can update start_page in music', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .patch('/api/v1/settings')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'music', settings: { start_page: 'artists' } })
-      .expect(200)
-
-    expect(res.body.updated.some((r: { name: string }) => r.name === 'start_page')).toBe(true)
-  })
-
-  it('can update start_page in photos', async () => {
-    const res = await request(testApp.app.getHttpServer())
-      .patch('/api/v1/settings')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ app: 'photos', settings: { start_page: 'albums' } })
-      .expect(200)
-
-    expect(res.body.updated.some((r: { name: string }) => r.name === 'start_page')).toBe(true)
   })
 
   // Admin-only settings
