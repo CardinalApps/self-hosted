@@ -172,7 +172,8 @@
     margin-bottom: 30px;
 
     &.type-toggle,
-    &.type-number {
+    &.type-number,
+    &.type-select {
       min-height: 68px;
       margin-bottom: 15px;
       padding: 15px 20px;
@@ -190,7 +191,15 @@
     }
 
     &.type-select {
-      max-width: 240px;
+
+      .field-input {
+        width: 240px;
+        flex-shrink: 0;
+      }
+
+      .typing-area {
+        background-color: var(--bg-4);
+      }
     }
 
     &.type-title {
