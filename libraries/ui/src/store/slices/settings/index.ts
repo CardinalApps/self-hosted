@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { getSetting } from '@cardinalapps/app-settings/src'
+import { getDefaultSettings, getSetting } from '@cardinalapps/app-settings/src'
 
 import set from './thunks/set'
 import sync from './thunks/sync'
@@ -8,12 +8,14 @@ import homeServerLogout from '../homeServerUser/thunks/logout'
 import { globalActions } from '../../constants/actions'
 
 import { STORE_KEY } from './constants'
-import { CardinalApp } from '../../../lib/env/cardinal'
+import { CardinalApp, getAppBasePathFromUrl } from '../../../lib/env/cardinal'
 
-// FIXME why does this have admin hardcoded?
-const langSetting = getSetting('lang')('admin', 'en')
-const themeSetting = getSetting('theme')('admin', 'en')
-const accentColorSetting = getSetting('accent_color')('admin', 'en')
+// Seed client-stored defaults (eg. theme) for the running app so they are
+// present before the first server sync. The server no longer stores these.
+// Falls back to admin outside a known app (eg. storybook, kiosk).
+const currentApp = (getAppBasePathFromUrl() as CardinalApp) || CardinalApp.ADMIN
+const clientDefaults = getDefaultSettings(currentApp, 'en', 'client')
+const langSetting = getSetting('lang')(currentApp, 'en')
 
 export type Setting = {
   key: string,
@@ -46,9 +48,8 @@ const initialState: InitialState = {
     error: null,
   },
   current: {
+    ...clientDefaults,
     [langSetting.slug]: langSetting.defaultValue,
-    [themeSetting.slug]: themeSetting.defaultValue,
-    [accentColorSetting.slug]: accentColorSetting.defaultValue,
     lang: 'en',
   },
 }

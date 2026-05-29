@@ -22,36 +22,70 @@ export const getFields = (app, lang) => {
       commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
-    theme: [
+    appearance: [
       commonFields.theme,
       commonFields.accentColor,
       commonFields.enableGlass,
+      commonFields.customCss,
     ],
   }
 
   switch (app) {
     case 'admin':
       return [
-        // General settings tab
+        // --- Personal preferences (this admin, this device) ---
+        // General settings tab (developer_mode lives under Advanced for admin)
         {
           tabName: i18n['settings.tab-name-general'][lang],
           tabIcon: 'fas fa-home',
           fields: [
-            adminServerFields.serverName,
-            ...defaults.general,
-            adminServerFields.inactiveSessionTimeout,
+            commonFields.enableCustomContextMenu,
             adminServerFields.openAppsInNewTab,
+          ],
+        },
+        // Appearance settings tab
+        {
+          tabName: i18n['settings.tab-name-appearance'][lang],
+          tabIcon: 'fas fa-palette',
+          fields: [
+            ...defaults.appearance,
+          ],
+        },
+        // --- Server administration (system-wide, all users) ---
+        // Server settings tab
+        {
+          // The "Server" section heading is rendered before this tab.
+          section: i18n['settings.section-server'][lang],
+          tabName: i18n['settings.tab-name-server'][lang],
+          tabIcon: 'fas fa-server',
+          fields: [
+            adminServerFields.serverName,
             adminServerFields.autoCheckForUpdates,
+          ],
+        },
+        // Users & Access settings tab
+        {
+          tabName: i18n['settings.tab-name-users-access'][lang],
+          tabIcon: 'fas fa-user-shield',
+          fields: [
+            adminServerFields.inactiveSessionTimeout,
+          ],
+        },
+        // Libraries settings tab
+        {
+          tabName: i18n['settings.tab-name-libraries'][lang],
+          tabIcon: 'fas fa-folder-open',
+          fields: [
             adminServerFields.maxRating,
             adminServerFields.enableHalfRatings,
           ],
         },
-        // Theme settings tab
+        // Advanced settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-palette',
+          tabName: i18n['settings.tab-name-advanced'][lang],
+          tabIcon: 'fas fa-flask',
           fields: [
-            ...defaults.theme,
+            commonFields.developerMode,
           ],
         },
       ]
@@ -66,12 +100,12 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
+        // Appearance settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
+          tabName: i18n['settings.tab-name-appearance'][lang],
           tabIcon: 'fas fa-palette',
           fields: [
-            ...defaults.theme,
+            ...defaults.appearance,
           ],
         },
         // Music settings tab
@@ -99,12 +133,12 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
+        // Appearance settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
+          tabName: i18n['settings.tab-name-appearance'][lang],
           tabIcon: 'fas fa-palette',
           fields: [
-            ...defaults.theme,
+            ...defaults.appearance,
           ],
         },
         // People settings tab
@@ -135,12 +169,12 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
+        // Appearance settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
+          tabName: i18n['settings.tab-name-appearance'][lang],
           tabIcon: 'fas fa-palette',
           fields: [
-            ...defaults.theme,
+            ...defaults.appearance,
           ],
         },
       ]
@@ -155,12 +189,12 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
+        // Appearance settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
+          tabName: i18n['settings.tab-name-appearance'][lang],
           tabIcon: 'fas fa-palette',
           fields: [
-            ...defaults.theme,
+            ...defaults.appearance,
           ],
         },
       ]
@@ -176,12 +210,12 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
+        // Appearance settings tab
         {
-          tabName: i18n['settings.tab-name-theme'][lang],
+          tabName: i18n['settings.tab-name-appearance'][lang],
           tabIcon: 'fas fa-palette',
           fields: [
-            ...defaults.theme,
+            ...defaults.appearance,
           ],
         },
       ]

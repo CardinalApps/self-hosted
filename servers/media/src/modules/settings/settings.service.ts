@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { getDefaultSettings } from '@cardinalapps/app-settings/dist/cjs'
+import { getDefaultSettings, getStoredSlugs } from '@cardinalapps/app-settings/dist/cjs'
 
 import { Setting } from './setting.entity'
 import { SettingName, SettingValue, SettingsObject } from './types'
@@ -15,11 +15,13 @@ export class SettingsService {
     private settingRepository: Repository<Setting>,
   ) {}
 
+  // The server only persists home_server settings; client-stored settings (eg.
+  // theme) live in the browser and never round-trip through the database.
   defaultSettings = {
-    [CardinalApp.ADMIN]: getDefaultSettings(CardinalApp.ADMIN, 'en'),
-    [CardinalApp.MUSIC]: getDefaultSettings(CardinalApp.MUSIC, 'en'),
-    [CardinalApp.PHOTOS]: getDefaultSettings(CardinalApp.PHOTOS, 'en'),
-    [CardinalApp.CINEMA]: getDefaultSettings(CardinalApp.CINEMA, 'en'),
+    [CardinalApp.ADMIN]: getDefaultSettings(CardinalApp.ADMIN, 'en', 'home_server'),
+    [CardinalApp.MUSIC]: getDefaultSettings(CardinalApp.MUSIC, 'en', 'home_server'),
+    [CardinalApp.PHOTOS]: getDefaultSettings(CardinalApp.PHOTOS, 'en', 'home_server'),
+    [CardinalApp.CINEMA]: getDefaultSettings(CardinalApp.CINEMA, 'en', 'home_server'),
   }
 
   /**
@@ -40,14 +42,23 @@ export class SettingsService {
     const entities: Partial<Setting>[] = []
 
     appsToUpdate.forEach((app) => {
-      Object.keys(settings).map((name) => {
-        entities.push({
-          app: app,
-          name: name,
-          value: settings[name].toString(),
+      // Drop any client-stored settings; they belong in the browser, not the db.
+      const clientSlugs = getStoredSlugs(app, 'en', 'client')
+
+      Object.keys(settings)
+        .filter((name) => !clientSlugs.includes(name))
+        .forEach((name) => {
+          entities.push({
+            app: app,
+            name: name,
+            value: settings[name].toString(),
+          })
         })
-      })
     })
+
+    if (!entities.length) {
+      return entities
+    }
 
     try {
       await this.settingRepository.upsert(entities, ['app', 'name'])

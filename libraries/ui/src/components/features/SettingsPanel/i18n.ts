@@ -22,6 +22,21 @@ const i18n: StringList = {
   "settings.tab-name-theme": {
     "en": "Theme",
   },
+  "settings.tab-name-appearance": {
+    "en": "Appearance",
+  },
+  "settings.tab-name-server": {
+    "en": "Server",
+  },
+  "settings.tab-name-users-access": {
+    "en": "Users & Access",
+  },
+  "settings.tab-name-libraries": {
+    "en": "Libraries",
+  },
+  "settings.section-server": {
+    "en": "Server",
+  },
   "settings.tab-name-people": {
     "en": "People",
   },

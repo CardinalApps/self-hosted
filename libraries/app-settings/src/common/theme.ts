@@ -7,7 +7,7 @@ export const themeFactory: SettingsFieldFactory = (app: SupportedCardinalApp, la
   slug: THEME_SLUG,
   label: i18n?.['settings.theme.title']?.[lang],
   type: 'select',
-  storage: 'home_server',
+  storage: 'client',
   defaultValue: 'light',
   options: {
     'light': i18n['settings.theme.option.light']['en'],
