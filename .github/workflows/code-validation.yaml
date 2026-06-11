@@ -20,13 +20,17 @@ on:
 # Per-branch concurrency group. Serializes runs of this workflow per ref so two
 # pushes don't have overlapping installs on the shared self-hosted pool.
 concurrency:
-  group: redwood-ci-${{ github.ref }}
+  group: code-validation-${{ github.ref }}
   cancel-in-progress: false
 
+# This workflow runs in the private repo and is published verbatim to the public
+# self-hosted repo. The private repo sets the Actions variable CI_RUNNER=self-hosted
+# to target its runner pool; anywhere the variable is unset (the public repo, forks)
+# falls back to GitHub-hosted runners.
 jobs:
   discover:
     name: Discover packages
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     outputs:
       lint-packages: ${{ steps.discover.outputs.lint-packages }}
       typecheck-packages: ${{ steps.discover.outputs.typecheck-packages }}
@@ -35,6 +39,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      # Installs the pnpm version pinned by package.json's packageManager field.
+      # Required on GitHub-hosted runners, harmless on the self-hosted pool.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -76,7 +85,7 @@ jobs:
 
   lint:
     name: "Lint (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     needs: discover
     strategy:
       fail-fast: true
@@ -95,7 +104,7 @@ jobs:
 
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after lint so only one matrix runs at a time on the shared VM.
     needs: [discover, lint]
     strategy:
@@ -115,7 +124,7 @@ jobs:
 
   unit:
     name: "Unit (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after typecheck.
     needs: [discover, typecheck]
     strategy:
@@ -135,7 +144,7 @@ jobs:
 
   integration:
     name: "Integration (${{ matrix.package.label }})"
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after unit.
     needs: [discover, unit]
     strategy:
@@ -155,7 +164,7 @@ jobs:
 
   validate:
     name: Code Validation
-    runs-on: self-hosted
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     needs: [lint, typecheck, unit, integration]
     if: always()
     steps:
