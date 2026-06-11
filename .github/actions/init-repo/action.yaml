@@ -5,6 +5,11 @@ description: Initialize the workspace for CI tasks by installing dependencies of
 runs:
   using: composite
   steps:
+    # Installs the pnpm version pinned by package.json's packageManager field.
+    # Required on GitHub-hosted runners, harmless on the self-hosted pool.
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+
     - name: Setup Node.js
       uses: actions/setup-node@v5
       with:
