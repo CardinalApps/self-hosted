@@ -161,7 +161,7 @@ async function startup() {
     Logger.log(`│ API specification...............${(ip+':'+PORT+'/api/docs').padEnd(31)}│`, 'Welcome')
     Logger.log('│ Manage your Cardinal account....account.cardinalapps.io        │', 'Welcome')
     Logger.log('│ Get help using your apps........help.cardinalapps.io           │', 'Welcome')
-    Logger.log('│ Community Forums................cardinal.discourse.group       │', 'Welcome')
+    Logger.log('│ Community Forums.......itsasmall.world/c/cardinal-media-server │', 'Welcome')
     Logger.log('╰────────────────────────────────────────────────────────────────╯', 'Welcome')
   }
 
