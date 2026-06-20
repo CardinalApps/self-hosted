@@ -45,11 +45,11 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
+      # No `cache: pnpm`: see the note in .github/actions/init-repo.
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
-          cache: pnpm
 
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile
