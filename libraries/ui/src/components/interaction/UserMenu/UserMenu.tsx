@@ -232,7 +232,7 @@ const UserMenu = ({
                                     </Button>
                                   </li>
                                   <li>
-                                    <Button href="https://cardinal.discourse.group" target="_blank" icon="fas fa-comments">
+                                    <Button href="https://itsasmall.world/c/cardinal-media-server" target="_blank" icon="fas fa-comments">
                                       {i18n['user-menu.forums']['en']}
                                     </Button>
                                   </li>
@@ -248,7 +248,7 @@ const UserMenu = ({
                           <div className="links">
                             {/* <span>
                               <i className="fas fa-comments" />
-                              <a href="https://forums.cardinalapps.io" target="_blank">
+                              <a href="https://itsasmall.world/c/cardinal-media-server" target="_blank">
                                 {i18n['user-menu.forums']['en']}
                               </a>
                             </span> */}

@@ -70,7 +70,7 @@ These are the packages in this monorepo.
   <ul>
     <li><strong>Suggestions:</strong> Create a post on the forums or create a GitHub issue.</li>
     <li><strong>Bug Reports:</strong> Create a GitHub issue. For a serious vulnerability, please disclose responsibly using the email on the <a href="https://cardinalapps.io/contact" target="_blank">Contact page</a>.</li>
-    <li><strong>Code Contributions:</strong> Public contributions are currently closed. If you particularly like this project then come say hello in the <a href="https://cardinal.discourse.group" target="_blank">Forums</a> or on <a href="https://reddit.com/r/CardinalApps" target="_blank">Reddit<a/>.</li>
+    <li><strong>Code Contributions:</strong> Public contributions are currently closed. If you particularly like this project then come say hello in the <a href="https://itsasmall.world/c/cardinal-media-server" target="_blank">Forums</a> or on <a href="https://reddit.com/r/CardinalApps" target="_blank">Reddit<a/>.</li>
   </ul>
 </details>
 
