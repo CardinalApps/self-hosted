@@ -10,11 +10,14 @@ runs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
 
+    # No `cache: pnpm` here: the self-hosted pool already keeps a warm pnpm
+    # store on local disk, shared across concurrent matrix jobs. Letting
+    # setup-node restore/save a store tarball on top of that races the shared
+    # store (ENOENT on copy) and the post-step save fails path validation.
     - name: Setup Node.js
       uses: actions/setup-node@v5
       with:
         node-version-file: .nvmrc
-        cache: 'pnpm'
 
     - name: Install workspace deps
       run: pnpm install --frozen-lockfile
