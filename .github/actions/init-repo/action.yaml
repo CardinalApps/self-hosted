@@ -5,15 +5,17 @@ description: Initialize the workspace for CI tasks by installing dependencies of
 runs:
   using: composite
   steps:
-    # Installs the pnpm version pinned by package.json's packageManager field.
-    # Required on GitHub-hosted runners, harmless on the self-hosted pool.
+    # Only GitHub-hosted runners (the OSS repo, forks) need pnpm bootstrapped;
+    # the self-hosted pool already has it on PATH. Skipping the self-installer on
+    # the pool avoids the shared-HOME ~/setup-pnpm race that crashed concurrent
+    # matrix jobs (ENOTEMPTY). pnpm's shared on-disk store is concurrency-safe.
     - name: Setup pnpm
+      if: runner.environment == 'github-hosted'
       uses: pnpm/action-setup@v4
 
-    # No `cache: pnpm` here: the self-hosted pool already keeps a warm pnpm
-    # store on local disk, shared across concurrent matrix jobs. Letting
-    # setup-node restore/save a store tarball on top of that races the shared
-    # store (ENOENT on copy) and the post-step save fails path validation.
+    # No `cache: pnpm`: on the self-hosted pool it races the shared on-disk store
+    # (restore/save fights concurrent installs), and the pool keeps that store
+    # warm on its own. Hosted runners are ephemeral, so a cache would be cold.
     - name: Setup Node.js
       uses: actions/setup-node@v5
       with:

@@ -40,12 +40,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      # Installs the pnpm version pinned by package.json's packageManager field.
-      # Required on GitHub-hosted runners, harmless on the self-hosted pool.
+      # Only GitHub-hosted runners need pnpm bootstrapped; the self-hosted pool
+      # already has it. See the note in .github/actions/init-repo.
       - name: Setup pnpm
+        if: runner.environment == 'github-hosted'
         uses: pnpm/action-setup@v4
 
-      # No `cache: pnpm`: see the note in .github/actions/init-repo.
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
