@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/access-control",
   "description": "Access control layer for Cardinal apps.",
-  "license": "Elastic License 2.0 (ELv2)",
+  "license": "Licensed under DISL (dualinterestlicense.com)",
   "version": "0.1.1",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,

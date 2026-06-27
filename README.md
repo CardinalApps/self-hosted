@@ -76,6 +76,6 @@ These are the packages in this monorepo.
 
 ## License
 
-[Elastic License 2.0](/LICENSE)
+[Licensed under DISL (dualinterestlicense.com)](/LICENSE)
 
 Copyright Cardinal Apps Inc. 2023 - 2026

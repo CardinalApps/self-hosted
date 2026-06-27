@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/monorepo",
   "description": "Monorepo for Cardinal's apps.",
-  "license": "Elastic License 2.0 (ELv2)",
+  "license": "Licensed under DISL (dualinterestlicense.com)",
   "version": "2.0.0",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,

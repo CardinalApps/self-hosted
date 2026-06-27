@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/media-server",
   "description": "Self-hosted Cardinal Media Server.",
-  "license": "Elastic License 2.0 (ELv2)",
+  "license": "Licensed under DISL (dualinterestlicense.com)",
   "version": "0.0.0",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "private": true,
