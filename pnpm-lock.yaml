@@ -244,6 +244,9 @@ importers:
       '@cardinalapps/ui':
         specifier: workspace:*
         version: link:../../libraries/ui
+      '@reduxjs/toolkit':
+        specifier: 2.6.1
+        version: 2.6.1(react-redux@9.2.0(@types/react@18.2.79)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
