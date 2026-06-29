@@ -51,6 +51,9 @@
       "ffmpeg-static",
       "mongodb-memory-server",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "@radix-ui/react-slot": "1.2.3"
+    }
   }
 }

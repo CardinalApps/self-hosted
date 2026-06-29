@@ -11,3 +11,4 @@
 **/.env.*
 !**/.env.example
 npm-debug.log
+**/out
