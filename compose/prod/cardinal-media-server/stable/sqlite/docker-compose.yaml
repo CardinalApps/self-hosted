@@ -2,6 +2,7 @@
 
 services:
   cardinal-media-server-stable-sqlite:
+    platform: linux/x86_64
     image: cardinalapps/media-server:stable
     container_name: cardinal-media-server-stable-sqlite
     ports:
