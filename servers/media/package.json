@@ -79,7 +79,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "semver": "^7.5.4",
-    "sharp": "^0.33.0",
+    "sharp": "^0.34.0",
     "typeorm": "^0.3.20",
     "typeorm-naming-strategies": "^4.1.0",
     "ua-parser-js": "^1.0.37",
@@ -118,7 +118,8 @@
       "../../node_modules/swagger-ui-dist/**/*",
       "../../node_modules/music-metadata/**/*",
       "../../node_modules/better-sqlite3/**/*",
-      "../../node_modules/sharp/**/*"
+      "../../node_modules/sharp/**/*",
+      "../../node_modules/@img/**/*"
     ],
     "targets": [
       "node22-linux-x64"

@@ -4,3 +4,16 @@ packages:
   - "libraries/*"
   - "servers/*"
   - "scripts/screenshots"
+
+# Install host-platform binaries AND linux-x64 binaries for native deps with
+# split per-platform optional packages (notably sharp 0.33+ via @img/sharp-*).
+# The media-server is packaged as a node22-linux-x64 binary via @yao-pkg/pkg,
+# so the linux-x64 native modules must be present on the build host even when
+# that host is darwin-arm64.
+supportedArchitectures:
+  os:
+    - current
+    - linux
+  cpu:
+    - current
+    - x64
