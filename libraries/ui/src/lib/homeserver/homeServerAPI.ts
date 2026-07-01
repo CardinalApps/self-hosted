@@ -137,9 +137,6 @@ const homeServerAPI = async <T>(
     headers: options.headers as HeadersInit,
     body: body,
     credentials: 'include',
-    // TODO disable caching of the 410 Gone response server-side (it can be
-    // returned on any endpoint)
-    //cache: 'no-cache',
   })
 
   await triggerMiddleware(res, endpoint, method, body)
