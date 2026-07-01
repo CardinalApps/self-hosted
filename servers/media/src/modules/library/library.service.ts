@@ -128,6 +128,12 @@ export class LibraryService {
       return library.paths
     }) || []
 
+    // No paths to match (unknown, empty, or another user's library) — match no
+    // rows. Emitting an empty `()` clause is a syntax error on SQLite.
+    if (libraryPaths.length === 0) {
+      return ['file', '1 = 0', {}]
+    }
+
     // PG
     if (envVar('CARDINAL_POSTGRES', false)) {
       return [
