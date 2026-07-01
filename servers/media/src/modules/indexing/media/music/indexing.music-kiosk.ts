@@ -11,13 +11,20 @@ export function parseKioskPath(absolutePath: string): { artistName: string, rele
   const artistName  = parts[parts.length - 3] ?? 'Unknown Artist'
   const releaseName = parts[parts.length - 2] ?? 'Unknown Release'
   const fileName    = parts[parts.length - 1] ?? ''
-  const trackName   = fileName.replace(/\.mp3$/, '')
+  const baseName    = fileName.replace(/\.[^.]+$/, '')
 
-  // track number is the final numeric segment, e.g. artist-1-release-1-track-7 → 7
-  const trackNumMatch = trackName.match(/-(\d+)$/)
-  const trackNumber   = trackNumMatch ? Number(trackNumMatch[1]) : 1
+  // A leading track number, e.g. "01 Allegro" → { 1, "Allegro" }. Used by the
+  // believable demo seed so titles read cleanly and tracks sort correctly.
+  const leadMatch = baseName.match(/^(\d{1,3})[\s._-]+(.+)$/)
+  if (leadMatch) {
+    return { artistName, releaseName, trackName: leadMatch[2], trackNumber: Number(leadMatch[1]) }
+  }
 
-  return { artistName, releaseName, trackName, trackNumber }
+  // Otherwise a trailing numeric segment, e.g. artist-1-release-1-track-7 → 7.
+  const trailMatch = baseName.match(/-(\d+)$/)
+  const trackNumber = trailMatch ? Number(trailMatch[1]) : 1
+
+  return { artistName, releaseName, trackName: baseName, trackNumber }
 }
 
 export function buildKioskEmbeddedMetadata(absolutePath: string): Record<string, unknown> {

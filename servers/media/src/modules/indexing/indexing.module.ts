@@ -6,6 +6,7 @@ import { IndexingController } from './indexing.controller'
 import { IndexingService } from './indexing.service'
 import { IndexingSeedLargeService } from './indexing-seed.service'
 import { IndexingSeedFsService } from './indexing-seed-fs.service'
+import { IndexingSeedDemoService } from './indexing-seed-demo.service'
 import { ScannerService } from './scanner.service'
 import { PhotoIndexingService } from './media/indexing.photos.service'
 import { MusicIndexingService } from './media/music/indexing.music.service'
@@ -21,6 +22,7 @@ import { MusicArtistModule } from '../music-artist/music-artist.module'
 import { MusicGenreModule } from '../music-genres/music-genre.module'
 import { PhotoModule } from '../photo/photo.module'
 import { UserModule } from '../user/user.module'
+import { LibraryModule } from '../library/library.module'
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { UserModule } from '../user/user.module'
     MusicGenreModule,
     PhotoModule,
     UserModule,
+    LibraryModule,
   ],
   exports: [
     TypeOrmModule,
@@ -44,6 +47,7 @@ import { UserModule } from '../user/user.module'
     IndexingService,
     IndexingSeedLargeService,
     IndexingSeedFsService,
+    IndexingSeedDemoService,
     ScannerService,
     MusicIndexingService,
     PhotoIndexingService,

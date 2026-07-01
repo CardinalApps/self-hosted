@@ -23,6 +23,7 @@ import { GETIndexStateResponse } from './types'
 import { IndexingService } from './indexing.service'
 import { IndexingSeedLargeService } from './indexing-seed.service'
 import { IndexingSeedFsService } from './indexing-seed-fs.service'
+import { IndexingSeedDemoService, DemoSeedPlan } from './indexing-seed-demo.service'
 import { Run } from './entities/run.entity'
 import { File } from './entities/file.entity'
 import { RunLog } from './entities/run-log.entity'
@@ -51,6 +52,7 @@ export class IndexingController {
     private readonly indexingService: IndexingService,
     private readonly indexingSeedLargeService: IndexingSeedLargeService,
     private readonly indexingSeedFsService: IndexingSeedFsService,
+    private readonly indexingSeedDemoService: IndexingSeedDemoService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
     @InjectRepository(RunLog)
@@ -300,5 +302,31 @@ export class IndexingController {
     }
     const n = parseInt(artists, 10) || 10
     this.indexingSeedFsService.seed(n)
+  }
+
+  /**
+   * Builds the curated public Music demo dataset: ~500 believable tracks across
+   * three genre libraries (Classical / Contemporary / Soundtracks) on the /music
+   * mount, each track a copy of a bundled sample and each album with a generated
+   * cover. Wipes existing media, registers the libraries for the demo user, and
+   * kicks off a reindex. Can only be used in kiosk mode.
+   */
+  @Post('/index/seed/demo')
+  @StandardEndpoint({
+    summary: 'Seed the curated public demo dataset (kiosk mode only).',
+    capabilities: ['Indexing.Operate'],
+  })
+  async seedIndexDemo(
+    @Query('username') username: string,
+    @Query('scale') scale: string,
+  ): Promise<DemoSeedPlan> {
+    if (!envVar('KIOSK_MODE', false)) {
+      throw new ForbiddenException('Kiosk mode must be enabled to run seeding.')
+    }
+    const parsedScale = parseFloat(scale)
+    return await this.indexingSeedDemoService.start({
+      username: username || undefined,
+      scale: Number.isFinite(parsedScale) && parsedScale > 0 ? parsedScale : undefined,
+    })
   }
 }
