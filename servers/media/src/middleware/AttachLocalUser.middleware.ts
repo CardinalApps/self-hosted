@@ -5,6 +5,7 @@ import { UserService } from '../modules/user/user.service'
 import { TokenService } from '../modules/auth/token.service'
 
 import { getJWTFromHeaders, getJWTFromQuery } from '../utils/jwt'
+import { denyAuthUncacheable } from './auth-cache-headers'
 
 /**
  * This middleware reads the JWT in the Authorization header and verifies the
@@ -38,12 +39,14 @@ export class AttachLocalUserToRequest implements NestMiddleware {
 
     if (tokenStatus === 'expired') {
       // Tell the client to refresh — do not force a full logout
+      denyAuthUncacheable(response)
       throw new UnauthorizedException('Token expired')
     }
 
     if (tokenStatus === 'invalid') {
       // Signing secret changed or token tampered — force client logout
       Logger.warn(`Invalid JWT: ${localUserJWT}`)
+      denyAuthUncacheable(response)
       throw new GoneException()
     }
 
@@ -52,6 +55,7 @@ export class AttachLocalUserToRequest implements NestMiddleware {
     // Token is valid but user doesn't exist server-side.
     // Client apps will force a logout and clear their local data when they get this.
     if (!user) {
+      denyAuthUncacheable(response)
       throw new GoneException()
     }
 
