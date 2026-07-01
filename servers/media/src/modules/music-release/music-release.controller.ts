@@ -99,6 +99,9 @@ export class MusicReleaseController {
     const thumbnailFile = getAppDir(thumbnail.relativeSrc)
     const file = fs.createReadStream(thumbnailFile)
 
-    return new StreamableFile(file)
+    const format = (thumbnail.format || 'jpeg').toLowerCase()
+    const mimeType = format === 'png' ? 'image/png' : format === 'gif' ? 'image/gif' : 'image/jpeg'
+
+    return new StreamableFile(file, { type: mimeType })
   }
 }

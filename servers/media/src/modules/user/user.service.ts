@@ -379,6 +379,19 @@ export class UserService {
   }
 
   /**
+   * Enables or disables a local user by username. Returns the updated user, or
+   * null if no such user exists.
+   */
+  async setEnabled(username: string, enabled: boolean): Promise<User | null> {
+    const user = await this.getUserByLocalUsername(username)
+    if (!user) {
+      return null
+    }
+    user.enabled = enabled
+    return await this.userRepository.save(user)
+  }
+
+  /**
    * Returns the guest account. There is a check during server startup to
    * guarentee it exists.
    */
