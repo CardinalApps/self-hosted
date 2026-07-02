@@ -24,7 +24,7 @@
       top: 6px;
       left: -340px;
       right: 0;
-      bottom: -420px;
+      bottom: -447px;
       overflow: hidden;
       border-radius: 40px;
       box-shadow: var(--box-shadow-2);
@@ -37,7 +37,7 @@
     &.cloud-user-logged-in {
 
       .user-dropdown-under {
-        bottom: -440x;
+        bottom: -440px;
       }
     }
   }

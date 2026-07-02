@@ -227,9 +227,15 @@
       }
 
       .realtime {
-        padding-left: 26px;
         font-weight: 400;
         font-size: 13px;
+        padding-left: 25px;
+
+        .success-check {
+          margin-left: 6px;
+          color: var(--success);
+          font-size: 10px;
+        }
       }
     }
   }
