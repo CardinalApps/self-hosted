@@ -37,7 +37,7 @@
     &.cloud-user-logged-in {
 
       .user-dropdown-under {
-        bottom: -460px;
+        bottom: -440x;
       }
     }
   }
@@ -59,7 +59,7 @@
   }
 
   .user-dropdown-button-group {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 
     &:last-of-type {
       margin-bottom: 0;
