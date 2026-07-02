@@ -36,7 +36,6 @@ type UserMenuProps = {
  */
 const UserMenu = ({
   onSwitchAccountClick,
-  onLogoutClick,
   loginButton,
 }: PropsWithChildren<UserMenuProps>) => {
   const dispatch = useAppDispatch()
@@ -54,12 +53,12 @@ const UserMenu = ({
   const themeFieldFactory = getSetting('theme')
   const themeField = themeFieldFactory(app, lang as SupportedLang)
 
-  const handleLogout = () => {
-    setMenuIsOpen(false)
-    if (typeof onLogoutClick === 'function') {
-      onLogoutClick()
-    }
-  }
+  // const handleLogout = () => {
+  //   setMenuIsOpen(false)
+  //   if (typeof onLogoutClick === 'function') {
+  //     onLogoutClick()
+  //   }
+  // }
 
   const handleSwitchAccountClick = () => {
     if (onSwitchAccountClick && typeof onSwitchAccountClick === 'function') {
