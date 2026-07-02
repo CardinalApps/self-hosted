@@ -3,6 +3,7 @@ import ms from 'ms'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import H1 from '@cardinalapps/ui/src/components/typography/H1'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import Loading from '@cardinalapps/ui/src/components/layout/Loading'
 
 import {
@@ -54,7 +55,7 @@ function PhotoAlbumPage() {
           }
           {!isLoading && !photoAlbumEntries.length &&
             <NoContentMessage
-              icon={<i className="fas fa-photo-video" />}
+              icon={<Icon fa="fas fa-photo-video" />}
               title={i18n['no-content-message.title']['en']}
               button={
                 <Link to={routes.ROOT} className="button solid">

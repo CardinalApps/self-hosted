@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 import Card from '../../layout/Card'
 import SearchBar from '../../interaction/SearchBar'
+import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 
@@ -83,7 +84,7 @@ function Map({
             ? <div className="compact-controls">
                 {onOpenExternalMap &&
                   <button type="button" onClick={() => onOpenExternalMap?.()}>
-                    <i className="fas fa-map-marked-alt" />
+                    <Icon fa="fas fa-map-marked-alt" />
                   </button>
                 }
               </div>
@@ -120,12 +121,12 @@ function Map({
                   <div className="map-zoom-controls">
                     <div>
                       <button type="button" onClick={() => mapRef.current.zoomIn()}>
-                        <i className="fas fa-plus" />
+                        <Icon fa="fas fa-plus" />
                       </button>
                     </div>
                     <div>
                       <button type="button" onClick={() => mapRef.current.zoomOut()}>
-                        <i className="fas fa-minus" />
+                        <Icon fa="fas fa-minus" />
                       </button>
                     </div>
                   </div>

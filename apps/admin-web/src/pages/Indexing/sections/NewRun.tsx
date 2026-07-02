@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import Loading from '@cardinalapps/ui/src/components/layout/Loading'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
 import Select from '@cardinalapps/ui/src/components/forms/Select'
@@ -105,7 +106,7 @@ function Indexer() {
             )}
             onClick={handlePowerButtonClick}
           >
-            <i className="fas fa-power-off" />
+            <Icon fa="fas fa-power-off" />
           </button>
           <Loading className={'spinny'} speed={'1.4'} />
         </div>

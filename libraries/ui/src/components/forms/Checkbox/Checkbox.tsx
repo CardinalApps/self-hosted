@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react'
 import clsx from 'clsx'
 
+import Icon from '../../typography/Icon'
 import './Checkbox.css'
 
 type CheckboxProps = {
@@ -22,7 +23,7 @@ const Checkbox = ({
       <label>
         <input name={name} type="checkbox" checked={checked} tabIndex={0} onChange={(e) => onChange(e.target.checked)} />
         <div className="box">
-          <i className="fas fa-check" />
+          <Icon fa="fas fa-check" />
         </div>
       </label>
     </div>

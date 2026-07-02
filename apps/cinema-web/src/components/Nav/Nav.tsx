@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+
 import * as routes from '../../routes'
 
 import i18n from './i18n.json'
@@ -22,7 +24,7 @@ function Nav({ children }: PropsWithChildren) {
         key="watch-now"
       >
         <Link to={routes.ROOT}>
-          <i className="fas fa-film" />
+          <Icon fa="fas fa-film" />
           <span>{i18n['nav.watch-now']['en']}</span>
         </Link>
       </li>
@@ -33,7 +35,7 @@ function Nav({ children }: PropsWithChildren) {
         key="movies"
       >
         <Link to={routes.MOVIES}>
-          <i className="fas fa-video" />
+          <Icon fa="fas fa-video" />
           <span>{i18n['nav.movies']['en']}</span>
         </Link>
       </li>
@@ -44,7 +46,7 @@ function Nav({ children }: PropsWithChildren) {
         key="tv"
       >
         <Link to={routes.TV}>
-          <i className="fas fa-tv" />
+          <Icon fa="fas fa-tv" />
           <span>{i18n['nav.tv']['en']}</span>
         </Link>
       </li>
@@ -55,7 +57,7 @@ function Nav({ children }: PropsWithChildren) {
         key="channels"
       >
         <Link to={routes.CHANNELS}>
-          <i className="fas fa-couch" />
+          <Icon fa="fas fa-couch" />
           <span>{i18n['nav.channels']['en']}</span>
         </Link>
       </li>
@@ -66,7 +68,7 @@ function Nav({ children }: PropsWithChildren) {
         key="libraries"
       >
         <Link to={routes.LIBRARIES}>
-          <i className="fas fa-boxes" />
+          <Icon fa="fas fa-boxes" />
           <span>{i18n['nav.libraries']['en']}</span>
         </Link>
       </li>
@@ -77,7 +79,7 @@ function Nav({ children }: PropsWithChildren) {
         key="playlists"
       >
         <Link to={routes.PLAYLISTS}>
-          <i className="fas fa-stream" />
+          <Icon fa="fas fa-stream" />
           <span>{i18n['nav.playlists']['en']}</span>
         </Link>
       </li>
@@ -88,7 +90,7 @@ function Nav({ children }: PropsWithChildren) {
         key="history"
       >
         <Link to={routes.HISTORY}>
-          <i className="fas fa-history" />
+          <Icon fa="fas fa-history" />
           <span>{i18n['nav.history']['en']}</span>
         </Link>
       </li>

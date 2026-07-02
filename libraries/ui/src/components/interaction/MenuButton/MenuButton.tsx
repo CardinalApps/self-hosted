@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import './MenuButton.css'
 import clsx from 'clsx'
 
+import Icon from '../../typography/Icon'
+
 type MenuButtonProps = {
   className?: string,
   width?: number,
@@ -84,7 +86,7 @@ const MenuButton = ({
         {
           icon
             ? icon
-            : <i className="fas fa-ellipsis-v" style={overrideIconStyle} />
+            : <Icon fa="fas fa-ellipsis-v" style={overrideIconStyle} />
         }
       </button>
       <AnimatePresence>

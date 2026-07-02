@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { useSelector } from 'react-redux'
 import { AnimatePresence, motion } from 'framer-motion'
 import H3 from '../../typography/H3'
+import Icon from '../../typography/Icon'
 import { getSetting } from '@cardinalapps/app-settings/src'
 // import ms from 'ms'
 
@@ -141,7 +142,7 @@ const UserMenu = ({
                           className="subscription"
                           // title={memberDays()}
                         >
-                          <i className="fas fa-trophy" />
+                          <Icon fa="fas fa-trophy" />
                           {i18n[`user-menu.subscription.${currentCloudUser.subscription}`]?.['en'] || i18n[`user-menu.subscription.free`]?.['en']}
                         </span>
                       </div>

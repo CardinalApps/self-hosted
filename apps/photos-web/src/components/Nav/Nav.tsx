@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+
 import * as routes from '../../routes'
 
 import i18n from './i18n.json'
@@ -22,7 +24,7 @@ function Nav({ children }: PropsWithChildren) {
         key="overview"
       >
         <Link to={routes.ROOT}>
-          <i className="fas fa-images" />
+          <Icon fa="fas fa-images" />
           <span>{i18n['nav.archive']['en']}</span>
         </Link>
       </li>
@@ -33,7 +35,7 @@ function Nav({ children }: PropsWithChildren) {
         key="albums"
       >
         <Link to={routes.PHOTO_ALBUMS}>
-          <i className="fas fa-book" />
+          <Icon fa="fas fa-book" />
           <span>{i18n['nav.albums']['en']}</span>
         </Link>
       </li>
@@ -44,7 +46,7 @@ function Nav({ children }: PropsWithChildren) {
         key="people"
       >
         <Link to={routes.PEOPLE}>
-          <i className="fas fa-users" />
+          <Icon fa="fas fa-users" />
           <span>{i18n['nav.people']['en']}</span>
         </Link>
       </li>
@@ -55,7 +57,7 @@ function Nav({ children }: PropsWithChildren) {
         key="locations"
       >
         <Link to={routes.LOCATIONS}>
-          <i className="fas fa-map-marked-alt" />
+          <Icon fa="fas fa-map-marked-alt" />
           <span>{i18n['nav.locations']['en']}</span>
         </Link>
       </li>

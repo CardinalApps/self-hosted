@@ -3,6 +3,8 @@ import type { CSSProperties, PropsWithChildren } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
+import Icon from '../../typography/Icon'
+
 import {
   layoutSelectors,
   layoutActions,
@@ -188,8 +190,8 @@ const SidebarNav = ({
               className={`toggle-collapse ${resolveIsCollapsed() ? 'collapsed' : 'expanded'}`}
               onClick={() => handleCollapseClick()}
             >
-              <i className="fas fa-compress-alt collapse" />
-              <i className="fas fa-expand-alt expand" />
+              <Icon fa="fas fa-compress-alt collapse" />
+              <Icon fa="fas fa-expand-alt expand" />
             </button>
           }
         </div>
@@ -199,8 +201,8 @@ const SidebarNav = ({
         type="button"
         onClick={() => dispatch(layoutActions.setMobileNavIsOpen(!mobileNavIsOpen))}
       >
-        <i className="when-closed fas fa-bars" />
-        <i className="when-open fas fa-long-arrow-alt-down"></i>
+        <Icon fa="when-closed fas fa-bars" />
+        <Icon fa="when-open fas fa-long-arrow-alt-down" />
       </button>
     </>
   )

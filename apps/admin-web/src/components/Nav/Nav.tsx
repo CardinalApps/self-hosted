@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 import i18n from './i18n.json'
 import { AdminRoutes } from '@cardinalapps/ui/src/lib/net/router'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 function Nav({ children }: PropsWithChildren) {
   const { pathname } = useLocation()
@@ -21,7 +22,7 @@ function Nav({ children }: PropsWithChildren) {
         key="overview"
       >
         <Link to={AdminRoutes.root}>
-          <i className="fas fa-chart-area" />
+          <Icon fa="fas fa-chart-area" />
           <span>{i18n['nav.overview']['en']}</span>
         </Link>
       </li>
@@ -32,7 +33,7 @@ function Nav({ children }: PropsWithChildren) {
         key="users"
       >
         <Link to={AdminRoutes.users}>
-          <i className="fas fa-user" />
+          <Icon fa="fas fa-user" />
           <span>{i18n['nav.users']['en']}</span>
         </Link>
       </li>
@@ -43,7 +44,7 @@ function Nav({ children }: PropsWithChildren) {
         key="roles"
       >
         <Link to={AdminRoutes.roles}>
-          <i className="fas fa-key" />
+          <Icon fa="fas fa-key" />
           <span>{i18n['nav.roles']['en']}</span>
         </Link>
       </li>
@@ -54,7 +55,7 @@ function Nav({ children }: PropsWithChildren) {
         key="indexing"
       >
         <Link to={AdminRoutes.indexing}>
-          <i className="fas fa-copy" />
+          <Icon fa="fas fa-copy" />
           <span>{i18n['nav.indexing']['en']}</span>
         </Link>
       </li>
@@ -65,7 +66,7 @@ function Nav({ children }: PropsWithChildren) {
         key="jobs"
       >
         <Link to={AdminRoutes.jobs}>
-          <i className="fas fa-hard-hat" style={{}} />
+          <Icon fa="fas fa-hard-hat" style={{}} />
           <span>{i18n['nav.jobs']['en']}</span>
         </Link>
       </li>
@@ -76,7 +77,7 @@ function Nav({ children }: PropsWithChildren) {
         key="libraries"
       >
         <Link to={AdminRoutes.libraries}>
-          <i className="fas fa-folder-open" style={{}} />
+          <Icon fa="fas fa-folder-open" style={{}} />
           <span>{i18n['nav.libraries']['en']}</span>
         </Link>
       </li>

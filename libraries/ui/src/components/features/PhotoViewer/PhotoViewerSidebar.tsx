@@ -6,6 +6,7 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNowStrict'
 
 import H4 from '../../typography/H4'
 import H6 from '../../typography/H6'
+import Icon from '../../typography/Icon'
 import Card from '../../layout/Card'
 import Button from '../../interaction/Button'
 import Select from '../../forms/Select'
@@ -165,7 +166,7 @@ const PhotoViewerSidebar = ({
                     title={i18n['controls.close.title'][lang]}
                     onClick={() => setIsOpen(false)}
                   >
-                    <i className="fas fa-times" />
+                    <Icon fa="fas fa-times" />
                   </button>
                 </div>
                 <div className="date-metadata">
@@ -183,7 +184,7 @@ const PhotoViewerSidebar = ({
                     className="slideshow secondary-button"
                     onClick={() => alert('Coming soon')}
                   >
-                    <i className="fas fa-stopwatch" />
+                    <Icon fa="fas fa-stopwatch" />
                     {i18n['controls.slideshow.title'][lang]}
                   </Button>
                   {/* Fullscreen button */}
@@ -192,7 +193,7 @@ const PhotoViewerSidebar = ({
                     className="fullscreen secondary-button"
                     onClick={() => toggleFullScreen()}
                   >
-                    <i className="fas fa-expand-alt" />
+                    <Icon fa="fas fa-expand-alt" />
                     {i18n['controls.fullscreen'][lang]}
                   </Button>
                 </div>
@@ -239,7 +240,7 @@ const PhotoViewerSidebar = ({
                           }
                         >
                           <span>{convertedFrom}</span>
-                          <i className="converted-icon fas fa-random" />
+                          <Icon fa="converted-icon fas fa-random" />
                           <span>{convertedTo}</span>
                         </div>
                       : photoEntity?.file?.extension &&

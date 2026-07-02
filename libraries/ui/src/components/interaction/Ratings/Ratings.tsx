@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import { settingsSelectors } from '../../../store/slices/settings'
+import Icon from '../../typography/Icon'
 
 import './Ratings.css'
 
@@ -75,7 +76,7 @@ const Ratings = ({
                 />
               </>
             )}
-            <i className="fa-icon fas fa-star" />
+            <Icon fa="fa-icon fas fa-star" />
           </div>
         )
       })}

@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import Loading from '@cardinalapps/ui/src/components/layout/Loading'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { JobStatus as JobStatusType } from '@cardinalapps/ui/src/store/apis/jobs'
@@ -22,7 +23,7 @@ function JobStatus({
     <div className={'jobStatus'}>
       {status === 'in_queue' &&
         <>
-          <i className="fas fa-hourglass-half" />
+          <Icon fa="fas fa-hourglass-half" />
           <p className={'label'}>{i18n[`job.status.${status}`]?.[lang]}</p>
         </>
       }
@@ -40,25 +41,25 @@ function JobStatus({
       }
       {status === 'paused' &&
         <>
-          <i className="fas fa-pause" />
+          <Icon fa="fas fa-pause" />
           <p className={'label'}>{i18n[`job.status.${status}`]?.[lang]}</p>
         </>
       }
       {status === 'canceled' &&
         <>
-          <i className="fas fa-times" />
+          <Icon fa="fas fa-times" />
           <p className={'label'}>{i18n[`job.status.${status}`]?.[lang]}</p>
         </>
       }
       {status === 'completed' &&
         <>
-          <i className="fas fa-check" />
+          <Icon fa="fas fa-check" />
           <p className={'label'}>{i18n[`job.status.${status}`]?.[lang]}</p>
         </>
       }
       {status === 'errored' &&
         <>
-          <i className="fas fa-exclamation-circle" />
+          <Icon fa="fas fa-exclamation-circle" />
           <p className={'label'}>{i18n[`job.status.${status}`]?.[lang]}</p>
         </>
       }

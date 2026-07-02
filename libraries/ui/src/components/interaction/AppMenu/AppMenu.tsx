@@ -5,6 +5,7 @@ import { settingsSelectors } from '../../../store/slices/settings'
 
 import MenuButton from '../MenuButton'
 import BrandLogo from '../../layout/BrandLogo'
+import Icon from '../../typography/Icon'
 
 import i18n from './i18n'
 
@@ -31,7 +32,7 @@ const AppMenu = ({
       align={align}
       size="m"
       title={i18n['icon.title'][lang]}
-      icon={<i className="fas fa-th" />}
+      icon={<Icon fa="fas fa-th" />}
     >
       <MenuButton.Section className="app-menu">
         <div className="web-apps">

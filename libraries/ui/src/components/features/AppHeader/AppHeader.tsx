@@ -7,6 +7,7 @@ import clsx from 'clsx'
 import H1 from '../../typography/H1'
 import BrandLogo from '../../layout/BrandLogo'
 import WrittenText from '../../typography/WrittenText'
+import Icon from '../../typography/Icon'
 
 import Modal from '../../layout/Modal'
 import AppMenu from '../../interaction/AppMenu'
@@ -50,13 +51,13 @@ const AppHeader = ({
     const badges = []
 
     if (kioskMode) {
-      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><i className="fas fa-store" />{i18n['major-badge.kiosk'][lang]}</span>)
+      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><Icon fa="fas fa-store" />{i18n['major-badge.kiosk'][lang]}</span>)
     }
     if (app === CardinalApp.CINEMA) {
-      badges.push(<span key="planned" onClick={() => setShowBadgeModal('planned')} style={{ background: '#007bd7' }}><i className="fas fa-clock" />{i18n['major-badge.planned'][lang]}</span>)
+      badges.push(<span key="planned" onClick={() => setShowBadgeModal('planned')} style={{ background: '#007bd7' }}><Icon fa="fas fa-clock" />{i18n['major-badge.planned'][lang]}</span>)
     }
     if (app === CardinalApp.PHOTOS) {
-      badges.push(<span key="wip" onClick={() => setShowBadgeModal('wip')} style={{ background: '#700bd8' }}><i className="fas fa-terminal" />{i18n['major-badge.wip'][lang]}</span>)
+      badges.push(<span key="wip" onClick={() => setShowBadgeModal('wip')} style={{ background: '#700bd8' }}><Icon fa="fas fa-terminal" />{i18n['major-badge.wip'][lang]}</span>)
     }
 
     return badges

@@ -2,6 +2,7 @@ import type { CSSProperties, PropsWithChildren } from 'react'
 import { motion } from 'framer-motion'
 import clsx from 'clsx'
 
+import Icon from '../../typography/Icon'
 import './SelectContent.css'
 
 type SelectContentProps = {
@@ -66,7 +67,7 @@ const SelectContent = ({
           animate={{ transform: selected ? 'scale(1)' : 'scale(0)' }}
           transition={{ type: "spring", bounce: 0.4, duration: 0.3 }}
         >
-          <i className="fas fa-check" />
+          <Icon fa="fas fa-check" />
         </motion.div>
       </motion.button>
       <div className="selectable-content">

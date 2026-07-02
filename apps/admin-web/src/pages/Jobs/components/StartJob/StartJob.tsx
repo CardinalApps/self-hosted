@@ -6,6 +6,7 @@ import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import WrittenText from '@cardinalapps/ui/src/components/typography/WrittenText'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { toastActions } from '@cardinalapps/ui/src/store/slices/toast'
@@ -85,7 +86,7 @@ function StartJob({
                 target="_blank"
               >
                 {i18n[`job.docs`]?.[lang]}
-                <i className="fas fa-external-link-alt" />
+                <Icon fa="fas fa-external-link-alt" />
               </a>
             </div>
             <div className={'buttons'}>

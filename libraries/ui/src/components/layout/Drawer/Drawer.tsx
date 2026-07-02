@@ -9,6 +9,7 @@ import HasCapabilities from '../HasCapabilities'
 import { MediaServerCapability } from '@cardinalapps/access-control/src'
 
 import H3 from '../../typography/H3'
+import Icon from '../../typography/Icon'
 import Loading from '../Loading'
 
 import { drawerActions } from '../../../store/slices/drawer'
@@ -86,7 +87,7 @@ const Drawer = ({
         >
           <div className="drawer-pane-inner">
             <button className="drawer-close">
-              <i className="fas fa-times" onClick={handleClose} />
+              <Icon fa="fas fa-times" onClick={handleClose} />
             </button>
             <Card className="drawer-content" shadow={2}>
               {loading

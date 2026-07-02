@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 
 import H1 from '@cardinalapps/ui/src/components/typography/H1'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
 
 import { settingsSelectors, settingsActions } from '@cardinalapps/ui/src/store/slices/settings'
@@ -42,7 +43,7 @@ function Theme({
             onMouseEnter={() => handleThemeChange('light')}
             onClick={() => next()}
           >
-            <i className="fas fa-sun" />
+            <Icon fa="fas fa-sun" />
             <p>{i18n['theme.name.light'][lang]}</p>
           </button>
           <button
@@ -53,7 +54,7 @@ function Theme({
             onMouseEnter={() => handleThemeChange('dark')}
             onClick={() => next()}
           >
-            <i className="fas fa-moon" />
+            <Icon fa="fas fa-moon" />
             <p>{i18n['theme.name.dark'][lang]}</p>
           </button>
         </div>
