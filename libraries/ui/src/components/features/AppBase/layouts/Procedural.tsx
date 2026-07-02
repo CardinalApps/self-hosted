@@ -15,8 +15,8 @@ export type ProceduralProps = {
   className?: string | string[],
   isReady?: boolean,
   hasContent?: boolean,
-  emptyTitle?: boolean,
-  emptyMessage?: boolean,
+  emptyTitle?: string,
+  emptyMessage?: string,
   onLoadMore?: () => void
 }
 
