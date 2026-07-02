@@ -188,7 +188,6 @@ const UserMenu = ({
                               }))}
                             />
                           </div>
-                          <H3 className="user-dropdown-section-title">{i18n['user-menu.media-server']['en']}</H3>
                           <div className="user-dropdown-button-group">
                             <ul>
                               <li>
@@ -197,20 +196,30 @@ const UserMenu = ({
                                 </Button>
                               </li>
                               <li>
-                                <Button href="https://help.cardinalapps.io" target="_blank" icon="fas fa-info-circle">
-                                  {i18n['user-menu.help']['en']}
-                                </Button>
-                              </li>
-                              <li>
                                 <Button onClick={handleSwitchAccountClick} icon="fas fa-users">
                                   {i18n['user-menu.switch-account']['en']}
                                 </Button>
                               </li>
                               <li>
+                                <Button href="https://help.cardinalapps.io" target="_blank" icon="fas fa-info-circle">
+                                  {i18n['user-menu.help']['en']}
+                                </Button>
+                              </li>
+                              <li>
+                                <Button href="https://cardinalapps.io/news" target="_blank" icon="fas fa-newspaper">
+                                  {i18n['user-menu.news']['en']}
+                                </Button>
+                              </li>
+                              <li>
+                                <Button href="https://itsasmall.world/c/cardinal-media-server" target="_blank" icon="fas fa-comments">
+                                  {i18n['user-menu.community']['en']}
+                                </Button>
+                              </li>
+                              {/* <li>
                                 <Button onClick={handleLogout} icon="fas fa-sign-out-alt">
                                   {i18n['user-menu.logout']['en']}
                                 </Button>
-                              </li>
+                              </li> */}
                             </ul>
                           </div>
                           {
@@ -229,11 +238,6 @@ const UserMenu = ({
                                   <li>
                                     <Button href="https://status.cardinalapps.io" target="_blank" icon="fas fa-cloud">
                                       {i18n['user-menu.status']['en']}
-                                    </Button>
-                                  </li>
-                                  <li>
-                                    <Button href="https://itsasmall.world/c/cardinal-media-server" target="_blank" icon="fas fa-comments">
-                                      {i18n['user-menu.forums']['en']}
                                     </Button>
                                   </li>
                                 </ul>

@@ -13,6 +13,9 @@ const i18n: StringList = {
   "user-menu.help": {
     "en": "Docs",
   },
+  "user-menu.news": {
+    "en": "News",
+  },
   "user-menu.status": {
     "en": "Status",
   },
@@ -24,9 +27,6 @@ const i18n: StringList = {
   },
   "user-menu.quick-settings": {
     "en": "Quick Settings",
-  },
-  "user-menu.media-server": {
-    "en": "Media Server",
   },
   "user-menu.cloud": {
     "en": "Cardinal Cloud",
@@ -73,8 +73,8 @@ const i18n: StringList = {
   "user-menu.member-days.default": {
     "en": "Joined {month}/{year}",
   },
-  "user-menu.forums": {
-    "en": "Forums",
+  "user-menu.community": {
+    "en": "Community",
   },
   "user-menu.website": {
     "en": "cardinalapps.io",
