@@ -2,6 +2,7 @@ import { useSelector } from "react-redux"
 import { MusicArtistType } from "@cardinalapps/ui/src/store/apis/musicArtists"
 import MusicRelease from "@cardinalapps/ui/src/components/interaction/MusicRelease"
 import { MusicReleaseType } from "@cardinalapps/ui/src/store/apis/musicReleases"
+import { MusicTrackType } from "@cardinalapps/ui/src/store/apis/musicTracks"
 import { getAppUrl } from "@cardinalapps/ui/src/lib/net/router"
 import H3 from "@cardinalapps/ui/src/components/typography/H3"
 import { settingsSelectors } from "@cardinalapps/ui/src/store/slices/settings"
@@ -35,6 +36,7 @@ function ReleaseList({ releases }: { releases: MusicReleaseType[] }) {
           key={release.id}
           releaseId={release.id}
           releaseTitle={release.title}
+          tracks={release.tracks as MusicTrackType[]}
           releaseLink={getAppUrl('release', {
             params: {
               ':id': release?.musicReleaseId?.toString() || '',

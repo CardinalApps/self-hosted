@@ -52,7 +52,8 @@ const MusicPlaybackButton = ({
   const isPaused = paused.find((player: Player) => musicTrackIds.includes(player.trackId))
 
   const handlePlayClick = () => {
-    dispatch(play({ trackIds: [musicTrackIdToPlay] }))
+    const orderedTrackIds = [musicTrackIdToPlay, ...musicTrackIds.filter((id) => id !== musicTrackIdToPlay)]
+    dispatch(play({ trackIds: orderedTrackIds }))
   }
 
   const handlePauseClick = () => {
