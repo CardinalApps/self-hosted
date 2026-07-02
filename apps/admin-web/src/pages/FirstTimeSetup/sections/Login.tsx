@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
@@ -59,7 +60,7 @@ function Login({
         <Card
           className={'card'}
           padding="thick"
-          icon={<i className="fas fa-stamp" />}
+          icon={<Icon fa="fas fa-stamp" />}
           iconSize="l"
           header={<H2 className={'title'}>{i18n['login.title'][lang]}</H2>}
           footer={
@@ -81,7 +82,7 @@ function Login({
             {loggedIn
               ?
                 <p className={'currentUser'} data-testid="setup-login-confirmed">
-                  <i className="fas fa-check" /> {i18n['login.logged-in-as']['en'].replace('{name}', userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang])}
+                  <Icon fa="fas fa-check" /> {i18n['login.logged-in-as']['en'].replace('{name}', userObjectOfFutureOwner?.publicName || i18n['login.no-public-name-set'][lang])}
                 </p>
               : <CardinalAdminSSOButton
                   onSSOSuccess={onSSOSuccess}

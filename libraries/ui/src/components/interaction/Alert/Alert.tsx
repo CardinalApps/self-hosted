@@ -1,4 +1,5 @@
 import Button from '../Button'
+import Icon from '../../typography/Icon'
 
 import './Alert.css'
 
@@ -22,13 +23,13 @@ const Alert = ({
   const getIcon = () => {
     switch (type) {
       case 'info':
-        return <i className="fas fa-info-circle" />
+        return <Icon fa="fas fa-info-circle" />
       case 'success':
-        return <i className="fas fa-check-circle" />
+        return <Icon fa="fas fa-check-circle" />
       case 'warning':
-        return <i className="fas fa-exclamation-triangle" />
+        return <Icon fa="fas fa-exclamation-triangle" />
       case 'error':
-        return <i className="fas fa-exclamation-circle" />
+        return <Icon fa="fas fa-exclamation-circle" />
     }
   }
   return (

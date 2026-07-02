@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import clsx from 'clsx'
 
 import useClickOutside from '../../../hooks/useClickOutside'
+import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 
@@ -240,7 +241,7 @@ const Select = ({
               onKeyUp={onOptionKeyUp}
             >
               {item?.label}
-              {!!isSelected && <i className="fas fa-check-circle" />}
+              {!!isSelected && <Icon fa="fas fa-check-circle" />}
             </button>
           :
           undefined
@@ -334,7 +335,7 @@ const Select = ({
                 onFocus={() => setPopoutOpen(true)}
                 style={upperStyles}
               >
-                <span>{labelIcon ? <i className={clsx(labelIcon, 'label-icon')} /> : null}{inputLabel()}</span>
+                <span>{labelIcon ? <Icon fa={clsx(labelIcon, 'label-icon')} /> : null}{inputLabel()}</span>
               </div>
               <i className="icon down-icon fas fa-angle-down" />
             </>
@@ -364,7 +365,7 @@ const Select = ({
                     }, 0)
                   }}
                 >
-                  <i className="icon erase-icon fas fa-eraser" />
+                  <Icon fa="icon erase-icon fas fa-eraser" />
                 </button>
               }
             </>

@@ -8,6 +8,7 @@ import { v4 } from 'uuid'
 import clsx from 'clsx'
 
 import Loading from '../../layout/Loading'
+import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 import { toastActions } from '../../../store/slices/toast'
@@ -380,7 +381,7 @@ const PhotoViewer = ({
               title={i18n['controls.close.title'][lang]}
               onClick={handleClose}
             >
-              <i className="fas fa-times-circle" />
+              <Icon fa="fas fa-times-circle" />
             </button>
             {/* Sidebar button */}
             <button
@@ -389,7 +390,7 @@ const PhotoViewer = ({
               title={i18n['controls.sidebar.title'][lang]}
               onClick={() => toggleSidebar()}
             >
-              <i className="fas fa-info-circle" />
+              <Icon fa="fas fa-info-circle" />
             </button>
           </div>
           {/* Prev button */}
@@ -400,7 +401,7 @@ const PhotoViewer = ({
               title={i18n['controls.prev.title'][lang]}
               onClick={() => prevImage()}
             >
-              <i className="fas fa-arrow-circle-left" />
+              <Icon fa="fas fa-arrow-circle-left" />
             </button>
           }
           {/* Next button */}
@@ -411,7 +412,7 @@ const PhotoViewer = ({
               title={i18n['controls.next.title'][lang]}
               onClick={() => nextImage()}
             >
-              <i className="fas fa-arrow-circle-right" />
+              <Icon fa="fas fa-arrow-circle-right" />
             </button>
           }
         </motion.div>

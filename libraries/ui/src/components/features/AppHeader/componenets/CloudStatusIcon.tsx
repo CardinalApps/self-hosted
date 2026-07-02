@@ -4,6 +4,7 @@ import { settingsSelectors } from '../../../../store/slices/settings'
 import { homeServerUserSelectors } from '../../../../store/slices/homeServerUser'
 import { cloudUserSelectors } from '../../../../store/slices/cloudUser'
 import MenuButton from '../../../interaction/MenuButton'
+import Icon from '../../../typography/Icon'
 
 import i18n from '../i18n'
 
@@ -66,22 +67,22 @@ const CloudStatusIcon = () => {
       <MenuButton.Section className="current-status">
         <div className="server">
           <p className="server-name">
-            <i className="fas fa-home" />
+            <Icon fa="fas fa-home" />
             {i18n['cloud-status-icon.media-server.title'][lang]}
           </p>
           <p className="realtime">
             {i18n[`cloud-status-icon.dots.${getMediaServerStatus()}`][lang]}
-            {getMediaServerStatus() === STATUS_DOTS.connected && <i className="fas fa-check success-check" />}
+            {getMediaServerStatus() === STATUS_DOTS.connected && <Icon fa="fas fa-check success-check" />}
           </p>
         </div>
         <div className="server">
           <p className="server-name">
-            <i className="fas fa-cloud" />
+            <Icon fa="fas fa-cloud" />
             {i18n['cloud-status-icon.cloud-services.title'][lang]}
           </p>
           <p className="realtime">
             {currentMediaServerUser?.designation === 'guest_account' ? i18n['cloud-status-icon.guest-account'][lang] : i18n[`cloud-status-icon.dots.${getCloudStatus()}`][lang]}
-            {getCloudStatus() === STATUS_DOTS.connected && <i className="fas fa-check success-check" />}
+            {getCloudStatus() === STATUS_DOTS.connected && <Icon fa="fas fa-check success-check" />}
           </p>
         </div>
       </MenuButton.Section>

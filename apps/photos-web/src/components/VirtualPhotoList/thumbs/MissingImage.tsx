@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import Thumb from '@cardinalapps/ui/src/components/interaction/Thumb'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 // import usePhoto from '@cardinalapps/ui/src/hooks/usePhoto'
 
@@ -54,7 +55,7 @@ function MissingImage({
   return (
     <div className={'missingImage'}>
       <div className={'missingImageMessage'}>
-        <p><i className="fas fa-image" /></p>
+        <p><Icon fa="fas fa-image" /></p>
         <div dangerouslySetInnerHTML={{ __html: i18n['missing-image'][lang] }} />
       </div>
       <Thumb

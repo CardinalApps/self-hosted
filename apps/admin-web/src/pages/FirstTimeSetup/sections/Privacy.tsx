@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
@@ -28,7 +29,7 @@ function Privacy({
         <Card
           className={'card'}
           padding="thick"
-          icon={<i className="fas fa-handshake" />}
+          icon={<Icon fa="fas fa-handshake" />}
           iconSize="l"
           header={<H2 className={'title'}>{i18n['privacy.title'][lang]}</H2>}
           footer={

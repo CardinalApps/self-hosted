@@ -8,6 +8,7 @@ import clsx from 'clsx'
 
 import H2 from '../../typography/H2'
 import H5 from '../../typography/H5'
+import Icon from '../../typography/Icon'
 import Button from '../../interaction/Button'
 import BrandLogo from '../../layout/BrandLogo'
 import Card from '../../layout/Card'
@@ -217,7 +218,7 @@ const LoginScreen = ({
             <div className="help">
               <div className="login-screen-help-link">
                 <a href="https://help.cardinalapps.io/guides/cardinal-media-server/accounts" target="_blank">{i18n['footer.help'][lang]}</a>
-                <i className="fas fa-external-link-alt" />
+                <Icon fa="fas fa-external-link-alt" />
               </div>
               {/* {!!theme &&
                 <div className="login-screen-theme-switcher">
@@ -227,7 +228,7 @@ const LoginScreen = ({
             </div>
             <div className="login-screen-help-link">
               <a href="https://cardinalapps.io/contact" target="_blank">{i18n['footer.report'][lang]}</a>
-              <i className="fas fa-external-link-alt" />
+              <Icon fa="fas fa-external-link-alt" />
             </div>
           </footer>
         </Card>

@@ -10,6 +10,8 @@ import { modalActions } from '../../../store/slices/modal'
 
 import Card from '../Card'
 
+import Icon from '../../typography/Icon'
+
 import './Modal.css'
 
 type ModalProps = {
@@ -89,7 +91,7 @@ const Modal = ({
             }}
           >
             <button ref={closeButtonRef} className="modal-close" onClick={() => handleClose()}>
-              <i className="fas fa-times" />
+              <Icon fa="fas fa-times" />
             </button>
             <div>
               <Card className="modal-content" style={{ ...(width && { maxWidth: width }) }}>

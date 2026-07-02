@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import i18n from './i18n.json'
 
@@ -19,7 +20,7 @@ function ReloadButton({ onClick }: ReloadButtonProps) {
       title={i18n['reload-button.title'][lang]}
       onClick={onClick}
     >
-      <i className="fas fa-redo-alt" />
+      <Icon fa="fas fa-redo-alt" />
     </button>
   )
 }

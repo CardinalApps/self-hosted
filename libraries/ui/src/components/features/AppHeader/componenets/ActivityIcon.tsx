@@ -17,6 +17,7 @@ import { useAppSelector } from '../../../../hooks/useAppSelector'
 import useHasCapability from '../../../../hooks/useHasCapability'
 
 import MenuButton from '../../../interaction/MenuButton'
+import Icon from '../../../typography/Icon'
 
 import i18n from '../i18n'
 import globalI18n from '../../../../i18n/global'
@@ -130,8 +131,8 @@ const ActivityIcon = () => {
       align={'center'}
       title={i18n['activity-icon.title'][lang]}
       icon={
-        <i
-          className={`fas fa-bolt`}
+        <Icon
+          fa={`fas fa-bolt`}
           style={somethingIsActive ? { color: 'var(--accent-color)', animation: 'iconPulse 3s infinite' } : {}}
         />
       }

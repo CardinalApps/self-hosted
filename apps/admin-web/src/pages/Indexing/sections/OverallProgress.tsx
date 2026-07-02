@@ -6,6 +6,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import List from '@cardinalapps/ui/src/components/interaction/List'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import homeServerAPI from '@cardinalapps/ui/src/lib/homeserver/homeServerAPI'
 import { formatWithCommas } from '@cardinalapps/ui/src/lib/formatting/number'
@@ -103,14 +104,14 @@ function Indexer() {
                       title={i18n['stop-run.title-attr'][lang]}
                       onClick={handleStopButtonClick}
                     >
-                      <i className="far fa-stop-circle" />
+                      <Icon fa="far fa-stop-circle" />
                     </button>
                   </span>
                 }
                 {indexingServiceState === 'completed' && numFilesIndexed >= 1 &&
                   <span>
                     {i18n['state.completed'][lang]}
-                    <i className={`fas fa-check importCompletedIcon`} />
+                    <Icon fa={`fas fa-check importCompletedIcon`} />
                   </span>
                 }
                 {indexingServiceState === 'completed' && numFilesIndexed === 0 &&

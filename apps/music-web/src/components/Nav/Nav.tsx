@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+
 import * as routes from '../../routes'
 
 import i18n from './i18n.json'
@@ -22,7 +24,7 @@ function Nav({ children }: PropsWithChildren) {
         key="listen-now"
       >
         <Link to={routes.ROOT}>
-          <i className="fas fa-music" />
+          <Icon fa="fas fa-music" />
           <span>{i18n['nav.listen-now']['en']}</span>
         </Link>
       </li>
@@ -33,7 +35,7 @@ function Nav({ children }: PropsWithChildren) {
         key="artists"
       >
         <Link to={routes.ARTISTS}>
-          <i className="fas fa-guitar" />
+          <Icon fa="fas fa-guitar" />
           <span>{i18n['nav.artists']['en']}</span>
         </Link>
       </li>
@@ -44,7 +46,7 @@ function Nav({ children }: PropsWithChildren) {
         key="releases"
       >
         <Link to={routes.RELEASES}>
-          <i className="fas fa-compact-disc" />
+          <Icon fa="fas fa-compact-disc" />
           <span>{i18n['nav.releases']['en']}</span>
         </Link>
       </li>
@@ -55,7 +57,7 @@ function Nav({ children }: PropsWithChildren) {
         key="tracks"
       >
         <Link to={routes.TRACKS}>
-          <i className="fas fa-file-audio" />
+          <Icon fa="fas fa-file-audio" />
           <span>{i18n['nav.tracks']['en']}</span>
         </Link>
       </li>
@@ -77,7 +79,7 @@ function Nav({ children }: PropsWithChildren) {
         key="history"
       >
         <Link to={routes.HISTORY}>
-          <i className="fas fa-history" />
+          <Icon fa="fas fa-history" />
           <span>{i18n['nav.history']['en']}</span>
         </Link>
       </li>

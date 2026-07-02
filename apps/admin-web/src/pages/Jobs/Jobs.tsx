@@ -4,6 +4,7 @@ import { motion, AnimatePresence, Variants } from 'framer-motion'
 import clsx from 'clsx'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 
@@ -105,8 +106,8 @@ function Jobs() {
               onClick={() => handleJobTypeClick(job)}
             >
               {configuring
-                ? <i className="fas fa-minus-circle" />
-                : <i className="fas fa-plus-circle" />
+                ? <Icon fa="fas fa-minus-circle" />
+                : <Icon fa="fas fa-plus-circle" />
               }
               <span>{i18n[`job.${job}.name`]?.['en'] || job}</span>
             </button>

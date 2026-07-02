@@ -1,5 +1,6 @@
 import type { Meta } from '@storybook/react'
 
+import Icon from '../../typography/Icon'
 import SidebarNav from './SidebarNav'
 
 const meta = {
@@ -14,32 +15,32 @@ export const Default = () => {
       <SidebarNav>
         <li className="active" key="browse">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-grip" />
+            <Icon fa="fas fa-grip" />
             <span>Browse</span>
           </a>
         </li>
         <li key="explore">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-compass" />
+            <Icon fa="fas fa-compass" />
             <span>Explore</span>
           </a>
         </li>
         <li key="albums">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-record-vinyl" />
+            <Icon fa="fas fa-record-vinyl" />
             <span>Albums</span>
           </a>
         </li>
         <p className="section">Library</p>
         <li key="favourites">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-star" />
+            <Icon fa="fas fa-star" />
             <span>Favourites</span>
           </a>
         </li>
         <li key="account">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-user" />
+            <Icon fa="fas fa-user" />
             <span>My Account</span>
           </a>
         </li>
@@ -54,32 +55,32 @@ export const Thin = () => {
       <SidebarNav size="thin">
         <li className="active" key="browse">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-grip" />
+            <Icon fa="fas fa-grip" />
             <span>Browse</span>
           </a>
         </li>
         <li key="explore">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-compass" />
+            <Icon fa="fas fa-compass" />
             <span>Explore</span>
           </a>
         </li>
         <li key="albums">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-record-vinyl" />
+            <Icon fa="fas fa-record-vinyl" />
             <span>Albums</span>
           </a>
         </li>
         <p className="section">Library</p>
         <li key="favourites">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-star" />
+            <Icon fa="fas fa-star" />
             <span>Favourites</span>
           </a>
         </li>
         <li key="account">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-user" />
+            <Icon fa="fas fa-user" />
             <span>My Account</span>
           </a>
         </li>
@@ -113,7 +114,7 @@ export const Overflow = () => {
           section && <p key={`section-${i}`} className="section">{section}</p>,
           <li key={label} className={i === 0 ? 'active' : ''}>
             <a href="#" onClick={(e) => e.preventDefault()}>
-              <i className={icon} />
+              <Icon fa={icon} />
               <span>{label}</span>
             </a>
           </li>,
@@ -129,32 +130,32 @@ export const Collapseable = () => {
       <SidebarNav showCollapseButton={true}>
         <li className="active" key="browse">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-grip" />
+            <Icon fa="fas fa-grip" />
             <span>Browse</span>
           </a>
         </li>
         <li key="explore">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-compass" />
+            <Icon fa="fas fa-compass" />
             <span>Explore</span>
           </a>
         </li>
         <li key="albums">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-record-vinyl" />
+            <Icon fa="fas fa-record-vinyl" />
             <span>Albums</span>
           </a>
         </li>
         <p className="section">Library</p>
         <li key="favourites">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-star" />
+            <Icon fa="fas fa-star" />
             <span>Favourites</span>
           </a>
         </li>
         <li key="account">
           <a href="#" onClick={(e) => e.preventDefault()}>
-            <i className="fas fa-user" />
+            <Icon fa="fas fa-user" />
             <span>My Account</span>
           </a>
         </li>

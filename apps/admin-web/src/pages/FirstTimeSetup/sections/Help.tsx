@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
@@ -28,7 +29,7 @@ function Help({
         <Card
           className={'card'}
           padding="thick"
-          icon={<i className="fas fa-comments" />}
+          icon={<Icon fa="fas fa-comments" />}
           iconSize="l"
           header={<H2 className={'title'}>{i18n['help.title'][lang]}</H2>}
           footer={

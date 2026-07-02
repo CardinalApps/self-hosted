@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 import H2 from '@cardinalapps/ui/src/components/typography/H2'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import I11nFadeIn from '@cardinalapps/ui/src/components/layout/I11nFadeIn'
@@ -34,7 +35,7 @@ function UsageData({
         <Card
           className={'card'}
           padding="thick"
-          icon={<i className="fas fa-user-shield" />}
+          icon={<Icon fa="fas fa-user-shield" />}
           iconSize="l"
           header={<H2 className={'title'}>{i18n['usage-data.title'][lang]}</H2>}
           footer={

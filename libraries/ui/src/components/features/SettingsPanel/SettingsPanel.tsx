@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import Loading from '../../layout/Loading'
 import H2 from '../../typography/H2'
 import H3 from '../../typography/H3'
+import Icon from '../../typography/Icon'
 
 import SidebarNav from '../../interaction/SidebarNav'
 import Card from '../../layout/Card'
@@ -125,13 +126,13 @@ const SettingsPanel = ({
     <section className="settings-panel" data-app={app}>
       <aside className="settings-panel-position-controls">
         <button type="button" className="close" aria-label="Close settings" onClick={handleClose}>
-          <i className="fas fa-times" />
+          <Icon fa="fas fa-times" />
         </button>
         <button type="button" aria-label="Expand panel" onClick={stepUp}>
-          <i className="fas fa-chevron-up" />
+          <Icon fa="fas fa-chevron-up" />
         </button>
         <button type="button" aria-label="Collapse panel" onClick={stepDown}>
-          <i className="fas fa-chevron-down" />
+          <Icon fa="fas fa-chevron-down" />
         </button>
       </aside>
       <div className="panel">
@@ -139,7 +140,7 @@ const SettingsPanel = ({
           <div className="title">
             <H3 className="title-text">{i18n['settings.main-title']['en']}</H3>
             <div className="icons">
-              {!!syncError && <i className="error-icon fas fa-exclamation-triangle" title={syncError} />}
+              {!!syncError && <Icon fa="error-icon fas fa-exclamation-triangle" title={syncError} />}
               {!!syncing && <Loading size="s" />}
             </div>
           </div>
@@ -150,7 +151,7 @@ const SettingsPanel = ({
                   {tab?.section && <li className="section">{tab.section}</li>}
                   <li className={`${index === activeTabIndex ? 'active' : ''}`}>
                     <button type="button" onClick={() => setActiveTabIndex(index)}>
-                      <i className={tab?.tabIcon}></i>
+                      <Icon fa={tab?.tabIcon} />
                       <span>{tab?.tabName}</span>
                     </button>
                   </li>

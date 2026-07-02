@@ -1,5 +1,6 @@
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import NoContentMessage from '../../components/NoContentMessage'
 
@@ -20,7 +21,7 @@ function HistoryPage() {
       <section>
         <NoContentMessage
           showUnavailableMessage={true}
-          icon={<i className="fas fa-upload" />}
+          icon={<Icon fa="fas fa-upload" />}
           title={i18n['no-movies-tv-card-title']['en']}
           button={
             <Button href={`${HOME_SERVER_HOST}/admin/media`} target="_blank" solid={true}>

@@ -21,6 +21,7 @@ import PhotoViewerPage from './story-pages/feature/PhotoViewer'
 
 import { PAGE_LAYOUT } from '../../../store/slices/layout/constants'
 import { CardinalApp } from '../../../lib/env/cardinal'
+import Icon from '../../typography/Icon'
 
 import { routes } from './routes'
 
@@ -84,7 +85,7 @@ const DemoApp = () => {
               key="standard-layout"
             >
               <Link to={'/'}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: standard</span>
               </Link>
             </li>
@@ -95,7 +96,7 @@ const DemoApp = () => {
               key="thin-layout"
             >
               <Link to={`/${PAGE_LAYOUT["thin"]}`}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: thin</span>
               </Link>
             </li>
@@ -106,7 +107,7 @@ const DemoApp = () => {
               key="fixed-layout"
             >
               <Link to={`/${PAGE_LAYOUT["fixed"]}`}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: fixed</span>
               </Link>
             </li>
@@ -117,7 +118,7 @@ const DemoApp = () => {
               key="full-layout"
             >
               <Link to={`/${PAGE_LAYOUT["full"]}`}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: full</span>
               </Link>
             </li>
@@ -128,7 +129,7 @@ const DemoApp = () => {
               key="file-browser-layout"
             >
               <Link to={`/${PAGE_LAYOUT["files"]}`}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: files</span>
               </Link>
             </li>
@@ -139,7 +140,7 @@ const DemoApp = () => {
               key="procedural-layout"
             >
               <Link to={`/${PAGE_LAYOUT["procedural"]}`}>
-                <i className="fas fa-border-all" />
+                <Icon fa="fas fa-border-all" />
                 <span>Layout: procedural</span>
               </Link>
             </li>
@@ -150,7 +151,7 @@ const DemoApp = () => {
               key="modal-test-page"
             >
               <Link to={`/modal`}>
-                <i className="fas fa-box" />
+                <Icon fa="fas fa-box" />
                 <span>Feat: Modal</span>
               </Link>
             </li>
@@ -161,7 +162,7 @@ const DemoApp = () => {
               key="drawer-test-page"
             >
               <Link to={`/drawer`}>
-                <i className="fas fa-box" />
+                <Icon fa="fas fa-box" />
                 <span>Feat: Drawer</span>
               </Link>
             </li>
@@ -172,7 +173,7 @@ const DemoApp = () => {
               key="photo-viewer-test-page"
             >
               <Link to={`/photo-viewer`}>
-                <i className="fas fa-box" />
+                <Icon fa="fas fa-box" />
                 <span>Feat: PhotoViewer</span>
               </Link>
             </li>

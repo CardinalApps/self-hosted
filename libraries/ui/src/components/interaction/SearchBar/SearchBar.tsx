@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import clsx from 'clsx'
 
+import Icon from '../../typography/Icon'
+
 import './SearchBar.css'
 
 type SearchBarProps = {
@@ -28,7 +30,7 @@ const SearchBar = ({
   return (
     <div className={clsx('search-bar', `size-${size}`)}>
       <label>
-        <i className="fas fa-search"></i>
+        <Icon fa="fas fa-search" />
         <input
           type="search"
           name="query"
