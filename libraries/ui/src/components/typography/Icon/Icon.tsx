@@ -13,6 +13,7 @@ type IconProps = {
   className?: string,
   iconClassName?: string,
   style?: CSSProperties,
+  border?: 0 | 1 | 2 | 3 | 4,
   onClick?: (e: MouseEvent) => void,
 }
 
@@ -29,28 +30,30 @@ const Icon = ({
   className,
   iconClassName,
   style,
+  border,
   onClick,
 }: PropsWithChildren<IconProps>) => {
   const iconEl = fa
     ? <i className={clsx('fa-icon', fa, iconClassName)} style={style} />
     : icon
+  const borderClassName = border ? `border-${border}` : ''
 
   if (href) {
     return (
-      <a href={href} className={clsx('app-icon', 'href-icon', className)} target={target} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
+      <a href={href} className={clsx('app-icon', 'href-icon', borderClassName, className)} target={target} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
         {iconEl}
       </a>
     )
   } else {
     if (onClick) {
       return (
-        <button type="button" className={clsx('app-icon', 'button-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
+        <button type="button" className={clsx('app-icon', 'button-icon', borderClassName, className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
           {iconEl}
         </button>
       )
     } else {
       return (
-        <span className={clsx('span-icon', className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
+        <span className={clsx('span-icon', borderClassName, className)} title={title} onClick={onClick} data-hover-type={hoverType} style={style}>
           {iconEl}
         </span>
       )

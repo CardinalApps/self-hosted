@@ -5,7 +5,12 @@
   justify-content: center;
   position: relative;
   border-radius: 100%;
-  
+
+  &.border-1 { border: 1px solid var(--border-color-1); }
+  &.border-2 { border: 1px solid var(--border-color-2); }
+  &.border-3 { border: 1px solid var(--border-color-3); }
+  &.border-4 { border: 1px solid var(--border-color-4); }
+
   i {
     font-size: 18px;
     color: var(--text-color-2);
@@ -70,6 +75,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 100%;
+
+  &.border-1 { border: 1px solid var(--border-color-1); }
+  &.border-2 { border: 1px solid var(--border-color-2); }
+  &.border-3 { border: 1px solid var(--border-color-3); }
+  &.border-4 { border: 1px solid var(--border-color-4); }
 
   i {
     font-size: 18px;
