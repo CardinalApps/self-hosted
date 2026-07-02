@@ -36,7 +36,7 @@ export class MusicArtistController {
   })
   async getMusicArtist(@Param() { id }: GetMusicArtistDto): Promise<MusicArtist> {
     const musicArtist = await this.musicArtistService.get(id, {
-      releases: true,
+      releases: { tracks: true },
       tracks: true,
     })
 

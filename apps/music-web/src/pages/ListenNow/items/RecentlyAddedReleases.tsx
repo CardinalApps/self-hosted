@@ -20,6 +20,7 @@ function RecentlyAddedReleases() {
     orderBy: 'createdAt',
     order: 'DESC',
     take: 40,
+    tracks: true,
     ...(libraries?.length ? { libraries } : {}),
   })
 
