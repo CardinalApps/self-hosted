@@ -171,7 +171,7 @@
       transition: all 200ms;
     }
 
-    span {
+    span:not(.span-icon) {
       margin-left: 45px;
     }
   }
