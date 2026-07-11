@@ -35,9 +35,9 @@ These are the packages in this monorepo.
 
 <details>
   <summary>How does this repo work?</summary>
-  <p>Cardinal uses an internal monorepo that is a mix of open and closed source code. This monorepo, the self-hosted monorepo, contains only the open source code, cherry-picked from the internal repo into this repo.</p>
+  <p>The main development happens on an internal monorepo that is made of a mix of open and closed source packages. The repo that you are looking at now (the self-hosted monorepo) contains only the open source code, cherry-picked from the internal repo and copied here.</p>
   <p>This repo was created in March 2026, that's why the commit history only goes back that far despite the development of the internal repo going back to 2022.</p>
-  <p>Every few days to few weeks, a CI job within the internal repo will extract all of the open source code and create a PR to update the self-hosted repo. This operation brings over the code, commit messages, and authorship without any alterations.</p>
+  <p>Every few days to few weeks, a CI job within the internal repo will extract all of the open source code and create a PR to update this repo. This operation brings over the code, commit messages, and authorship without any alterations.</p>
   <p>The <a href="https://github.com/CardinalApps/self-hosted/commit/dfbd64ef15e02999026a6f4597d2bd31514c0135" target="_blank">second commit</a> in this repo is a squashed commit containing all the self-hosted code from the internal repo since 2022. That one commit adds 270k lines of code, and it is also the last commit before AI coding assistants were allowed to contribute.</p>
   <p>It's normal that sometimes a commit message will mention packages from the internal repo that do not exist here.</p>
 </details>
