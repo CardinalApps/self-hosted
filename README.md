@@ -89,7 +89,7 @@ docker compose up -d</pre>
 
   <p><strong>3. Install all dependencies:</strong></p>
 
-  <pre>pnpm i --frozen-lock-file</pre>
+  <pre>pnpm i --frozen-lockfile</pre>
 
   <p><strong>4. Start all apps:</strong></p>
 
