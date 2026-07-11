@@ -1,106 +1,88 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "stream",
-  "globalEnv": ["TZ", "npm_package_version", "CARDINAL_POSTGRES", "APP_ENCRYPTION_KEY", "MONGODB_URI", "MONGODB_DB_NAME", "NODE_ENV", "LOG_LEVEL"],
+  "globalEnv": ["NODE_ENV", "TZ"],
+  "globalPassThroughEnv": [
+    "APP_ENCRYPTION_KEY",
+    "CARDINAL_POSTGRES",
+    "LOG_LEVEL",
+    "MONGODB_URI",
+    "MONGODB_DB_NAME",
+    "npm_package_version"
+  ],
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["VITE_*", "NEXT_PUBLIC_*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "$TURBO_ROOT$/config/typescript/*.json"],
+      "outputs": ["build/**", "dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "build:storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
     "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "serve": {
+      "dependsOn": ["build"],
       "cache": false,
       "persistent": true
     },
     "lint": {
-      "dependsOn": [],
-      "cache": false
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/config/eslint/*.js"]
     },
     "typecheck": {
-      "dependsOn": [],
-      "cache": false
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/config/typescript/*.json"]
     },
     "test:unit": {
-      "dependsOn": []
+      "dependsOn": ["^build"]
     },
     "test:integration": {
-      "dependsOn": []
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "test:e2e": {
-      "dependsOn": []
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "test:e2e:fts": {
-      "dependsOn": []
+      "dependsOn": ["^build"],
+      "cache": false
     },
     "test:e2e:ui": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
     "test:e2e:fts:ui": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
     "test:e2e:install": {
       "cache": false
     },
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["build/**", "dist/**", ".next/**", "!.next/cache/**"]
-    },
-    "serve": {
-      "dependsOn": ["^serve"]
-    },
-    "@cardinalapps/access-control#dev": {
-      "dependsOn": [],
+    "@cardinalapps/ui#serve": {
+      "dependsOn": ["build:storybook"],
       "cache": false,
       "persistent": true
     },
-    "@cardinalapps/topology#dev": {
-      "dependsOn": [],
-      "cache": false,
-      "persistent": true
-    },
-    "@cardinalapps/app-settings#dev": {
-      "dependsOn": [],
-      "cache": false,
-      "persistent": true
-    },
-    "@cardinalapps/products#dev": {
-      "dependsOn": [],
-      "cache": false,
-      "persistent": true
-    },
-    "@cardinalapps/cloud-entry#dev": {
+    "@cardinalapps/media-server#bundle": {
       "dependsOn": [
-        "@cardinalapps/access-control#build",
-        "@cardinalapps/topology#build"
+        "@cardinalapps/admin-web#build",
+        "@cardinalapps/cinema-web#build",
+        "@cardinalapps/music-web#build",
+        "@cardinalapps/photos-web#build"
       ],
-      "cache": false,
-      "persistent": true
+      "outputs": ["public/admin/**", "public/cinema/**", "public/music/**", "public/photos/**"]
     },
-    "@cardinalapps/feedback-server#dev": {
-      "dependsOn": [
-        "@cardinalapps/topology#build"
-      ],
-      "cache": false
-    },
-    "@cardinalapps/auth-server#dev": {
-      "dependsOn": [
-        "@cardinalapps/access-control#build",
-        "@cardinalapps/products#build"
-      ],
-      "cache": false
-    },
-    "@cardinalapps/media-server#dev": {
-      "dependsOn": [
-        "@cardinalapps/access-control#build",
-        "@cardinalapps/app-settings#build",
-        "@cardinalapps/products#build",
-        "@cardinalapps/topology#build"
-      ],
-      "cache": false
-    },
-    "@cardinalapps/remote-access-server#dev": {
-      "dependsOn": [
-        "@cardinalapps/remote-access#build"
-      ],
-      "cache": false
+    "@cardinalapps/media-server#build:bin": {
+      "dependsOn": ["build", "bundle"],
+      "outputs": ["bin/prod/**"]
     }
   }
 }
