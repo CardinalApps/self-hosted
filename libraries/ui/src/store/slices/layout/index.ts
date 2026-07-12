@@ -53,7 +53,7 @@ const initialState: LayoutSliceState = {
   showLibrarySwitcher: false,
   pageDocLink: '',
   settingsPanelOpen: false,
-  settingsPanelTop: '45vh',
+  settingsPanelTop: '50px',
   sidebarMode: SIDEBAR_MODE.expanded,
   userSelectedSidebarMode: SIDEBAR_MODE.expanded,
 }
