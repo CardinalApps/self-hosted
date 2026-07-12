@@ -8,5 +8,5 @@ export const enableGlassFactory: SettingsFieldFactory = (app: SupportedCardinalA
   label: i18n?.['settings.enable-glass.label']?.[lang],
   type: 'toggle',
   storage: 'client',
-  defaultValue: true,
+  defaultValue: false,
 })
