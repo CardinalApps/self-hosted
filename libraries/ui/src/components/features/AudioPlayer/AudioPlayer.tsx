@@ -17,6 +17,7 @@ import previous from '../../../store/slices/music/thunks/previous'
 import { getHowl } from '../../../hooks/useHowler'
 import { useReleaseCover } from '../../../hooks/useReleaseCover'
 import { useCoverColors } from '../../../hooks/useCoverColors'
+import { getContrastTextColor } from '../../../lib/color/getContrastTextColor'
 import { settingsSelectors } from '../../../store/slices/settings'
 
 import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
@@ -64,6 +65,12 @@ const AudioPlayer = ({
   const [coverSrc] = useReleaseCover(track?.release?.id)
   const coverColors = useCoverColors(coverSrc)
   const [fadeIn, setFadeIn] = useState(false)
+
+  // The glass background is derived from the cover art, so its icons and text need to
+  // follow suit rather than the theme's static colors, or they can end up unreadable.
+  const contrastStyle = enable_glass && coverColors.length > 0 && getContrastTextColor(coverColors) === 'light'
+    ? { color: '#fff' }
+    : undefined
 
   const handlePlayClick = (id) => {
     dispatch(play({ trackIds: [id] }))
@@ -168,6 +175,7 @@ const AudioPlayer = ({
         <p
           className="audio-player-track-title"
           title={track?.title}
+          style={contrastStyle}
         >
           {track?.title}
         </p>
@@ -180,6 +188,7 @@ const AudioPlayer = ({
         <p
           className="audio-player-track-artists"
           title={track?.artists?.map((artist) => artist.name)?.join(', ')}
+          style={contrastStyle}
         >
           {track?.artists?.map((artist) => {
             return (
@@ -200,6 +209,7 @@ const AudioPlayer = ({
             fa="fas fa-backward"
             className={clsx('audio-player-playback-button', 'prev', 'no-collapse')}
             hoverType={enable_glass ? 'glass' : 'background'}
+            style={contrastStyle}
             onClick={() => handlePrevClick()}
           />
           {!!(musicTrackLoading || musicBlobLoading) && <Loading size="s" />}
@@ -208,6 +218,7 @@ const AudioPlayer = ({
               fa="fas fa-play"
               className={clsx('audio-player-playback-button', 'play')}
               hoverType={enable_glass ? 'glass' : 'background'}
+              style={contrastStyle}
               onClick={() => handlePlayClick(track?.musicTrackId)}
             />
           }
@@ -216,6 +227,7 @@ const AudioPlayer = ({
               fa="fas fa-pause"
               className={clsx('audio-player-playback-button', 'pause')}
               hoverType={enable_glass ? 'glass' : 'background'}
+              style={contrastStyle}
               onClick={() => handlePauseClick()}
             />
           }
@@ -223,12 +235,14 @@ const AudioPlayer = ({
             fa="fas fa-forward"
             className={clsx('audio-player-playback-button', 'next', 'no-collapse')}
             hoverType={enable_glass ? 'glass' : 'background'}
+            style={contrastStyle}
             onClick={() => handleNextClick()}
           />
           <Icon
             fa="fas fa-stop"
             className={clsx('audio-player-playback-button', 'stop', 'no-collapse')}
             hoverType={enable_glass ? 'glass' : 'background'}
+            style={contrastStyle}
             onClick={() => handleStopClick()}
           />
         </div>
@@ -249,7 +263,7 @@ const AudioPlayer = ({
                   howl.seek(value)
                 }}
               />
-              <div className="scrubber-time">
+              <div className="scrubber-time" style={contrastStyle}>
                 <time className="current-time">{secondsToMMSS(playbackSeconds)}</time> <span className="no-collapse">/</span>
                 <time className="total-time no-collapse">{duration ? secondsToMMSS(duration) : '--:--'}</time>
               </div>
