@@ -11,11 +11,9 @@ import authAPI from '../../../lib/auth/authAPI'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import Loading from '../../layout/Loading'
 
-import './SSOLogin.css'
+import { ACCOUNT_APP_HOST } from '../../../../env'
 
-// TODO use topology package
-const SSO_URL_DEV = 'http://localhost:3077'
-const SSO_URL_PROD = 'https://account.cardinalapps.io'
+import './SSOLogin.css'
 
 export const SSO_DEBUG_PARAM = '?___debugSSO' as const
 
@@ -56,7 +54,7 @@ const SSOLogin = ({
   onSSOSuccess,
   onPopupClosed,
   label = 'Sign in with Cardinal Cloud',
-  ssoUrl,
+  ssoUrl = ACCOUNT_APP_HOST,
   serverName = '(Not set)',
   style,
 }: PropsWithChildren<SSOLoginProps>) => {
@@ -67,15 +65,6 @@ const SSOLogin = ({
   const [nonce, setNonce] = useState(uuid())
 
   const debug = window.location.search.includes(SSO_DEBUG_PARAM)
-
-  /**
-   * TODO use topology package
-   */
-  if (!ssoUrl) {
-    ssoUrl = window.location.href.includes('//localhost:') || window.location.href.includes('//127.0.0.1:')
-      ? SSO_URL_DEV
-      : SSO_URL_PROD
-  }
 
   /**
    * Handle all incoming IPC messages from the child window that is running the

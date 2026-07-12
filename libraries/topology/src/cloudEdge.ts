@@ -18,6 +18,7 @@ export enum InfrastructureProvider {
 }
 
 export enum CloudService {
+  ACCOUNT = "account",
   AUTH = "auth",
   BEV = "bev",
   CMS = "cms",
@@ -34,6 +35,14 @@ export type CloudApp = {
 }
 
 export const CloudEdge = {
+  account: {
+    provider: InfrastructureProvider.AZURE,
+    name: 'Account Portal',
+    entry: {
+      dev: 'http://localhost:3077',
+      prod: 'https://account.cardinalapps.io',
+    },
+  },
   auth: {
     provider: InfrastructureProvider.AZURE,
     name: 'Authentication',

@@ -16,6 +16,7 @@
   "dependencies": {
     "@cardinalapps/access-control": "workspace:*",
     "@cardinalapps/app-settings": "workspace:*",
+    "@cardinalapps/topology": "workspace:*",
     "@reduxjs/toolkit": "2.6.1",
     "@storybook/manager-api": "^8.5.8",
     "@storybook/preview-api": "^8.5.8",
