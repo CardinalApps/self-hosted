@@ -19,6 +19,7 @@
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.26.0",
     "@cardinalapps/eslint-config": "workspace:*",
+    "@cardinalapps/typescript-config": "workspace:*",
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
