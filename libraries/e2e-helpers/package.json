@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@cardinalapps/eslint-config": "workspace:*",
+    "@cardinalapps/typescript-config": "workspace:*",
     "@playwright/test": "^1.52.0",
     "@types/node": "^22.13.4",
     "eslint": "9.20.1",
