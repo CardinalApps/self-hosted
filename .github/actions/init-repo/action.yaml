@@ -21,10 +21,22 @@ runs:
       with:
         node-version-file: .nvmrc
 
+    # Shared turbo cache. On the self-hosted pool every runner service shares one
+    # HOME, so task results persist across jobs, runners, and branches; unchanged
+    # tasks replay from cache instead of re-executing. Hosted runners (OSS repo,
+    # forks) just get a cold per-job dir — same behavior as before. Exported to
+    # GITHUB_ENV so the job's later steps (turbo task runs) hit the same cache.
+    # The nightly cleanup cron on the runner VM garbage-collects stale entries.
+    - name: Configure turbo cache
+      run: echo "TURBO_CACHE_DIR=$HOME/.cache/turbo" >> "$GITHUB_ENV"
+      shell: bash
+
     - name: Install workspace deps
       run: pnpm install --frozen-lockfile
       shell: bash
 
+    # Turbo skips packages whose build inputs haven't changed (warm cache), so
+    # this is a ~2s replay on most jobs instead of 8 tsc builds every time.
     - name: Build library packages
-      run: pnpm --filter="./libraries/**" build
+      run: pnpm exec turbo run build --filter='./libraries/*' --output-logs=errors-only
       shell: bash

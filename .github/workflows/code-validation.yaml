@@ -11,7 +11,11 @@ on:
       - 'servers/**'
       - '.github/workflows/code-validation.yaml'
       - '.github/actions/init-repo/**'
+      - '.npmrc'
       - '.nvmrc'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
       - '!**/*.md'
       - '!**/README*'
       - '!**/.gitignore'
@@ -27,6 +31,12 @@ concurrency:
 # self-hosted repo. The private repo sets the Actions variable CI_RUNNER=self-hosted
 # to target its runner pool; anywhere the variable is unset (the public repo, forks)
 # falls back to GitHub-hosted runners.
+#
+# The matrix is limited to packages affected by the push (changed packages plus
+# their dependents, resolved through turbo's package graph), and every task runs
+# through turbo so unchanged work replays from the shared cache on the runner VM.
+# A stage with no affected packages is skipped entirely; the final Code Validation
+# job treats skipped stages as passing.
 jobs:
   discover:
     name: Discover packages
@@ -39,6 +49,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # Full history so turbo can diff HEAD against the push base.
+          fetch-depth: 0
 
       # Only GitHub-hosted runners need pnpm bootstrapped; the self-hosted pool
       # already has it. See the note in .github/actions/init-repo.
@@ -54,29 +67,40 @@ jobs:
       - name: Install workspace deps
         run: pnpm install --frozen-lockfile
 
+      # Resolve the git base for change detection. Prefer the push base
+      # (github.event.before); fall back to the merge-base with the default
+      # branch when that commit is unusable (new branch, force push). If no
+      # base resolves at all, run the full matrix rather than skipping work.
+      - name: Resolve diff base
+        id: base
+        run: |
+          BASE="${{ github.event.before }}"
+          if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            BASE=$(git merge-base "origin/${{ github.event.repository.default_branch }}" HEAD 2>/dev/null || true)
+          fi
+          if [[ -n "$BASE" ]]; then
+            echo "TURBO_SCM_BASE=$BASE" >> "$GITHUB_ENV"
+            echo "affected=--affected" >> "$GITHUB_OUTPUT"
+            echo "Diffing against $BASE"
+          else
+            echo "affected=" >> "$GITHUB_OUTPUT"
+            echo "No usable base — running the full matrix"
+          fi
+
+      # Emit a JSON array of {name, label} for every package whose task turbo
+      # would actually run: affected packages (changed + dependents) that define
+      # the script. Dry-run entries without a real script are virtual graph
+      # nodes and are filtered out.
       - name: Discover packages
         id: discover
         run: |
-          PKGS=$(pnpm ls -r --depth -1 --json)
-          # Emit a JSON array of {name, label} for every workspace package whose
-          # package.json declares the given script. Used to drive matrix jobs.
+          set -o pipefail
           discover() {
-            local SCRIPT="$1"
-            echo "$PKGS" | SCRIPT="$SCRIPT" node -e "
-              const fs = require('fs');
-              const script = process.env.SCRIPT;
-              const pkgs = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
-              const result = pkgs
-                .filter(p => p.path !== process.cwd())
-                .filter(p => {
-                  try {
-                    const s = JSON.parse(fs.readFileSync(p.path + '/package.json', 'utf8')).scripts || {};
-                    return script in s;
-                  } catch { return false; }
-                })
-                .map(p => ({ name: p.name, label: p.name.replace(/^[^/]+\//, '') }));
-              process.stdout.write(JSON.stringify(result));
-            "
+            pnpm exec turbo run "$1" ${{ steps.base.outputs.affected }} --dry=json 2>/dev/null \
+              | sed -n '/^{/,$p' \
+              | jq -c --arg t "$1" '[.tasks[]
+                  | select(.task == $t and .command != "<NONEXISTENT>")
+                  | {name: .package, label: (.package | sub("^[^/]+/"; ""))}]'
           }
           echo "lint-packages=$(discover lint)" >> $GITHUB_OUTPUT
           echo "typecheck-packages=$(discover typecheck)" >> $GITHUB_OUTPUT
@@ -87,6 +111,7 @@ jobs:
     name: "Lint (${{ matrix.package.label }})"
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     needs: discover
+    if: ${{ needs.discover.outputs.lint-packages != '[]' }}
     strategy:
       fail-fast: true
       max-parallel: 3
@@ -100,13 +125,15 @@ jobs:
         uses: ./.github/actions/init-repo
 
       - name: Lint
-        run: pnpm --filter="${{ matrix.package.name }}" lint --max-warnings 0
+        run: pnpm exec turbo run lint --filter="${{ matrix.package.name }}" -- --max-warnings 0
 
   typecheck:
     name: "Typecheck (${{ matrix.package.label }})"
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after lint so only one matrix runs at a time on the shared VM.
+    # !failure() (not success()) so this still runs when lint is skipped.
     needs: [discover, lint]
+    if: ${{ !failure() && !cancelled() && needs.discover.outputs.typecheck-packages != '[]' }}
     strategy:
       fail-fast: true
       max-parallel: 3
@@ -120,13 +147,14 @@ jobs:
         uses: ./.github/actions/init-repo
 
       - name: Typecheck
-        run: pnpm --filter="${{ matrix.package.name }}" typecheck
+        run: pnpm exec turbo run typecheck --filter="${{ matrix.package.name }}"
 
   unit:
     name: "Unit (${{ matrix.package.label }})"
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after typecheck.
     needs: [discover, typecheck]
+    if: ${{ !failure() && !cancelled() && needs.discover.outputs.unit-packages != '[]' }}
     strategy:
       fail-fast: true
       max-parallel: 2
@@ -140,13 +168,14 @@ jobs:
         uses: ./.github/actions/init-repo
 
       - name: Unit tests
-        run: pnpm --filter="${{ matrix.package.name }}" test:unit
+        run: pnpm exec turbo run test:unit --filter="${{ matrix.package.name }}"
 
   integration:
     name: "Integration (${{ matrix.package.label }})"
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     # Serialize after unit.
     needs: [discover, unit]
+    if: ${{ !failure() && !cancelled() && needs.discover.outputs.integration-packages != '[]' }}
     strategy:
       fail-fast: true
       max-parallel: 2
@@ -160,19 +189,23 @@ jobs:
         uses: ./.github/actions/init-repo
 
       - name: Integration tests
-        run: pnpm --filter="${{ matrix.package.name }}" test:integration
+        run: pnpm exec turbo run test:integration --filter="${{ matrix.package.name }}"
 
   validate:
     name: Code Validation
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
-    needs: [lint, typecheck, unit, integration]
+    needs: [discover, lint, typecheck, unit, integration]
     if: always()
     steps:
+      # Skipped stages are fine (no affected packages); failures and
+      # cancellations are not. Discover itself must always succeed.
       - name: Check results
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" \
-             || "${{ needs.typecheck.result }}" != "success" \
-             || "${{ needs.unit.result }}" != "success" \
-             || "${{ needs.integration.result }}" != "success" ]]; then
+          ok() { [[ "$1" == "success" || "$1" == "skipped" ]]; }
+          if [[ "${{ needs.discover.result }}" != "success" ]] \
+             || ! ok "${{ needs.lint.result }}" \
+             || ! ok "${{ needs.typecheck.result }}" \
+             || ! ok "${{ needs.unit.result }}" \
+             || ! ok "${{ needs.integration.result }}"; then
             exit 1
           fi
