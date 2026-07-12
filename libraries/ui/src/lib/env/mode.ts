@@ -1,20 +1,17 @@
 export const MODE_DEV = 'dev'
 export const MODE_PROD = 'prod'
 
-/**
- * Determines the mode. Can be `dev` or `prod`.
- *
- * @returns {object}
- */
-export function getMode(force?) {
-  if (force) {
-    return force
-  }
+// Every bundler in the monorepo (Vite, Next.js, Metro) statically replaces this expression at
+// build time, so it is safe in the browser where no real `process` global exists.
+declare const process: { env: { NODE_ENV?: string } }
 
-  // 192.168.*.* and 10.*.*.* are actually considered prod because that's where users self-host
-  if (window.location.href.includes('http://localhost') || window.location.href.includes('http://127.0.0.1')) {
-    return MODE_DEV
-  } else {
-    return MODE_PROD
-  }
+/*
+  Determines the mode. Can be `dev` or `prod`.
+
+  The mode is a build-time property: dev servers produce `dev`, production builds produce `prod`.
+  It deliberately ignores where the app is served from, so that users can self-host production
+  builds anywhere, including on localhost.
+*/
+export function getMode() {
+  return process.env.NODE_ENV === 'development' ? MODE_DEV : MODE_PROD
 }

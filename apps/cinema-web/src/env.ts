@@ -1,16 +1,4 @@
-import { getMode, MODE_DEV, MODE_PROD } from '@cardinalapps/ui/src/lib/env/mode'
-
-const mode = getMode()
-
-export const CLOUD_AUTH_HOST =
-  mode === MODE_DEV ? 'http://localhost:4013' :
-    mode === MODE_PROD ? 'https://auth.cardinalcloud.io' :
-      null
-
-export const HOME_SERVER_HOST =
-  mode === MODE_DEV ? 'http://localhost:3080' :
-    mode === MODE_PROD ? window.location.origin :
-      null
+export { CLOUD_AUTH_HOST, HOME_SERVER_HOST } from '@cardinalapps/ui/env'
 
 // Assigned by Cardinal app registry
 export const CARDINAL_PUBLIC_APP_ID = '9ffa2b5b-c8d1-4239-a68f-1d3a87719265'
