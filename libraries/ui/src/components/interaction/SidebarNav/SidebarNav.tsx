@@ -112,7 +112,8 @@ const SidebarNav = ({
         return
       }
 
-      const spanWidth = li.querySelector('span')?.clientWidth || 0
+      // The Icon component renders its own <span>, so the label has to be asked for by name
+      const spanWidth = li.querySelector('span:not(.span-icon)')?.clientWidth || 0
       const otherLi = Array.from(e.target.closest('ul').querySelectorAll('li')).filter((el) => el !== li)
       li.classList.add('expand-label')
       anchor.style.width = `${spanWidth + 90}px`
