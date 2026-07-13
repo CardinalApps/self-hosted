@@ -6,6 +6,7 @@
   --file-browser-width: 340px;
   --file-browser-gutter: 10px;
   --header-height: 85px;
+  --playback-sidebar-width: 380px;
 
   &[data-sidebar-mode="collapsed"] {
     --sidebar-nav-width: 66px;
@@ -103,6 +104,27 @@
       position: absolute;
       top: 0;
       right: 0;
+    }
+  }
+}
+
+/*
+  Docked is the default: the scaffold gives up a column on the right so that nothing
+  ends up underneath the playback sidebar. The header is fixed, so it has to be pulled
+  in by hand. Floating mode skips all of this and lets the sidebar cover the page.
+*/
+.scaffold[data-playback-sidebar="docked"] {
+  padding-right: var(--playback-sidebar-width);
+
+  .app-header {
+    right: calc(var(--playback-sidebar-width) + 20px);
+  }
+
+  @media (max-width: 768px) {
+    padding-right: 0;
+
+    .app-header {
+      right: 20px;
     }
   }
 }
@@ -407,29 +429,6 @@
   }
 }
 
-.mini-queue {
-  padding-bottom: 15px;
-
-  .playback-queue {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    position: relative;
-
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      pointer-events: none;
-      background-image: linear-gradient(var(--bg-2) -4%, transparent);
-      z-index: 2;
-    }
-  }
-}
-
 .mini-audio-player {
 
   &.glass-enabled .animated-gradient {
@@ -492,11 +491,7 @@
     left: 15px;
     bottom: 15px;
     z-index: 6000;
-    
-    .mini-queue {
-      display: none;
-    }
-    
+
     .audio-player-pagination {
       padding: 2px 5px 2px 2px;
       border: 1px solid var(--border-color-1);

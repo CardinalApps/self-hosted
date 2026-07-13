@@ -34,6 +34,7 @@ export type LayoutSliceState = {
   pageDocLink: string,
   settingsPanelOpen: boolean,
   settingsPanelTop: string,
+  playbackSidebarOpen: boolean,
 
   // The actual current mode of the sidebar
   sidebarMode: SIDEBAR_MODE,
@@ -54,6 +55,7 @@ const initialState: LayoutSliceState = {
   pageDocLink: '',
   settingsPanelOpen: false,
   settingsPanelTop: '50px',
+  playbackSidebarOpen: false,
   sidebarMode: SIDEBAR_MODE.expanded,
   userSelectedSidebarMode: SIDEBAR_MODE.expanded,
 }
@@ -99,6 +101,13 @@ const layoutSlice = createSlice({
     },
     setSettingsPanelTop: (state, action: PayloadAction<string>) => {
       state.settingsPanelTop = action.payload
+    },
+    // Opening the playback sidebar hides the mini player, so the two are never on screen together
+    setPlaybackSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.playbackSidebarOpen = action.payload
+    },
+    togglePlaybackSidebar: (state) => {
+      state.playbackSidebarOpen = !state.playbackSidebarOpen
     },
     setUserSelectedSidebarMode: (state, action: PayloadAction<SIDEBAR_MODE>) => {
       state.userSelectedSidebarMode = action.payload
@@ -174,6 +183,7 @@ const layoutSlice = createSlice({
     showLibrarySwitcher: (state) => state.showLibrarySwitcher,
     settingsPanelOpen: (state) => state.settingsPanelOpen,
     settingsPanelTop: (state) => state.settingsPanelTop,
+    playbackSidebarOpen: (state) => state.playbackSidebarOpen,
   },
 })
 

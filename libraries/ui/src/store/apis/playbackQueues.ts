@@ -95,6 +95,24 @@ export const playbackQueueApi = baseHomeServerApi
         invalidatesTags: ['PlaybackQueue.List'],
       }),
 
+      // The server works out the item's new position from the item it was dropped
+      // behind, so a stale queue on this end cannot land a track in the wrong place
+      moveQueueItem: builder.mutation<
+        QueueItem[],
+        {
+          queueId: string,
+          queueItemId: string,
+          afterQueueItemId: string,
+        }
+      >({
+        query: ({ queueId, queueItemId, afterQueueItemId }) => ({
+          url: `/playback-queues/${queueId}/items/${queueItemId}`,
+          method: 'PATCH',
+          body: { afterQueueItemId },
+        }),
+        invalidatesTags: ['PlaybackQueue.List'],
+      }),
+
       deleteQueue: builder.mutation<
         boolean,
         string
@@ -113,4 +131,5 @@ export const {
   useGetQueueItemsQuery,
   useCreateQueueMutation,
   useDeleteQueueMutation,
+  useMoveQueueItemMutation,
 } = playbackQueueApi

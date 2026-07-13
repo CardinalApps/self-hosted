@@ -1,0 +1,71 @@
+.playback-sidebar {
+  width: var(--playback-sidebar-width);
+  padding: var(--header-height) 0 0 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000;
+  overflow: hidden;
+  border-left: 1px solid var(--border-color-3);
+  background-color: var(--bg-1);
+
+  /* The album-art gradient paints the whole sidebar, behind the player and the queue */
+  .animated-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .playback-sidebar-content {
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-left: 0;
+  }
+}
+
+/* Floating mode covers the page; docked mode has the scaffold make room for it instead */
+.playback-sidebar.glass-enabled {
+  background-color: var(--bg-2);
+}
+
+/* A dark album turns the sidebar dark, and the theme's text colors stop reading on it */
+.playback-sidebar[data-contrast="light"] {
+
+  .playback-sidebar-empty,
+  .playback-queue-title,
+  .playback-queue-empty {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .queue-item-handle {
+    color: rgba(255, 255, 255, 0.55);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .music-track {
+    color: #fff;
+
+    .sep {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+}

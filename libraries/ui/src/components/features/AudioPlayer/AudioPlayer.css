@@ -150,6 +150,116 @@
   }
 }
 
+/*
+  The wide player is the full sized, fully capable player that lives in the playback
+  sidebar. It fills the sidebar's width and has two rows of its own: the artwork and
+  the controls on top, and nothing but the seek bar underneath.
+*/
+.audio-player[data-size="wide"] {
+  width: 100%;
+  padding: 16px;
+
+  .metadata {
+    padding-bottom: 14px;
+    text-align: center;
+
+    p {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .audio-player-track-title {
+      margin-bottom: 2px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .audio-player-track-artists {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color-2);
+    }
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .release-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color-1);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--box-shadow-2);
+    background-color: var(--bg-4);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    i {
+      font-size: 40px;
+      color: var(--text-color-4);
+    }
+  }
+
+  .audio-player-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    button {
+      width: 44px;
+      height: 44px;
+    }
+
+    .loading-indicator {
+      width: 44px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* The play/pause button is the primary action, so it outweighs the rest */
+    .play i,
+    .pause i {
+      font-size: 26px;
+    }
+  }
+
+  /* The seek bar gets a row to itself, with the times tucked underneath it */
+  .scrubber-row {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .scrubber {
+      width: 100%;
+    }
+
+    .scrubber-time {
+      width: 100%;
+      justify-content: space-between;
+
+      /* The separator only makes sense when the times sit side by side */
+      span {
+        display: none;
+      }
+    }
+  }
+}
+
 [data-mobile-nav-open="true"] {
   @media (max-width: 768px) {
     .audio-player {

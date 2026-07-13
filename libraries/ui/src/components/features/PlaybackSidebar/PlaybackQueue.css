@@ -1,0 +1,82 @@
+.playback-queue {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  .playback-queue-title {
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-color-3);
+  }
+
+  .playback-queue-empty {
+    font-size: 14px;
+    color: var(--text-color-3);
+  }
+
+  .queue-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1;
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    /* Dragged rows are lifted out of the flow by framer-motion, so they need a stacking context */
+    background-color: transparent;
+
+    .queue-item-track {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    /* The queue is narrow, so the row sheds everything but the essentials */
+    .music-track {
+      .track-plays,
+      .track-duration,
+      .ratings {
+        display: none;
+      }
+    }
+  }
+
+  .queue-item-handle {
+    width: 22px;
+    padding: 0;
+    border: 0;
+    flex-shrink: 0;
+    cursor: grab;
+    color: var(--text-color-4);
+    background: none;
+    touch-action: none;
+
+    &:hover {
+      color: var(--text-color-2);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    i {
+      font-size: 13px;
+    }
+  }
+}
+
+/* Glass mode paints the sidebar with the album art, so the rows have to let it through */
+.playback-sidebar.glass-enabled .playback-queue {
+
+  .music-track {
+    background-color: transparent;
+  }
+}
