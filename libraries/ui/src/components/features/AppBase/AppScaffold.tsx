@@ -4,10 +4,12 @@ import clsx from 'clsx'
 
 import SidebarNav from '../../interaction/SidebarNav'
 import { MiniAudioPlayer } from '../AudioPlayer'
+import PlaybackSidebar from '../PlaybackSidebar'
 import { DirectoryTreeSidebarPortal, DirectoryTreeMobileButton } from '../../interaction/DirectoryTree'
 
 import { layoutSelectors } from '../../../store/slices/layout'
 import { PAGE_LAYOUT } from '../../../store/slices/layout'
+import { settingsSelectors } from '../../../store/slices/settings'
 import { RouterContext } from '../../../context/router'
 import AccessError from '../../layout/AccessError'
 import { useAppSelector } from '../../../hooks/useAppSelector'
@@ -22,6 +24,7 @@ type AppScaffoldProps = {
   sidebarOptions: SidebarOptions,
   privateScaffoldRoutes: ReactNode,
   enableGlobalAudioPlayer?: boolean,
+  playbackSidebar?: ReactNode,
 }
 
 function AppScaffold({
@@ -29,15 +32,25 @@ function AppScaffold({
   sidebarOptions,
   privateScaffoldRoutes,
   enableGlobalAudioPlayer = false,
+  playbackSidebar,
 }: PropsWithChildren<AppScaffoldProps>) {
   const { Routes, Route } = useContext(RouterContext)
   const pageScrollRef = useRef(null)
   const mobileNavIsOpen = useAppSelector(layoutSelectors.mobileNavIsOpen)
   const layout = useAppSelector(layoutSelectors.current)
   const mobileFileBrowserIsOpen = useAppSelector(layoutSelectors.mobileFileBrowserIsOpen)
+  const playbackSidebarOpen = useAppSelector(layoutSelectors.playbackSidebarOpen)
+  const { floating_playback_sidebar } = useAppSelector(settingsSelectors.current)
+
+  // The playback sidebar carries a full sized player, so the mini player stands down while it's open
+  const showMiniAudioPlayer = !!enableGlobalAudioPlayer && !(playbackSidebarOpen && playbackSidebar)
 
   return (
-    <div className={clsx('scaffold')} data-layout={layout}>
+    <div
+      className={clsx('scaffold')}
+      data-layout={layout}
+      data-playback-sidebar={playbackSidebarOpen && playbackSidebar ? (floating_playback_sidebar ? 'floating' : 'docked') : 'closed'}
+    >
       {header}
       <div className={clsx('sidebar-nav-col')}>
         <SidebarNav overflow={sidebarOptions?.overflow}>
@@ -45,7 +58,7 @@ function AppScaffold({
         </SidebarNav>
       </div>
       <div className={clsx('sidebar-bottom')}>
-        {!!enableGlobalAudioPlayer && <MiniAudioPlayer />}
+        {!!showMiniAudioPlayer && <MiniAudioPlayer />}
       </div>
       <DirectoryTreeSidebarPortal />
       <section
@@ -61,6 +74,7 @@ function AppScaffold({
           </Routes>
         </main>
       </section>
+      <PlaybackSidebar contents={playbackSidebar} />
     </div>
   )
 }

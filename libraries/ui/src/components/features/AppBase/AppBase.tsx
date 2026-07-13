@@ -74,6 +74,7 @@ type AppBaseProps = {
   sidebarOptions?: SidebarOptions,
   enableGlobalAudioPlayer?: boolean,
   settingsPanel?: ReactNode,
+  playbackSidebar?: ReactNode,
   publicRoutes?: ReactNode,
   privateRoutes?: ReactNode,
   privateScaffoldRoutes?: ReactNode,
@@ -102,6 +103,7 @@ function AppBase({
   sidebarOptions,
   enableGlobalAudioPlayer,
   settingsPanel,
+  playbackSidebar,
   publicRoutes,
   privateRoutes,
   privateScaffoldRoutes,
@@ -141,6 +143,7 @@ function AppBase({
     <AppHeader
       onSwitchAccountClick={() => navigate(routes.LOGIN)}
       loginButton={ssoButton}
+      showPlaybackSidebarToggle={!!playbackSidebar}
     />
   )
 
@@ -313,6 +316,7 @@ function AppBase({
                       privateScaffoldRoutes={privateScaffoldRoutes}
                       loginWithCardinalButton={ssoButton}
                       enableGlobalAudioPlayer={enableGlobalAudioPlayer}
+                      playbackSidebar={playbackSidebar}
                     />
                   : <AppPublic
                       publicRoutes={publicRoutes}

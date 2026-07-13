@@ -26,6 +26,7 @@ export const getFields = (app, lang) => {
       commonFields.theme,
       commonFields.accentColor,
       commonFields.enableGlass,
+      commonFields.floatingPlaybackSidebar,
       commonFields.customCss,
     ],
   }

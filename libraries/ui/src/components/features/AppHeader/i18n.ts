@@ -34,6 +34,12 @@ const i18n: StringList = {
   "activity-icon.title": {
     "en": "Activity",
   },
+  "playback-sidebar-icon.open": {
+    "en": "Open the playback sidebar",
+  },
+  "playback-sidebar-icon.close": {
+    "en": "Close the playback sidebar",
+  },
   "activity.indexing.name": {
     "en": "Indexing",
   },

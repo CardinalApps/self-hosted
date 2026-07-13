@@ -8,6 +8,7 @@ import {
   Body,
   ForbiddenException,
   Delete,
+  Patch,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -29,6 +30,7 @@ import { QueryPlaybackQueueItemsDto } from './dtos/QueryPlaybackQueueItem.dto'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { QueueItemService } from './playback-queue-item.service'
 import { CreatePlaybackQueueNextItemsDto } from './dtos/CreatePlaybackQueueNextItems'
+import { MovePlaybackQueueItemDto, MovePlaybackQueueItemParamsDto } from './dtos/MovePlaybackQueueItem.dto'
 
 @Controller('/playback-queues')
 @ApiTags('Playback Queues')
@@ -84,6 +86,31 @@ export class PlaybackQueueController {
     @Query() query: QueryPlaybackQueueItemsDto,
   ): Promise<[PlaybackQueueItem[], number]> {
     return await this.playbackQueueItemService.getQueueSlice(id, query)
+  }
+
+  /**
+   * Move a queue item behind another one.
+   */
+  @Patch('/:id/items/:queueItemId')
+  @StandardEndpoint({
+    summary: 'Move a queue item behind another one.',
+  })
+  async movePlaybackQueueItem(
+    @Param() { id, queueItemId }: MovePlaybackQueueItemParamsDto,
+    @Body() { afterQueueItemId }: MovePlaybackQueueItemDto,
+    @CurrentUser() user: User,
+  ): Promise<PlaybackQueueItem[]> {
+    const queue = await this.playbackQueueService.get(id)
+
+    if (!queue) {
+      throw new NotFoundException()
+    }
+
+    if (queue?.user?.userId !== user?.userId) {
+      throw new ForbiddenException()
+    }
+
+    return await this.playbackQueueItemService.moveItem(id, queueItemId, afterQueueItemId)
   }
 
   /**

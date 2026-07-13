@@ -17,6 +17,12 @@ export default {
   "settings.enable-glass.label": {
     "en": "Enable glass accents",
   },
+  "settings.floating-playback-sidebar.label": {
+    "en": "Float the playback sidebar",
+  },
+  "settings.floating-playback-sidebar.desc": {
+    "en": "Let the playback sidebar float above the page instead of making room for it. The page will not shrink when the sidebar is opened, but the sidebar will cover part of it.",
+  },
   "settings.notifications.title": {
     "en": "Enable notifications",
   },

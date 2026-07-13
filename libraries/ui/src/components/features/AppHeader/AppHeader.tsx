@@ -20,6 +20,7 @@ import { CardinalApp } from '../../../lib/env/cardinal'
 import LibrarySwitcher from './componenets/LibrarySwitcher'
 import CloudStatusIcon from './componenets/CloudStatusIcon'
 import ActivityIcon from './componenets/ActivityIcon'
+import PlaybackSidebarIcon from './componenets/PlaybackSidebarIcon'
 import { layoutSelectors, SIDEBAR_MODE } from '../../../store/slices/layout'
 
 import i18n from './i18n'
@@ -29,6 +30,7 @@ import './AppHeader.css'
 type AppHeaderProps = {
   onSwitchAccountClick?: () => void,
   loginButton?: ReactNode,
+  showPlaybackSidebarToggle?: boolean,
 }
 
 /**
@@ -37,6 +39,7 @@ type AppHeaderProps = {
 const AppHeader = ({
   onSwitchAccountClick,
   loginButton,
+  showPlaybackSidebarToggle = false,
 }: PropsWithChildren<AppHeaderProps>) => {
   const dispatch = useAppDispatch()
   const kioskMode = useAppSelector(appSelectors.kioskMode)
@@ -112,6 +115,12 @@ const AppHeader = ({
             {majorBadges()}
           </div>
           <LibrarySwitcher />
+          {/* Playback sidebar toggle */}
+          {!!showPlaybackSidebarToggle &&
+            <div className="icon">
+              <PlaybackSidebarIcon />
+            </div>
+          }
           {/* Activity icon */}
           <div className="icon">
             <ActivityIcon />

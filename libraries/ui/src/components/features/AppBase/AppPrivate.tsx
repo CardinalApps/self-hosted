@@ -19,6 +19,7 @@ type AppPrivateProps = {
   privateScaffoldRoutes: ReactNode,
   loginWithCardinalButton: ReactNode,
   enableGlobalAudioPlayer: boolean,
+  playbackSidebar?: ReactNode,
 }
 
 /**
@@ -33,6 +34,7 @@ function AppPrivate({
   privateScaffoldRoutes,
   loginWithCardinalButton,
   enableGlobalAudioPlayer,
+  playbackSidebar,
 }: PropsWithChildren<AppPrivateProps>) {
   const { Routes, Route, navigate } = useContext<RouterContextType>(RouterContext)
   const { startPage } = useSelector(settingsSelectors.current)
@@ -59,6 +61,7 @@ function AppPrivate({
             sidebarOptions={sidebarOptions}
             privateScaffoldRoutes={privateScaffoldRoutes}
             enableGlobalAudioPlayer={enableGlobalAudioPlayer}
+            playbackSidebar={playbackSidebar}
           />
         }
       />

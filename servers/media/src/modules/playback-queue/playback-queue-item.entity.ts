@@ -28,6 +28,12 @@ export class PlaybackQueueItem extends BaseEntity {
   @Column({ nullable: false })
   mediaId: string
 
-  @Column({ nullable: false })
+  /*
+    Fractionally indexed, so that reordering an item only ever rewrites that one row:
+    a moved item takes the midpoint of the two items it was dropped between. Positions
+    are therefore ordered but not contiguous. Double precision (float8) matches the
+    range of a JS number, which the midpoint arithmetic relies on.
+  */
+  @Column({ type: 'double precision', nullable: false })
   position: number
 }

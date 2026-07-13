@@ -1,6 +1,7 @@
 import { Router, Route, Routes, Navigate, Link, useNavigate, useLocation, useParams } from 'react-router-dom'
 
 import AppBase from '@cardinalapps/ui/src/components/features/AppBase'
+import { MusicPlayback } from '@cardinalapps/ui/src/components/features/PlaybackSidebar'
 import { MusicRoutes } from '@cardinalapps/ui/src/lib/net/router'
 
 import Nav from '../Nav'
@@ -68,6 +69,7 @@ function AppRoot() {
       }}
       enableGlobalAudioPlayer={true}
       settingsPanel={<SettingsPanel />}
+      playbackSidebar={<MusicPlayback />}
       publicRoutes={<></>}
       privateRoutes={<></>}
       privateScaffoldRoutes={

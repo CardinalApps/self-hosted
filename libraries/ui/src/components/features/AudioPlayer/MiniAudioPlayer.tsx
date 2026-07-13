@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
-import { audioSelectors, Player } from '../../../store/slices/music'
+import { audioSelectors } from '../../../store/slices/music'
+import { useVisiblePlayer } from '../../../hooks/useVisiblePlayer'
 import AnimatedGradient from '../../layout/AnimatedGradient'
 
 import AudioPlayer from './AudioPlayer'
@@ -25,10 +26,7 @@ import './AudioPlayer.css'
 const MiniAudioPlayer = () => {
   const { lang, enable_glass } = useSelector(settingsSelectors.current)
   const players = useSelector(audioSelectors.players)
-  const playerIds = useSelector(audioSelectors.playerIds)
-  const playing = useSelector(audioSelectors.playing)
-  const playingIds = useSelector(audioSelectors.playingIds)
-  const [visiblePlayer, setVisiblePlayer] = useState<string | undefined>()
+  const [visiblePlayer, setVisiblePlayer] = useVisiblePlayer()
   const [glassColors, setGlassColors] = useState<string[]>([])
 
   const changePlayer = (change) => {
@@ -49,29 +47,6 @@ const MiniAudioPlayer = () => {
 
     setVisiblePlayer(nextId)
   }
-
-  /**
-   * Switch to the newest player when one is added.
-   */
-  useEffect(() => {
-    const newest = Object.values(players).sort((a, b) => a?.initializedAt >= b?.initializedAt ? -1 : 1)?.[0]
-    if (newest) {
-      setVisiblePlayer(newest.id)
-    } else {
-      setVisiblePlayer(undefined)
-    }
-  }, [playerIds])
-
-  /**
-   * Always show the active player. If multiple are active, show the newest one.
-   */
-  useEffect(() => {
-    const inOrderOfNewset = playing.sort((a: Player, b: Player) => a?.currentPlaybackStartedAt >= b?.currentPlaybackStartedAt ? -1 : 1)
-    const playerToShow = inOrderOfNewset?.[0] as Player
-    if (playerToShow) {
-      setVisiblePlayer(playerToShow.id)
-    }
-  }, [playingIds])
 
   return (
     <div className={clsx('mini-audio-player', enable_glass && 'glass-enabled')}>

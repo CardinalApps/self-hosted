@@ -9,6 +9,11 @@ import { Library } from '../../apis/libraries'
 import { STORE_KEY, PLAYER, PLAYBACK_STATE } from './constants'
 import { DynamicQueueType, QueueType } from '../../apis/playbackQueues'
 
+/**
+ * Queue items always arrive from the server in queue order. Their stored position is
+ * deliberately not modelled here: it is fractional, so it says nothing about how far
+ * into the queue an item sits, and nothing on this end should ever ask.
+ */
 export type QueueItem = {
   mediaType: 'music_track',
   mediaId: string,
