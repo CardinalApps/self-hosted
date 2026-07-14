@@ -230,10 +230,36 @@ const AnimatedGradient = ({
   const originalColorsRef = useRef<string[]>(values)
   const [activeValues, setActiveValues] = useState<string[]>(values)
 
-  // Keep anchor colors in sync when `values` changes externally.
+  /*
+    The drift timer is only ever set up once, so it reads its tuning from here. Closing
+    over the props it happened to be handed on the first render would leave it drifting to
+    the old bounds forever after the caller changed them.
+  */
+  const driftRef = useRef({
+    huePull, hueNoise,
+    satPull, satNoise,
+    lightPull, lightNoise,
+    satMin, satMax,
+    lightMin, lightMax,
+    burstChance, burstMin, burstMax,
+    driftMin, driftMax,
+  })
+
+  driftRef.current = {
+    huePull, hueNoise,
+    satPull, satNoise,
+    lightPull, lightNoise,
+    satMin, satMax,
+    lightMin, lightMax,
+    burstChance, burstMin, burstMax,
+    driftMin, driftMax,
+  }
+
+  // Keep anchor colors in sync when `values` changes externally, and start dancing from
+  // the new colors rather than carrying on from wherever the old ones had wandered to.
   useEffect(() => {
     originalColorsRef.current = values
-    if (!dance) setActiveValues(values)
+    setActiveValues(values)
   }, [values])
 
   // Autonomous drift timer.
@@ -242,22 +268,24 @@ const AnimatedGradient = ({
     const timer = { id: 0 }
 
     const scheduleNext = () => {
+      const drift = driftRef.current
       const delay =
-        Math.random() < burstChance
-          ? burstMin + Math.random() * (burstMax - burstMin)
-          : driftMin + Math.random() * (driftMax - driftMin)
+        Math.random() < drift.burstChance
+          ? drift.burstMin + Math.random() * (drift.burstMax - drift.burstMin)
+          : drift.driftMin + Math.random() * (drift.driftMax - drift.driftMin)
 
       timer.id = window.setTimeout(() => {
+        const current = driftRef.current
         setActiveValues((prev) =>
           prev.map((color, i) =>
             driftColor(
               color,
               originalColorsRef.current[i] ?? color,
-              huePull, hueNoise,
-              satPull, satNoise,
-              lightPull, lightNoise,
-              satMin, satMax,
-              lightMin, lightMax,
+              current.huePull, current.hueNoise,
+              current.satPull, current.satNoise,
+              current.lightPull, current.lightNoise,
+              current.satMin, current.satMax,
+              current.lightMin, current.lightMax,
             ),
           ),
         )
