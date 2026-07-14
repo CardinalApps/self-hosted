@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Reorder } from 'framer-motion'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import clsx from 'clsx'
 
 import QueueTrack from './QueueTrack'
@@ -13,9 +14,24 @@ import i18n from './i18n'
 
 import './PlaybackQueue.css'
 
-// How far ahead of the current track to show. Queues run to 200+ items, and nobody
-// scrolls that far into the future.
-const QUEUE_LOOKAHEAD = 50
+// How much of the queue we mount as reorderable rows. A True Shuffle queue runs to
+// 200+ items, and the whole forward window arrives in one cheap request, so this is
+// generous. The per-row cost (a track lookup, the full row) is windowed below, so
+// what this really bounds is the number of empty Reorder shells, not the work.
+const QUEUE_WINDOW = 500
+
+// Every row is pinned to this height, which lets the virtualizer below work out which
+// rows are near the viewport from the scroll offset alone. It must match the row height
+// in PlaybackQueue.css exactly, or the visible range drifts as the user scrolls.
+const ROW_HEIGHT = 64
+
+// How many rows to keep loaded on each side of the viewport, so a flick of the scroll
+// wheel lands on real rows rather than placeholders.
+const ROW_OVERSCAN = 8
+
+// Until the scroll element has been measured, the virtualizer reports no range, so this
+// many rows are loaded from the top to fill the first paint.
+const INITIAL_ROWS = 16
 
 type PlaybackQueueProps = {
   className?: string,
@@ -41,7 +57,7 @@ const PlaybackQueue = ({
 
   const { data: queueItemsData } = useGetQueueItemsQuery({
     queueId,
-    leading: QUEUE_LOOKAHEAD,
+    leading: QUEUE_WINDOW,
     currentQueueItemId,
     includeCurrentItemInReturn: false,
   }, {
@@ -58,6 +74,24 @@ const PlaybackQueue = ({
   useEffect(() => {
     setItems(serverItems ?? [])
   }, [serverItems])
+
+  /*
+    framer-motion's Reorder wants every row mounted so it can measure the layout it drags
+    against, which rules out a virtualizer that unmounts rows. So the rows all stay, and
+    the virtualizer is used only to read which of them sit near the viewport: the expensive
+    part of a row (a track lookup, the full MusicTrack) loads for those, and the rest render
+    a same-height placeholder. Because the rows are a fixed height, the range comes straight
+    off the scroll offset, so none of the virtualizer's own positioning is needed here.
+  */
+  const listRef = useRef<HTMLOListElement>(null)
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => listRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: ROW_OVERSCAN,
+  })
+  const visibleRows = virtualizer.getVirtualItems()
+  const activeRows = new Set(visibleRows.map((row) => row.index))
 
   /**
    * Persist a drag by naming the row the item was dropped behind, and let the server
@@ -96,17 +130,20 @@ const PlaybackQueue = ({
     <div className={clsx(className, 'playback-queue')}>
       <h3 className="playback-queue-title">{i18n['playback-sidebar.queue-title'][lang]}</h3>
       <Reorder.Group
+        ref={listRef}
         as="ol"
         axis="y"
         className="queue-list"
         values={items}
         onReorder={setItems}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <QueueTrack
             key={item.queueItemId}
             item={item}
             lang={lang as string}
+            // Before the first measurement the virtualizer reports nothing, so fill the head
+            active={activeRows.size ? activeRows.has(index) : index < INITIAL_ROWS}
             onDragEnd={handleDragEnd}
           />
         ))}
