@@ -4,6 +4,9 @@ const i18n: StringList = {
   "playback-sidebar.nothing-playing": {
     "en": "Nothing is playing right now.",
   },
+  "playback-sidebar.nothing-playing.double-clicked": {
+    "en": "Why would double clicking do anything?",
+  },
   "playback-sidebar.queue-title": {
     "en": "Up Next",
   },

@@ -1,6 +1,7 @@
 import { useContext, useRef } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import clsx from 'clsx'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import SidebarNav from '../../interaction/SidebarNav'
 import { MiniAudioPlayer } from '../AudioPlayer'
@@ -58,7 +59,20 @@ function AppScaffold({
         </SidebarNav>
       </div>
       <div className={clsx('sidebar-bottom')}>
-        {!!showMiniAudioPlayer && <MiniAudioPlayer />}
+        {/* The mini player hands over to the playback sidebar, so it fades rather than blinking out */}
+        <AnimatePresence>
+          {!!showMiniAudioPlayer && (
+            <motion.div
+              key="mini-audio-player"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <MiniAudioPlayer />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <DirectoryTreeSidebarPortal />
       <section
