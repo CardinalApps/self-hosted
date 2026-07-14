@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
@@ -22,11 +23,30 @@ const MusicPlayback = () => {
   const [visiblePlayer] = useVisiblePlayer()
   const { setGlassColors } = usePlaybackSidebar()
   const player = visiblePlayer ? players?.[visiblePlayer] : undefined
+  const [doubleClicked, setDoubleClicked] = useState(false)
+
+  /*
+    Hand the sidebar back its idle state when playback stops. The player unmounts without
+    ever reporting that its artwork is gone, so without this the sidebar keeps painting
+    itself with the colors of a track that is no longer playing.
+  */
+  useEffect(() => {
+    if (!player) {
+      setGlassColors([])
+    } else {
+      setDoubleClicked(false)
+    }
+  }, [player, setGlassColors])
 
   if (!player) {
     return (
-      <div className="playback-sidebar-empty">
-        <p>{i18n['playback-sidebar.nothing-playing'][lang]}</p>
+      <div className="playback-sidebar-empty" onDoubleClick={() => setDoubleClicked(true)}>
+        <p>
+          {doubleClicked
+            ? i18n['playback-sidebar.nothing-playing.double-clicked'][lang]
+            : i18n['playback-sidebar.nothing-playing'][lang]
+          }
+        </p>
       </div>
     )
   }

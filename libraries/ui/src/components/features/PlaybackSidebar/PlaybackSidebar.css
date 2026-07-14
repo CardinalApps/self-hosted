@@ -1,12 +1,50 @@
+/*
+  The sidebar and the header never overlap, so the sidebar never needs a gap at its top.
+  Docked takes a column of its own and the header is pulled in beside it, leaving the
+  sidebar the full height of the window. Floating leaves the header at its full width, so
+  the sidebar stops short of it and starts underneath instead.
+
+  The outer element is only a rail: it holds no styling of its own and always sits flush
+  against the right edge of the window. It is the piece that slides, so sliding it by its
+  own width is always exactly enough to carry the card off screen, no matter what insets
+  the card is given. Inset the rail itself and the card would be left poking out.
+*/
 .playback-sidebar {
   width: var(--playback-sidebar-width);
-  padding: var(--header-height) 0 0 0;
+  padding: 0;
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   z-index: 3000;
+  /* Only the card is really there; the rail's gutter must not swallow clicks on the page */
+  pointer-events: none;
+
+  &.floating {
+    width: calc(var(--playback-sidebar-width) + var(--gutter));
+    top: var(--header-height);
+    bottom: var(--gutter);
+    padding-right: var(--gutter);
+  }
+
+  @media (max-width: 768px) {
+    /* The sidebar takes the whole screen here, so there is no column to push the header into */
+    width: 100%;
+    top: var(--header-height);
+
+    &.floating {
+      width: 100%;
+    }
+  }
+}
+
+/* Everything you can actually see lives on the card */
+.playback-sidebar-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
   overflow: hidden;
+  pointer-events: auto;
   border-left: 1px solid var(--border-color-3);
   background-color: var(--bg-1);
 
@@ -34,13 +72,29 @@
   }
 
   @media (max-width: 768px) {
-    width: 100%;
     border-left: 0;
   }
 }
 
-/* Floating mode covers the page; docked mode has the scaffold make room for it instead */
-.playback-sidebar.glass-enabled {
+/* With no player and no queue to hold it up, the message would otherwise sit in the corner */
+.playback-sidebar-empty {
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-color-3);
+}
+
+.playback-sidebar.floating .playback-sidebar-card {
+  border-left: 0;
+  border-radius: 18px;
+  box-shadow: var(--box-shadow-2);
+}
+
+.playback-sidebar.glass-enabled .playback-sidebar-card {
   background-color: var(--bg-2);
 }
 
