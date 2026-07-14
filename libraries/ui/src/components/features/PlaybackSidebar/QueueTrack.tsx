@@ -11,6 +11,9 @@ import i18n from './i18n'
 type QueueTrackProps = {
   item: QueueItem,
   lang: string,
+  // Whether this row sits near the viewport. Off-screen rows stay mounted (Reorder needs
+  // them) but skip the track lookup and render an empty box of the same height.
+  active: boolean,
   onDragEnd: (item: QueueItem) => void,
 }
 
@@ -21,9 +24,9 @@ type QueueTrackProps = {
  * click to play), so dragging is driven from a dedicated handle rather than from
  * the row itself.
  */
-const QueueTrack = ({ item, lang, onDragEnd }: QueueTrackProps) => {
+const QueueTrack = ({ item, lang, active, onDragEnd }: QueueTrackProps) => {
   const dragControls = useDragControls()
-  const { data: musicTrack } = useGetMusicTrackQuery({ id: item.mediaId })
+  const { data: musicTrack } = useGetMusicTrackQuery({ id: item.mediaId }, { skip: !active })
 
   return (
     <Reorder.Item
@@ -42,14 +45,19 @@ const QueueTrack = ({ item, lang, onDragEnd }: QueueTrackProps) => {
         <i className="fa-icon fas fa-grip-lines" />
       </button>
       <div className="queue-item-track">
-        <MusicTrack
-          musicTrackId={item.mediaId}
-          trackTitle={musicTrack?.title}
-          releaseTitle={musicTrack?.release?.title}
-          releaseId={musicTrack?.release?.id}
-          artistName={musicTrack?.artists?.map((artist) => artist.name)?.join(', ')}
-          canRate={false}
-        />
+        {active
+          ? (
+            <MusicTrack
+              musicTrackId={item.mediaId}
+              trackTitle={musicTrack?.title}
+              releaseTitle={musicTrack?.release?.title}
+              releaseId={musicTrack?.release?.id}
+              artistName={musicTrack?.artists?.map((artist) => artist.name)?.join(', ')}
+              canRate={false}
+            />
+          )
+          : <div className="queue-item-placeholder" />
+        }
       </div>
     </Reorder.Item>
   )

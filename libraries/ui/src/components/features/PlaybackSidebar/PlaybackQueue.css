@@ -27,6 +27,9 @@
   }
 
   .queue-item {
+    /* Fixed so the virtualizer can find the viewport rows from the scroll offset alone.
+       Kept in step with ROW_HEIGHT in PlaybackQueue.tsx. */
+    height: 64px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -41,11 +44,22 @@
 
     /* The queue is narrow, so the row sheds everything but the essentials */
     .music-track {
+      /* The row's fixed height owns the spacing now, so drop the track's own margin */
+      margin-bottom: 0;
+
       .track-plays,
       .track-duration,
       .ratings {
         display: none;
       }
+    }
+
+    /* Stands in for an off-screen row's track until it scrolls into range */
+    .queue-item-placeholder {
+      height: 55px;
+      border-radius: var(--border-radius);
+      background-color: var(--bg-3);
+      opacity: 0.4;
     }
   }
 
