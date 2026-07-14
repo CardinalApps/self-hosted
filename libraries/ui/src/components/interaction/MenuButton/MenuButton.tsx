@@ -19,6 +19,14 @@ type MenuButtonProps = {
   align?: string,
   defaultOpen?: boolean,
   title?: string,
+
+  /*
+    Hand this in to own the open state yourself. A MenuButton that toggles something
+    outside of itself, rather than dropping a menu down, cannot keep its own state:
+    clicking elsewhere on the page would close the button while the thing it opened
+    stayed open.
+  */
+  open?: boolean,
 }
 
 /**
@@ -39,29 +47,43 @@ const MenuButton = ({
   align = 'left',
   defaultOpen = false,
   title,
+  open,
   children,
 }: PropsWithChildren<MenuButtonProps>) => {
   const ref = useRef(null)
-  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalIsOpen
+
+  const close = () => {
+    if (!isControlled) {
+      setInternalIsOpen(false)
+    }
+  }
 
   const handleOnClick = () => {
-    setIsOpen(!isOpen)
+    const nextIsOpen = !isOpen
+
+    if (!isControlled) {
+      setInternalIsOpen(nextIsOpen)
+    }
+
     if (typeof onOpenChange === 'function') {
-      onOpenChange(true)
+      onOpenChange(nextIsOpen)
     }
   }
 
   useEffect(() => {
     const onEsc = (e) => {
       if (e.key === 'Escape') {
-        setIsOpen(false)
+        close()
       }
     }
 
     const onClickOutside = (e) => {
       const closestMenuButton = e.target.closest('.menu-button')
       if (ref.current !== closestMenuButton) {
-        setIsOpen(false)
+        close()
       }
     }
 
