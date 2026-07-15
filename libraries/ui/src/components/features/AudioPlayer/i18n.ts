@@ -37,6 +37,9 @@ const i18n: StringList = {
   "audio-player.playback.rate": {
     "en": "Playback speed",
   },
+  "audio-player.playback.volume": {
+    "en": "Volume",
+  },
   "audio-player.track.title": {
     "en": "Track: {track}",
   },

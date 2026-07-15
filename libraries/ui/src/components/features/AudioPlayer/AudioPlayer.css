@@ -314,6 +314,26 @@
   }
 }
 
+/* Volume: a slider with a live percentage readout, in the speaker button's popover */
+.audio-player-volume-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .scrubber {
+    flex-grow: 1;
+  }
+
+  .audio-player-volume-value {
+    flex-shrink: 0;
+    width: 36px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color-2);
+  }
+}
+
 [data-mobile-nav-open="true"] {
   @media (max-width: 768px) {
     .audio-player {

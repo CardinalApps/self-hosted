@@ -40,6 +40,16 @@ const RATE_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
 
 const formatRate = (rate: number) => `${rate}×`
 
+const volumeIcon = (volume: number) => {
+  if (volume <= 0) {
+    return 'fa-volume-off'
+  }
+  if (volume < 0.5) {
+    return 'fa-volume-down'
+  }
+  return 'fa-volume-up'
+}
+
 type AudioPlayerProps = {
   className?: string,
   playerId: string,
@@ -78,6 +88,12 @@ const AudioPlayer = ({
 
   const repeat = player.repeat ?? REPEAT_MODE.OFF
   const rate = player.rate ?? 1
+  const volume = player.volume ?? 1
+
+  // The store's volume is only written on release, so a live drag value drives the readout
+  // and speaker icon in the meantime; it falls back to the stored volume when not dragging
+  const [draggingVolume, setDraggingVolume] = useState<number | null>(null)
+  const displayVolume = draggingVolume ?? volume
 
   // "Loop queue" only makes sense with more than one item to loop, so a single-track
   // queue drops it from the cycle. The count is all this needs, so it queries the
@@ -211,6 +227,12 @@ const AudioPlayer = ({
     howl?.rate(rate)
   }, [howl, player.trackId, rate])
 
+  // Same idea for volume: reapply the stored volume to each fresh Howl. Live dragging is
+  // applied straight to the Howl below, so this only runs on real volume/track changes.
+  useEffect(() => {
+    howl?.volume(volume)
+  }, [howl, player.trackId, volume])
+
   return (
     <div className={clsx("audio-player", className, !!fadeIn && 'fade-in')} data-size={size} data-state={player.state} key={playerId}>
       <div className="metadata no-collapse">
@@ -322,6 +344,38 @@ const AudioPlayer = ({
                     {formatRate(step)}
                   </button>
                 ))}
+              </MenuButton.Section>
+            </MenuButton>
+          }
+          {size === 'wide' &&
+            <MenuButton
+              className="audio-player-volume"
+              solid={false}
+              align="right"
+              width={190}
+              title={i18n['audio-player.playback.volume']?.[lang as string]}
+              icon={<i className={clsx('fa-icon', 'fas', volumeIcon(displayVolume))} style={contrastStyle} />}
+            >
+              <MenuButton.Section>
+                <div className="audio-player-volume-slider">
+                  {/* Drag applies straight to the Howl for instant feedback and tracks a local
+                      value so the readout follows; the store is written on release so a drag
+                      does not thrash the persisted state. */}
+                  <Scrubber
+                    value={volume}
+                    min={0}
+                    max={1}
+                    onChange={({ value }) => {
+                      howl?.volume(value)
+                      setDraggingVolume(value)
+                    }}
+                    onChangeEnd={({ value }) => {
+                      dispatch(audioActions.setVolume({ playerId: player.id, volume: value }))
+                      setDraggingVolume(null)
+                    }}
+                  />
+                  <span className="audio-player-volume-value">{Math.round(displayVolume * 100)}%</span>
+                </div>
               </MenuButton.Section>
             </MenuButton>
           }

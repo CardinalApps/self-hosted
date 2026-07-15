@@ -36,6 +36,7 @@ export type Player = {
   state: string,
   repeat: RepeatMode,
   rate: number,
+  volume: number,
   currentPlaybackStartedAt: number,
   initializedAt: number,
   currentSeconds?: number,
@@ -76,6 +77,13 @@ const audioSlice = createSlice({
       const player = state.players[payload.playerId]
       if (player) {
         player.rate = payload.rate
+      }
+    },
+    // Set a player's volume (0..1); the driver is kept in step by the AudioPlayer
+    setVolume: (state, { payload }: PayloadAction<{ playerId: string, volume: number }>) => {
+      const player = state.players[payload.playerId]
+      if (player) {
+        player.volume = payload.volume
       }
     },
     stop: (state, { payload: id }) => {
