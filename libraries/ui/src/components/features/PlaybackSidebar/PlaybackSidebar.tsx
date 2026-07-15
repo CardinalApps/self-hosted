@@ -91,25 +91,33 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
               <div className="playback-sidebar-content">
                 {contents}
               </div>
-              {/* The idle colors fill an otherwise empty sidebar, so they show whether or not glass is on */}
-              {!!idle && (
-                <AnimatedGradient
-                  values={idleColors}
-                  dance
-                  /*
-                    Every blotch is pulled back towards its own colour as it drifts, so with no
-                    hue or saturation noise the greys stay grey and the accent stays the accent.
-                    Only their lightness and their placement wander.
-                  */
-                  hueNoise={0}
-                  satNoise={0}
-                  satMin={0}
-                  satMax={100}
-                  lightMin={idleGradient.lightMin}
-                  lightMax={idleGradient.lightMax}
-                />
+              {/*
+                The gradient is a glass-mode flourish. With glass off the card stays a flat
+                --bg-1. With glass on it always animates: the album's own colours when a track
+                with artwork is playing, and the idle greys-and-accent for everything else
+                (nothing playing, or a track with no cover to sample).
+              */}
+              {!!enable_glass && (
+                idle
+                  ? (
+                    <AnimatedGradient
+                      values={idleColors}
+                      dance
+                      /*
+                        Every blotch is pulled back towards its own colour as it drifts, so with no
+                        hue or saturation noise the greys stay grey and the accent stays the accent.
+                        Only their lightness and their placement wander.
+                      */
+                      hueNoise={0}
+                      satNoise={0}
+                      satMin={0}
+                      satMax={100}
+                      lightMin={idleGradient.lightMin}
+                      lightMax={idleGradient.lightMax}
+                    />
+                  )
+                  : <AnimatedGradient values={glassColors} />
               )}
-              {!idle && !!enable_glass && <AnimatedGradient values={glassColors} />}
             </div>
           </motion.aside>
         )}
