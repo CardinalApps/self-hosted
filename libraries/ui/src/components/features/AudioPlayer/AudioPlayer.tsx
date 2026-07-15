@@ -9,7 +9,7 @@ import Loading from '../../layout/Loading'
 import Scrubber from '../../interaction/Scrubber'
 
 import { audioSelectors, audioActions } from '../../../store/slices/music'
-import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../../store/slices/music/constants'
+import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE, REPEAT_MODE, RepeatMode } from '../../../store/slices/music/constants'
 import play from '../../../store/slices/music/thunks/play'
 import next from '../../../store/slices/music/thunks/next'
 import previous from '../../../store/slices/music/thunks/previous'
@@ -21,8 +21,11 @@ import { getContrastTextColor } from '../../../lib/color/getContrastTextColor'
 import { settingsSelectors } from '../../../store/slices/settings'
 
 import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
+import { useGetQueueItemsQuery } from '../../../store/apis/playbackQueues'
 
 import { secondsToMMSS } from '../../../lib/formatting/time'
+
+import i18n from './i18n'
 
 import './AudioPlayer.css'
 
@@ -48,7 +51,7 @@ const AudioPlayer = ({
 }: PropsWithChildren<AudioPlayerProps>) => {
   const howl = getHowl(playerId)
   const dispatch = useAppDispatch()
-  const { enable_glass } = useAppSelector(settingsSelectors.current)
+  const { enable_glass, lang } = useAppSelector(settingsSelectors.current)
   const playbackTimeInterval = useRef(null)
   const players = useAppSelector(audioSelectors.players)
   const player = players?.[playerId]
@@ -65,6 +68,28 @@ const AudioPlayer = ({
   const [coverSrc] = useReleaseCover(track?.release?.id)
   const coverColors = useCoverColors(coverSrc)
   const [fadeIn, setFadeIn] = useState(false)
+
+  const repeat = player.repeat ?? REPEAT_MODE.OFF
+
+  // "Loop queue" only makes sense with more than one item to loop, so a single-track
+  // queue drops it from the cycle. The count is all this needs, so it queries the
+  // lightest slice and reads the queue-wide total the endpoint returns alongside it.
+  const { data: queueItemsData } = useGetQueueItemsQuery({
+    queueId: player.queue?.queueId ?? '',
+    includeCurrentItemInReturn: false,
+  }, {
+    skip: size !== 'wide' || !player.queue?.queueId,
+  })
+  const hasMultiItemQueue = (queueItemsData?.[1] ?? 0) > 1
+
+  // Cycle off -> queue -> track -> off, skipping "queue" when there is nothing to loop
+  const cycleRepeat = () => {
+    const order: RepeatMode[] = hasMultiItemQueue
+      ? [REPEAT_MODE.OFF, REPEAT_MODE.QUEUE, REPEAT_MODE.TRACK]
+      : [REPEAT_MODE.OFF, REPEAT_MODE.TRACK]
+    const nextMode = order[(order.indexOf(repeat) + 1) % order.length]
+    dispatch(audioActions.setRepeat({ playerId: player.id, repeat: nextMode }))
+  }
 
   // The glass background is derived from the cover art, so its icons and text need to
   // follow suit rather than the theme's static colors, or they can end up unreadable.
@@ -245,6 +270,21 @@ const AudioPlayer = ({
             style={contrastStyle}
             onClick={() => handleStopClick()}
           />
+          {size === 'wide' &&
+            <Icon
+              fa="fas fa-retweet"
+              className={clsx(
+                'audio-player-playback-button', 'repeat', 'no-collapse',
+                repeat !== REPEAT_MODE.OFF && 'is-active',
+                repeat === REPEAT_MODE.TRACK && 'is-track',
+              )}
+              hoverType={enable_glass ? 'glass' : 'background'}
+              // Active repeat carries its own accent colour, so it skips the glass contrast override
+              style={repeat === REPEAT_MODE.OFF ? contrastStyle : undefined}
+              title={i18n[`audio-player.playback.repeat.${repeat}`]?.[lang as string]}
+              onClick={() => cycleRepeat()}
+            />
+          }
         </div>
       </div>
       <div className="scrubber-row">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Howl } from 'howler'
 import { useAppDispatch } from '../useAppDispatch'
 import { useAppSelector } from '../useAppSelector'
@@ -6,7 +6,7 @@ import { useAppSelector } from '../useAppSelector'
 import { getSetting } from '@cardinalapps/app-settings/src'
 import { SupportedLang } from '@cardinalapps/app-settings/src/types'
 import { audioSelectors, audioActions, Player } from '../../store/slices/music'
-import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../store/slices/music/constants'
+import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE, REPEAT_MODE } from '../../store/slices/music/constants'
 import { authorizedFetchHeaders, getJwt, JWT_TYPE } from '../../lib/auth/jwt'
 import { settingsSelectors } from '../../store/slices/settings'
 import { useUpsertHistoryEntryMutation } from '../../store/apis/musicHistory'
@@ -59,6 +59,13 @@ export default function useHowler() {
   const maxConcurrentAudioStreams = Number(max_concurrent_audio_streams || defaultMaxConcurrentAudioStreams)
 
   const [upsertHistory] = useUpsertHistoryEntryMutation()
+
+  // A Howl's callbacks are created once and capture the player as it was then, but a
+  // player's `repeat` can change mid-track. This ref hands those callbacks the live value.
+  const playersRef = useRef(players)
+  useEffect(() => {
+    playersRef.current = players
+  }, [players])
 
   /**
    * Creates a new Howl instance for a player. Includes callbacks for
@@ -126,6 +133,16 @@ export default function useHowler() {
 
     howl.on('end', () => {
       saveMusicHistory(player.id, player.trackId, player?.currentQueueItem?.queueItemId)
+
+      // Loop the current track: restart it here rather than advancing. This lives in the
+      // driver, like seeking, because it is a replay of the same stream. Loop-queue, by
+      // contrast, is a real advance and is handled by the next() thunk.
+      if (playersRef.current?.[player.id]?.repeat === REPEAT_MODE.TRACK) {
+        howl.seek(0)
+        howl.play()
+        return
+      }
+
       dispatch(next({ playerId: player.id }))
     })
 

@@ -3,7 +3,7 @@ import { Player, QueueItem } from '..'
 
 import { AppDispatch, RootState } from '../../../'
 
-import { PLAYBACK_STATE, STORE_KEY } from '../constants'
+import { PLAYBACK_STATE, STORE_KEY, REPEAT_MODE } from '../constants'
 import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
 import queryParams from '../../../../lib/net/queryParams'
 
@@ -69,6 +69,26 @@ const next = createAsyncThunk<
 
   // End of queue
   if (!nextQueueItems?.length) {
+    // Loop the queue: wrap back to the first item instead of stopping. The endpoint
+    // returns the queue's first item when no currentQueueItemId is passed.
+    if (player.repeat === REPEAT_MODE.QUEUE) {
+      const [firstItems] = await homeServerAPI<[QueueItem[], number]>(queryParams(`/playback-queues/${player.queue.queueId}/items`, {
+        includeCurrentItemInReturn: true,
+      }))
+      const firstItem = firstItems?.[0]
+
+      if (firstItem) {
+        workToDo.update = {
+          id: playerId,
+          state: PLAYBACK_STATE.LOADING,
+          trackId: firstItem.mediaId,
+          currentQueueItem: firstItem,
+          currentPlaybackStartedAt: Date.now(),
+        }
+        return workToDo
+      }
+    }
+
     workToDo.isEndOfQueue = true
     return workToDo
   }

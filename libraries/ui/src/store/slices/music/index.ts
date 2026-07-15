@@ -6,7 +6,7 @@ import next from './thunks/next'
 import previous from './thunks/previous'
 
 import { Library } from '../../apis/libraries'
-import { STORE_KEY, PLAYER, PLAYBACK_STATE } from './constants'
+import { STORE_KEY, PLAYER, PLAYBACK_STATE, RepeatMode } from './constants'
 import { DynamicQueueType, QueueType } from '../../apis/playbackQueues'
 
 /**
@@ -34,6 +34,7 @@ export type Player = {
   trackId: string,
   queue: ServerQueue,
   state: string,
+  repeat: RepeatMode,
   currentPlaybackStartedAt: number,
   initializedAt: number,
   currentSeconds?: number,
@@ -61,6 +62,13 @@ const audioSlice = createSlice({
   reducers: {
     pause: (state, { payload: playerId }) => {
       state.players[playerId].state = PLAYBACK_STATE.PAUSED
+    },
+    // Set how a player behaves when its track ends (loop the track, loop the queue, or off)
+    setRepeat: (state, { payload }: PayloadAction<{ playerId: string, repeat: RepeatMode }>) => {
+      const player = state.players[payload.playerId]
+      if (player) {
+        player.repeat = payload.repeat
+      }
     },
     stop: (state, { payload: id }) => {
       delete state.players[id]

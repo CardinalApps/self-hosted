@@ -25,6 +25,15 @@ const i18n: StringList = {
   "audio-player.playback.stop": {
     "en": "Stop",
   },
+  "audio-player.playback.repeat.off": {
+    "en": "Repeat off",
+  },
+  "audio-player.playback.repeat.queue": {
+    "en": "Repeat queue",
+  },
+  "audio-player.playback.repeat.track": {
+    "en": "Repeat track",
+  },
   "audio-player.track.title": {
     "en": "Track: {track}",
   },
