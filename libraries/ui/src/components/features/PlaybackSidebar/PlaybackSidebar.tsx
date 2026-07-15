@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -43,6 +43,14 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
   const { enable_glass, floating_playback_sidebar, theme, accent_color } = useAppSelector(settingsSelectors.current)
   const [glassColors, setGlassColors] = useState<string[]>([])
 
+  // If the sidebar is already open at first render (hydrated from the cached store), skip
+  // the slide-in so a reload lands it in place. Cleared after the first commit so a user
+  // toggle still animates.
+  const skipEnter = useRef(open)
+  useEffect(() => {
+    skipEnter.current = false
+  }, [])
+
   // Memoized so that contents can safely depend on it in an effect
   const publishGlassColors = useCallback((colors: string[]) => {
     setGlassColors(colors)
@@ -82,7 +90,7 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
             key="playback-sidebar"
             className={clsx('playback-sidebar', enable_glass && 'glass-enabled', floating_playback_sidebar && 'floating')}
             data-contrast={contrast}
-            initial={{ x: '100%' }}
+            initial={skipEnter.current ? false : { x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 320, damping: 34 }}
