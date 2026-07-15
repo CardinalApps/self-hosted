@@ -29,6 +29,7 @@ export const PLAYER = Object.freeze({
   state: PLAYBACK_STATE.LOADING,
   repeat: REPEAT_MODE.OFF,
   rate: 1,
+  volume: 1,
   initializedAt: null,
   currentPlaybackStartedAt: null,
   type: PLAYBACK_SOURCE_TYPE.MUSIC_TRACK,
