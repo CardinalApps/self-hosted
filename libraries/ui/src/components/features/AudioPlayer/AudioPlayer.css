@@ -237,6 +237,27 @@
     .pause i {
       font-size: 26px;
     }
+
+    /* Repeat lights up in the accent colour when on, with a "1" over the glyph for
+       repeat-one (Font Awesome 5 has no repeat-1 icon of its own). */
+    .repeat {
+      position: relative;
+
+      &.is-active i {
+        color: var(--accent-color);
+      }
+
+      &.is-track::after {
+        content: '1';
+        position: absolute;
+        right: 9px;
+        bottom: 7px;
+        font-size: 9px;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--accent-color);
+      }
+    }
   }
 
   /* The seek bar gets a row to itself, with the times tucked underneath it */
