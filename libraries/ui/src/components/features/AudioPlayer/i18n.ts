@@ -34,6 +34,9 @@ const i18n: StringList = {
   "audio-player.playback.repeat.track": {
     "en": "Repeat track",
   },
+  "audio-player.playback.rate": {
+    "en": "Playback speed",
+  },
   "audio-player.track.title": {
     "en": "Track: {track}",
   },

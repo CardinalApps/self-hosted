@@ -281,6 +281,39 @@
   }
 }
 
+/* Playback-speed menu: a compact trigger showing the current rate, with the steps in a popover */
+.audio-player-rate {
+
+  .audio-player-rate-value {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  &.is-active .audio-player-rate-value {
+    color: var(--accent-color);
+  }
+}
+
+.audio-player-rate-option {
+  width: 100%;
+  padding: 6px 16px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color-1);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--bg-3);
+  }
+
+  &.is-selected {
+    color: var(--accent-color);
+  }
+}
+
 [data-mobile-nav-open="true"] {
   @media (max-width: 768px) {
     .audio-player {

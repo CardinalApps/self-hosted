@@ -35,6 +35,7 @@ export type Player = {
   queue: ServerQueue,
   state: string,
   repeat: RepeatMode,
+  rate: number,
   currentPlaybackStartedAt: number,
   initializedAt: number,
   currentSeconds?: number,
@@ -68,6 +69,13 @@ const audioSlice = createSlice({
       const player = state.players[payload.playerId]
       if (player) {
         player.repeat = payload.repeat
+      }
+    },
+    // Set a player's playback rate; the driver is kept in step by the AudioPlayer
+    setRate: (state, { payload }: PayloadAction<{ playerId: string, rate: number }>) => {
+      const player = state.players[payload.playerId]
+      if (player) {
+        player.rate = payload.rate
       }
     },
     stop: (state, { payload: id }) => {

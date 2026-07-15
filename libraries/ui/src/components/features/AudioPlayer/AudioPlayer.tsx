@@ -7,6 +7,7 @@ import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import Icon from '../../typography/Icon'
 import Loading from '../../layout/Loading'
 import Scrubber from '../../interaction/Scrubber'
+import MenuButton from '../../interaction/MenuButton'
 
 import { audioSelectors, audioActions } from '../../../store/slices/music'
 import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE, REPEAT_MODE, RepeatMode } from '../../../store/slices/music/constants'
@@ -32,6 +33,12 @@ import './AudioPlayer.css'
 export type CachedSeekPositionType = {
   [playerId: string]: number,
 }
+
+// The playback speeds offered in the wide player. Kept within the range browsers can
+// pitch-preserve; 1 is normal speed.
+const RATE_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
+
+const formatRate = (rate: number) => `${rate}×`
 
 type AudioPlayerProps = {
   className?: string,
@@ -70,6 +77,7 @@ const AudioPlayer = ({
   const [fadeIn, setFadeIn] = useState(false)
 
   const repeat = player.repeat ?? REPEAT_MODE.OFF
+  const rate = player.rate ?? 1
 
   // "Loop queue" only makes sense with more than one item to loop, so a single-track
   // queue drops it from the cycle. The count is all this needs, so it queries the
@@ -194,6 +202,15 @@ const AudioPlayer = ({
     }
   }, [onColorsLoaded, coverColors])
 
+  /*
+    Keep the driver's playback rate in step with the player's stored rate. Applied here
+    (like seeking) rather than in useHowler, so the rate lands on the fresh Howl while the
+    next track is still loading and an advancing queue keeps the same speed without a blip.
+  */
+  useEffect(() => {
+    howl?.rate(rate)
+  }, [howl, player.trackId, rate])
+
   return (
     <div className={clsx("audio-player", className, !!fadeIn && 'fade-in')} data-size={size} data-state={player.state} key={playerId}>
       <div className="metadata no-collapse">
@@ -284,6 +301,29 @@ const AudioPlayer = ({
               title={i18n[`audio-player.playback.repeat.${repeat}`]?.[lang as string]}
               onClick={() => cycleRepeat()}
             />
+          }
+          {size === 'wide' &&
+            <MenuButton
+              className={clsx('audio-player-rate', rate !== 1 && 'is-active')}
+              solid={false}
+              align="right"
+              width={128}
+              title={i18n['audio-player.playback.rate']?.[lang as string]}
+              icon={<span className="audio-player-rate-value" style={rate === 1 ? contrastStyle : undefined}>{formatRate(rate)}</span>}
+            >
+              <MenuButton.Section>
+                {RATE_STEPS.map((step) => (
+                  <button
+                    key={step}
+                    type="button"
+                    className={clsx('audio-player-rate-option', step === rate && 'is-selected')}
+                    onClick={() => dispatch(audioActions.setRate({ playerId: player.id, rate: step }))}
+                  >
+                    {formatRate(step)}
+                  </button>
+                ))}
+              </MenuButton.Section>
+            </MenuButton>
           }
         </div>
       </div>
