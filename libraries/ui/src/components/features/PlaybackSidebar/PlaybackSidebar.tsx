@@ -6,8 +6,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import AnimatedGradient from '../../layout/AnimatedGradient'
 
 import { useAppSelector } from '../../../hooks/useAppSelector'
-import { layoutSelectors } from '../../../store/slices/layout'
+import { useAppDispatch } from '../../../hooks/useAppDispatch'
+import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
 import { settingsSelectors } from '../../../store/slices/settings'
+import { modalSelectors } from '../../../store/slices/modal'
 import { getContrastTextColor } from '../../../lib/color/getContrastTextColor'
 
 import { PlaybackSidebarContext } from './context'
@@ -39,7 +41,9 @@ const IDLE_GRADIENT: Record<string, { greys: string[], lightMin: number, lightMa
  * use a VideoPlayer, and so on.
  */
 const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) => {
+  const dispatch = useAppDispatch()
   const open = useAppSelector(layoutSelectors.playbackSidebarOpen)
+  const modalIsOpen = useAppSelector(modalSelectors.isOpen)
   const { enable_glass, floating_playback_sidebar, theme, accent_color } = useAppSelector(settingsSelectors.current)
   const [glassColors, setGlassColors] = useState<string[]>([])
 
@@ -50,6 +54,26 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
   useEffect(() => {
     skipEnter.current = false
   }, [])
+
+  /*
+    Esc closes the sidebar, matching the settings panel. A modal or one of the sidebar's own
+    menus (rate, volume) takes the key first, so those close on the first press and the
+    sidebar on the next. The menu is matched by its trigger's `.open` class (the popover
+    element lingers through its exit animation), and scoped to inside the sidebar so the
+    header toggle — itself an always-"open" MenuButton while the sidebar is open — is ignored.
+  */
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+    const onEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !modalIsOpen && !document.querySelector('.playback-sidebar .menu-button button.open')) {
+        dispatch(layoutActions.setPlaybackSidebarOpen(false))
+      }
+    }
+    document.addEventListener('keydown', onEsc)
+    return () => document.removeEventListener('keydown', onEsc)
+  }, [open, modalIsOpen, dispatch])
 
   // Memoized so that contents can safely depend on it in an effect
   const publishGlassColors = useCallback((colors: string[]) => {
