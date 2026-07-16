@@ -429,3 +429,83 @@ export async function confirmUserEmail(userId: string): Promise<void> {
     throw new Error(`confirmUserEmail failed (${res.status}): ${text}`)
   }
 }
+
+// Promote a user to a Cardinal employee admin via the dev-only endpoint, so the
+// employeeGuard accepts them on the staff-console (BEV) endpoints. The user must
+// already have an @cardinalapps.io email — the guard checks that too. NODE_ENV=dev only.
+export async function makeEmployee(userId: string): Promise<void> {
+  const res = await fetch(`${AUTH_BASE}/dev/user/${encodeURIComponent(userId)}/make-employee`, {
+    method: 'POST',
+    headers: { 'User-Agent': BROWSER_UA },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`makeEmployee failed (${res.status}): ${text}`)
+  }
+}
+
+// Read a user's own cloud record via GET /user, independent of any UI. Used to
+// assert persisted state (publicName, userDefinedSettings, ...) after a flow.
+export async function getCloudUser(jwt: string): Promise<Record<string, unknown> & { userDefinedSettings?: Record<string, unknown> }> {
+  const res = await fetch(`${AUTH_BASE}/user`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      'User-Agent': BROWSER_UA,
+    },
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`getCloudUser failed (${res.status}): ${text}`)
+  }
+  return res.json() as Promise<Record<string, unknown> & { userDefinedSettings?: Record<string, unknown> }>
+}
+
+// Patch a user's own cloud record via PATCH /user. Used by tests to give a fresh
+// user a known, searchable publicName without going through the account UI.
+export async function patchCloudUser(jwt: string, body: Record<string, unknown>): Promise<void> {
+  const res = await fetch(`${AUTH_BASE}/user`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': BROWSER_UA,
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`patchCloudUser failed (${res.status}): ${text}`)
+  }
+}
+
+// Register a fresh @cardinalapps.io user, promote them to an admin employee, and
+// seed the page's localStorage with their cloud JWT — the fast path to a logged-in
+// staff-console (BEV) session. The email MUST end in @cardinalapps.io, or the
+// employeeGuard rejects the promoted user. Caller must `deleteTestUser(jwt)` in a
+// finally block. Mirrors seedLoggedInUser's addInitScript race avoidance.
+export async function seedLoggedInEmployee(
+  page: Page,
+  email: string,
+  password: string,
+): Promise<{ jwt: string, userId: string, email: string }> {
+  if (!email.endsWith('@cardinalapps.io')) {
+    throw new Error('seedLoggedInEmployee requires an @cardinalapps.io email for the employeeGuard to accept the user')
+  }
+
+  const jwt = await registerUser(email, password)
+  const userId = getUserIdFromJwt(jwt)
+  await makeEmployee(userId)
+
+  await page.addInitScript(
+    ([key, value, sentinel]) => {
+      if (localStorage.getItem(sentinel)) return
+      localStorage.setItem(key, value)
+      localStorage.setItem(sentinel, '1')
+    },
+    [JWT_STORAGE_KEY, jwt, JWT_SEEDED_SENTINEL] as const,
+  )
+  await page.goto('/')
+  await page.waitForSelector('.app-loading', { state: 'hidden', timeout: 10_000 })
+
+  return { jwt, userId, email }
+}
