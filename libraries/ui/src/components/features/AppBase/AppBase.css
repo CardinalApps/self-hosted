@@ -83,10 +83,22 @@
   flex-wrap: wrap;
   justify-content: center;
   overflow: hidden;
-  /* transition: padding 300ms; */
 
   --page-toolbar-height: 78px;
   --page-title-bar-height: 40px;
+
+  /*
+    Docked (not floating) gives up a column on the right so that nothing ends up underneath
+    the playback sidebar, and pulls the fixed header in to match. `--docked-progress` is set
+    by AppScaffold with the same spring used for the sidebar's own slide, so the column and
+    the sidebar ease over together instead of the column snapping. Floating mode never moves
+    it (progress stays 0) and just lets the sidebar cover the page.
+  */
+  padding-right: calc(var(--docked-progress, 0) * var(--playback-sidebar-width));
+
+  .app-header {
+    right: calc(20px + var(--docked-progress, 0) * var(--playback-sidebar-width));
+  }
 
   .page-toolbar {
     height: 48px;
@@ -97,6 +109,11 @@
 
   @media (max-width: 768px) {
     padding-left: 0 !important;
+    padding-right: 0;
+
+    .app-header {
+      right: 20px;
+    }
 
     .page-toolbar {
       height: 38px;
@@ -104,27 +121,6 @@
       position: absolute;
       top: 0;
       right: 0;
-    }
-  }
-}
-
-/*
-  Docked is the default: the scaffold gives up a column on the right so that nothing
-  ends up underneath the playback sidebar. The header is fixed, so it has to be pulled
-  in by hand. Floating mode skips all of this and lets the sidebar cover the page.
-*/
-.scaffold[data-playback-sidebar="docked"] {
-  padding-right: var(--playback-sidebar-width);
-
-  .app-header {
-    right: calc(var(--playback-sidebar-width) + 20px);
-  }
-
-  @media (max-width: 768px) {
-    padding-right: 0;
-
-    .app-header {
-      right: 20px;
     }
   }
 }

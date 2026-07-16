@@ -2,6 +2,7 @@ import { useContext, useRef } from 'react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
+import type { TargetAndTransition } from 'framer-motion'
 
 import SidebarNav from '../../interaction/SidebarNav'
 import { MiniAudioPlayer } from '../AudioPlayer'
@@ -46,11 +47,18 @@ function AppScaffold({
   // The playback sidebar carries a full sized player, so the mini player stands down while it's open
   const showMiniAudioPlayer = !!enableGlobalAudioPlayer && !(playbackSidebarOpen && playbackSidebar)
 
+  // Docked (not floating) is the only mode that reserves a column, so it's the only one that needs
+  // the main column and header to ease over. Driven with the sidebar's own spring so the two pair up.
+  const dockedPlaybackSidebar = playbackSidebarOpen && !!playbackSidebar && !floating_playback_sidebar
+
   return (
-    <div
+    <motion.div
       className={clsx('scaffold')}
       data-layout={layout}
       data-playback-sidebar={playbackSidebarOpen && playbackSidebar ? (floating_playback_sidebar ? 'floating' : 'docked') : 'closed'}
+      initial={false}
+      animate={{ '--docked-progress': dockedPlaybackSidebar ? 1 : 0 } as TargetAndTransition}
+      transition={{ type: 'spring', stiffness: 320, damping: 34 }}
     >
       {header}
       <div className={clsx('sidebar-nav-col')}>
@@ -89,7 +97,7 @@ function AppScaffold({
         </main>
       </section>
       <PlaybackSidebar contents={playbackSidebar} />
-    </div>
+    </motion.div>
   )
 }
 
