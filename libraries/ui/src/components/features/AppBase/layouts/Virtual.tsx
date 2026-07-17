@@ -121,16 +121,17 @@ function VirtualLayout({
    * Gets the items for a single row.
    */
   const getRowItems = (rowIndex: number) => {
-    // One item per row
+    // One item per row. Rows outside the cached data window render empty until their page loads
     if (itemsPerRow === 1) {
-      return getItem(cachedRTKData[rowIndex - trailingPageParams.skip])
+      const rowData = cachedRTKData[rowIndex - trailingPageParams.skip]
+      return rowData ? getItem(rowData) : null
     }
 
     // Multiple items per row
     const startIndex = (rowIndex * itemsPerRow) - trailingPageParams.skip
     const endIndex = Math.min(startIndex + itemsPerRow, cachedRTKData.length)
-    const rowItems = cachedRTKData.slice(startIndex, endIndex)
-    return rowItems.map((data) => getItem(data))
+    const rowItems = startIndex < 0 ? [] : cachedRTKData.slice(startIndex, endIndex)
+    return rowItems.filter(Boolean).map((data) => getItem(data))
   }
 
   const rowVirtualizer = useVirtualizer({
