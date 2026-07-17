@@ -45,6 +45,8 @@ import { settingsSelectors } from '../../../store/slices/settings'
 import syncSettings from '../../../store/slices/settings/thunks/sync'
 import { useGetInstanceQuery } from '../../../store/apis/instance'
 
+import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
+
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
 
@@ -134,7 +136,15 @@ function AppBase({
     lang,
     enable_custom_context_menu,
     developer_mode = initialDeveloperMode,
-  } = useSelector(settingsSelectors.current)
+    custom_themes: customThemes = [],
+  } = useSelector(settingsSelectors.current) as unknown as { lang: string, custom_themes: CustomTheme[], [key: string]: unknown }
+
+  // `theme` may be "light", "dark", or "custom:<id>". Custom themes fall back
+  // to a built-in base for CSS and everything not in their own overrides.
+  const selectedCustomTheme = (theme as string)?.startsWith('custom:')
+    ? customThemes.find((customTheme) => `custom:${customTheme.id}` === theme)
+    : undefined
+  const resolvedBaseTheme = selectedCustomTheme?.base || theme
 
   const instanceQuery = useGetInstanceQuery()
   const { data: instanceData } = instanceQuery
@@ -262,6 +272,34 @@ function AppBase({
   }, [accent_color])
 
   /**
+   * Apply a selected custom theme's variable overrides. Excludes
+   * --accent-color, which the effect above already owns independently of
+   * theme selection. Removes its own overrides on cleanup so switching back
+   * to a built-in theme (or a different custom theme) doesn't leave stale
+   * inline styles behind.
+   */
+  useEffect(() => {
+    if (!selectedCustomTheme || !appRef.current) {
+      return
+    }
+
+    const el = appRef.current
+    Object.entries(selectedCustomTheme.vars).forEach(([varName, value]) => {
+      if (varName !== '--accent-color' && value) {
+        el.style.setProperty(varName, value)
+      }
+    })
+
+    return () => {
+      Object.keys(selectedCustomTheme.vars).forEach((varName) => {
+        if (varName !== '--accent-color') {
+          el.style.removeProperty(varName)
+        }
+      })
+    }
+  }, [selectedCustomTheme])
+
+  /**
    * Sync some props to the store.
    */
   useEffect(() => { dispatch(appActions.setCardinalApp(app)) }, [app])
@@ -293,7 +331,7 @@ function AppBase({
         ref={appRef}
         id={id}
         className={clsx('app-base')}
-        data-theme={theme}
+        data-theme={resolvedBaseTheme}
         data-path={location.pathname}
         data-sidebar-mode={sidebarMode}
         data-mobile-nav-open={mobileNavIsOpen}

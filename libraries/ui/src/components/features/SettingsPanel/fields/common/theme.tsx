@@ -1,6 +1,6 @@
 import { getSetting } from '@cardinalapps/app-settings/src'
 
-import Select from '../../../../forms/Select'
+import ThemeField from './ThemeField'
 
 const theme = (app?, lang?) => {
   const fieldFactory = getSetting('theme')
@@ -10,12 +10,9 @@ const theme = (app?, lang?) => {
     ...field,
     render: ({ value, onChange }) => {
       return (
-        <Select
-          name={field.slug}
-          options={field.options as Record<string, string>}
+        <ThemeField
+          field={{ slug: field.slug, options: field.options as Record<string, string> }}
           value={value}
-          min={1}
-          multi={false}
           onChange={onChange}
         />
       )

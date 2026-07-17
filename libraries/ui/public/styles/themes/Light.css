@@ -17,12 +17,13 @@
 
   /* Inputs */
   --input-bg: #f1f1f1;
-  --input-search-focus-bg: #333333;
+  --input-search-focus-bg: #e6e6e6;
 
   /* Borders */
   --border-color-1: #dedede;
   --border-color-2: #afafaf;
   --border-color-3: #e7e7e7;
+  --border-color-4: #c7c7c7;
   --border-color-focus: #bbbbbb;
 
   /* Buttons */

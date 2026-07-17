@@ -11,6 +11,9 @@ export default {
   "settings.theme.option.light": {
     "en": "Light",
   },
+  "settings.custom-themes.title": {
+    "en": "Saved themes",
+  },
   "settings.accent-color.title": {
     "en": "Accent colour",
   },

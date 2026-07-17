@@ -13,7 +13,10 @@ export type InputType =
   'text' |
   'textArea' |
   'number' |
-  'swatches'
+  'swatches' |
+  // Managed programmatically (eg. by the theme toolbar), never rendered by
+  // the generic Field mechanism.
+  'json'
 
 export type InputValue =
   string |
