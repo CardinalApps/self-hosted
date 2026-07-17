@@ -82,7 +82,7 @@ const AudioPlayer = ({
     isLoading: musicTrackLoading,
   } = useGetMusicTrackQuery({ id: player.trackId })
   const track = musicTrackResponse
-  const [coverSrc] = useReleaseCover(track?.release?.id)
+  const [coverSrc] = useReleaseCover(track?.release?.id, size === 'wide' ? 'medium_nocrop' : 'small_nocrop')
   const coverColors = useCoverColors(coverSrc)
   const [fadeIn, setFadeIn] = useState(false)
 

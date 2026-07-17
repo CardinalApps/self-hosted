@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import homeServerAPI from '../lib/homeserver/homeServerAPI'
+import queryParams from '../lib/net/queryParams'
 
-export function useReleaseCover(releaseId: string | number): [string, { coverIsLoading: boolean }] {
+export type ReleaseCoverSize = 'small_nocrop' | 'medium_nocrop'
+
+export function useReleaseCover(releaseId: string | number, size: ReleaseCoverSize = 'small_nocrop'): [string, { coverIsLoading: boolean }] {
   const [imageSrc, setImageSrc] = useState<string>()
   const [coverIsLoading, setCoverIsLoading] = useState<boolean>(true)
 
@@ -12,7 +15,7 @@ export function useReleaseCover(releaseId: string | number): [string, { coverIsL
     }
     homeServerAPI<{
       blobUrl: string,
-    }>(`/music/releases/${releaseId}/cover`, 'GET', { blob: true })
+    }>(queryParams(`/music/releases/${releaseId}/cover`, { size }), 'GET', { blob: true })
       .then(({ blobUrl }) => {
         setImageSrc(blobUrl)
       })
@@ -22,7 +25,7 @@ export function useReleaseCover(releaseId: string | number): [string, { coverIsL
       .finally(() => {
         setCoverIsLoading(false)
       })
-  }, [releaseId])
+  }, [releaseId, size])
 
   return [imageSrc, { coverIsLoading }]
 }

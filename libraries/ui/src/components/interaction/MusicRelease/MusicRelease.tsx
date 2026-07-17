@@ -44,7 +44,10 @@ const MusicRelease = ({
   const [showInner, setShowInner] = useState<boolean>()
   const [tracksInOrder, setTracksInOrder] = useState(tracks)
   const trackIdsInRelease = tracksInOrder.map((track) => track.musicTrackId).filter((track) => !!track)
-  const [coverSrc, { coverIsLoading }] = useReleaseCover(hasArtwork ? releaseId : null)
+  const coverThumbnailSize = Math.max(Number(coverSize?.width) || 0, Number(coverSize?.height) || 0) > 160
+    ? 'medium_nocrop'
+    : 'small_nocrop'
+  const [coverSrc, { coverIsLoading }] = useReleaseCover(hasArtwork ? releaseId : null, coverThumbnailSize)
 
   const getArtwork = () => {
     if (overrideArtwork) {

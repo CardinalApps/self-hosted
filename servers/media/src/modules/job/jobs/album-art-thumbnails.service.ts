@@ -32,7 +32,8 @@ export class AlbumArtThumbnailsJobService implements JobProcessor {
   ) {}
 
   private sizes = {
-    small_nocrop: [null, 200],
+    small_nocrop: [null, 160],
+    medium_nocrop: [null, 640],
   }
 
   /**
