@@ -22,8 +22,10 @@ export const getFields = (app, lang) => {
       commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
-    appearance: [
+    theme: [
       commonFields.theme,
+    ],
+    appearance: [
       commonFields.accentColor,
       commonFields.enableGlass,
       commonFields.floatingPlaybackSidebar,
@@ -42,6 +44,14 @@ export const getFields = (app, lang) => {
           fields: [
             commonFields.enableCustomContextMenu,
             adminServerFields.openAppsInNewTab,
+          ],
+        },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
           ],
         },
         // Appearance settings tab
@@ -101,6 +111,14 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
+          ],
+        },
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -132,6 +150,14 @@ export const getFields = (app, lang) => {
           tabIcon: 'fas fa-home',
           fields: [
             ...defaults.general,
+          ],
+        },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
           ],
         },
         // Appearance settings tab
@@ -170,6 +196,14 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
+          ],
+        },
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -188,6 +222,14 @@ export const getFields = (app, lang) => {
           tabIcon: 'fas fa-home',
           fields: [
             ...defaults.general,
+          ],
+        },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
           ],
         },
         // Appearance settings tab
@@ -209,6 +251,14 @@ export const getFields = (app, lang) => {
           tabIcon: 'fas fa-home',
           fields: [
             ...defaults.general,
+          ],
+        },
+        // Theme settings tab
+        {
+          tabName: i18n['settings.tab-name-theme'][lang],
+          tabIcon: 'fas fa-swatchbook',
+          fields: [
+            ...defaults.theme,
           ],
         },
         // Appearance settings tab

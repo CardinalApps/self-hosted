@@ -61,6 +61,27 @@ const i18n: StringList = {
   "settings.music.multi-player": {
     "en": "Multi-Player",
   },
+  "settings.theme.save": {
+    "en": "Save",
+  },
+  "settings.theme.duplicate": {
+    "en": "Duplicate",
+  },
+  "settings.theme.delete": {
+    "en": "Delete",
+  },
+  "settings.theme.export": {
+    "en": "Export",
+  },
+  "settings.theme.saved-toast": {
+    "en": "Theme saved",
+  },
+  "settings.theme.exported-toast": {
+    "en": "Theme copied to clipboard",
+  },
+  "settings.theme.delete-confirm": {
+    "en": "Delete the \"{name}\" theme? This can't be undone.",
+  },
 }
 
 export default i18n

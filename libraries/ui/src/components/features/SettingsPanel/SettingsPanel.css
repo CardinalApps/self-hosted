@@ -202,6 +202,22 @@
       }
     }
 
+    // The theme dropdown sits directly on the tab's Card, not in its own
+    // nested boxed field.
+    &.theme {
+      padding: 0;
+      border: none;
+      background-color: transparent;
+
+      .field-input {
+        width: auto;
+      }
+
+      .typing-area {
+        background-color: var(--input-bg);
+      }
+    }
+
     &.type-title {
       margin-bottom: 15px;
       padding-top: 15px;
@@ -287,6 +303,18 @@
         text-decoration: underline;
       }
     }
+  }
+
+  .theme-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .theme-field-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .swatches {
