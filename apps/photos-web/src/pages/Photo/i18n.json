@@ -1,5 +1,14 @@
 {
   "long-load-time-message": {
     "en": "Welp, it's been 10 whole seconds, so something probably isn't working."
+  },
+  "no-photo-card-title": {
+    "en": "Photo unavailable"
+  },
+  "no-photo-card-message": {
+    "en": "This photo couldn't be loaded."
+  },
+  "no-photo-button": {
+    "en": "Back to archive"
   }
 }

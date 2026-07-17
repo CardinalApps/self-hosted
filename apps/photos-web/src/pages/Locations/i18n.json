@@ -4,5 +4,14 @@
   },
   "map-seach.placeholder": {
     "en": "Search the map"
+  },
+  "no-locations-card-title": {
+    "en": "No locations"
+  },
+  "no-locations-card-message": {
+    "en": "After importing photos with location data, you'll see them plotted on the map."
+  },
+  "no-locations-button": {
+    "en": "Import photos"
   }
 }
