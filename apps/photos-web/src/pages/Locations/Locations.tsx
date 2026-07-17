@@ -3,6 +3,8 @@ import ms from 'ms'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import Map from '@cardinalapps/ui/src/components/features/Map'
+import Button from '@cardinalapps/ui/src/components/interaction/Button'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 
@@ -10,6 +12,9 @@ import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 import { queryParams } from '@cardinalapps/ui/src/lib/net/queryParams'
 import useLargeData from '../../hooks/useLargeData'
 
+import NoContentMessage from '../../components/NoContentMessage'
+
+import i18n from './i18n.json'
 import './styles.css'
 
 import { HOME_SERVER_HOST } from '../../env'
@@ -25,46 +30,46 @@ function LocationsPage() {
   // const [selectedPhoto, setSelectedPhoto] = useState()
   // const [initialMapZoom] = useState(11)
   // const [initialMapPosition] = useState([40.79109283486991, -73.97536683683397])
-  const [markers, setMarkers] = useState([])
-  const { data } = useLargeData([], queryParams(`/photos`, {
-    thumbnails: true,
-    metadata: false,
-    order: defaults.order,
-    take: defaults.take,
-    skip: defaults.skip,
-  }),
-  {
-    expiration: ms('8 seconds'),
-  })
+  // const [markers, setMarkers] = useState([])
+  // const { data } = useLargeData([], queryParams(`/photos`, {
+  //   thumbnails: true,
+  //   metadata: false,
+  //   order: defaults.order,
+  //   take: defaults.take,
+  //   skip: defaults.skip,
+  // }),
+  // {
+  //   expiration: ms('8 seconds'),
+  // })
 
-  /**
-   * Convert photos to markers.
-   */
-  useEffect(() => {
-    if (!data) return
+  // /**
+  //  * Convert photos to markers.
+  //  */
+  // useEffect(() => {
+  //   if (!data) return
 
-    const markers = []
+  //   const markers = []
 
-    data.forEach((photo) => {
-      if (photo?.gpsLat && photo?.gpsLng) {
-        const marker = {
-          popupAnchor: [photo.gpsLat, photo.gpsLng],
-          iconSize: [40, 40],
-          photo,
-        }
-        markers.push(marker)
-      }
-    })
+  //   data.forEach((photo) => {
+  //     if (photo?.gpsLat && photo?.gpsLng) {
+  //       const marker = {
+  //         popupAnchor: [photo.gpsLat, photo.gpsLng],
+  //         iconSize: [40, 40],
+  //         photo,
+  //       }
+  //       markers.push(marker)
+  //     }
+  //   })
 
-    setMarkers(markers)
-  }, [data])
+  //   setMarkers(markers)
+  // }, [data])
 
   return (
     <AppPage
       layout={PAGE_LAYOUT.full}
       capabilities={['Photos.Read']}
     >
-      <div className="locations">
+      {/* <div className="locations">
         <Map
           renderDelay={400}
           markers={markers}
@@ -74,7 +79,21 @@ function LocationsPage() {
             setActiveContent(<img src={thumb} />)
           }}
         />
-      </div>
+      </div> */}
+      <section>
+        <NoContentMessage
+          showUnavailableMessage={true}
+          icon={<Icon fa="fas fa-map-marked-alt" />}
+          title={i18n['no-locations-card-title']['en']}
+          button={
+            <Button href={`${HOME_SERVER_HOST}/admin/media`} target="_blank" solid={true}>
+              {i18n['no-locations-button']['en']}
+            </Button>
+          }
+        >
+          <p>{i18n['no-locations-card-message']['en']}</p>
+        </NoContentMessage>
+      </section>
     </AppPage>
   )
 }

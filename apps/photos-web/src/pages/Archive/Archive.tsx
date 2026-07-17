@@ -34,16 +34,16 @@ const defaults = {
  * the data is too large to be stored in localstorage.
  */
 function ArchivePage() {
-  const { data, isLoading } = useLargeData([], queryParams(`/photos`, {
-    thumbnails: true,
-    metadata: false,
-    order: defaults.order,
-    take: defaults.take,
-    skip: defaults.skip,
-  }),
-  {
-    expiration: ms('8 seconds'),
-  })
+  // const { data, isLoading } = useLargeData([], queryParams(`/photos`, {
+  //   thumbnails: true,
+  //   metadata: false,
+  //   order: defaults.order,
+  //   take: defaults.take,
+  //   skip: defaults.skip,
+  // }),
+  // {
+  //   expiration: ms('8 seconds'),
+  // })
 
   return (
     <AppPage
@@ -52,7 +52,7 @@ function ArchivePage() {
       pageTitle={i18n['title']['en']}
       capabilities={['Photos.Read']}
     >
-      <div
+      {/* <div
         className={clsx(
           'photosArchive',
           isLoading ? 'loading' : null,
@@ -76,7 +76,21 @@ function ArchivePage() {
                 <p>{i18n['no-photos-card-message']['en']}</p>
               </NoContentMessage>
         }
-      </div>
+      </div> */}
+      <section>
+        <NoContentMessage
+          showUnavailableMessage={true}
+          icon={<i className="fas fa-upload" />}
+          title={i18n['no-photos-card-title']['en']}
+          button={
+            <Button href={`${HOME_SERVER_HOST}/admin/indexing`} target="_blank" solid={true}>
+              {i18n['no-photos-button']['en']}
+            </Button>
+          }
+        >
+          <p>{i18n['no-photos-card-message']['en']}</p>
+        </NoContentMessage>
+      </section>
     </AppPage>
   )
 }

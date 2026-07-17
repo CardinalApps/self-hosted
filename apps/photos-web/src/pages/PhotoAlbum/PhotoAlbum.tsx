@@ -23,22 +23,22 @@ import * as routes from '../../routes'
 import './styles.css'
 
 function PhotoAlbumPage() {
-  const { params: { id: photoAlbumId } } = useMatch(routes.PHOTO_ALBUM)
-  const { data: photoAlbumData = {} } = useGetPhotoAlbumQuery({ photoAlbumId })
-  const { data: photoAlbumEntries, isLoading } = useLargeData([], queryParams(`/photo-album/${photoAlbumId}/entries`, {
-    joinPhoto: true,
-  }),
-  {
-    expiration: ms('8 seconds'),
-  })
-  const photos = photoAlbumEntries.map((entry) => entry.photo)
+  // const { params: { id: photoAlbumId } } = useMatch(routes.PHOTO_ALBUM)
+  // const { data: photoAlbumData = {} } = useGetPhotoAlbumQuery({ photoAlbumId })
+  // const { data: photoAlbumEntries, isLoading } = useLargeData([], queryParams(`/photo-album/${photoAlbumId}/entries`, {
+  //   joinPhoto: true,
+  // }),
+  // {
+  //   expiration: ms('8 seconds'),
+  // })
+  // const photos = photoAlbumEntries.map((entry) => entry.photo)
 
   return (
     <AppPage
       restoreScrollPoint={false}
       capabilities={['Photos.Read']}
     >
-      <div className="album">
+      {/* <div className="album">
         <header className="header">
           <div className="photoAlbum">
             <H1 className="title">{photoAlbumData.name}</H1>
@@ -67,7 +67,21 @@ function PhotoAlbumPage() {
             </NoContentMessage>
           }
         </div>
-      </div>
+      </div> */}
+      <section>
+        <NoContentMessage
+          showUnavailableMessage={true}
+          icon={<Icon fa="fas fa-photo-video" />}
+          title={i18n['no-content-message.title']['en']}
+          button={
+            <Link to={routes.ROOT} className="button solid">
+              {i18n['no-content-message.button']['en']}
+            </Link>
+          }
+        >
+          <p>{i18n['no-content-message.desc']['en']}</p>
+        </NoContentMessage>
+      </section>
     </AppPage>
   )
 }

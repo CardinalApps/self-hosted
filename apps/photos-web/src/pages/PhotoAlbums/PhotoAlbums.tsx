@@ -33,48 +33,48 @@ const defaults = {
 }
 
 function PhotoAlbumsPage() {
-  const dispatch = useDispatch()
-  const { lang } = useSelector(settingsSelectors.current)
-  const [createPhotoAlbum, createPhotoAlbumResult] = useCreatePhotoAlbumMutation()
+  // const dispatch = useDispatch()
+  // const { lang } = useSelector(settingsSelectors.current)
+  // const [createPhotoAlbum, createPhotoAlbumResult] = useCreatePhotoAlbumMutation()
   // const [deletePhotoAlbum, deletePhotoAlbumResult] = useDeletePhotoAlbumMutation()
-  const { data, isFetching, isLoading/*, refetch*/ } = useGetPhotoAlbumsQuery({
-    take: defaults.take,
-    skip: defaults.skip,
-    order: defaults.order,
-  })
-  const [photosAlbums = [], totalPhotoAlbums] = data || []
+  // const { data, isFetching, isLoading/*, refetch*/ } = useGetPhotoAlbumsQuery({
+  //   take: defaults.take,
+  //   skip: defaults.skip,
+  //   order: defaults.order,
+  // })
+  // const [photosAlbums = [], totalPhotoAlbums] = data || []
 
-  /**
-   * Creates a new photo album.
-   */
-  const handleNewPhotoAlbumSubmit = (name) => {
-    if (typeof name === 'string' && name) {
-      createPhotoAlbum({ name })
-    }
-  }
-
-  /**
-   * Todo
-   */
-  // const handleDeleteClick = (e) => {
-  //   e.preventDefault()
-  //   deletePhotoAlbum({ id: photoAlbumId })
+  // /**
+  //  * Creates a new photo album.
+  //  */
+  // const handleNewPhotoAlbumSubmit = (name) => {
+  //   if (typeof name === 'string' && name) {
+  //     createPhotoAlbum({ name })
+  //   }
   // }
 
-  /**
-   * After photo album creation, for both pass or fail.
-   */
-  useEffect(() => {
-    if (createPhotoAlbumResult.isSuccess) {
-      // noop
-    } else if (createPhotoAlbumResult.isError) {
-      dispatch(toastActions.addToQueue({
-        ttl: 5000,
-        title: i18n['create-album.error'][lang],
-        type: 'danger',
-      }))
-    }
-  }, [createPhotoAlbumResult])
+  // /**
+  //  * Todo
+  //  */
+  // // const handleDeleteClick = (e) => {
+  // //   e.preventDefault()
+  // //   deletePhotoAlbum({ id: photoAlbumId })
+  // // }
+
+  // /**
+  //  * After photo album creation, for both pass or fail.
+  //  */
+  // useEffect(() => {
+  //   if (createPhotoAlbumResult.isSuccess) {
+  //     // noop
+  //   } else if (createPhotoAlbumResult.isError) {
+  //     dispatch(toastActions.addToQueue({
+  //       ttl: 5000,
+  //       title: i18n['create-album.error'][lang],
+  //       type: 'danger',
+  //     }))
+  //   }
+  // }, [createPhotoAlbumResult])
 
   return (
     <AppPage
@@ -82,7 +82,7 @@ function PhotoAlbumsPage() {
       pageTitle={i18n['title']['en']}
       capabilities={['PhotoAlbums.Read', 'Photos.Read']}
     >
-      <HasCapabilities capabilities={['PhotoAlbums.Create']}>
+      {/* <HasCapabilities capabilities={['PhotoAlbums.Create']}>
         <CreateSomething
           fieldLabel={i18n['create-album.name'][lang]}
           onSubmit={(name) => handleNewPhotoAlbumSubmit(name)}
@@ -120,6 +120,20 @@ function PhotoAlbumsPage() {
               })}
             </section>
         }
+      </section> */}
+      <section>
+        <NoContentMessage
+          showUnavailableMessage={true}
+          icon={<Icon fa="fas fa-upload" />}
+          title={i18n['no-albums-card-title']['en']}
+          button={
+            <Button href={`${HOME_SERVER_HOST}/admin/media`} target="_blank" solid={true}>
+              {i18n['no-albums-button']['en']}
+            </Button>
+          }
+        >
+          <p>{i18n['no-albums-card-message']['en']}</p>
+        </NoContentMessage>
       </section>
     </AppPage>
   )
