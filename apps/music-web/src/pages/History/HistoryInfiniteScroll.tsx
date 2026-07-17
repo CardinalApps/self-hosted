@@ -63,7 +63,7 @@ function MusicHistoryInfiniteScroll({
   const getItem = (historyEntry: MusicHistoryEntryType) => {
     const musicRelease = historyEntry.track?.release
     return (
-      <Card className="music-history-entry" padding={0} border={1} key={musicRelease.id}>
+      <Card className="music-history-entry" padding={0} border={1} key={historyEntry.id}>
         <div className="cols">
           <div className="artwork-col">
             <MusicRelease
