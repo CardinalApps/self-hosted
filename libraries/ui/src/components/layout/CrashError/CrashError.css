@@ -1,0 +1,26 @@
+.crash-error {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-direction: column;
+  /* The theme scope that normally provides the font may have crashed along with the app */
+  font-family: var(--font-family, 'Heebo', 'Helvetica', 'Arial', sans-serif);
+
+  > img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  > p {
+    font-weight: 600;
+  }
+}
+
+/* The top level error boundary renders directly into the root element, which has no height of its own */
+#root > .crash-error {
+  height: 100dvh;
+}

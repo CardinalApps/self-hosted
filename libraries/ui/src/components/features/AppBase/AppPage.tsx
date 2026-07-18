@@ -13,6 +13,8 @@ import {
 } from '../../../store/slices/layout'
 import HasCapabilities from '../../layout/HasCapabilities'
 import AccessError, { NetworkError } from '../../layout/AccessError/AccessError'
+import CrashError from '../../layout/CrashError'
+import { ErrorBoundary } from '../../../lib/react-error-boundary'
 import useScrollPointRestoration from '../../../hooks/useScrollPointRestoration'
 import { createPortal } from 'react-dom'
 
@@ -118,17 +120,20 @@ function AppPage({
       style={style}
       className={clsx('app-page', className, sidebarIsCollapsed && 'sidebar-is-collapsed', loading && 'loading')}
     >
-      {
-        networkError
-          // All page-level errors, like 404's for dynamic routes
-          ? <AccessError networkError={networkError} />
-          : <>
-              {!!toolbar && toolbarPortalIsReady && renderToolbar()}
-              <HasCapabilities capabilities={capabilities}>
-                {children}
-              </HasCapabilities>
-            </>
-      }
+      {/* Render errors in the page swap it for the crash screen; the app scaffold stays alive */}
+      <ErrorBoundary fallback={<CrashError />}>
+        {
+          networkError
+            // All page-level errors, like 404's for dynamic routes
+            ? <AccessError networkError={networkError} />
+            : <>
+                {!!toolbar && toolbarPortalIsReady && renderToolbar()}
+                <HasCapabilities capabilities={capabilities}>
+                  {children}
+                </HasCapabilities>
+              </>
+        }
+      </ErrorBoundary>
     </div>
   )
 }
