@@ -1,7 +1,7 @@
 import * as path from 'path'
 import { Injectable, Scope } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull, Not, In } from 'typeorm'
+import { Repository } from 'typeorm'
 import { v4 as uuid } from 'uuid'
 
 import { JobTask } from '../job-task.entity'
@@ -37,37 +37,44 @@ export class AlbumArtThumbnailsJobService implements JobProcessor {
   }
 
   /**
-   * Get all albums without artwork thumbnails.
+   * A release needs work if it's missing a thumbnail for any of `this.sizes`, so
+   * this counts existing thumbnails rather than checking for none at all - otherwise
+   * a release that already has some (but not all) of the configured sizes would
+   * never be revisited, even after `this.sizes` gains a new size.
+   */
+  private incompleteReleasesQuery(exclude: number[]) {
+    const qb = this.musicReleaseRepository
+      .createQueryBuilder('release')
+      .leftJoin('release.thumbnails', 'thumbnail')
+      .groupBy('release.id')
+      .having('COUNT(thumbnail.id) < :expectedSizeCount', { expectedSizeCount: Object.keys(this.sizes).length })
+
+    if (exclude.length) {
+      qb.where('release.id NOT IN (:...exclude)', { exclude })
+    }
+
+    return qb
+  }
+
+  /**
+   * Get all albums missing one or more artwork thumbnail sizes.
    */
   async countWork(exclude: number[]): Promise<number> {
-    const remaining = await this.musicReleaseRepository.count({
-      where: {
-        id: Not(In(exclude)),
-        thumbnails: {
-          id: IsNull(),
-        },
-      },
-    })
+    const remaining = await this.incompleteReleasesQuery(exclude)
+      .select('release.id')
+      .getMany()
 
-    return remaining
+    return remaining.length
   }
 
   /**
    * Get a batch of albums that need artwork thumbnails.
    */
   async getWork(exclude: number[], batchSize: number): Promise<number[]> {
-    const batch = await this.musicReleaseRepository.find({
-      select: {
-        id: true,
-      },
-      where: {
-        id: Not(In(exclude)),
-        thumbnails: {
-          id: IsNull(),
-        },
-      },
-      take: batchSize,
-    })
+    const batch = await this.incompleteReleasesQuery(exclude)
+      .select('release.id')
+      .take(batchSize)
+      .getMany()
 
     return batch.map(({ id }) => id)
   }
@@ -94,6 +101,15 @@ export class AlbumArtThumbnailsJobService implements JobProcessor {
         thumbnails: true,
       },
     })
+
+    const existingSizes = new Set((release?.thumbnails ?? []).map((thumbnail) => thumbnail.size))
+    const sizesToCreate = Object.fromEntries(
+      Object.entries(this.sizes).filter(([size]) => !existingSizes.has(size)),
+    )
+
+    if (!Object.keys(sizesToCreate).length) {
+      return await this._taskEnd(task, JobTaskStatus.COMPLETED)
+    }
 
     /**
      * Use the first track returned from the database. Track order is undefined
@@ -129,14 +145,14 @@ export class AlbumArtThumbnailsJobService implements JobProcessor {
     if (typeof primaryArtwork === 'string') {
       result = await this.thumbnailService.createThumbnails({
         absoluteFilePath: primaryArtwork,
-        sizes: this.sizes,
+        sizes: sizesToCreate,
       } as CreateThumbnailsOptions)
     } else {
       result = await this.thumbnailService.createThumbnails({
         buffer: primaryArtwork,
         fileName: `${release.title.replace(' ', '-')}_${uuid()}.jpeg`,
         fileExtension: 'jpeg',
-        sizes: this.sizes,
+        sizes: sizesToCreate,
       } as CreateThumbnailsOptions)
     }
 
