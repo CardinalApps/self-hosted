@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, type PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
+import clsx from 'clsx'
 
 import MusicPlaybackButton from '../MusicPlaybackButton'
 import Ratings from '../Ratings'
@@ -31,6 +32,9 @@ type MusicTrackProps = {
   rating?: number | null,
   hasArtwork?: boolean,
   canRate?: boolean,
+  // Glass only reads true above an animated background (e.g. the playback sidebar), so
+  // callers opt in rather than this following the global glass setting on its own.
+  glass?: boolean,
 }
 
 const MusicTrack = ({
@@ -47,6 +51,7 @@ const MusicTrack = ({
   rating,
   hasArtwork = true,
   canRate = true,
+  glass = false,
 }: PropsWithChildren<MusicTrackProps>) => {
   const dispatch = useAppDispatch()
   const { Link } = useContext(RouterContext)
@@ -92,7 +97,7 @@ const MusicTrack = ({
   }
 
   return (
-    <div className="music-track" onDoubleClick={handleDoubleClick}>
+    <div className={clsx('music-track', glass && 'glass')} onDoubleClick={handleDoubleClick}>
       <div className="col music-track-play-pause">
         <MusicPlaybackButton musicTrackIds={[musicTrackId]} musicTrackIdToPlay={musicTrackId} />
       </div>
