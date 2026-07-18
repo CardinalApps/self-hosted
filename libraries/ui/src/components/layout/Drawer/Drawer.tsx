@@ -86,8 +86,8 @@ const Drawer = ({
           }}
         >
           <div className="drawer-pane-inner">
-            <button className="drawer-close">
-              <Icon fa="fas fa-times" onClick={handleClose} />
+            <button className="drawer-close" onClick={handleClose}>
+              <Icon fa="fas fa-times" />
             </button>
             <Card className="drawer-content" shadow={2}>
               {loading
