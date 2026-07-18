@@ -26,6 +26,13 @@ export enum ToolbarItem {
   VIRTUALLAYOUT = 'virtuallayout',
   SIMPLECOUNT = 'simplecount',
   SELECTION = 'selection',
+  CYCLE = 'cycle',
+}
+
+export type CycleOption = {
+  value: string,
+  icon: string,
+  title?: string,
 }
 
 export type BreadcrumbItem = {

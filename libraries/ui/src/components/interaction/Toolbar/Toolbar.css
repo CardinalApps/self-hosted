@@ -119,6 +119,11 @@
       }
     }
 
+    &.slim {
+      height: 100%;
+      padding: 0;
+    }
+
     .toolbar-text {
       margin-right: 12px;
       margin-left: 12px;

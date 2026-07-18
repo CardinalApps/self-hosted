@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import clsx from 'clsx'
 
 import Drawer from '../../layout/Drawer'
 
@@ -15,6 +16,7 @@ import DateRange, { DATE_RANGE_SLUG } from './items/DateRange'
 import Delete, { DELETE_SLUG } from './items/Delete'
 import Deselect, { DESELECT_SLUG } from './items/Deselect'
 import Pagination, { PAGINATION_SLUG } from './items/Pagination'
+import Cycle, { CYCLE_SLUG } from './items/Cycle'
 
 import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 
@@ -175,6 +177,8 @@ const ToolbarItems = ({
         return Deselect
       case PAGINATION_SLUG:
         return Pagination
+      case CYCLE_SLUG:
+        return Cycle
     }
   }
 
@@ -199,8 +203,9 @@ const ToolbarItems = ({
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
       !!items.length && items.map((group, i) => {
+        const isSlimMenuGroup = group.some((item) => item?.render === CYCLE_SLUG)
         return (
-          <div className="toolbar-group" key={i}>
+          <div className={clsx('toolbar-group', { 'slim': isSlimMenuGroup })} key={i}>
             {group.map((item, i) => {
               // Render built-in toolbar items
               if (typeof item?.render === 'string') {
