@@ -272,6 +272,31 @@ export const Cycle = (props) => {
   )
 }
 
+export const Icon = (props) => {
+  const [clicks, setClicks] = useState(0)
+  return (
+    <div>
+      <DrawerLayer />
+      <Toolbar
+        {...props}
+        name="story-icon"
+        items={[[
+          {
+            slug: 'shuffle',
+            render: ToolbarItem.ICON,
+            title: 'Shuffle',
+            extra: {
+              icon: 'fa-random',
+              onClick: () => setClicks((c) => c + 1),
+            },
+          },
+        ]]}
+      />
+      <p>Clicked {clicks} times</p>
+    </div>
+  )
+}
+
 export const Pagination = (props) => {
   const toolbarName = 'story-pagination'
   const initialValue = {

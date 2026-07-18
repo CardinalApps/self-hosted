@@ -7,9 +7,9 @@
   width: 50px;
   height: 100%;
   min-width: 30px;
-  padding: 1px 15px;
+  padding: 4px 15px 1px;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   border-radius: var(--border-radius-s);
 }
 
