@@ -24,6 +24,13 @@
     overflow-y: auto;
     overflow-x: hidden;
     flex-grow: 1;
+
+    /* A drag is a mousedown-and-move over the row's own text, which the browser also
+       reads as a selection — the whole list opts out for as long as one is live, since
+       the cursor drags across sibling rows too. */
+    &.is-dragging {
+      user-select: none;
+    }
   }
 
   .queue-item {
@@ -61,36 +68,5 @@
       background-color: var(--bg-3);
       opacity: 0.4;
     }
-  }
-
-  .queue-item-handle {
-    width: 22px;
-    padding: 0;
-    border: 0;
-    flex-shrink: 0;
-    cursor: grab;
-    color: var(--text-color-4);
-    background: none;
-    touch-action: none;
-
-    &:hover {
-      color: var(--text-color-2);
-    }
-
-    &:active {
-      cursor: grabbing;
-    }
-
-    i {
-      font-size: 13px;
-    }
-  }
-}
-
-/* Glass mode paints the sidebar with the album art, so the rows have to let it through */
-.playback-sidebar.glass-enabled .playback-queue {
-
-  .music-track {
-    background-color: transparent;
   }
 }

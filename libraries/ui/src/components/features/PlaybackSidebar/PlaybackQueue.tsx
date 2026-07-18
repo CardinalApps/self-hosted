@@ -71,6 +71,10 @@ const PlaybackQueue = ({
   // instead of waiting for the server to agree
   const [items, setItems] = useState<QueueItem[]>([])
 
+  // Grabbing a row is a mousedown-and-move over its own text, which the browser also reads
+  // as a text selection — so selection is switched off for exactly as long as a drag is live.
+  const [isDragging, setIsDragging] = useState(false)
+
   useEffect(() => {
     setItems(serverItems ?? [])
   }, [serverItems])
@@ -99,6 +103,8 @@ const PlaybackQueue = ({
    * which is what keeps a dragged item from landing behind the playhead.
    */
   const handleDragEnd = (item: QueueItem) => {
+    setIsDragging(false)
+
     const predecessorOf = (list: QueueItem[]) => {
       const index = list.findIndex((candidate) => candidate.queueItemId === item.queueItemId)
       if (index === -1) {
@@ -133,7 +139,7 @@ const PlaybackQueue = ({
         ref={listRef}
         as="ol"
         axis="y"
-        className="queue-list"
+        className={clsx('queue-list', isDragging && 'is-dragging')}
         values={items}
         onReorder={setItems}
       >
@@ -144,6 +150,7 @@ const PlaybackQueue = ({
             lang={lang as string}
             // Before the first measurement the virtualizer reports nothing, so fill the head
             active={activeRows.size ? activeRows.has(index) : index < INITIAL_ROWS}
+            onDragStart={() => setIsDragging(true)}
             onDragEnd={handleDragEnd}
           />
         ))}
