@@ -5,7 +5,7 @@ import { baseHomeServerApi } from './baseHomeServerApi'
 export const GET_JOB_TASKS_DEFAULT_OPTIONS = {
   take: 24,
   skip: 0,
-  order: 'desc',
+  order: 'DESC',
 }
 
 export const jobTasksApi = baseHomeServerApi
