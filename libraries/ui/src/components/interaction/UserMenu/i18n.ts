@@ -28,6 +28,9 @@ const i18n: StringList = {
   "user-menu.quick-settings": {
     "en": "Quick Settings",
   },
+  "user-menu.quick-settings.glass": {
+    "en": "Glass",
+  },
   "user-menu.cloud": {
     "en": "Cardinal Cloud",
   },

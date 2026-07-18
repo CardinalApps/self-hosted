@@ -52,6 +52,9 @@
 
   .user-menu-quick-settings {
     margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 
     .custom-select {
       max-width: 130px;
