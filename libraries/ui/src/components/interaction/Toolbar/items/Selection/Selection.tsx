@@ -47,7 +47,7 @@ const ToolbarSelection = ({
     : itemNamePlural ?? i18n['item.plural.default'][lang]
 
   return (
-    <>
+    <div className="toolbar-selection">
       <p className="toolbar-total-items toolbar-text">
         {i18n['selected-items'][lang]
           .replace('{selected}', formatWithCommas(numItemsSelected))
@@ -63,7 +63,7 @@ const ToolbarSelection = ({
           <Delete onClick={onDeleteSelection} />
         </div>
       }
-    </>
+    </div>
   )
 }
 

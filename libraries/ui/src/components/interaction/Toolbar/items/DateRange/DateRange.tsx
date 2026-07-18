@@ -38,7 +38,7 @@ const DateRange = ({
   const { lang } = useSelector(settingsSelectors.current)
   const [popoutIsOpen, setPopoutIsOpen] = useState(false)
   const { [toolbarName]: toolbarValues } = useSelector(layoutSelectors.toolbarValues)
-  const daterange = toolbarValues.daterange as DateRangeValue
+  const daterange = toolbarValues?.daterange as DateRangeValue
   const startDate = daterange?.start ? new Date(daterange.start) : DEFAULT_VALUE.start
   const endDate = daterange?.end ? new Date(daterange.end) : DEFAULT_VALUE.end
 

@@ -38,10 +38,10 @@ const Pagination = ({
   const { lang } = useSelector(settingsSelectors.current)
   const { [toolbarName]: toolbarValues } = useSelector(layoutSelectors.toolbarValues)
   const slug = item?.slug || SLUG
-  const pagination = toolbarValues[slug] as PaginationValue
+  const pagination = toolbarValues?.[slug] as PaginationValue
 
   const paginationIsEnabled = () => {
-    return pagination?.take !== null && pagination?.skip !== null && !!numArchiveItems
+    return pagination?.take != null && pagination?.skip != null && !!numArchiveItems
   }
 
   const getCurrentPageNum = () => {

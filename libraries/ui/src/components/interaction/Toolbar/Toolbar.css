@@ -206,6 +206,11 @@ a.toolbar-breadcrumb {
   color: var(--text-color-2);
 }
 
+.toolbar-selection {
+  display: flex;
+  align-items: center;
+}
+
 .toolbar-pagination {
   display: flex;
   justify-content: center;
