@@ -20,6 +20,7 @@ import set from '../../../store/slices/settings/thunks/set'
 import UserTag from '../UserTag'
 import { homeServerUserSelectors } from '../../../store/slices/homeServerUser'
 import Select from '../../forms/Select'
+import ToggleSwitch from '../../forms/ToggleSwitch'
 
 import i18n from './i18n'
 
@@ -43,7 +44,7 @@ const UserMenu = ({
   const app = useSelector(appSelectors.app)
   const currentHomeServerUser = useSelector(homeServerUserSelectors.current)
   const currentCloudUser = useSelector(cloudUserSelectors.current)
-  const { lang, theme } = useSelector(settingsSelectors.current)
+  const { lang, theme, enable_glass } = useSelector(settingsSelectors.current)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
 
   const handleSettingsClick = () => {
@@ -53,6 +54,9 @@ const UserMenu = ({
 
   const themeFieldFactory = getSetting('theme')
   const themeField = themeFieldFactory(app, lang as SupportedLang)
+
+  const enableGlassFieldFactory = getSetting('enable_glass')
+  const enableGlassField = enableGlassFieldFactory(app, lang as SupportedLang)
 
   // const handleLogout = () => {
   //   setMenuIsOpen(false)
@@ -183,6 +187,17 @@ const UserMenu = ({
                               onChange={(val) => dispatch(set({
                                 settings: {
                                   [themeField.slug]: val,
+                                },
+                                app: app,
+                              }))}
+                            />
+                            <ToggleSwitch
+                              name={enableGlassField.slug}
+                              label={i18n['user-menu.quick-settings.glass']['en']}
+                              value={!!enable_glass}
+                              onChange={(val) => dispatch(set({
+                                settings: {
+                                  [enableGlassField.slug]: val,
                                 },
                                 app: app,
                               }))}
