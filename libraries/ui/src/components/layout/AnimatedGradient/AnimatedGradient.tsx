@@ -62,8 +62,10 @@ function randomBlotches(colors: string[]): Blotch[] {
 function lerpBlotches(from: Blotch[], to: Blotch[], t: number): Blotch[] {
   const count = Math.max(from.length, to.length)
   return Array.from({ length: count }, (_, i) => {
-    const a = from[i] ?? to[i]
-    const b = to[i] ?? from[i]
+    /* When the sets differ in size, a blotch with no counterpart shrinks away to nothing (or
+       grows in from nothing) — cloning it from the surviving side would keep it alive forever */
+    const a = from[i] ?? { ...to[i], size: 0 }
+    const b = to[i] ?? { ...from[i], size: 0 }
     return {
       color: lerpColor(a.color, b.color, t),
       x: a.x + (b.x - a.x) * t,
