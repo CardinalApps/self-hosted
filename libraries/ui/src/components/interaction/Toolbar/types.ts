@@ -27,6 +27,7 @@ export enum ToolbarItem {
   SIMPLECOUNT = 'simplecount',
   SELECTION = 'selection',
   CYCLE = 'cycle',
+  ICON = 'icon',
 }
 
 export type CycleOption = {

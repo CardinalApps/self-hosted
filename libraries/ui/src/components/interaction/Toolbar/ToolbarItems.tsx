@@ -17,6 +17,7 @@ import Delete, { DELETE_SLUG } from './items/Delete'
 import Deselect, { DESELECT_SLUG } from './items/Deselect'
 import Pagination, { PAGINATION_SLUG } from './items/Pagination'
 import Cycle, { CYCLE_SLUG } from './items/Cycle'
+import Icon, { ICON_SLUG } from './items/Icon'
 
 import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 
@@ -179,6 +180,8 @@ const ToolbarItems = ({
         return Pagination
       case CYCLE_SLUG:
         return Cycle
+      case ICON_SLUG:
+        return Icon
     }
   }
 
@@ -203,7 +206,7 @@ const ToolbarItems = ({
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
       !!items.length && items.map((group, i) => {
-        const isSlimMenuGroup = group.some((item) => item?.render === CYCLE_SLUG)
+        const isSlimMenuGroup = group.some((item) => item?.render === CYCLE_SLUG || item?.render === ICON_SLUG)
         return (
           <div className={clsx('toolbar-group', { 'slim': isSlimMenuGroup })} key={i}>
             {group.map((item, i) => {
