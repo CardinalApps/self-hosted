@@ -125,7 +125,7 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
               </div>
               {/*
                 The gradient is a glass-mode flourish. With glass off the card stays a flat
-                --bg-1. With glass on it always animates: the album's own colours when a track
+                --bg-2. With glass on it always animates: the album's own colours when a track
                 with artwork is playing, and the idle greys-and-accent for everything else
                 (nothing playing, or a track with no cover to sample).
               */}

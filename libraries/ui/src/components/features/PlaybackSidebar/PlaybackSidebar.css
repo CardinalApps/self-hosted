@@ -46,7 +46,7 @@
   overflow: hidden;
   pointer-events: auto;
   border-left: 1px solid var(--border-color-3);
-  background-color: var(--bg-1);
+  background-color: var(--bg-2);
 
   /* The album-art gradient paints the whole sidebar, behind the player and the queue */
   .animated-gradient {

@@ -1,5 +1,3 @@
-// Alpha of the translucent white ".glass" overlay rendered on top of the cover-derived gradient
-const GLASS_OVERLAY_ALPHA = 0.2
 const BRIGHTNESS_THRESHOLD = 128
 
 /**
@@ -13,8 +11,7 @@ export function getContrastTextColor(colors: string[]): 'light' | 'dark' {
   const avg = rgbs.reduce((acc, rgb) => [acc[0] + rgb[0], acc[1] + rgb[1], acc[2] + rgb[2]], [0, 0, 0])
     .map((sum) => sum / rgbs.length) as [number, number, number]
 
-  const blended = avg.map((channel) => channel * (1 - GLASS_OVERLAY_ALPHA) + 255 * GLASS_OVERLAY_ALPHA)
-  const brightness = (blended[0] * 299 + blended[1] * 587 + blended[2] * 114) / 1000
+  const brightness = (avg[0] * 299 + avg[1] * 587 + avg[2] * 114) / 1000
 
   return brightness < BRIGHTNESS_THRESHOLD ? 'light' : 'dark'
 }

@@ -8,7 +8,7 @@ const i18n: StringList = {
     "en": "Why would double clicking do anything?",
   },
   "playback-sidebar.queue-title": {
-    "en": "Up Next",
+    "en": "Queue",
   },
   "playback-sidebar.queue-empty": {
     "en": "Nothing else is in the queue.",

@@ -1,0 +1,15 @@
+/* The container clips; the inner span is the piece that the animation slides */
+.marquee-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  .marquee-text-inner {
+    display: inline-block;
+  }
+
+  /* An ellipsis on moving text looks broken */
+  &.is-marqueeing {
+    text-overflow: clip;
+  }
+}
