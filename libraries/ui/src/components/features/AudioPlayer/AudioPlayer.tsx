@@ -5,12 +5,13 @@ import { useAppSelector } from '../../../hooks/useAppSelector'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
 
 import Icon from '../../typography/Icon'
+import MarqueeText from '../../typography/MarqueeText'
 import Loading from '../../layout/Loading'
 import Scrubber from '../../interaction/Scrubber'
-import MenuButton from '../../interaction/MenuButton'
+import PlaybackControlBar from '../PlaybackSidebar/PlaybackControlBar'
 
 import { audioSelectors, audioActions } from '../../../store/slices/music'
-import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE, REPEAT_MODE, RepeatMode } from '../../../store/slices/music/constants'
+import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../../store/slices/music/constants'
 import play from '../../../store/slices/music/thunks/play'
 import next from '../../../store/slices/music/thunks/next'
 import previous from '../../../store/slices/music/thunks/previous'
@@ -22,11 +23,8 @@ import { getContrastTextColor } from '../../../lib/color/getContrastTextColor'
 import { settingsSelectors } from '../../../store/slices/settings'
 
 import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
-import { useGetQueueItemsQuery } from '../../../store/apis/playbackQueues'
 
 import { secondsToMMSS } from '../../../lib/formatting/time'
-
-import i18n from './i18n'
 
 import './AudioPlayer.css'
 
@@ -34,21 +32,19 @@ export type CachedSeekPositionType = {
   [playerId: string]: number,
 }
 
-// The playback speeds offered in the wide player. Kept within the range browsers can
-// pitch-preserve; 1 is normal speed.
-const RATE_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
+/*
+  The wide layout's title aims for 24px and sheds size as the title grows, reaching the 16px
+  floor around 36 characters. Character count stands in for real text measurement: the budget
+  is the title row's ~318px width divided by the ~0.55em average glyph width of the 800 weight.
+*/
+const WIDE_TITLE_MAX_PX = 24
+const WIDE_TITLE_MIN_PX = 16
+const WIDE_TITLE_WIDTH_BUDGET = 578
 
-const formatRate = (rate: number) => `${rate}×`
-
-const volumeIcon = (volume: number) => {
-  if (volume <= 0) {
-    return 'fa-volume-off'
-  }
-  if (volume < 0.5) {
-    return 'fa-volume-down'
-  }
-  return 'fa-volume-up'
-}
+// Font size in px for the wide layout's track title
+const wideTitleFontSize = (title: string) => Math.round(
+  Math.min(WIDE_TITLE_MAX_PX, Math.max(WIDE_TITLE_MIN_PX, WIDE_TITLE_WIDTH_BUDGET / title.length)),
+)
 
 type AudioPlayerProps = {
   className?: string,
@@ -68,7 +64,7 @@ const AudioPlayer = ({
 }: PropsWithChildren<AudioPlayerProps>) => {
   const howl = getHowl(playerId)
   const dispatch = useAppDispatch()
-  const { enable_glass, lang } = useAppSelector(settingsSelectors.current)
+  const { enable_glass } = useAppSelector(settingsSelectors.current)
   const playbackTimeInterval = useRef(null)
   const players = useAppSelector(audioSelectors.players)
   const player = players?.[playerId]
@@ -86,34 +82,10 @@ const AudioPlayer = ({
   const coverColors = useCoverColors(coverSrc)
   const [fadeIn, setFadeIn] = useState(false)
 
-  const repeat = player.repeat ?? REPEAT_MODE.OFF
+  // Rate and volume no longer have controls here (they moved to PlaybackControlBar), but a
+  // fresh Howl for a new track still needs the player's stored values re-applied to it.
   const rate = player.rate ?? 1
   const volume = player.volume ?? 1
-
-  // The store's volume is only written on release, so a live drag value drives the readout
-  // and speaker icon in the meantime; it falls back to the stored volume when not dragging
-  const [draggingVolume, setDraggingVolume] = useState<number | null>(null)
-  const displayVolume = draggingVolume ?? volume
-
-  // "Loop queue" only makes sense with more than one item to loop, so a single-track
-  // queue drops it from the cycle. The count is all this needs, so it queries the
-  // lightest slice and reads the queue-wide total the endpoint returns alongside it.
-  const { data: queueItemsData } = useGetQueueItemsQuery({
-    queueId: player.queue?.queueId ?? '',
-    includeCurrentItemInReturn: false,
-  }, {
-    skip: size !== 'wide' || !player.queue?.queueId,
-  })
-  const hasMultiItemQueue = (queueItemsData?.[1] ?? 0) > 1
-
-  // Cycle off -> queue -> track -> off, skipping "queue" when there is nothing to loop
-  const cycleRepeat = () => {
-    const order: RepeatMode[] = hasMultiItemQueue
-      ? [REPEAT_MODE.OFF, REPEAT_MODE.QUEUE, REPEAT_MODE.TRACK]
-      : [REPEAT_MODE.OFF, REPEAT_MODE.TRACK]
-    const nextMode = order[(order.indexOf(repeat) + 1) % order.length]
-    dispatch(audioActions.setRepeat({ playerId: player.id, repeat: nextMode }))
-  }
 
   // The glass background is derived from the cover art, so its icons and text need to
   // follow suit rather than the theme's static colors, or they can end up unreadable.
@@ -236,13 +208,27 @@ const AudioPlayer = ({
   return (
     <div className={clsx("audio-player", className, !!fadeIn && 'fade-in')} data-size={size} data-state={player.state} key={playerId}>
       <div className="metadata no-collapse">
-        <p
-          className="audio-player-track-title"
-          title={track?.title}
-          style={contrastStyle}
-        >
-          {track?.title}
-        </p>
+        {size === 'wide'
+          ? (
+            <MarqueeText
+              className="audio-player-track-title"
+              title={track?.title}
+              style={track?.title
+                ? { ...contrastStyle, fontSize: wideTitleFontSize(track.title) }
+                : contrastStyle}
+            >
+              {track?.title}
+            </MarqueeText>
+          )
+          : (
+            <p
+              className="audio-player-track-title"
+              title={track?.title}
+              style={contrastStyle}
+            >
+              {track?.title}
+            </p>
+          )}
         {/* <p
           className="audio-player-track-release"
           title={i18n['audio-player.release.title'][lang].replace('{release}', track?.release?.title)}
@@ -302,82 +288,14 @@ const AudioPlayer = ({
             style={contrastStyle}
             onClick={() => handleNextClick()}
           />
-          <Icon
-            fa="fas fa-stop"
-            className={clsx('audio-player-playback-button', 'stop', 'no-collapse')}
-            hoverType={enable_glass ? 'glass' : 'background'}
-            style={contrastStyle}
-            onClick={() => handleStopClick()}
-          />
-          {size === 'wide' &&
+          {size !== 'wide' &&
             <Icon
-              fa="fas fa-retweet"
-              className={clsx(
-                'audio-player-playback-button', 'repeat', 'no-collapse',
-                repeat !== REPEAT_MODE.OFF && 'is-active',
-                repeat === REPEAT_MODE.TRACK && 'is-track',
-              )}
+              fa="fas fa-stop"
+              className={clsx('audio-player-playback-button', 'stop', 'no-collapse')}
               hoverType={enable_glass ? 'glass' : 'background'}
-              // Active repeat carries its own accent colour, so it skips the glass contrast override
-              style={repeat === REPEAT_MODE.OFF ? contrastStyle : undefined}
-              title={i18n[`audio-player.playback.repeat.${repeat}`]?.[lang as string]}
-              onClick={() => cycleRepeat()}
+              style={contrastStyle}
+              onClick={() => handleStopClick()}
             />
-          }
-          {size === 'wide' &&
-            <MenuButton
-              className={clsx('audio-player-rate', rate !== 1 && 'is-active')}
-              solid={false}
-              align="right"
-              width={128}
-              title={i18n['audio-player.playback.rate']?.[lang as string]}
-              icon={<span className="audio-player-rate-value" style={rate === 1 ? contrastStyle : undefined}>{formatRate(rate)}</span>}
-            >
-              <MenuButton.Section>
-                {RATE_STEPS.map((step) => (
-                  <button
-                    key={step}
-                    type="button"
-                    className={clsx('audio-player-rate-option', step === rate && 'is-selected')}
-                    onClick={() => dispatch(audioActions.setRate({ playerId: player.id, rate: step }))}
-                  >
-                    {formatRate(step)}
-                  </button>
-                ))}
-              </MenuButton.Section>
-            </MenuButton>
-          }
-          {size === 'wide' &&
-            <MenuButton
-              className="audio-player-volume"
-              solid={false}
-              align="right"
-              width={190}
-              title={i18n['audio-player.playback.volume']?.[lang as string]}
-              icon={<i className={clsx('fa-icon', 'fas', volumeIcon(displayVolume))} style={contrastStyle} />}
-            >
-              <MenuButton.Section>
-                <div className="audio-player-volume-slider">
-                  {/* Drag applies straight to the Howl for instant feedback and tracks a local
-                      value so the readout follows; the store is written on release so a drag
-                      does not thrash the persisted state. */}
-                  <Scrubber
-                    value={volume}
-                    min={0}
-                    max={1}
-                    onChange={({ value }) => {
-                      howl?.volume(value)
-                      setDraggingVolume(value)
-                    }}
-                    onChangeEnd={({ value }) => {
-                      dispatch(audioActions.setVolume({ playerId: player.id, volume: value }))
-                      setDraggingVolume(null)
-                    }}
-                  />
-                  <span className="audio-player-volume-value">{Math.round(displayVolume * 100)}%</span>
-                </div>
-              </MenuButton.Section>
-            </MenuButton>
           }
         </div>
       </div>
@@ -405,6 +323,9 @@ const AudioPlayer = ({
           )
         })()}
       </div>
+      {size === 'wide' &&
+        <PlaybackControlBar playerId={playerId} />
+      }
     </div>
   )
 }

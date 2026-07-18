@@ -172,8 +172,10 @@
 
     .audio-player-track-title {
       margin-bottom: 2px;
-      font-size: 18px;
+      /* The target size; long titles shrink it inline down to 16px to dodge truncation */
+      font-size: 24px;
       font-weight: 800;
+      line-height: 1.1em;
     }
 
     .audio-player-track-artists {
@@ -237,6 +239,40 @@
     .pause i {
       font-size: 26px;
     }
+  }
+
+  /* The seek bar gets a row to itself, with the times tucked underneath it */
+  .scrubber-row {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .scrubber {
+      width: 100%;
+    }
+
+    .scrubber-time {
+      width: 100%;
+      justify-content: space-between;
+
+      /* The separator only makes sense when the times sit side by side */
+      span {
+        display: none;
+      }
+    }
+  }
+
+  /* Stop, repeat, speed, and volume: a row of their own under the seek bar */
+  .playback-control-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding-top: 14px;
+
+    button {
+      width: 44px;
+      height: 44px;
+    }
 
     /* Repeat lights up in the accent colour when on, with a "1" over the glyph for
        repeat-one (Font Awesome 5 has no repeat-1 icon of its own). */
@@ -256,26 +292,6 @@
         font-weight: 800;
         line-height: 1;
         color: var(--accent-color);
-      }
-    }
-  }
-
-  /* The seek bar gets a row to itself, with the times tucked underneath it */
-  .scrubber-row {
-    flex-wrap: wrap;
-    gap: 4px;
-
-    .scrubber {
-      width: 100%;
-    }
-
-    .scrubber-time {
-      width: 100%;
-      justify-content: space-between;
-
-      /* The separator only makes sense when the times sit side by side */
-      span {
-        display: none;
       }
     }
   }
