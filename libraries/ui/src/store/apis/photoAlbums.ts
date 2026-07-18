@@ -5,13 +5,13 @@ import { baseHomeServerApi } from './baseHomeServerApi'
 export const GET_PHOTO_ALBUMS_DEFAULT_OPTIONS = {
   take: 10000,
   skip: 0,
-  order: 'desc',
+  order: 'DESC',
 }
 
 export const GET_PHOTO_ALBUM_ENTRIES_DEFUALT_OPTIONS = {
   take: 9999999,
   skip: 0,
-  order: 'desc',
+  order: 'DESC',
 }
 
 export const photoAlbumsApi = baseHomeServerApi

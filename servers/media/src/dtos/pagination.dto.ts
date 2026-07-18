@@ -18,7 +18,7 @@ export class Pagination {
   @IsNumber()
   skip?: number = 0
 
-  @Transform(({ value }) => String(value))
+  @Transform(({ value }) => String(value).toUpperCase())
   @IsOptional()
   @IsIn(['ASC', 'DESC'])
   order?: 'ASC' | 'DESC'
