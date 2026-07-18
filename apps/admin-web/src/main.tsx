@@ -4,6 +4,8 @@ import { Provider } from 'react-redux'
 
 import AppRoot from './components/AppRoot'
 
+import CrashError from '@cardinalapps/ui/src/components/layout/CrashError'
+import { ErrorBoundary } from '@cardinalapps/ui/src/lib/react-error-boundary'
 import { store } from '@cardinalapps/ui/src/store'
 
 // E2E test seam: lets Playwright drive Redux directly (mainly to replay `sse/*`
@@ -29,9 +31,11 @@ if (el) {
     // FIXME when strict mode is enabled, toasts cannot be cleared
     // <React.StrictMode>
       <Provider store={store}>
-        <BrowserRouter basename="/admin">
-          <AppRoot />
-        </BrowserRouter>
+        <ErrorBoundary fallback={<CrashError />}>
+          <BrowserRouter basename="/admin">
+            <AppRoot />
+          </BrowserRouter>
+        </ErrorBoundary>
       </Provider>,
     // </React.StrictMode>,
   )

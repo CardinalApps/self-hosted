@@ -369,7 +369,8 @@
     opacity: 0;
   }
 
-  > .access-error {
+  > .access-error,
+  > .crash-error {
     position: absolute;
     top: 0;
     left: 0;
