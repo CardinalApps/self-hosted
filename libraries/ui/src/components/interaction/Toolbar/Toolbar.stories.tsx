@@ -39,7 +39,8 @@ export const DefaultItems = (props) => {
           {
             slug: 'sort',
             render: ToolbarItem.ORDERBY,
-            initialValue: 'date_added',
+            initialValue: 'createdAt',
+            options: ['createdAt', 'title', 'duration', 'playCount'],
           },
           {
             slug: ToolbarItem.SIMPLECOUNT,
@@ -70,33 +71,15 @@ export const CustomValues = (props) => {
             render: ToolbarItem.DATERANGE,
           },
           {
-            slug: 'daterange',
-            initialValue: 'date_added',
-            extra: [
-              {
-                label: 'Extended sort 1',
-                value: 'extended_sort_1',
-              },
-              {
-                label: 'Extended sort 2',
-                value: 'extended_sort_2',
-              },
-            ],
+            slug: 'orderBy',
+            initialValue: 'createdAt',
+            options: ['createdAt', 'title', 'extended_sort_1', 'extended_sort_2'],
             render: ToolbarItem.ORDERBY,
           },
           {
             slug: 'sort_custom',
             initialValue: 'custom_sort_1',
-            options: [
-              {
-                label: 'Custom sort 1',
-                value: 'custom_sort_1',
-              },
-              {
-                label: 'Custom sort 2',
-                value: 'custom_sort_2',
-              },
-            ],
+            options: ['custom_sort_1', 'custom_sort_2'],
             render: ToolbarItem.ORDERBY,
           },
           {
@@ -149,7 +132,8 @@ export const Groups = (props) => {
           [
             {
               slug: 'sort',
-              initialValue: 'date_added',
+              initialValue: 'createdAt',
+              options: ['createdAt', 'title', 'duration', 'playCount'],
               render: ToolbarItem.ORDERBY,
             },
           ],
@@ -273,13 +257,13 @@ export const Pagination = (props) => {
       <Toolbar
         {...props}
         name={toolbarName}
-        items={[
+        items={[[
           {
             slug: 'pagination',
-            render: 'pagination',
+            render: ToolbarItem.PAGINATION,
             initialValue,
           },
-        ]}
+        ]]}
         numShowingItems={initialValue.take}
         numArchiveItems={numArchiveItems}
       />
