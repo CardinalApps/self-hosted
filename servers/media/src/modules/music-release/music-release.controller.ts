@@ -6,11 +6,14 @@ import {
   Query,
   NotFoundException,
   Param,
+  Req,
+  Res,
   StreamableFile,
 } from '@nestjs/common'
 import {
   ApiTags,
 } from '@nestjs/swagger'
+import { Request, Response } from 'express'
 
 import { MusicRelease } from './music-release.entity'
 import { MusicReleaseService } from './music-release.service'
@@ -73,7 +76,7 @@ export class MusicReleaseController {
    * Returns the blob data of a release cover. Supports numeric row ID and musicReleaseId col.
    */
   @Get('/music/releases/:id/cover')
-  @Header('Cache-Control', 'private, max-age=31536000, immutable')
+  @Header('Cache-Control', 'private, no-cache')
   @StandardEndpoint({
     summary: 'Get the cover image of a release.',
     capabilities: ['MusicReleases.Read'],
@@ -81,7 +84,9 @@ export class MusicReleaseController {
   async getReleaseCoverBlob(
     @Param('id') id: string | number,
     @Query() query: GetMusicReleaseCover,
-  ): Promise<StreamableFile> {
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile | undefined> {
     const release = await this.musicReleaseService.get(id, {
       thumbnails: true,
     })
@@ -94,6 +99,19 @@ export class MusicReleaseController {
 
     if (!thumbnail) {
       throw new NotFoundException('No thumbnail of this size found for this release.')
+    }
+
+    // thumbnailId is a fresh uuid every time this size is (re)created, so it doubles as a
+    // content fingerprint - the client re-sends it as If-None-Match on the next request, and
+    // an unchanged thumbnail short-circuits into a 304 instead of a full re-download.
+    const etag = `"${thumbnail.thumbnailId}"`
+
+    res.set('ETag', etag)
+    res.set('Last-Modified', new Date(thumbnail.updatedAt).toUTCString())
+
+    if (req.headers['if-none-match'] === etag) {
+      res.status(304)
+      return undefined
     }
 
     const thumbnailFile = getAppDir(thumbnail.relativeSrc)
