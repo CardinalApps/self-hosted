@@ -223,6 +223,55 @@ export const Selection = (props) => {
   )
 }
 
+export const Cycle = (props) => {
+  return (
+    <div>
+      <DrawerLayer />
+      <Toolbar
+        {...props}
+        name="story-cycle"
+        items={[
+          [
+            {
+              slug: 'repeat',
+              render: ToolbarItem.CYCLE,
+              initialValue: 'off',
+              options: [
+                { value: 'off', icon: 'fa-ban', title: 'No repeat' },
+                { value: 'track', icon: 'fa-redo-alt', title: 'Repeat track' },
+                { value: 'queue', icon: 'fa-retweet', title: 'Repeat queue' },
+              ],
+            },
+          ],
+          [
+            {
+              slug: 'layout',
+              render: ToolbarItem.CYCLE,
+              initialValue: 'list',
+              options: [
+                { value: 'list', icon: 'fa-list', title: 'List view' },
+                { value: 'grid', icon: 'fa-th-large', title: 'Grid view' },
+                { value: 'compact', icon: 'fa-th', title: 'Compact view' },
+              ],
+            },
+          ],
+          [
+            {
+              slug: 'visibility',
+              render: ToolbarItem.CYCLE,
+              initialValue: 'visible',
+              options: [
+                { value: 'visible', icon: 'fa-eye', title: 'Visible' },
+                { value: 'hidden', icon: 'fa-eye-slash', title: 'Hidden' },
+              ],
+            },
+          ],
+        ]}
+      />
+    </div>
+  )
+}
+
 export const Pagination = (props) => {
   const toolbarName = 'story-pagination'
   const initialValue = {
