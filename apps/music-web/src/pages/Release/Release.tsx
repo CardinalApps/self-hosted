@@ -33,8 +33,6 @@ function ReleasePage() {
     error,
   } = useGetMusicReleaseQuery({ id: releaseId })
 
-  const artists = data?.artists || []
-
   /**
    * Order tracks by disc then number.
    */
@@ -116,7 +114,6 @@ function ReleasePage() {
                       trackTitle={musicTrack?.title}
                       releaseId={musicTrack?.release?.id}
                       trackNumber={musicTrack.trackNumber}
-                      artistName={(musicTrack?.artists?.[0]?.name || artists?.[0]?.name) as string}
                       hasArtwork={!!musicTrack.thumbnails?.length}
                       rating={musicTrack?.rating}
                       plays={musicTrack?.playCount}
