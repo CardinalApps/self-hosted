@@ -35,6 +35,10 @@ type MusicTrackProps = {
   // Glass only reads true above an animated background (e.g. the playback sidebar), so
   // callers opt in rather than this following the global glass setting on its own.
   glass?: boolean,
+  // The full set of track IDs this track's play button represents, in queue order
+  // (e.g. this track plus the rest of the album from this position forward).
+  // Defaults to just this track. Passed straight through to MusicPlaybackButton.
+  musicTrackIds?: string[],
 }
 
 const MusicTrack = ({
@@ -52,6 +56,7 @@ const MusicTrack = ({
   hasArtwork = true,
   canRate = true,
   glass = false,
+  musicTrackIds,
 }: PropsWithChildren<MusicTrackProps>) => {
   const dispatch = useAppDispatch()
   const { Link } = useContext(RouterContext)
@@ -76,8 +81,9 @@ const MusicTrack = ({
       && !e.target.matches('.music-playback-button')
       && !e.target.closest('.music-playback-button')
     ) {
+      const idsToQueue = musicTrackIds?.length ? musicTrackIds : [musicTrackId]
       dispatch(play({
-        trackIds: [musicTrackId],
+        trackIds: [musicTrackId, ...idsToQueue.filter((id) => id !== musicTrackId)],
       }))
     }
   }
@@ -99,7 +105,7 @@ const MusicTrack = ({
   return (
     <div className={clsx('music-track', glass && 'glass')} onDoubleClick={handleDoubleClick}>
       <div className="col music-track-play-pause">
-        <MusicPlaybackButton musicTrackIds={[musicTrackId]} musicTrackIdToPlay={musicTrackId} />
+        <MusicPlaybackButton musicTrackIds={musicTrackIds?.length ? musicTrackIds : [musicTrackId]} musicTrackIdToPlay={musicTrackId} />
       </div>
       {!!trackNumber && <p className="col music-track-number">{trackNumber}.</p>}
       <div className="col music-track-info">

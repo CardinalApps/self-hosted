@@ -10,6 +10,7 @@ import { MusicReleaseThumbnail } from './music-release-thumbnail.entity'
 import { ReleaseType } from './enums'
 
 import { EventService } from '../event/event.service'
+import { MusicTrackService } from '../music-track/music-track.service'
 
 import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
 import { MusicArtist } from '../music-artist/music-artist.entity'
@@ -39,6 +40,7 @@ export class MusicReleaseService {
 
     private readonly eventService: EventService,
     private readonly libraryService: LibraryService,
+    private readonly musicTrackService: MusicTrackService,
   ) {}
 
   /**
@@ -68,7 +70,17 @@ export class MusicReleaseService {
         return null
       }
 
-      return musicRelease[0]
+      const release = musicRelease[0]
+
+      if (release.tracks?.length) {
+        const playCounts = await this.musicTrackService.getPlayCounts(release.tracks.map((track) => track.id))
+        release.tracks = release.tracks.map((track) => ({
+          ...track,
+          playCount: playCounts.get(track.id) || 0,
+        }))
+      }
+
+      return release
     } catch (error) {
       Logger.error(error)
       return null

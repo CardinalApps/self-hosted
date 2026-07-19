@@ -146,6 +146,27 @@ export class MusicTrackService {
   }
 
   /**
+   * Returns play counts for a batch of track IDs, keyed by track ID. Tracks
+   * with no history are omitted, so callers should default missing entries to 0.
+   */
+  async getPlayCounts(trackIds: number[]): Promise<Map<number, number>> {
+    if (!trackIds.length) {
+      return new Map()
+    }
+
+    const rows = await this.dataSource
+      .getRepository(MusicHistory)
+      .createQueryBuilder('history')
+      .select('history.track_id', 'trackId')
+      .addSelect('COUNT(history.id)', 'playCount')
+      .where('history.track_id IN (:...trackIds)', { trackIds })
+      .groupBy('history.track_id')
+      .getRawMany()
+
+    return new Map(rows.map((row) => [parseInt(row.trackId, 10), parseInt(row.playCount, 10) || 0]))
+  }
+
+  /**
    * Creates a new music track entity in the database.
    */
   async create(file: File, queryRunner?: QueryRunner): Promise<MusicTrack> {

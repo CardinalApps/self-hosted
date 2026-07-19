@@ -102,7 +102,13 @@ function ReleasePage() {
             return (
               <div key={`disc-${i}`} className="release-disc-tracks">
                 <p className="release-disc-number">{i18n['music-release.disc-number']['en'].replace('{num}', `${i + 1}`)}</p>
-                {disc.map((musicTrack: MusicTrackType) => {
+                {disc.map((musicTrack: MusicTrackType, trackIndex: number) => {
+                  // Upcoming tracks on this disc, then every remaining disc in full.
+                  const musicTrackIds = [
+                    ...disc.slice(trackIndex),
+                    ...tracksbyDiscInOrder.slice(i + 1).flat(),
+                  ].map((track: MusicTrackType) => track.musicTrackId)
+
                   return (
                     <MusicTrack
                       key={musicTrack.id}
@@ -110,9 +116,11 @@ function ReleasePage() {
                       trackTitle={musicTrack?.title}
                       releaseId={musicTrack?.release?.id}
                       trackNumber={musicTrack.trackNumber}
-                      artistName={artists?.[0]?.name as string}
+                      artistName={(musicTrack?.artists?.[0]?.name || artists?.[0]?.name) as string}
                       hasArtwork={!!musicTrack.thumbnails?.length}
                       rating={musicTrack?.rating}
+                      plays={musicTrack?.playCount}
+                      musicTrackIds={musicTrackIds}
                     />
                   )
                 })}
