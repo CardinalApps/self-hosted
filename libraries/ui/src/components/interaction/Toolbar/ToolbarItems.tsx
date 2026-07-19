@@ -39,6 +39,7 @@ type ToolbarItemsProps = {
   itemNameSingular?: string,
   defaultValues?: Record<string, unknown>,
   virtualViewName?: string,
+  slim?: boolean,
   className?: string,
   style?: CSSProperties,
   collider?: string,
@@ -57,6 +58,7 @@ const ToolbarItems = ({
   numArchiveItems,
   virtualViewName,
   defaultValues,
+  slim = false,
   collider,
 }: ToolbarItemsProps) => {
   const dispatch = useDispatch()
@@ -206,9 +208,8 @@ const ToolbarItems = ({
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
       !!items.length && items.map((group, i) => {
-        const isSlimMenuGroup = group.some((item) => !!item?.slim)
         return (
-          <div className={clsx('toolbar-group', { 'slim': isSlimMenuGroup })} key={i}>
+          <div className={clsx('toolbar-group', { 'slim': slim })} key={i}>
             {group.map((item, i) => {
               // Render built-in toolbar items
               if (typeof item?.render === 'string') {
@@ -274,7 +275,9 @@ const ToolbarItems = ({
     return null
   }
 
-  return windowSize.width > 768
+  // Slim toolbars are a handful of single-button groups that fit anywhere, so they never
+  // collapse into the mobile filter drawer
+  return slim || windowSize.width > 768
     ?
       // Desktop toolbar
       <div ref={toolbarRef} className="toolbar-collider">

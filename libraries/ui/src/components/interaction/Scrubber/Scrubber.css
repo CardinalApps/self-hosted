@@ -59,4 +59,29 @@
       height: 20px;
     }
   }
+
+  &.vertical {
+    width: 16px;
+    height: 100%;
+    justify-content: center;
+
+    .scrubber-bar {
+      width: 2px;
+      height: 100%;
+
+      .scrubber-bar-buffered,
+      .scrubber-bar-fill {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+
+    .scrubber-handle {
+      top: auto;
+      left: 50%;
+      transform: translate(-50%, 50%);
+    }
+  }
 }

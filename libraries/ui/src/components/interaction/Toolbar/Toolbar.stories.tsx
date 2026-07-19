@@ -230,11 +230,11 @@ export const Cycle = (props) => {
       <Toolbar
         {...props}
         name="story-cycle"
+        slim
         items={[
           [
             {
               slug: 'repeat',
-              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'off',
               options: [
@@ -247,7 +247,6 @@ export const Cycle = (props) => {
           [
             {
               slug: 'layout',
-              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'list',
               options: [
@@ -260,7 +259,6 @@ export const Cycle = (props) => {
           [
             {
               slug: 'visibility',
-              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'visible',
               options: [
@@ -283,10 +281,10 @@ export const Icon = (props) => {
       <Toolbar
         {...props}
         name="story-icon"
+        slim
         items={[[
           {
             slug: 'shuffle',
-            slim: true,
             render: ToolbarItem.ICON,
             title: 'Shuffle',
             extra: {
