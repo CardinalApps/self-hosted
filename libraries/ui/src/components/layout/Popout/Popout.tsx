@@ -49,6 +49,8 @@ type PopoutProps = {
   width?: number,
   title?: string,
   className?: string,
+  /* Extra classes for the floating panel itself; `className` lands on the anchor wrapper */
+  innerClassName?: string,
 }
 
 /**
@@ -71,6 +73,7 @@ const Popout = ({
   width,
   title,
   className,
+  innerClassName,
   children,
 }: PropsWithChildren<PopoutProps>) => {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -107,7 +110,7 @@ const Popout = ({
             animate={{ opacity: 1, y: 0, transition: { type: 'spring', mass: 0.1 } }}
             exit={{ opacity: 0, y: -4, transition: { type: 'spring', mass: 0.1 } }}
           >
-            <div className="popout-inner" style={innerStyle}>
+            <div className={clsx('popout-inner', innerClassName)} style={innerStyle}>
               {title && <p className="popout-title">{title}</p>}
               {children}
             </div>

@@ -65,4 +65,22 @@ export const AutomaticProgress = () => {
   )
 }
 
+export const Vertical = () => {
+  const [value, setValue] = useState(60)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ height: 140 }}>
+        <Scrubber
+          vertical
+          value={value}
+          max={100}
+          onChange={(v) => setValue(v.value)}
+          onChangeEnd={(v) => setValue(v.value)}
+        />
+      </div>
+      <div style={{ fontSize: 12, opacity: 0.6 }}>{Math.round(value)} / 100</div>
+    </div>
+  )
+}
+
 export default meta

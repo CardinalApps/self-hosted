@@ -98,6 +98,11 @@
   background-color: var(--bg-2);
 }
 
+.playback-sidebar-player {
+  position: relative;
+  z-index: 3;
+}
+
 /* A dark album turns the sidebar dark, and the theme's text colors stop reading on it */
 .playback-sidebar[data-contrast="light"] {
 
@@ -118,8 +123,24 @@
   .music-track {
     color: #fff;
 
-    .sep {
+    .music-release .sep {
       color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .music-playback-button .play .fa-icon {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .playback-control-bar {
+
+    .toolbar-icon,
+    .playback-rate-value {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .cycle-dot:not(.active) {
+      background-color: rgba(255, 255, 255, 0.35);
     }
   }
 }

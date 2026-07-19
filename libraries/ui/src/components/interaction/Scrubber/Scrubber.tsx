@@ -17,6 +17,8 @@ type ScrubberProps = {
   buffered?: number,
   isPlaying?: boolean,
   rate?: number,
+  /* Stand the scrubber upright: the track runs bottom-to-top and needs a height from the parent */
+  vertical?: boolean,
   className?: string,
   onChangeStart?: (position: ScrubberPosition) => void,
   onChange?: (position: ScrubberPosition) => void,
@@ -32,6 +34,7 @@ const Scrubber = ({
   min = 0,
   max = 100,
   buffered = 0,
+  vertical = false,
   onChangeStart = () => {},
   onChange = () => {},
   onChangeEnd = () => {},
@@ -63,6 +66,24 @@ const Scrubber = ({
    */
   const getEventPosition = (e): ScrubberPosition => {
     const scrubberBox = scrubberRef.current.getBoundingClientRect()
+
+    // Vertical runs bottom-to-top, so the offset is measured up from the bottom edge
+    if (vertical) {
+      const pageY = e?.pageY
+        ? e.pageY
+        : e?.changedTouches?.[0] ? e.changedTouches[0]?.pageY : 0
+      let offset = scrubberBox.bottom - pageY
+
+      // Clamp
+      if (offset < 0) offset = 0
+      if (offset > scrubberBox.height) offset = scrubberBox.height
+
+      const percent = (offset / scrubberBox.height) * 100
+      const value = min + ((max - min) * (percent / 100))
+
+      return { value, percent, offset }
+    }
+
     const pageX = e?.pageX
       ? e.pageX
       : e?.changedTouches?.[0] ? e.changedTouches[0]?.pageX : 0
@@ -140,15 +161,15 @@ const Scrubber = ({
     if (value && !isScrubbing) {
       const scrubberBox = scrubberRef.current.getBoundingClientRect()
       const percent = value / max
-      const offset = scrubberBox.width * percent
-      setOffset(offset)
+      const length = vertical ? scrubberBox.height : scrubberBox.width
+      setOffset(length * percent)
     }
   }, [value])
 
   return (
     <div
       ref={scrubberRef}
-      className={clsx("scrubber", className)}
+      className={clsx("scrubber", vertical && 'vertical', className)}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
@@ -156,13 +177,13 @@ const Scrubber = ({
         <div
           className="scrubber-bar-buffered"
           style={{
-            width: `${max > 0 ? Math.min(100, (buffered / max) * 100) : 0}%`,
+            [vertical ? 'height' : 'width']: `${max > 0 ? Math.min(100, (buffered / max) * 100) : 0}%`,
           }}
         />
         <div
           className="scrubber-bar-fill"
           style={{
-            width: offset,
+            [vertical ? 'height' : 'width']: offset,
           }}
         />
       </div>
@@ -176,7 +197,7 @@ const Scrubber = ({
         aria-valuemax={max}
         aria-valuenow={lastOnChangePosition.current?.value || 0}
         style={{
-          left: offset,
+          [vertical ? 'bottom' : 'left']: offset,
         }}
       />
     </div>

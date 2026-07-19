@@ -41,4 +41,28 @@ export const MiniPlayer = () => {
   )
 }
 
+export const WidePlayer = () => {
+  useHowler()
+  const dispatch = useAppDispatch()
+  const players = useAppSelector(audioSelectors.players)
+  const player = Object.values(players).find((player) => player.trackId === samepleTrackId)
+
+  return (
+    <>
+      <div style={{ padding: '10px 0' }}>
+        <p>Hardcoded to use track ID 1. Use the Music page in the sandbox app for more advanced testing.</p>
+        <p><Button onClick={() => dispatch(play({ trackIds: [samepleTrackId] }))}>Play track 1</Button></p>
+      </div>
+      {!!player &&
+        <div style={{ width: 380 }}>
+          <AudioPlayer
+            playerId={player.id}
+            size="wide"
+          />
+        </div>
+      }
+    </>
+  )
+}
+
 export default meta

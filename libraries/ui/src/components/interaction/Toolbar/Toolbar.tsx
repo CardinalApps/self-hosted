@@ -31,6 +31,12 @@ type ToolbarProps = {
   itemNamePlural?: string,
   itemNameSingular?: string,
   virtualViewName?: string,
+  /*
+    A slim toolbar holds a single, wholly clickable button per group: full-height buttons,
+    no group padding, and no collapse into the mobile drawer. Meant for Cycle/Icon-style
+    items; don't mix slim and regular items in one toolbar.
+  */
+  slim?: boolean,
   className?: string,
   style?: CSSProperties,
   collider?: string,
@@ -50,6 +56,7 @@ const Toolbar = ({
   itemNamePlural,
   itemNameSingular,
   virtualViewName,
+  slim = false,
   className,
   style,
   collider = '.menu-col',
@@ -89,10 +96,11 @@ const Toolbar = ({
 
   return (
     <>
-      <div className={clsx('toolbar', 'toolbar-uid-' + name, className)} style={style}>
+      <div className={clsx('toolbar', 'toolbar-uid-' + name, slim && 'slim', className)} style={style}>
         <ToolbarItems
           name={name}
           items={items}
+          slim={slim}
           numShowingItems={numShowingItems}
           numArchiveItems={numArchiveItems}
           numItemsSelected={numItemsSelected}

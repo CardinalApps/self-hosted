@@ -172,14 +172,13 @@
 
     .audio-player-track-title {
       margin-bottom: 2px;
-      /* The target size; long titles shrink it inline down to 16px to dodge truncation */
       font-size: 24px;
       font-weight: 800;
       line-height: 1.1em;
     }
 
     .audio-player-track-artists {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       color: var(--text-color-2);
     }
@@ -261,93 +260,6 @@
     }
   }
 
-  /* Stop, repeat, speed, and volume: a row of their own under the seek bar */
-  .playback-control-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding-top: 14px;
-
-    button {
-      width: 44px;
-      height: 44px;
-    }
-
-    /* Repeat lights up in the accent colour when on, with a "1" over the glyph for
-       repeat-one (Font Awesome 5 has no repeat-1 icon of its own). */
-    .repeat {
-      position: relative;
-
-      &.is-active i {
-        color: var(--accent-color);
-      }
-
-      &.is-track::after {
-        content: '1';
-        position: absolute;
-        right: 9px;
-        bottom: 7px;
-        font-size: 9px;
-        font-weight: 800;
-        line-height: 1;
-        color: var(--accent-color);
-      }
-    }
-  }
-}
-
-/* Playback-speed menu: a compact trigger showing the current rate, with the steps in a popover */
-.audio-player-rate {
-
-  .audio-player-rate-value {
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  &.is-active .audio-player-rate-value {
-    color: var(--accent-color);
-  }
-}
-
-.audio-player-rate-option {
-  width: 100%;
-  padding: 6px 16px;
-  border: 0;
-  background: none;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-color-1);
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--bg-3);
-  }
-
-  &.is-selected {
-    color: var(--accent-color);
-  }
-}
-
-/* Volume: a slider with a live percentage readout, in the speaker button's popover */
-.audio-player-volume-slider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  .scrubber {
-    flex-grow: 1;
-  }
-
-  .audio-player-volume-value {
-    flex-shrink: 0;
-    width: 36px;
-    text-align: right;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-color-2);
-  }
 }
 
 [data-mobile-nav-open="true"] {

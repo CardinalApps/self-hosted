@@ -52,9 +52,6 @@ export interface ToolbarItemObject {
   initialValue?: unknown,
   options?: unknown[],
   extra?: BreadcrumbsExtra | unknown,
-  /* Marks the item's group as slim: no group padding, full-height buttons. Typical for
-     Cycle and Icon items. */
-  slim?: boolean,
   render?: ToolbarItem | (({ toolbarName, onChange }) => ReactNode),
 }
 

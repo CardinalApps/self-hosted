@@ -47,9 +47,10 @@
       background-color: var(--bg-1);
       transition: transform 200ms;
 
-      &:hover, &:focus {
+      &:hover, &:focus-visible {
 
-        .toolbar-icon {
+        .toolbar-icon,
+        .toolbar-button-hover-highlight {
           color: var(--accent-color);
         }
       }
@@ -57,7 +58,8 @@
       &:active {
         transform: scale(0.95);
 
-        .toolbar-icon {
+        .toolbar-icon,
+        .toolbar-button-hover-highlight {
           color: var(--accent-color);
         }
       }
@@ -87,6 +89,28 @@
   .field-title {
     margin-bottom: 10px;
     line-height: 1em;
+  }
+
+  &.slim {
+    height: 42px;
+
+    .toolbar-item {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+
+      .popout-anchor {
+        height: 100%;
+      }
+    }
+
+    .toolbar-button {
+      width: 50px;
+      height: 100%;
+      min-width: 30px;
+      padding: 1px 15px;
+      border-radius: var(--border-radius-s);
+    }
   }
 
   .toolbar-group {
