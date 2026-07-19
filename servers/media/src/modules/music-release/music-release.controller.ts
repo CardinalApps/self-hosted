@@ -49,7 +49,7 @@ export class MusicReleaseController {
     const musicRelease = await this.musicReleaseService.get(id, {
       artists,
       genres,
-      ...(tracks ? { tracks: { metadata: true } } : false),
+      ...(tracks ? { tracks: { metadata: true, artists: true } } : false),
       thumbnails,
     })
 

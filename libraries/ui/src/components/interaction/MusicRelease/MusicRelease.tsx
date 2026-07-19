@@ -86,6 +86,7 @@ const MusicRelease = ({
             <div className="col music-track-play-pause">
               <MusicPlaybackButton
                 size={playButtonSize}
+                scope="release"
                 musicTrackIds={trackIdsInRelease}
                 musicTrackIdToPlay={trackIdsInRelease?.[0]}
               />
