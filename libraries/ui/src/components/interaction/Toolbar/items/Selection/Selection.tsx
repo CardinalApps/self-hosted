@@ -38,7 +38,7 @@ const ToolbarSelection = ({
 
   const total = virtualViewName ? virtualView?.total : numArchiveItems
 
-  if (!total || !numItemsSelected) {
+  if (!total || numItemsSelected == null) {
     return null
   }
 
