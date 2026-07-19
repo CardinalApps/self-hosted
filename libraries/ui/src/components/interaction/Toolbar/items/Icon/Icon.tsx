@@ -29,13 +29,17 @@ const ToolbarIcon = ({ item }: IconToolbarItemProps) => {
     return null
   }
 
+  // A bare icon name defaults to the solid style; a value with its own style
+  // prefix (e.g. "far fa-heart") is used as-is
+  const iconClasses = icon.includes(' ') ? icon : `fas ${icon}`
+
   return (
     <button
       className="toolbar-button icon"
       title={item?.title}
       onClick={onClick}
     >
-      <i className={`toolbar-icon fas ${icon}`} />
+      <i className={`toolbar-icon ${iconClasses}`} />
     </button>
   )
 }

@@ -453,30 +453,6 @@
     width: 100%;
   }
 
-  .audio-player-pagination {
-    margin: 0 0 6px 9px;
-    border-radius: var(--border-radius);
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-
-    .audio-player-pagination-icons {
-
-      button {
-        padding: 5px;
-      }
-
-      i {
-        font-size: 14px;
-      }
-    }
-
-    p {
-      font-weight: 600;
-      font-size: 13px;
-    }
-  }
-
   .audio-player-list {
     position: relative;
     z-index: 2;
@@ -488,12 +464,6 @@
     left: 15px;
     bottom: 15px;
     z-index: 6000;
-
-    .audio-player-pagination {
-      padding: 2px 5px 2px 2px;
-      border: 1px solid var(--border-color-1);
-      background: var(--bg-1);
-    }
   }
 }
 
@@ -503,18 +473,6 @@
 
       .no-collapse {
         display: none;
-      }
-
-      .audio-player-pagination {
-        width: 100%;
-        margin-left: 0;
-      }
-
-      .audio-player-pagination-icons {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       .audio-player[data-size="mini"] {

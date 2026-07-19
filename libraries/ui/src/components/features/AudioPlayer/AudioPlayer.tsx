@@ -51,6 +51,9 @@ type AudioPlayerProps = {
   playerId: string,
   size: 'mini' | 'wide',
   onColorsLoaded?: (color: string[]) => void
+  // Lets the wide player's control bar switch which player is being shown. The visible
+  // player is owned by whoever renders this, so switching has to be handed back up.
+  onSwitchPlayer?: (playerId: string) => void
 }
 
 /**
@@ -61,6 +64,7 @@ const AudioPlayer = ({
   playerId,
   size,
   onColorsLoaded,
+  onSwitchPlayer,
 }: PropsWithChildren<AudioPlayerProps>) => {
   const howl = getHowl(playerId)
   const dispatch = useAppDispatch()
@@ -324,7 +328,7 @@ const AudioPlayer = ({
         })()}
       </div>
       {size === 'wide' &&
-        <PlaybackControlBar playerId={playerId} />
+        <PlaybackControlBar playerId={playerId} onSwitchPlayer={onSwitchPlayer} />
       }
     </div>
   )

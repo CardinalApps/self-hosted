@@ -7,9 +7,6 @@ const i18n: StringList = {
   "audio-player.pagination.next": {
     "en": "Next player",
   },
-  "audio-player.pagination.label": {
-    "en": "{current} of {total}",
-  },
   "audio-player.playback.next": {
     "en": "Next track",
   },
