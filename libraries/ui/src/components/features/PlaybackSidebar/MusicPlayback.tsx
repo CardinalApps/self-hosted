@@ -6,6 +6,7 @@ import AudioPlayer from '../AudioPlayer/AudioPlayer'
 import PlaybackQueue from './PlaybackQueue'
 
 import { audioSelectors } from '../../../store/slices/music'
+import { PLAYBACK_STATE } from '../../../store/slices/music/constants'
 import { settingsSelectors } from '../../../store/slices/settings'
 import { useVisiblePlayer } from '../../../hooks/useVisiblePlayer'
 
@@ -61,6 +62,20 @@ const MusicPlayback = () => {
         onColorsLoaded={setGlassColors}
         onSwitchPlayer={setVisiblePlayer}
       />
+      {Object.keys(players).length > 1 &&
+        <div className="player-dots">
+          {Object.keys(players).map((id) => (
+            <span
+              key={id}
+              className={clsx(
+                'player-dot',
+                id === visiblePlayer && 'active',
+                players[id].state === PLAYBACK_STATE.PLAYING && 'playing',
+              )}
+            />
+          ))}
+        </div>
+      }
       <PlaybackQueue
         queueId={player.queue?.queueId}
         currentQueueItemId={player.currentQueueItem?.queueItemId}

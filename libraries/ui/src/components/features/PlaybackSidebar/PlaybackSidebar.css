@@ -103,6 +103,49 @@
   z-index: 3;
 }
 
+.player-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.player-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  position: relative;
+  background-color: var(--border-color-4);
+  transition: background-color 150ms;
+
+  &.active {
+    background-color: var(--accent-color);
+  }
+
+  &.playing:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 100%;
+    border: 1px solid var(--accent-color);
+    animation: player-dot-ripple 2s ease-out infinite;
+  }
+}
+
+@keyframes player-dot-ripple {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
 /* A dark album turns the sidebar dark, and the theme's text colors stop reading on it */
 .playback-sidebar[data-contrast="light"] {
 
@@ -139,7 +182,8 @@
       color: rgba(255, 255, 255, 0.8);
     }
 
-    .cycle-dot:not(.active) {
+    .cycle-dot:not(.active),
+    .player-dot:not(.active) {
       background-color: rgba(255, 255, 255, 0.35);
     }
   }
