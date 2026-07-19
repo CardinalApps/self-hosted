@@ -20,7 +20,7 @@ import i18n from './i18n'
 const MusicPlayback = () => {
   const { lang, enable_glass } = useSelector(settingsSelectors.current)
   const players = useSelector(audioSelectors.players)
-  const [visiblePlayer] = useVisiblePlayer()
+  const [visiblePlayer, setVisiblePlayer] = useVisiblePlayer()
   const { setGlassColors } = usePlaybackSidebar()
   const player = visiblePlayer ? players?.[visiblePlayer] : undefined
   const [doubleClicked, setDoubleClicked] = useState(false)
@@ -59,6 +59,7 @@ const MusicPlayback = () => {
         playerId={visiblePlayer}
         size="wide"
         onColorsLoaded={setGlassColors}
+        onSwitchPlayer={setVisiblePlayer}
       />
       <PlaybackQueue
         queueId={player.queue?.queueId}

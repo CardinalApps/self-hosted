@@ -38,13 +38,14 @@ const volumeIcon = (volume: number) => {
 
 type PlaybackControlBarProps = {
   playerId: string,
+  onSwitchPlayer?: (playerId: string) => void,
 }
 
 /**
  * Stop, repeat, speed, and volume for the wide player: secondary controls that sit in
  * their own toolbar under the seek bar.
  */
-const PlaybackControlBar = ({ playerId }: PlaybackControlBarProps) => {
+const PlaybackControlBar = ({ playerId, onSwitchPlayer }: PlaybackControlBarProps) => {
   const dispatch = useAppDispatch()
   const howl = getHowl(playerId)
   const { enable_glass, lang } = useAppSelector(settingsSelectors.current)
@@ -80,6 +81,18 @@ const PlaybackControlBar = ({ playerId }: PlaybackControlBarProps) => {
 
   const title = (key: string) => audioPlayerI18n[key]?.[lang as string]
 
+  // More than one audio stream can run at once; the arrows page the sidebar through them
+  const playerIds = Object.keys(players)
+  const showPlayerArrows = playerIds.length > 1 && !!onSwitchPlayer
+
+  const changePlayer = (change: 'prev' | 'next') => {
+    const currentIndex = playerIds.indexOf(player.id)
+    const nextIndex = change === 'next'
+      ? (currentIndex + 1) % playerIds.length
+      : (currentIndex - 1 + playerIds.length) % playerIds.length
+    onSwitchPlayer?.(playerIds[nextIndex])
+  }
+
   // Off -> queue -> track, skipping "queue" when there is nothing to loop
   const repeatOptions: CycleOption[] = [
     { value: REPEAT_MODE.OFF, icon: 'fa-ban', title: title('audio-player.playback.repeat.off') },
@@ -89,15 +102,15 @@ const PlaybackControlBar = ({ playerId }: PlaybackControlBarProps) => {
 
   // One group per control, so each gets a border of its own
   const items: ToolbarItems = [
-    [{
-      slug: 'stop',
-      title: title('audio-player.playback.stop'),
+    ...(showPlayerArrows ? [[{
+      slug: 'prev-player',
+      title: title('audio-player.pagination.prev'),
       render: ToolbarItem.ICON,
       extra: {
-        icon: 'fa-stop',
-        onClick: () => dispatch(audioActions.stop(player.id)),
+        icon: 'far fa-arrow-alt-circle-left',
+        onClick: () => changePlayer('prev'),
       },
-    }],
+    }]] : []),
     [{
       slug: 'repeat',
       /*
@@ -192,6 +205,24 @@ const PlaybackControlBar = ({ playerId }: PlaybackControlBarProps) => {
         </Popout>
       ),
     }],
+    [{
+      slug: 'stop',
+      title: title('audio-player.playback.stop'),
+      render: ToolbarItem.ICON,
+      extra: {
+        icon: 'fa-stop',
+        onClick: () => dispatch(audioActions.stop(player.id)),
+      },
+    }],
+    ...(showPlayerArrows ? [[{
+      slug: 'next-player',
+      title: title('audio-player.pagination.next'),
+      render: ToolbarItem.ICON,
+      extra: {
+        icon: 'far fa-arrow-alt-circle-right',
+        onClick: () => changePlayer('next'),
+      },
+    }]] : []),
   ]
 
   return (
