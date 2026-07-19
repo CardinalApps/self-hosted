@@ -234,6 +234,7 @@ export const Cycle = (props) => {
           [
             {
               slug: 'repeat',
+              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'off',
               options: [
@@ -246,6 +247,7 @@ export const Cycle = (props) => {
           [
             {
               slug: 'layout',
+              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'list',
               options: [
@@ -258,6 +260,7 @@ export const Cycle = (props) => {
           [
             {
               slug: 'visibility',
+              slim: true,
               render: ToolbarItem.CYCLE,
               initialValue: 'visible',
               options: [
@@ -283,6 +286,7 @@ export const Icon = (props) => {
         items={[[
           {
             slug: 'shuffle',
+            slim: true,
             render: ToolbarItem.ICON,
             title: 'Shuffle',
             extra: {

@@ -206,7 +206,7 @@ const ToolbarItems = ({
     const total = virtualViewName ? virtualView?.total : numArchiveItems
     return (
       !!items.length && items.map((group, i) => {
-        const isSlimMenuGroup = group.some((item) => item?.render === CYCLE_SLUG || item?.render === ICON_SLUG)
+        const isSlimMenuGroup = group.some((item) => !!item?.slim)
         return (
           <div className={clsx('toolbar-group', { 'slim': isSlimMenuGroup })} key={i}>
             {group.map((item, i) => {

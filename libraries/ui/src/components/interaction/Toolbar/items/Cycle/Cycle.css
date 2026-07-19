@@ -7,16 +7,28 @@
   width: 50px;
   height: 100%;
   min-width: 30px;
-  padding: 4px 15px 1px;
+  padding: 0 15px;
   flex-direction: column;
   gap: 7px;
   border-radius: var(--border-radius-s);
+
+  /* Outweighs the toolbar's generic 16px icon rule, which shares specificity with any
+     [data-item] selector and loads later than this file */
+  .toolbar-icon {
+    font-size: 14px;
+  }
 }
 
 .cycle-dots {
+  padding-bottom: 6px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .cycle-dot {
