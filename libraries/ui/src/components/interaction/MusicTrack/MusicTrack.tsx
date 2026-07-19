@@ -108,7 +108,7 @@ const MusicTrack = ({
         <MusicPlaybackButton musicTrackIds={musicTrackIds?.length ? musicTrackIds : [musicTrackId]} musicTrackIdToPlay={musicTrackId} />
       </div>
       {!!trackNumber && <p className="col music-track-number">{trackNumber}.</p>}
-      <div className="col music-track-info">
+      <div className={clsx('col music-track-info', !releaseTitle && !artistName && 'no-meta')}>
         {!!trackTitle && <p className="music-track-title">{trackTitle}</p>}
         {!!(releaseTitle || artistName) &&
           <div className="music-release">

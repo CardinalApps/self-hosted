@@ -28,6 +28,11 @@
     align-items: flex-start;
     flex-grow: 1;
 
+    &.no-meta {
+      padding-bottom: 8px;
+      justify-content: center;
+    }
+
     .music-track-title {
       width: 100%;
       display: block;
