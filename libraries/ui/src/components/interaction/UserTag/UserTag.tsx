@@ -31,7 +31,7 @@ const UserTag = ({
       }
 
       {/* Local user with only a username */}
-      {showAvatar && user?.designation !== 'guest_account' && !user.cardinalId && user?.username &&
+      {showAvatar && user?.designation !== 'guest_account' && !user?.cardinalId && user?.username &&
         <Avatar
           size={size}
           className={'avatar'}
