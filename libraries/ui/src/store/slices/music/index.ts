@@ -86,6 +86,17 @@ const audioSlice = createSlice({
         player.volume = payload.volume
       }
     },
+    // Jump a player to another item in its own queue. Loading state plus the new track ID
+    // is what triggers useHowler() to swap the audio, same as advancing the queue.
+    playQueueItem: (state, { payload }: PayloadAction<{ playerId: string, queueItem: QueueItem, now: number }>) => {
+      const player = state.players[payload.playerId]
+      if (player) {
+        player.state = PLAYBACK_STATE.LOADING
+        player.trackId = payload.queueItem.mediaId
+        player.currentQueueItem = payload.queueItem
+        player.currentPlaybackStartedAt = payload.now
+      }
+    },
     stop: (state, { payload: id }) => {
       delete state.players[id]
     },

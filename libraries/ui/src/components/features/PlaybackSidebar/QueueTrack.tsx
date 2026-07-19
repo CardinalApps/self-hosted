@@ -4,14 +4,16 @@ import type { PointerEvent } from 'react'
 
 import MusicTrack from '../../interaction/MusicTrack'
 
-import { QueueItem } from '../../../store/slices/music'
+import { QueueItem, audioActions } from '../../../store/slices/music'
 import { settingsSelectors } from '../../../store/slices/settings'
 import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
+import { useAppDispatch } from '../../../hooks/useAppDispatch'
 
 import i18n from './i18n'
 
 type QueueTrackProps = {
   item: QueueItem,
+  playerId: string,
   lang: string,
   // Whether this row sits near the viewport. Off-screen rows stay mounted (Reorder needs
   // them) but skip the track lookup and render an empty box of the same height.
@@ -27,7 +29,8 @@ type QueueTrackProps = {
  * click to play), so a pointerdown only starts a drag when it doesn't land on one
  * of those controls — everywhere else on the row is fair game to grab.
  */
-const QueueTrack = ({ item, lang, active, onDragStart, onDragEnd }: QueueTrackProps) => {
+const QueueTrack = ({ item, playerId, lang, active, onDragStart, onDragEnd }: QueueTrackProps) => {
+  const dispatch = useAppDispatch()
   const dragControls = useDragControls()
   const { enable_glass } = useSelector(settingsSelectors.current)
   const { data: musicTrack } = useGetMusicTrackQuery({ id: item.mediaId }, { skip: !active })
@@ -62,6 +65,9 @@ const QueueTrack = ({ item, lang, active, onDragStart, onDragEnd }: QueueTrackPr
               artistName={musicTrack?.artists?.map((artist) => artist.name)?.join(', ')}
               canRate={false}
               glass={enable_glass as boolean}
+              // A queued track is already part of this player's queue, so playing it jumps
+              // the playhead there instead of spawning a new single-track queue
+              onPlayClick={() => dispatch(audioActions.playQueueItem({ playerId, queueItem: item, now: Date.now() }))}
             />
           )
           : <div className="queue-item-placeholder" />

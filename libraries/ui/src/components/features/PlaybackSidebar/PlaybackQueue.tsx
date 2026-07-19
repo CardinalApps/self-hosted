@@ -35,6 +35,7 @@ const INITIAL_ROWS = 16
 
 type PlaybackQueueProps = {
   className?: string,
+  playerId: string,
   queueId: string,
   currentQueueItemId: string,
 }
@@ -49,6 +50,7 @@ type PlaybackQueueProps = {
  */
 const PlaybackQueue = ({
   className,
+  playerId,
   queueId,
   currentQueueItemId,
 }: PlaybackQueueProps) => {
@@ -147,6 +149,7 @@ const PlaybackQueue = ({
           <QueueTrack
             key={item.queueItemId}
             item={item}
+            playerId={playerId}
             lang={lang as string}
             // Before the first measurement the virtualizer reports nothing, so fill the head
             active={activeRows.size ? activeRows.has(index) : index < INITIAL_ROWS}

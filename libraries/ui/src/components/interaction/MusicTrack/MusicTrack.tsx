@@ -39,6 +39,8 @@ type MusicTrackProps = {
   // (e.g. this track plus the rest of the album from this position forward).
   // Defaults to just this track. Passed straight through to MusicPlaybackButton.
   musicTrackIds?: string[],
+  // Passed straight through to MusicPlaybackButton
+  onPlayClick?: () => void,
 }
 
 const MusicTrack = ({
@@ -57,6 +59,7 @@ const MusicTrack = ({
   canRate = true,
   glass = false,
   musicTrackIds,
+  onPlayClick,
 }: PropsWithChildren<MusicTrackProps>) => {
   const dispatch = useAppDispatch()
   const { Link } = useContext(RouterContext)
@@ -105,7 +108,7 @@ const MusicTrack = ({
   return (
     <div className={clsx('music-track', glass && 'glass')} onDoubleClick={handleDoubleClick}>
       <div className="col music-track-play-pause">
-        <MusicPlaybackButton musicTrackIds={musicTrackIds?.length ? musicTrackIds : [musicTrackId]} musicTrackIdToPlay={musicTrackId} />
+        <MusicPlaybackButton musicTrackIds={musicTrackIds?.length ? musicTrackIds : [musicTrackId]} musicTrackIdToPlay={musicTrackId} onPlayClick={onPlayClick} />
       </div>
       {!!trackNumber && <p className="col music-track-number">{trackNumber}.</p>}
       <div className={clsx('col music-track-info', !releaseTitle && !artistName && 'no-meta')}>

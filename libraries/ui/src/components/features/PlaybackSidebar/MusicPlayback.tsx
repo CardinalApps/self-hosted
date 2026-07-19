@@ -77,6 +77,7 @@ const MusicPlayback = () => {
         </div>
       }
       <PlaybackQueue
+        playerId={player.id}
         queueId={player.queue?.queueId}
         currentQueueItemId={player.currentQueueItem?.queueItemId}
       />

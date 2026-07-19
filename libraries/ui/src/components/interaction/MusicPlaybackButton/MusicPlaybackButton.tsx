@@ -30,6 +30,9 @@ type MusicPlaybackButtonProps = {
   scope?: MusicPlaybackButtonScope,
   solid?: boolean,
   size?: PlayButtonSizeType,
+  // Replaces the default play action (queueing musicTrackIds into a new player).
+  // Pause behaviour is unaffected.
+  onPlayClick?: () => void,
 }
 
 /**
@@ -49,6 +52,7 @@ const MusicPlaybackButton = ({
   scope = 'track',
   solid,
   size = 's',
+  onPlayClick,
 }: PropsWithChildren<MusicPlaybackButtonProps>) => {
   const dispatch = useAppDispatch()
   const { lang } = useSelector(settingsSelectors.current)
@@ -61,6 +65,10 @@ const MusicPlaybackButton = ({
   const isPaused = paused.find((player: Player) => matchIds.includes(player.trackId))
 
   const handlePlayClick = () => {
+    if (onPlayClick) {
+      onPlayClick()
+      return
+    }
     const orderedTrackIds = [musicTrackIdToPlay, ...musicTrackIds.filter((id) => id !== musicTrackIdToPlay)]
     dispatch(play({ trackIds: orderedTrackIds }))
   }
