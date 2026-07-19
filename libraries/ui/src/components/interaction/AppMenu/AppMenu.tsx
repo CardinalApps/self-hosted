@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
+import clsx from 'clsx'
 
 import { settingsSelectors } from '../../../store/slices/settings'
 
-import MenuButton from '../MenuButton'
+import Popout from '../../layout/Popout'
+import type { PopoutAnchor } from '../../layout/Popout'
 import BrandLogo from '../../layout/BrandLogo'
 import Icon from '../../typography/Icon'
 
@@ -16,6 +19,12 @@ type AppMenuProps = {
   target?: '_blank',
 }
 
+const ALIGN_TO_ANCHOR: Record<AppMenuProps['align'], { position: PopoutAnchor, origin: PopoutAnchor }> = {
+  left: { position: 'tl', origin: 'bl' },
+  center: { position: 'tc', origin: 'bm' },
+  right: { position: 'tr', origin: 'br' },
+}
+
 /**
  * AppMenu.
  */
@@ -24,17 +33,30 @@ const AppMenu = ({
   target,
 }: PropsWithChildren<AppMenuProps>) => {
   const { lang } = useSelector(settingsSelectors.current)
+  const [isOpen, setIsOpen] = useState(false)
+  const { position, origin } = ALIGN_TO_ANCHOR[align]
 
   return (
-    <MenuButton
+    <Popout
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      position={position}
+      origin={origin}
+      offset={10}
       width={230}
-      solid={false}
-      align={align}
-      size="m"
       title={i18n['icon.title'][lang]}
-      icon={<Icon fa="fas fa-th" />}
+      trigger={
+        <button
+          className={clsx('app-menu-trigger', { open: isOpen })}
+          type="button"
+          title={i18n['icon.title'][lang]}
+          onClick={() => setIsOpen((o) => !o)}
+        >
+          <Icon fa="fas fa-th" />
+        </button>
+      }
     >
-      <MenuButton.Section className="app-menu">
+      <div className="app-menu">
         <div className="web-apps">
           <div>
             <a href="/admin" target={target} title={i18n['app.titleAttr.admin']['en']}>
@@ -69,8 +91,8 @@ const AppMenu = ({
             </a>
           </div>
         </div>
-      </MenuButton.Section>
-    </MenuButton>
+      </div>
+    </Popout>
   )
 }
 

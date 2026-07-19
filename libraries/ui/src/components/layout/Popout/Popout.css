@@ -1,0 +1,27 @@
+.popout-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.popout-box {
+  position: absolute;
+}
+
+.popout-inner {
+  width: 260px;
+  border-radius: var(--border-radius-s);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--box-shadow-2);
+  border: 1px solid var(--border-color-1);
+  background-color: var(--bg-1);
+  z-index: 1000;
+}
+
+.popout-title {
+  padding: 15px 20px 0 20px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-color-1);
+  text-transform: uppercase;
+}
