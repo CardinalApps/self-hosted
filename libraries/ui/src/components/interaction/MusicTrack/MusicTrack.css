@@ -49,8 +49,10 @@
       font-size: 13px;
 
       a {
+        color: var(--text-color-4);
 
         &:hover {
+          color: var(--accent-color);
           text-decoration: underline;
         }
       }

@@ -1,52 +1,33 @@
 .music-release-page {
-  
-  .release-page-cols {
-    display: flex;
-    gap: calc(var(--gutter) * 2);
 
-    .release-left-col {
+  .release-layout {
+    width: 100%;
+  }
+
+  .release-meta-card {
+    width: 100%;
+    margin-bottom: calc(var(--gutter) * 2);
+
+    .release-meta-card-cols {
+      display: flex;
+      gap: calc(var(--gutter) * 2);
+      align-items: flex-start;
 
       .release-artwork {
-        margin-bottom: var(--gutter);
+        /* MusicRelease's own width is hard-coded to 200px regardless of the
+           coverSize prop, so it must be overridden here to match. */
+        width: 280px;
+        flex-shrink: 0;
       }
 
-      .release-artists {
-        margin-bottom: var(--gutter);
-      }
-
-      .release-genres {
-        margin-bottom: var(--gutter);
-      }
-    }
-
-    .release-right-col {
-      flex-grow: 1;
-    }
-
-    @media screen and (max-width: 1200px) {
-      gap: 0;
-      flex-direction: column;
-
-      .release-left-col {
-        width: 100%;
-        justify-content: center;
-
-        .release-artwork {
-          display: flex;
-          justify-content: center;
-          text-align: center;
-        }
+      .release-meta {
+        flex-grow: 1;
       }
     }
   }
 
   .release-meta {
     width: 100%;
-    margin-bottom: calc(var(--gutter) * 2);
-
-    .release-name {
-      font-size: 24px;
-    }
 
     .meta-section-title {
       margin-bottom: 8px;
@@ -56,17 +37,53 @@
       color: var(--text-color-4);
     }
 
+    .release-meta-cols {
+      display: flex;
+      gap: calc(var(--gutter) * 2);
+    }
+
     .release-meta-list {
       width: 100%;
+      flex: 1;
+      min-width: 0;
 
       .item-list-item-name {
         width: 100%;
         display: flex;
         justify-content: space-between;
+        gap: 20px;
+
         strong {
+          flex-shrink: 0;
           font-weight: 600;
         }
+
+        span {
+          text-align: right;
+        }
+
+        .release-meta-artists a {
+          color: var(--text-color-2);
+
+          &:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+          }
+        }
       }
+    }
+  }
+
+  .release-bottom-row {
+    display: grid;
+    /* fr, not %: percentage tracks are resolved against the full container width and
+       then the gap is added on top, which overflows by exactly the gap size. fr tracks
+       divide the space left over after the gap is reserved. */
+    grid-template-columns: 2fr 3fr;
+    gap: calc(var(--gutter) * 2);
+
+    > * {
+      min-width: 0;
     }
   }
 
@@ -79,15 +96,20 @@
     margin-bottom: var(--gutter);
   }
 
-  .music-release {
-    width: 100%;
-
-    .music-release-art {
-      height: 300px;
-    }
-  }
-
   .music-release-track-list {
     flex-wrap: wrap;
+  }
+
+  @media screen and (max-width: 768px) {
+
+    .release-meta-card-cols {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .release-bottom-row {
+      grid-template-columns: 100%;
+    }
   }
 }
