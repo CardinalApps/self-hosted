@@ -1,6 +1,7 @@
 import { useContext, useMemo } from 'react'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
+import Card from '@cardinalapps/ui/src/components/layout/Card'
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
 
@@ -13,9 +14,7 @@ import Toolbar from '../../../../../libraries/ui/src/components/interaction/Tool
 import { ToolbarItem } from '../../../../../libraries/ui/src/components/interaction/Toolbar/types'
 import { MusicRoutes } from '../../../../../libraries/ui/src/lib/net/router'
 
-import ReleaseArtists from './ReleaseArtists'
 import ReleaseMeta from './ReleaseMeta'
-import ReleaseGenres from './ReleaseGenres'
 
 import i18n from './i18n.json'
 
@@ -78,52 +77,54 @@ function ReleasePage() {
         />
       )}
     >
-      <div className="release-page-cols">
-        <div className="release-left-col">
-          <MusicRelease
-            className="release-artwork"
-            hasControls={false}
-            hasArtwork={!!data?.thumbnails?.length}
-            releaseId={releaseId}
-            tracks={data?.tracks as MusicTrackType[] || []}
-            coverSize={{
-              width: 340,
-              height: 340,
-            }}
-          />
-          <ReleaseArtists release={data} />
-          <ReleaseGenres release={data} />
-          <ReleaseMeta release={data} />
-        </div>
-        <div className="release-right-col">
-          {tracksbyDiscInOrder.map((disc, i) => {
-            return (
-              <div key={`disc-${i}`} className="release-disc-tracks">
-                <p className="release-disc-number">{i18n['music-release.disc-number']['en'].replace('{num}', `${i + 1}`)}</p>
-                {disc.map((musicTrack: MusicTrackType, trackIndex: number) => {
-                  // Upcoming tracks on this disc, then every remaining disc in full.
-                  const musicTrackIds = [
-                    ...disc.slice(trackIndex),
-                    ...tracksbyDiscInOrder.slice(i + 1).flat(),
-                  ].map((track: MusicTrackType) => track.musicTrackId)
+      <div className="release-layout">
+        <Card className="release-meta-card" padding="thin">
+          <div className="release-meta-card-cols">
+            <MusicRelease
+              className="release-artwork"
+              hasControls={false}
+              hasArtwork={!!data?.thumbnails?.length}
+              releaseId={releaseId}
+              coverSize={{
+                width: 280,
+                height: 280,
+              }}
+            />
+            <ReleaseMeta release={data} />
+          </div>
+        </Card>
+        <div className="release-bottom-row">
+          <div className="release-left-col" />
+          <div className="release-right-col">
+            {tracksbyDiscInOrder.map((disc, i) => {
+              return (
+                <div key={`disc-${i}`} className="release-disc-tracks">
+                  <p className="release-disc-number">{i18n['music-release.disc-number']['en'].replace('{num}', `${i + 1}`)}</p>
+                  {disc.map((musicTrack: MusicTrackType, trackIndex: number) => {
+                    // Upcoming tracks on this disc, then every remaining disc in full.
+                    const musicTrackIds = [
+                      ...disc.slice(trackIndex),
+                      ...tracksbyDiscInOrder.slice(i + 1).flat(),
+                    ].map((track: MusicTrackType) => track.musicTrackId)
 
-                  return (
-                    <MusicTrack
-                      key={musicTrack.id}
-                      musicTrackId={musicTrack?.musicTrackId}
-                      trackTitle={musicTrack?.title}
-                      releaseId={musicTrack?.release?.id}
-                      trackNumber={musicTrack.trackNumber}
-                      hasArtwork={!!musicTrack.thumbnails?.length}
-                      rating={musicTrack?.rating}
-                      plays={musicTrack?.playCount}
-                      musicTrackIds={musicTrackIds}
-                    />
-                  )
-                })}
-              </div>
-            )
-          })}
+                    return (
+                      <MusicTrack
+                        key={musicTrack.id}
+                        musicTrackId={musicTrack?.musicTrackId}
+                        trackTitle={musicTrack?.title}
+                        releaseId={musicTrack?.release?.id}
+                        trackNumber={musicTrack.trackNumber}
+                        hasArtwork={!!musicTrack.thumbnails?.length}
+                        rating={musicTrack?.rating}
+                        plays={musicTrack?.playCount}
+                        musicTrackIds={musicTrackIds}
+                      />
+                    )
+                  })}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </AppPage>

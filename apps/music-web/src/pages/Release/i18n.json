@@ -8,6 +8,12 @@
   "music-release.meta.artists.none": {
     "en": "No artists"
   },
+  "music-release.meta.genres": {
+    "en": "Genres"
+  },
+  "music-release.meta.genres.none": {
+    "en": "No genres"
+  },
   "music-release.meta.meta": {
     "en": "Metadata"
   },
