@@ -39,6 +39,15 @@ type AnimatedGradientProps = {
   driftMax?: number
   /** Duration of the blotch transition animation in ms. Default: 800 */
   transitionDuration?: number
+  /**
+   * Blotch size lower/upper bound, as a percentage of the gradient box's own diagonal
+   * (farthest-corner distance) before fading to transparent. Defaults (70–120) suit a small
+   * card-sized box, where that spread still reads as distinct pools of color. On a much
+   * larger box (e.g. a full-viewport background) the same percentage covers a far greater
+   * absolute area, so blotches overlap into one smooth wash — pass a smaller range there.
+   */
+  sizeMin?: number
+  sizeMax?: number
 }
 
 type Blotch = {
@@ -50,12 +59,12 @@ type Blotch = {
 
 // ─── Blotch helpers ──────────────────────────────────────────────────────────
 
-function randomBlotches(colors: string[]): Blotch[] {
+function randomBlotches(colors: string[], sizeMin: number, sizeMax: number): Blotch[] {
   return colors.map((color) => ({
     color,
     x: 10 + Math.random() * 80,
     y: 10 + Math.random() * 80,
-    size: 70 + Math.random() * 50,
+    size: sizeMin + Math.random() * (sizeMax - sizeMin),
   }))
 }
 
@@ -222,10 +231,12 @@ const AnimatedGradient = ({
   driftMin = 5000,
   driftMax = 15000,
   transitionDuration = 800,
+  sizeMin = 70,
+  sizeMax = 120,
 }: AnimatedGradientProps) => {
   const ref = useRef<HTMLDivElement>(null)
-  const fromRef = useRef<Blotch[]>(randomBlotches(values))
-  const toRef = useRef<Blotch[]>(randomBlotches(values))
+  const fromRef = useRef<Blotch[]>(randomBlotches(values, sizeMin, sizeMax))
+  const toRef = useRef<Blotch[]>(randomBlotches(values, sizeMin, sizeMax))
   const rafRef = useRef<number | null>(null)
   const startRef = useRef<number | null>(null)
 
@@ -306,7 +317,7 @@ const AnimatedGradient = ({
     const el = ref.current
     if (!el) return
 
-    const newTarget = randomBlotches(displayValues)
+    const newTarget = randomBlotches(displayValues, sizeMin, sizeMax)
     const currentBlotches = (() => {
       if (startRef.current === null) return fromRef.current
       const elapsed = performance.now() - startRef.current

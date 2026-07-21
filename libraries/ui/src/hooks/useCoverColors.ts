@@ -6,9 +6,9 @@ const NUM_BLOTCHES = 3
 const SATURATION_BOOST = 1.5
 
 /**
- * Returns 4 dominant hex colors extracted from an image blob URL.
+ * Returns `numColors` dominant hex colors extracted from an image blob URL.
  */
-export function useCoverColors(coverSrc: string | null | undefined): string[] {
+export function useCoverColors(coverSrc: string | null | undefined, numColors: number = NUM_BLOTCHES): string[] {
   const [colors, setColors] = useState<string[]>([])
 
   useEffect(() => {
@@ -38,11 +38,11 @@ export function useCoverColors(coverSrc: string | null | undefined): string[] {
         }
       }
 
-      setColors(pickDominant(pixels, NUM_BLOTCHES))
+      setColors(pickDominant(pixels, numColors))
     }
 
     img.src = coverSrc
-  }, [coverSrc])
+  }, [coverSrc, numColors])
 
   return colors
 }
