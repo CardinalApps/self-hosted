@@ -132,7 +132,7 @@ function ReleasePage() {
         </Card>
         <div className="release-bottom-row">
           <div className="release-left-col" />
-          <div className="release-right-col">
+          <div className={clsx('release-right-col', enable_glass && 'bg-1-tracks')}>
             {tracksbyDiscInOrder.map((disc, i) => {
               return (
                 <div key={`disc-${i}`} className="release-disc-tracks">
