@@ -43,7 +43,7 @@ export type MusicReleaseType = {
 
 export const musicReleasesApi = baseHomeServerApi
   .enhanceEndpoints({
-    addTagTypes: ['list', 'MusicRelease'],
+    addTagTypes: ['list', 'MusicRelease', 'MusicTracks'],
   })
   .injectEndpoints({
     endpoints: (builder) => ({
@@ -129,6 +129,9 @@ export const musicReleasesApi = baseHomeServerApi
             thumbnails: true,
           })
         },
+        // Embeds each track's playCount, so a track play elsewhere (which
+        // invalidates 'MusicTracks') needs to refetch this too.
+        providesTags: ['MusicTracks'],
       }),
     }),
   })
