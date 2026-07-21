@@ -11,9 +11,11 @@ import {
   PAGE_BEHAVIORS,
   SIDEBAR_MODE,
 } from '../../../store/slices/layout'
+import { settingsSelectors } from '../../../store/slices/settings'
 import HasCapabilities from '../../layout/HasCapabilities'
 import AccessError, { NetworkError } from '../../layout/AccessError/AccessError'
 import CrashError from '../../layout/CrashError'
+import AnimatedGradient from '../../layout/AnimatedGradient'
 import { ErrorBoundary } from '../../../lib/react-error-boundary'
 import useScrollPointRestoration from '../../../hooks/useScrollPointRestoration'
 import { createPortal } from 'react-dom'
@@ -33,6 +35,7 @@ type AppPageProps = {
   virtualLayout?: ReactNode,
   style?: CSSProperties,
   children?: ReactNode,
+  animatedGradientColors?: string[],
 }
 
 /**
@@ -52,6 +55,7 @@ function AppPage({
   showLibrarySwitcher = false,
   networkError,
   style,
+  animatedGradientColors,
   ...props
 }: PropsWithChildren<AppPageProps>) {
   useScrollPointRestoration('.main-col', !restoreScrollPoint)
@@ -60,6 +64,23 @@ function AppPage({
   const userSelectedSidebarMode = useSelector(layoutSelectors.userSelectedSidebarMode)
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const sidebarIsCollapsed = sidebarMode === SIDEBAR_MODE.collapsed
+  const { enable_glass } = useSelector(settingsSelectors.current)
+
+  /*
+    Mounting AnimatedGradient before colors are sampled would hand it an empty values
+    array; when the real colors arrive a moment later it treats that as going from 0
+    blotches to N and grows each one from size 0. Waiting for colors first means it always
+    mounts at full size, and the fade-in below is a plain opacity transition instead.
+  */
+  const [gradientVisible, setGradientVisible] = useState(false)
+  useEffect(() => {
+    if (!animatedGradientColors?.length) {
+      setGradientVisible(false)
+      return
+    }
+    const raf = requestAnimationFrame(() => setGradientVisible(true))
+    return () => cancelAnimationFrame(raf)
+  }, [animatedGradientColors])
 
   /**
    * Renders the toolbar, either as a regular page item or within the toolbar
@@ -120,6 +141,14 @@ function AppPage({
       style={style}
       className={clsx('app-page', className, sidebarIsCollapsed && 'sidebar-is-collapsed', loading && 'loading')}
     >
+      {!!enable_glass && !!animatedGradientColors?.length &&
+        <AnimatedGradient
+          values={animatedGradientColors}
+          className={clsx('app-page-background', gradientVisible && 'visible')}
+          sizeMin={40}
+          sizeMax={80}
+        />
+      }
       {/* Render errors in the page swap it for the crash screen; the app scaffold stays alive */}
       <ErrorBoundary fallback={<CrashError />}>
         {
