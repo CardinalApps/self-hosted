@@ -141,6 +141,13 @@
     margin-bottom: var(--gutter);
   }
 
+  /* --bg-1 reads better than the default --bg-3 against the animated gradient
+     background enabled alongside glass mode. Deliberately not the `.glass` class
+     itself (no frosted/blur treatment) — just a plain flat tint. */
+  .release-right-col.bg-1-tracks .music-track {
+    background-color: var(--bg-1);
+  }
+
   .music-release-track-list {
     flex-wrap: wrap;
   }
