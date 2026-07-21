@@ -1,8 +1,7 @@
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import clsx from 'clsx'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
-import AnimatedGradient from '@cardinalapps/ui/src/components/layout/AnimatedGradient'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
@@ -43,22 +42,6 @@ function ReleasePage() {
   const [coverSrc] = useReleaseCover(hasArtwork ? releaseId : null, 'medium_nocrop')
   const coverColors = useCoverColors(coverSrc)
 
-  /*
-    Mounting AnimatedGradient before colors are sampled would hand it an empty values
-    array; when the real colors arrive a moment later it treats that as going from 0
-    blotches to N and grows each one from size 0. Waiting for colors first means it always
-    mounts at full size, and the fade-in below is a plain opacity transition instead.
-  */
-  const [gradientVisible, setGradientVisible] = useState(false)
-  useEffect(() => {
-    if (!coverColors.length) {
-      setGradientVisible(false)
-      return
-    }
-    const raf = requestAnimationFrame(() => setGradientVisible(true))
-    return () => cancelAnimationFrame(raf)
-  }, [coverColors])
-
   /**
    * Order tracks by disc then number.
    */
@@ -88,6 +71,7 @@ function ReleasePage() {
       networkError={error as NetworkError}
       loading={isLoading}
       capabilities={['MusicReleases.Read']}
+      animatedGradientColors={coverColors}
       toolbar={(
         <Toolbar
           name={TOOLBAR_NAME}
@@ -104,16 +88,6 @@ function ReleasePage() {
         />
       )}
     >
-      {!!enable_glass && !!coverColors.length &&
-        <AnimatedGradient
-          values={coverColors}
-          className={clsx('release-page-background', gradientVisible && 'visible')}
-          // Blotch size is a % of the gradient box's own diagonal, so the sidebar's
-          // small-card defaults (70-120) wash into one smear across a full-viewport box.
-          sizeMin={40}
-          sizeMax={80}
-        />
-      }
       <div className="release-layout">
         <Card className={clsx('release-meta-card', enable_glass && 'glass')} padding="thin">
           <div className="release-meta-card-cols">

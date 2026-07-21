@@ -1,42 +1,6 @@
 .music-release-page {
 
-  /*
-    Fixed behind the whole app, not just this page's own column, as a faint backdrop sampled
-    from the album cover — the same mechanism as the PlaybackSidebar's glass gradient, just
-    far more subdued. Low opacity (rather than tuned lightness bounds per theme) is what keeps
-    it subtle in both light and dark mode without having to compute contrast text colors for
-    the rest of the app.
-
-    The right edge shares --docked-progress/--playback-sidebar-width with the main column's
-    own padding-right (see AppBase.css) so it eases in against the sidebar with the same
-    spring the sidebar itself slides with, instead of ending up underneath it or snapping.
-  */
-  .release-page-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: calc(var(--docked-progress, 0) * var(--playback-sidebar-width, 0px));
-    /* AnimatedGradient's own base rule fixes width/height at 100%, which over-constrains
-       the box once left/right/top/bottom are all set too — width has to stay auto so the
-       browser derives it from left/right instead of ignoring right altogether. */
-    width: auto;
-    height: auto;
-    z-index: 0;
-    /* Starts invisible and fades in via the .visible class once mounted at full size
-       (see Release.tsx) — kept separate from AnimatedGradient's own blotch animation. */
-    opacity: 0;
-    transition: opacity 600ms ease;
-    pointer-events: none;
-
-    &.visible {
-      opacity: 0.1815;
-    }
-  }
-
   .release-layout {
-    position: relative;
-    z-index: 1;
     width: 100%;
   }
 
@@ -44,9 +8,6 @@
     width: 100%;
     margin-bottom: calc(var(--gutter) * 2);
 
-    /* Lets the fixed background gradient show through the card instead of sitting
-       flat behind it, matching the same blur-and-translucency treatment glass mode
-       uses elsewhere (Toolbar, Icon hover). */
     &.glass {
       background-color: color-mix(in srgb, var(--bg-1) 55%, transparent);
       backdrop-filter: blur(10px);
@@ -59,8 +20,6 @@
       align-items: flex-start;
 
       .release-artwork {
-        /* MusicRelease's own width is hard-coded to 200px regardless of the
-           coverSize prop, so it must be overridden here to match. */
         width: 280px;
         flex-shrink: 0;
       }
@@ -121,9 +80,6 @@
 
   .release-bottom-row {
     display: grid;
-    /* fr, not %: percentage tracks are resolved against the full container width and
-       then the gap is added on top, which overflows by exactly the gap size. fr tracks
-       divide the space left over after the gap is reserved. */
     grid-template-columns: 2fr 3fr;
     gap: calc(var(--gutter) * 2);
 
@@ -141,9 +97,6 @@
     margin-bottom: var(--gutter);
   }
 
-  /* --bg-1 reads better than the default --bg-3 against the animated gradient
-     background enabled alongside glass mode. Deliberately not the `.glass` class
-     itself (no frosted/blur treatment) — just a plain flat tint. */
   .release-right-col.bg-1-tracks .music-track {
     background-color: var(--bg-1);
   }
