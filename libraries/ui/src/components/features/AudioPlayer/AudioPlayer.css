@@ -171,6 +171,7 @@
     }
 
     .audio-player-track-title {
+      height: 26px;
       margin-bottom: 2px;
       font-size: 24px;
       font-weight: 800;
