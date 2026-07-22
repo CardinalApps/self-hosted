@@ -124,6 +124,11 @@ const settingsSlice = createSlice({
 })
 
 export const settingsActions = settingsSlice.actions
-export const settingsSelectors = settingsSlice.selectors
+
+/* Built with a root state fallback so that components can render inside host apps whose store does not
+   include this slice (eg. the website), where the selectors return the default settings instead of throwing. */
+export const settingsSelectors = settingsSlice.getSelectors(
+  (rootState: Partial<Record<typeof STORE_KEY, InitialState>>) => rootState[STORE_KEY] ?? initialState,
+)
 
 export default settingsSlice
