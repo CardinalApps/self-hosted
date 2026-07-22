@@ -3,6 +3,7 @@ import {
   Column,
   Index,
   OneToMany,
+  OneToOne,
   ManyToOne,
   ManyToMany,
   JoinColumn,
@@ -16,6 +17,7 @@ import { File } from  '../indexing/entities/file.entity'
 import { MusicArtist } from  '../music-artist/music-artist.entity'
 import { MusicRelease } from  '../music-release/music-release.entity'
 import { MusicTrackMetadata } from './music-track-metadata.entity'
+import { MusicTrackWaveform } from './music-track-waveform.entity'
 import { MusicHistory } from '../music-history/music-history.entity'
 
 @Entity()
@@ -65,6 +67,9 @@ export class MusicTrack extends BaseEntity {
   @OneToMany(() => MusicHistory, (musicHistory) => musicHistory.track, { onDelete: 'CASCADE' })
   @JoinColumn()
   history?: MusicHistory[]
+
+  @OneToOne(() => MusicTrackWaveform, (musicTrackWaveform) => musicTrackWaveform.track)
+  waveform?: MusicTrackWaveform
 }
 
 export class MusicTrackComputed extends MusicTrack {

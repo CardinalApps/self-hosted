@@ -1,6 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import type { PropsWithChildren } from 'react'
 import clsx from 'clsx'
+
+import type { MusicTrackWaveformType } from '../../../store/apis/musicTracks'
+import {
+  decodeWaveform,
+  deriveWaveformPalettes,
+  drawWaveformWave,
+  compositeWaveform,
+} from './drawWaveform'
 
 import './Scrubber.css'
 
@@ -19,6 +27,10 @@ type ScrubberProps = {
   rate?: number,
   /* Stand the scrubber upright: the track runs bottom-to-top and needs a height from the parent */
   vertical?: boolean,
+  /* When waveform data is given, the plain bar is replaced with the rendered wave (horizontal only) */
+  waveform?: MusicTrackWaveformType | null,
+  /* Colors to tint the wave with (e.g. from the cover art); falls back to the accent color */
+  tintColors?: string[],
   className?: string,
   onChangeStart?: (position: ScrubberPosition) => void,
   onChange?: (position: ScrubberPosition) => void,
@@ -35,6 +47,8 @@ const Scrubber = ({
   max = 100,
   buffered = 0,
   vertical = false,
+  waveform = null,
+  tintColors,
   onChangeStart = () => {},
   onChange = () => {},
   onChangeEnd = () => {},
@@ -47,6 +61,88 @@ const Scrubber = ({
   const lastOnChangePosition = useRef<ScrubberPosition>(null)
   const [offset, setOffset] = useState<number>()
   const [isScrubbing, setIsScrubbing] = useState(false)
+
+  const waveformCanvasRef = useRef<HTMLCanvasElement>(null)
+  const waveformLayersRef = useRef<{ dim: HTMLCanvasElement, vivid: HTMLCanvasElement } | null>(null)
+  const [waveformPaintTick, setWaveformPaintTick] = useState(0)
+  const decodedWaveform = useMemo(
+    () => (waveform && !vertical ? decodeWaveform(waveform) : null),
+    [waveform, vertical],
+  )
+  const hasWaveform = !!decodedWaveform
+  const tintKey = tintColors?.join(',')
+
+  /**
+   * Prerender the dim and vivid wave layers whenever the data, tint, or the
+   * scrubber's size changes.
+   */
+  useEffect(() => {
+    if (!decodedWaveform) {
+      waveformLayersRef.current = null
+      return
+    }
+
+    const scrubberEl = scrubberRef.current as HTMLElement
+    const canvas = waveformCanvasRef.current
+    if (!scrubberEl || !canvas) {
+      return
+    }
+
+    const render = () => {
+      const rect = scrubberEl.getBoundingClientRect()
+      if (!rect.width || !rect.height) {
+        return
+      }
+
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = Math.round(rect.width * dpr)
+      canvas.height = Math.round(rect.height * dpr)
+
+      const accentColor = getComputedStyle(scrubberEl).getPropertyValue('--accent-color')
+      const palettes = deriveWaveformPalettes(tintColors, accentColor)
+
+      const renderLayer = (palette: typeof palettes.vivid) => {
+        const layer = document.createElement('canvas')
+        layer.width = canvas.width
+        layer.height = canvas.height
+        const layerCtx = layer.getContext('2d')
+        layerCtx.scale(dpr, dpr)
+        drawWaveformWave(layerCtx, decodedWaveform, rect.width, rect.height, palette)
+        return layer
+      }
+
+      waveformLayersRef.current = {
+        vivid: renderLayer(palettes.vivid),
+        dim: renderLayer(palettes.dim),
+      }
+      setWaveformPaintTick((tick) => tick + 1)
+    }
+
+    render()
+    const observer = new ResizeObserver(render)
+    observer.observe(scrubberEl)
+    return () => observer.disconnect()
+  }, [decodedWaveform, tintKey])
+
+  /**
+   * Repaint the visible canvas as the playhead and buffered range move.
+   */
+  useEffect(() => {
+    const canvas = waveformCanvasRef.current
+    const layers = waveformLayersRef.current
+    if (!canvas || !layers) {
+      return
+    }
+
+    const ctx = canvas.getContext('2d')
+    const dpr = window.devicePixelRatio || 1
+    const cssWidth = canvas.width / dpr
+    const cssHeight = canvas.height / dpr
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+    const bufferedX = max > 0 ? Math.min(1, buffered / max) * cssWidth : 0
+    compositeWaveform(ctx, layers.dim, layers.vivid, cssWidth, cssHeight, offset ?? 0, bufferedX)
+  }, [offset, buffered, max, waveformPaintTick])
 
   /**
    * Trigger the onChange callback only if it's different from the last time it
@@ -169,7 +265,7 @@ const Scrubber = ({
   return (
     <div
       ref={scrubberRef}
-      className={clsx("scrubber", vertical && 'vertical', className)}
+      className={clsx("scrubber", vertical && 'vertical', hasWaveform && 'has-waveform', className)}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
@@ -187,6 +283,9 @@ const Scrubber = ({
           }}
         />
       </div>
+      {hasWaveform &&
+        <canvas ref={waveformCanvasRef} className="scrubber-waveform" />
+      }
       <div
         ref={handleRef}
         className="scrubber-handle"

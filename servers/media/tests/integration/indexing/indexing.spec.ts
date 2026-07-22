@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as request from 'supertest'
 
-import { createTestApp, destroyTestApp, TestApp } from '../../helpers/create-app'
+import { createTestApp, destroyTestApp, waitForBackgroundJobs, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
 import { IndexingStates, RunStates, RunType } from '../../../src/modules/indexing/enums'
 import { MusicArtist } from '../../../src/modules/music-artist/music-artist.entity'
@@ -57,8 +57,9 @@ beforeAll(async () => {
 afterAll(async () => {
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   delete process.env.MUSIC_DIR
+  await waitForBackgroundJobs(testApp)
   await destroyTestApp(testApp)
-})
+}, 90000)
 
 // -------------------------------------------------------------------------
 // GET /api/v1/index/state

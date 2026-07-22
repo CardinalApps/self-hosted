@@ -4,6 +4,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
+import { getRepositoryToken } from '@nestjs/typeorm'
+import { In, Repository } from 'typeorm'
 
 export interface TestApp {
   app: INestApplication
@@ -45,4 +47,37 @@ export async function createTestApp(): Promise<TestApp> {
 export async function destroyTestApp(testApp: TestApp): Promise<void> {
   await testApp.app.close()
   fs.rmSync(testApp.dbPath, { force: true })
+}
+
+/**
+ * Waits for auto-started background jobs (e.g. the jobs created after an
+ * indexing run) to settle. Specs that trigger indexing must call this before
+ * destroyTestApp, otherwise still-running job tasks write to a closed database
+ * connection and can poison whichever spec runs next.
+ *
+ * A job reads as completed slightly before its queue fires its last handlers
+ * (the drain event writes to the job row again), so "no active jobs" must hold
+ * through a grace period before it counts as settled.
+ */
+export async function waitForBackgroundJobs(testApp: TestApp, timeoutMs = 60000): Promise<void> {
+  const { Job } = await import('../../src/modules/job/job.entity')
+  const { JobStatus } = await import('../../src/modules/job/enums')
+  const jobRepository: Repository<InstanceType<typeof Job>> = testApp.moduleRef.get(getRepositoryToken(Job))
+
+  const countActive = () => jobRepository.count({
+    where: {
+      status: In([JobStatus.IN_QUEUE, JobStatus.PREPARING, JobStatus.RUNNING]),
+    },
+  })
+
+  const startTime = Date.now()
+  while (Date.now() - startTime < timeoutMs) {
+    if (!(await countActive())) {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      if (!(await countActive())) {
+        return
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
 }

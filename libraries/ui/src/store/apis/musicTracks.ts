@@ -13,6 +13,29 @@ export type MusicTracksOrderBy = Extract<ToolbarOrderByType,
   | 'trackNumber'
   | 'rating'
 >
+export type MusicTrackWaveformType = {
+  version: number,
+  binCount: number,
+  data: {
+    channels: {
+      peak: string,
+      rms: string,
+      low: string,
+      mid: string,
+      high: string,
+    },
+    scales: {
+      peak: number,
+      rms: number,
+      bands: number,
+    },
+  },
+  integratedLufs: number | null,
+  truePeakDb: number | null,
+  silenceLeadIn: number | null,
+  silenceLeadOut: number | null,
+}
+
 export type MusicTrackType = {
   id: number,
   musicTrackId: string,
@@ -118,6 +141,21 @@ export const musicTracksApi = baseHomeServerApi
         },
         providesTags: ['MusicTracks'],
       }),
+
+      /**
+       * Get the waveform of a track. A 202 means the server has started
+       * generating it; the data arrives later via the `music.waveform_ready`
+       * server-sent event, which upserts into this endpoint's cache.
+       */
+      getMusicTrackWaveform: builder.query<
+        MusicTrackWaveformType | null,
+        { id: string }
+      >({
+        query: ({ id }) => ({
+          url: queryParams(`/music/track/${id}/waveform`),
+          responseHandler: async (response) => (response.status === 202 ? null : response.json()),
+        }),
+      }),
     }),
   })
 
@@ -127,4 +165,5 @@ export const {
   useLazyGetMusicTracksQuery,
   useGetMusicTrackQuery,
   useLazyGetMusicTrackQuery,
+  useGetMusicTrackWaveformQuery,
 } = musicTracksApi

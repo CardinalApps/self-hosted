@@ -22,7 +22,7 @@ import { useCoverColors } from '../../../hooks/useCoverColors'
 import { getContrastTextColor } from '../../../lib/color/getContrastTextColor'
 import { settingsSelectors } from '../../../store/slices/settings'
 
-import { useGetMusicTrackQuery } from '../../../store/apis/musicTracks'
+import { useGetMusicTrackQuery, useGetMusicTrackWaveformQuery } from '../../../store/apis/musicTracks'
 
 import { secondsToMMSS } from '../../../lib/formatting/time'
 
@@ -85,6 +85,13 @@ const AudioPlayer = ({
   const [coverSrc] = useReleaseCover(track?.release?.id, size === 'wide' ? 'medium_nocrop' : 'small_nocrop')
   const coverColors = useCoverColors(coverSrc)
   const [fadeIn, setFadeIn] = useState(false)
+
+  // A 202 resolves to null and the data arrives later through the
+  // music.waveform_ready SSE upsert; the scrubber crossfades when it lands
+  const { data: waveform } = useGetMusicTrackWaveformQuery(
+    { id: player.trackId },
+    { skip: !player.trackId || size !== 'wide' },
+  )
 
   // Rate and volume no longer have controls here (they moved to PlaybackControlBar), but a
   // fresh Howl for a new track still needs the player's stored values re-applied to it.
@@ -315,6 +322,8 @@ const AudioPlayer = ({
                 buffered={bufferedSeconds}
                 min={0}
                 max={duration}
+                waveform={size === 'wide' ? waveform ?? null : null}
+                tintColors={coverColors}
                 onChangeEnd={({ value }) => {
                   howl.seek(value)
                 }}

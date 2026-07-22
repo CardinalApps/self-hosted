@@ -34,6 +34,7 @@ import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
 import { TranscodingModule } from '../transcoding/transcoding.module'
+import { WaveformModule } from '../waveform/waveform.module'
 
 import { HTTPLoggerMiddleware } from '../../middleware/HTTPLogger.middleware'
 import { RevokeDisabledUserSessions } from '../../middleware/RevokeDisabledUserSessions.middleware'
@@ -146,6 +147,7 @@ const resolvePostgresHost = () => {
     PlaybackQueueModule,
     ClaimModule,
     TranscodingModule,
+    WaveformModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
     ...(getCurrentMode() !== Mode.DEVELOPMENT ? [
       ServeStaticModule.forRoot({

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as request from 'supertest'
 
-import { createTestApp, destroyTestApp, TestApp } from '../../helpers/create-app'
+import { createTestApp, destroyTestApp, waitForBackgroundJobs, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
 import { IndexingStates, RunLogEvent, RunType } from '../../../src/modules/indexing/enums'
 
@@ -179,9 +179,10 @@ describeMaybe(`metadata robustness (${MUSIC_FILES.length} files in ${REAL_MUSIC_
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     delete process.env.MUSIC_DIR
     if (testApp) {
+      await waitForBackgroundJobs(testApp)
       await destroyTestApp(testApp)
     }
-  })
+  }, 90000)
 
   it.each(MUSIC_FILES)(
     'reached a terminal state without hanging: %s',
