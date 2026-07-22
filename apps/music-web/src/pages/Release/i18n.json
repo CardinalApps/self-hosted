@@ -2,6 +2,9 @@
   "music-release.title": {
     "en": "Music Release"
   },
+  "music-release.meta.name": {
+    "en": "Name"
+  },
   "music-release.meta.artists": {
     "en": "Artists"
   },
@@ -22,6 +25,69 @@
   },
   "music-release.meta.discs": {
     "en": "Discs"
+  },
+  "music-release.meta.year": {
+    "en": "Year"
+  },
+  "music-release.meta.type": {
+    "en": "Type"
+  },
+  "music-release.meta.type.album": {
+    "en": "Album"
+  },
+  "music-release.meta.type.ep": {
+    "en": "EP"
+  },
+  "music-release.meta.type.single": {
+    "en": "Single"
+  },
+  "music-release.meta.type.compilation": {
+    "en": "Compilation"
+  },
+  "music-release.meta.type.soundtrack": {
+    "en": "Soundtrack"
+  },
+  "music-release.meta.type.live": {
+    "en": "Live"
+  },
+  "music-release.meta.type.remix": {
+    "en": "Remix"
+  },
+  "music-release.meta.type.dj-mix": {
+    "en": "DJ Mix"
+  },
+  "music-release.meta.type.broadcast": {
+    "en": "Broadcast"
+  },
+  "music-release.meta.type.demo": {
+    "en": "Demo"
+  },
+  "music-release.meta.label": {
+    "en": "Label"
+  },
+  "music-release.meta.runtime": {
+    "en": "Runtime"
+  },
+  "music-release.meta.runtime.hours-minutes": {
+    "en": "{h} hr {m} min"
+  },
+  "music-release.meta.runtime.minutes": {
+    "en": "{m} min"
+  },
+  "music-release.meta.quality": {
+    "en": "Quality"
+  },
+  "music-release.meta.quality.lossless": {
+    "en": "Lossless"
+  },
+  "music-release.meta.quality.kbps": {
+    "en": "{kbps} kbps"
+  },
+  "music-release.meta.country": {
+    "en": "Country"
+  },
+  "music-release.meta.added": {
+    "en": "Added"
   },
   "music-release.disc-number": {
     "en": "Disc {num}"
