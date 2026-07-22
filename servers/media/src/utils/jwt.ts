@@ -46,11 +46,12 @@ export const getJWTFromHeaders = (headers): string | undefined | null => {
 }
 
 /**
- * Returns the *unverified* token given as the `token` query parameter.
- * Used for HTML5 Audio requests where the browser cannot set custom headers.
+ * Returns the *unverified* token given as the `token` query parameter, or the
+ * deprecated `authorization` alias. Used for HTML5 Audio and EventSource
+ * requests where the browser cannot set custom headers.
  */
 export const getJWTFromQuery = (query): string | undefined | null => {
-  const token = query?.['token']
+  const token = query?.['token'] ?? query?.['authorization']
 
   if (token === 'null') {
     return null

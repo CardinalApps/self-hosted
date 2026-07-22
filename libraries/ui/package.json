@@ -26,6 +26,7 @@
     "date-fns": "2.30.0",
     "embla-carousel-react": "^8.6.0",
     "embla-carousel-wheel-gestures": "^8.1.0",
+    "eventsource": "4.1.0",
     "framer-motion": "12.23.22",
     "howler": "2.2.4",
     "leaflet": "1.9.3",
