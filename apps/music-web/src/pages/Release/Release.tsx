@@ -20,6 +20,7 @@ import { ToolbarItem } from '../../../../../libraries/ui/src/components/interact
 import { MusicRoutes } from '../../../../../libraries/ui/src/lib/net/router'
 
 import ReleaseMeta from './ReleaseMeta'
+import ReleasePlayActions from './ReleasePlayActions'
 
 import i18n from './i18n.json'
 
@@ -63,6 +64,8 @@ function ReleasePage() {
     return groupedByDisc.map((disc) => disc.sort((a: MusicTrackType, b: MusicTrackType) => a.trackNumber - b.trackNumber))
   }, [data?.tracks])
 
+  const orderedTracks = useMemo(() => tracksbyDiscInOrder.flat(), [tracksbyDiscInOrder])
+
   return (
     <AppPage
       className="music-release-page"
@@ -105,7 +108,12 @@ function ReleasePage() {
           </div>
         </Card>
         <div className="release-bottom-row">
-          <div className="release-left-col" />
+          <div className="release-play-cta-col">
+            <ReleasePlayActions
+              releaseId={releaseId}
+              orderedTracks={orderedTracks}
+            />
+          </div>
           <div className={clsx('release-right-col', enable_glass && 'bg-1-tracks')}>
             {tracksbyDiscInOrder.map((disc, i) => {
               return (

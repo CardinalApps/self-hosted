@@ -29,6 +29,7 @@ const meta = {
       table: { category: 'Appearance' },
     },
     disabled: { control: 'boolean', table: { category: 'State' } },
+    choices: { control: false, table: { category: 'Content' } },
     animation: {
       control: { type: 'select' },
       options: [undefined, 'loading', 'checkmark'],
@@ -125,6 +126,17 @@ export const Action: Story = {
   },
 }
 
+export const Choices: Story = {
+  args: {
+    children: 'Play',
+    icon: 'fas fa-play',
+    choices: [
+      { label: 'Play Next', icon: 'fas fa-step-forward', onSelect: fn() },
+      { label: 'Add to Queue', icon: 'fas fa-plus', onSelect: fn() },
+    ],
+  },
+}
+
 export const Loading: Story = {
   render: () => {
     const [clicked, setClicked] = useState(false)
@@ -165,6 +177,15 @@ export const AllVariants: Story = {
       <Button color="danger">Danger</Button>
       <Button disabled>Disabled</Button>
       <Button icon="fas fa-music">With Icon</Button>
+      <Button
+        icon="fas fa-play"
+        choices={[
+          { label: 'Play Next', icon: 'fas fa-step-forward', onSelect: fn() },
+          { label: 'Add to Queue', icon: 'fas fa-plus', onSelect: fn() },
+        ]}
+      >
+        Choices
+      </Button>
       <Button action icon="fas fa-shuffle">Action</Button>
     </div>
   ),

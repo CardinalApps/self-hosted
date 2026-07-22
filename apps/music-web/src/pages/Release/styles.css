@@ -83,6 +83,48 @@
     }
   }
 
+  .release-play-cta-col {
+
+    .release-play-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gutter);
+    }
+
+    .release-drive-row {
+      display: flex;
+
+      .action-button-animation-box {
+        width: 100%;
+      }
+
+      .button.action {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .release-play-modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+
+      .popout-anchor {
+        width: 100%;
+      }
+
+      .button:not(.choices-toggle) {
+        flex-grow: 1;
+        min-width: 0;
+      }
+
+      .button-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
   .release-disc-number {
     margin-bottom: 10px;
     font-size: 18px;

@@ -25,5 +25,32 @@
   },
   "music-release.disc-number": {
     "en": "Disc {num}"
+  },
+  "music-release.play-actions.drive": {
+    "en": "Drive Playback"
+  },
+  "music-release.play-actions.play": {
+    "en": "Play"
+  },
+  "music-release.play-actions.shuffle": {
+    "en": "Shuffle"
+  },
+  "music-release.play-actions.favorites": {
+    "en": "Favorites"
+  },
+  "music-release.play-actions.unheard": {
+    "en": "Unheard"
+  },
+  "music-release.play-actions.top-tracks": {
+    "en": "Top Tracks"
+  },
+  "music-release.play-actions.resume": {
+    "en": "Resume"
+  },
+  "music-release.play-actions.play-next": {
+    "en": "Play Next"
+  },
+  "music-release.play-actions.add-to-queue": {
+    "en": "Add to Queue"
   }
 }

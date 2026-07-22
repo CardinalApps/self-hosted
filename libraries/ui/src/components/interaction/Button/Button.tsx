@@ -1,12 +1,23 @@
 import { useState } from 'react'
 import type { PropsWithChildren } from 'react'
+import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import Icon from '../../typography/Icon'
+import Popout from '../../layout/Popout'
+import { settingsSelectors } from '../../../store/slices/settings'
 
 import { getAnimationSVG } from './icons'
 
+import i18n from './i18n'
+
 import './Button.css'
+
+export type ButtonChoice = {
+  label: string,
+  icon?: string,
+  onSelect: () => void,
+}
 
 type ButtonProps = {
   type?: 'button' | 'submit' | 'reset',
@@ -29,6 +40,7 @@ type ButtonProps = {
   onClick?: () => void,
   className?: string,
   disabled?: boolean,
+  choices?: ButtonChoice[],
 
   // For the outer component to add conditional party-rendering logic
   partyTime?: boolean,
@@ -60,11 +72,14 @@ const Button = ({
   onClick = () => {},
   className = undefined,
   disabled = false,
+  choices = undefined,
   partyTime = false,
   partyRoom,
   ...props
 }: PropsWithChildren<ButtonProps>) => {
   const [mouseUpAnimation] = useState('')
+  const [choicesOpen, setChoicesOpen] = useState(false)
+  const { lang } = useSelector(settingsSelectors.current)
 
   const classNameProp = clsx(
     'button',
@@ -114,7 +129,7 @@ const Button = ({
       </a>,
     )
   } else {
-    return maybeWithWrapper(
+    const buttonElement = (
       <button
         type={type}
         className={classNameProp}
@@ -127,8 +142,58 @@ const Button = ({
         {animation && getAnimationSVG(animation, animationColor)}
         <span className="button-text">{children}</span>
         {partyRoom}
-      </button>,
+      </button>
     )
+
+    if (choices?.length) {
+      return maybeWithWrapper(
+        <Popout
+          className="button-choiced"
+          open={choicesOpen}
+          onClose={() => setChoicesOpen(false)}
+          position="tl"
+          origin="bl"
+          offset={6}
+          width={200}
+          trigger={(
+            <>
+              {buttonElement}
+              <button
+                type="button"
+                className={clsx(classNameProp, 'choices-toggle')}
+                title={i18n['button.choices.toggle'][lang]}
+                aria-haspopup="menu"
+                aria-expanded={choicesOpen}
+                disabled={disabled || animation ? true : false}
+                onClick={() => setChoicesOpen(!choicesOpen)}
+              >
+                <Icon fa="fas fa-ellipsis-v" />
+              </button>
+            </>
+          )}
+        >
+          <ul className="button-choices" role="menu">
+            {choices.map((choice) => (
+              <li key={choice.label} role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setChoicesOpen(false)
+                    choice.onSelect()
+                  }}
+                >
+                  {!!choice.icon && <Icon fa={choice.icon} />}
+                  <span>{choice.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Popout>,
+      )
+    }
+
+    return maybeWithWrapper(buttonElement)
   }
 }
 
