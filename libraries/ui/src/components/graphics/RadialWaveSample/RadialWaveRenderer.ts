@@ -1,4 +1,16 @@
-import { AnalysisFrame, BIN_COUNT, MAX_RINGS, TEX_WIDTH } from './dsp'
+import { AnalysisFrame, BIN_COUNT, MAX_RINGS, TEX_WIDTH } from '../visualizerCore/dsp'
+import {
+  FULLSCREEN_VERT,
+  RenderTarget,
+  buildProgram,
+  clamp,
+  createRenderTarget,
+  createTexture,
+  createVisualizerContext,
+  destroyRenderTarget,
+  hexToRgb,
+  hueRotate,
+} from '../visualizerCore/glUtils'
 
 export interface RadialWaveParams {
   ringCount: number
@@ -18,13 +30,6 @@ export interface RadialWaveParams {
   exposure: number
   sensitivity: number
 }
-
-/* Fullscreen triangle from gl_VertexID — no buffers, no attributes */
-const VERT = `#version 300 es
-void main() {
-  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
-  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
-}`
 
 /* Rings pass: each pixel computes its distance to every deformed ring. The core stroke is
    feathered by exactly one pixel (analytic AA, crisp at any DPR) and the glow is an exponential
@@ -119,11 +124,6 @@ void main() {
   outColor = vec4(col, 1.0);
 }`
 
-interface RenderTarget {
-  tex: WebGLTexture
-  fbo: WebGLFramebuffer
-}
-
 // WebGL2 renderer for the radial wave. Three fullscreen passes per frame (rings, feedback,
 // present); zero per-frame allocations; backing store sized to exact physical pixels by the host.
 export class RadialWaveRenderer {
@@ -146,20 +146,13 @@ export class RadialWaveRenderer {
   private height = 0
 
   constructor(canvas: HTMLCanvasElement) {
-    const gl = canvas.getContext('webgl2', {
-      alpha: false,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      powerPreference: 'high-performance',
-    })
-    if (!gl) throw new Error('WebGL2 is not available')
+    const gl = createVisualizerContext(canvas)
     this.gl = gl
     this.halfFloat = gl.getExtension('EXT_color_buffer_float') !== null
 
-    this.ringsProg = buildProgram(gl, VERT, RINGS_FRAG)
-    this.feedbackProg = buildProgram(gl, VERT, FEEDBACK_FRAG)
-    this.presentProg = buildProgram(gl, VERT, PRESENT_FRAG)
+    this.ringsProg = buildProgram(gl, FULLSCREEN_VERT, RINGS_FRAG)
+    this.feedbackProg = buildProgram(gl, FULLSCREEN_VERT, FEEDBACK_FRAG)
+    this.presentProg = buildProgram(gl, FULLSCREEN_VERT, PRESENT_FRAG)
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
     this.dispTex = createTexture(gl)
@@ -176,13 +169,8 @@ export class RadialWaveRenderer {
     gl.canvas.width = w
     gl.canvas.height = h
     this.destroyTargets()
-    this.scene = this.createTarget(w, h)
-    this.accum = [this.createTarget(w, h), this.createTarget(w, h)]
-    for (const target of this.accum) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, (target as RenderTarget).fbo)
-      gl.clearColor(0, 0, 0, 1)
-      gl.clear(gl.COLOR_BUFFER_BIT)
-    }
+    this.scene = createRenderTarget(gl, w, h, this.halfFloat)
+    this.accum = [createRenderTarget(gl, w, h, this.halfFloat), createRenderTarget(gl, w, h, this.halfFloat)]
   }
 
   // Draw one frame
@@ -306,27 +294,11 @@ export class RadialWaveRenderer {
     hueRotate(this.baseColors, params.hueDrift * timeSec, this.colors)
   }
 
-  private createTarget(w: number, h: number): RenderTarget {
-    const gl = this.gl
-    const tex = createTexture(gl)
-    if (this.halfFloat) {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null)
-    } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
-    }
-    const fbo = gl.createFramebuffer() as WebGLFramebuffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo)
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0)
-    return { tex, fbo }
-  }
-
   private destroyTargets(): void {
     const gl = this.gl
-    for (const target of [this.scene, ...this.accum]) {
-      if (!target) continue
-      gl.deleteTexture(target.tex)
-      gl.deleteFramebuffer(target.fbo)
-    }
+    destroyRenderTarget(gl, this.scene)
+    destroyRenderTarget(gl, this.accum[0])
+    destroyRenderTarget(gl, this.accum[1])
     this.scene = null
     this.accum = [null, null]
   }
@@ -338,76 +310,3 @@ export class RadialWaveRenderer {
   }
 }
 
-// ─── GL + color helpers ──────────────────────────────────────────────────────
-
-function buildProgram(gl: WebGL2RenderingContext, vertSrc: string, fragSrc: string): WebGLProgram {
-  const vert = compileShader(gl, gl.VERTEX_SHADER, vertSrc)
-  const frag = compileShader(gl, gl.FRAGMENT_SHADER, fragSrc)
-  const prog = gl.createProgram() as WebGLProgram
-  gl.attachShader(prog, vert)
-  gl.attachShader(prog, frag)
-  gl.linkProgram(prog)
-  gl.deleteShader(vert)
-  gl.deleteShader(frag)
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-    throw new Error(`Shader link failed: ${gl.getProgramInfoLog(prog) ?? 'unknown'}`)
-  }
-  return prog
-}
-
-function compileShader(gl: WebGL2RenderingContext, type: number, src: string): WebGLShader {
-  const shader = gl.createShader(type) as WebGLShader
-  gl.shaderSource(shader, src)
-  gl.compileShader(shader)
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error(`Shader compile failed: ${gl.getShaderInfoLog(shader) ?? 'unknown'}`)
-  }
-  return shader
-}
-
-// Linear-filtered, edge-clamped, no mipmaps (a mipmap-less texture is otherwise incomplete)
-function createTexture(gl: WebGL2RenderingContext): WebGLTexture {
-  const tex = gl.createTexture() as WebGLTexture
-  gl.bindTexture(gl.TEXTURE_2D, tex)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  return tex
-}
-
-function clamp(v: number, lo: number, hi: number): number {
-  return Math.min(hi, Math.max(lo, v))
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  let h = hex.replace('#', '')
-  if (h.length === 3) h = h.split('').map((c) => c + c).join('')
-  const v = parseInt(h, 16)
-  if (Number.isNaN(v)) return [1, 1, 1]
-  return [((v >> 16) & 255) / 255, ((v >> 8) & 255) / 255, (v & 255) / 255]
-}
-
-// SVG feColorMatrix hue-rotate applied to all ring colors at once
-function hueRotate(src: Float32Array, deg: number, out: Float32Array): void {
-  const rad = (deg * Math.PI) / 180
-  const c = Math.cos(rad)
-  const s = Math.sin(rad)
-  const m00 = 0.213 + c * 0.787 - s * 0.213
-  const m01 = 0.715 - c * 0.715 - s * 0.715
-  const m02 = 0.072 - c * 0.072 + s * 0.928
-  const m10 = 0.213 - c * 0.213 + s * 0.143
-  const m11 = 0.715 + c * 0.285 + s * 0.14
-  const m12 = 0.072 - c * 0.072 - s * 0.283
-  const m20 = 0.213 - c * 0.213 - s * 0.787
-  const m21 = 0.715 - c * 0.715 + s * 0.715
-  const m22 = 0.072 + c * 0.928 + s * 0.072
-  for (let i = 0; i < src.length; i += 3) {
-    const r = src[i]
-    const g = src[i + 1]
-    const b = src[i + 2]
-    out[i] = Math.max(0, m00 * r + m01 * g + m02 * b)
-    out[i + 1] = Math.max(0, m10 * r + m11 * g + m12 * b)
-    out[i + 2] = Math.max(0, m20 * r + m21 * g + m22 * b)
-  }
-}
