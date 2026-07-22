@@ -339,6 +339,7 @@ function AppBase({
         <ContextMenuRightClickSurface disabled={!enable_custom_context_menu}>
           <ContextMenuDOMLayer className="base-context-menu-layer" items={topLevelContextMenuItems}>
             <>
+              <div id="app-background-portal" className="app-background-layer" />
               <Toaster className="toaster" />
               <ModalLayer />
               <PhotoViewerLayer />

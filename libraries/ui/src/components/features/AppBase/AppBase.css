@@ -362,30 +362,17 @@
   }
 }
 
-.app-page {
-  height: 100%;
-
-  &.loading {
-    opacity: 0;
-  }
-
-  > .access-error,
-  > .crash-error {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
+.app-background-layer {
 
   /*
-    Fixed behind the whole app, not just this page's own column, as a faint backdrop
-    (e.g. sampled from an album cover — see AppPage's animatedGradientColors prop).
-    Negative z-index keeps ordinary in-flow page content painting on top without
-    having to promote every page's content into its own stacking context.
+    Fixed behind the whole app, not just the current page's own column, as a faint backdrop
+    (e.g. sampled from an album cover — see AppPage's animatedGradientColors prop). AppPage
+    portals the gradient here, an early sibling of the app scaffold, so plain DOM order keeps
+    it beneath everything — including the sidebars, which a z-index inside the main column's
+    stacking context could never get under.
 
     The right edge shares --docked-progress/--playback-sidebar-width with the main
-    column's own padding-right above so it eases in against the sidebar with the
+    column's own padding-right so it eases in against the sidebar with the
     same spring the sidebar itself slides with, instead of ending up underneath it
     or snapping.
   */
@@ -400,7 +387,6 @@
        browser derives it from left/right instead of ignoring right altogether. */
     width: auto;
     height: auto;
-    z-index: -1;
     /* Starts invisible and fades in via the .visible class once mounted at full size
        (see AppPage.tsx) — kept separate from AnimatedGradient's own blotch animation. */
     opacity: 0;
@@ -410,6 +396,23 @@
     &.visible {
       opacity: 0.35;
     }
+  }
+}
+
+.app-page {
+  height: 100%;
+
+  &.loading {
+    opacity: 0;
+  }
+
+  > .access-error,
+  > .crash-error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   /* &.sidebar-is-collapsed {
