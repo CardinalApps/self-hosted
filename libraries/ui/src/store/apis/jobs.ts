@@ -50,7 +50,7 @@ export const jobsApi = baseHomeServerApi
         [Job[], number],
         PaginationParams & {
           status: JobStatus[],
-          type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails',
+          type?: 'album_art_thumbnails' | 'photo_variations' | 'photo_thumbnails' | 'generate_waveform',
           order?: CommonOrderParams,
           orderBy?: 'name' | 'createdAt',
         }

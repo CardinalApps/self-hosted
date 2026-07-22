@@ -149,6 +149,7 @@ export class JobService {
     // For new music
     if (payload?.music?.indexed) {
       autoCreatedJobs.push(await this.createJob({ createJobDto: { type: JobType.ALBUM_ART_THUMBNAILS } }))
+      autoCreatedJobs.push(await this.createJob({ createJobDto: { type: JobType.GENERATE_WAVEFORM } }))
     }
 
     // For new photos

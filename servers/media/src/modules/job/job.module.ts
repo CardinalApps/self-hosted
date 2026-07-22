@@ -10,6 +10,7 @@ import { JobTaskQueueService } from './job-task-queue.service'
 import { AlbumArtThumbnailsJobService } from './jobs/album-art-thumbnails.service'
 import { PhotoThumbnailsJobService } from './jobs/photo-thumbnails.service'
 import { PhotoVariationsJobService } from './jobs/photo-variations.service'
+import { GenerateWaveformJobService } from './jobs/generate-waveform.service'
 
 import { Job } from './job.entity'
 import { JobTask } from './job-task.entity'
@@ -21,6 +22,8 @@ import { UserModule } from '../user/user.module'
 import { PhotoModule } from '../photo/photo.module'
 import { ThumbnailModule } from '../thumbnail/thumbnail.module'
 import { MusicReleaseModule } from '../music-release/music-release.module'
+import { MusicTrackModule } from '../music-track/music-track.module'
+import { WaveformModule } from '../waveform/waveform.module'
 
 @Module({
   imports: [
@@ -32,6 +35,8 @@ import { MusicReleaseModule } from '../music-release/music-release.module'
     ThumbnailModule,
     DatabaseModule,
     MusicReleaseModule,
+    MusicTrackModule,
+    WaveformModule,
   ],
   exports: [
     TypeOrmModule,
@@ -41,6 +46,7 @@ import { MusicReleaseModule } from '../music-release/music-release.module'
     AlbumArtThumbnailsJobService,
     PhotoVariationsJobService,
     PhotoThumbnailsJobService,
+    GenerateWaveformJobService,
   ],
   providers: [
     JobService,
@@ -49,6 +55,7 @@ import { MusicReleaseModule } from '../music-release/music-release.module'
     AlbumArtThumbnailsJobService,
     PhotoVariationsJobService,
     PhotoThumbnailsJobService,
+    GenerateWaveformJobService,
   ],
   controllers: [
     JobController,

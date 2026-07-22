@@ -32,6 +32,9 @@
   "job.album_art_thumbnails.name": {
     "en": "Album art thumbnails"
   },
+  "job.generate_waveform.name": {
+    "en": "Music waveforms"
+  },
   "start-new-job": {
     "en": "Start a new job"
   },
@@ -85,6 +88,12 @@
   },
   "job.album_art_thumbnails.desc": {
     "en": "<p>Creates thumbnails of your album artwork in various sizes.</p>"
+  },
+  "job.generate_waveform.title": {
+    "en": "Music waveforms"
+  },
+  "job.generate_waveform.desc": {
+    "en": "<p>Analyzes your music and creates the waveforms that are shown during playback, along with loudness data.</p>"
   },
   "active-job": {
     "en": "Active job"

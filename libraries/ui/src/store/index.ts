@@ -31,6 +31,7 @@ import { baseHomeServerApi } from './apis/baseHomeServerApi'
 import resetMiddleware from './middleware/reset'
 import sseFactoryResetMiddleware from './middleware/sseFactoryReset'
 import sseLatestEventMiddleware from './slices/homeServer/middleware/sseLatestEvent'
+import sseWaveformReadyMiddleware from './slices/music/middleware/sseWaveformReady'
 import logHTTPError from './middleware/logHTTPError'
 
 /**
@@ -101,6 +102,7 @@ const createStore = () => {
         resetMiddleware.middleware,
         sseFactoryResetMiddleware.middleware,
         sseLatestEventMiddleware.middleware,
+        sseWaveformReadyMiddleware.middleware,
         logHTTPError.middleware,
         baseHomeServerApi.middleware,
       )

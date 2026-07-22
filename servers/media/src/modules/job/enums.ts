@@ -2,6 +2,7 @@ export enum JobType {
   ALBUM_ART_THUMBNAILS = 'album_art_thumbnails',
   PHOTO_VARIATIONS = 'photo_variations',
   PHOTO_THUMBNAILS = 'photo_thumbnails',
+  GENERATE_WAVEFORM = 'generate_waveform',
 }
 
 export enum JobStatus {
@@ -19,6 +20,7 @@ export enum JobTaskType {
   CREATE_ALBUM_ARTWORK_THUMBNAIL = 'create_album_artwork_thumbnail',
   CREATE_PHOTO_THUMBNAIL = 'create_photo_thumbnail',
   HEIC_TO_JEPG = 'heic_to_jpeg',
+  GENERATE_TRACK_WAVEFORM = 'generate_track_waveform',
 }
 
 export enum JobTaskStatus {
