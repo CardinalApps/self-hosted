@@ -2,6 +2,7 @@ import { AnalysisFrame, BIN_COUNT, MAX_RINGS, TEX_WIDTH } from '../visualizerCor
 import {
   FULLSCREEN_VERT,
   RenderTarget,
+  TONEMAP_PRESENT_FRAG,
   buildProgram,
   clamp,
   createRenderTarget,
@@ -103,26 +104,6 @@ void main() {
   outColor = vec4(scene + prev * uDecay, 1.0);
 }`
 
-/* Present pass: soft filmic tonemap keeps additive blowouts graceful; the hash dither kills
-   banding in the dark glow falloff */
-const PRESENT_FRAG = `#version 300 es
-precision highp float;
-uniform sampler2D uAccum;
-uniform vec2 uRes;
-uniform float uExposure;
-out vec4 outColor;
-
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
-void main() {
-  vec2 uv = gl_FragCoord.xy / uRes;
-  vec3 hdr = texture(uAccum, uv).rgb;
-  vec3 col = vec3(1.0) - exp(-hdr * uExposure);
-  col += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
-  outColor = vec4(col, 1.0);
-}`
 
 // WebGL2 renderer for the radial wave. Three fullscreen passes per frame (rings, feedback,
 // present); zero per-frame allocations; backing store sized to exact physical pixels by the host.
@@ -152,7 +133,7 @@ export class RadialWaveRenderer {
 
     this.ringsProg = buildProgram(gl, FULLSCREEN_VERT, RINGS_FRAG)
     this.feedbackProg = buildProgram(gl, FULLSCREEN_VERT, FEEDBACK_FRAG)
-    this.presentProg = buildProgram(gl, FULLSCREEN_VERT, PRESENT_FRAG)
+    this.presentProg = buildProgram(gl, FULLSCREEN_VERT, TONEMAP_PRESENT_FRAG)
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1)
     this.dispTex = createTexture(gl)

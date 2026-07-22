@@ -5,6 +5,27 @@ void main() {
   gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
 }`
 
+/* Present pass shared by the non-CRT visualizers: soft filmic tonemap keeps additive blowouts
+   graceful; the hash dither kills banding in the dark glow falloff */
+export const TONEMAP_PRESENT_FRAG = `#version 300 es
+precision highp float;
+uniform sampler2D uAccum;
+uniform vec2 uRes;
+uniform float uExposure;
+out vec4 outColor;
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec3 hdr = texture(uAccum, uv).rgb;
+  vec3 col = vec3(1.0) - exp(-hdr * uExposure);
+  col += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
+  outColor = vec4(col, 1.0);
+}`
+
 export interface RenderTarget {
   tex: WebGLTexture
   fbo: WebGLFramebuffer
