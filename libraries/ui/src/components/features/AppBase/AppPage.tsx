@@ -141,13 +141,16 @@ function AppPage({
       style={style}
       className={clsx('app-page', className, sidebarIsCollapsed && 'sidebar-is-collapsed', loading && 'loading')}
     >
-      {!!enable_glass && !!animatedGradientColors?.length &&
-        <AnimatedGradient
-          values={animatedGradientColors}
-          className={clsx('app-page-background', gradientVisible && 'visible')}
-          sizeMin={40}
-          sizeMax={80}
-        />
+      {!!enable_glass && !!animatedGradientColors?.length && document.querySelector('#app-background-portal') &&
+        createPortal(
+          <AnimatedGradient
+            values={animatedGradientColors}
+            className={clsx('app-page-background', gradientVisible && 'visible')}
+            sizeMin={40}
+            sizeMax={80}
+          />,
+          document.querySelector('#app-background-portal'),
+        )
       }
       {/* Render errors in the page swap it for the crash screen; the app scaffold stays alive */}
       <ErrorBoundary fallback={<CrashError />}>
