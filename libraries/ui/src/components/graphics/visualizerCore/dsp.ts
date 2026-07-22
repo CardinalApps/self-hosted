@@ -1,12 +1,18 @@
 export const BIN_COUNT = 96
 export const TEX_WIDTH = 32
 export const MAX_RINGS = 5
+export const WAVE_POINTS = 512
+
+/* Samples of the analyser window shown by the oscilloscope (~43ms at 48kHz) */
+const WAVE_WINDOW = 2048
 
 export interface AnalysisFrame {
   /* Log-spaced spectrum, 0..1, envelope-smoothed and auto-gained */
   spectrum: Float32Array
-  /* Per-ring band energy envelopes, 0..1 */
+  /* Per-band energy envelopes, 0..1 (bass first; rings and lines both map onto these) */
   pulses: Float32Array
+  /* Phase-locked time-domain waveform, -1..1, auto-gained */
+  wave: Float32Array
   loudness: number
 }
 
@@ -17,11 +23,15 @@ export class SpectrumProcessor {
   private readonly raw = new Float32Array(BIN_COUNT)
   private readonly smoothed = new Float32Array(BIN_COUNT)
   private readonly env = new Float32Array(BIN_COUNT)
+  private readonly waveTmp = new Float32Array(WAVE_POINTS)
   private peak = 0.25
+  private wavePeak = 0.15
+  private lastTrigger = 0
 
   readonly frame: AnalysisFrame = {
     spectrum: new Float32Array(BIN_COUNT),
     pulses: new Float32Array(MAX_RINGS),
+    wave: new Float32Array(WAVE_POINTS),
     loudness: 0,
   }
 
@@ -98,5 +108,48 @@ export class SpectrumProcessor {
     }
 
     return frame
+  }
+
+  /* Phase-locked oscilloscope capture. Anchoring the window at the rising zero-crossing nearest
+     the previous trigger makes the wave hold still and breathe instead of jittering sideways —
+     the classic scope-trigger trick. */
+  processWave(time: Uint8Array, dt: number, sensitivity: number): void {
+    const { frame, waveTmp } = this
+    const maxStart = time.length - WAVE_WINDOW
+    let trigger = -1
+    let best = Infinity
+    for (let i = 1; i < maxStart; i++) {
+      if (time[i - 1] < 128 && time[i] >= 128) {
+        const d = Math.abs(i - this.lastTrigger)
+        if (d < best) {
+          best = d
+          trigger = i
+        }
+      }
+    }
+    if (trigger === -1) trigger = Math.min(this.lastTrigger, Math.max(0, maxStart))
+    this.lastTrigger = trigger
+
+    // downsample the window by block-averaging and track the peak for auto-gain
+    const step = WAVE_WINDOW / WAVE_POINTS
+    let framePeak = 0
+    for (let p = 0; p < WAVE_POINTS; p++) {
+      const i0 = trigger + Math.floor(p * step)
+      const i1 = i0 + Math.floor(step)
+      let sum = 0
+      for (let i = i0; i < i1; i++) sum += time[i] - 128
+      const v = sum / (i1 - i0) / 128
+      waveTmp[p] = v
+      framePeak = Math.max(framePeak, Math.abs(v))
+    }
+    this.wavePeak = Math.max(0.05, framePeak, this.wavePeak * Math.exp(-dt / 3))
+    const gain = Math.min(2.5, (0.85 * sensitivity) / this.wavePeak)
+
+    // light temporal blend tames shimmer without turning the scope to mush
+    const blend = 1 - Math.exp(-dt / 0.016)
+    for (let p = 0; p < WAVE_POINTS; p++) {
+      const v = Math.max(-1, Math.min(1, waveTmp[p] * gain))
+      frame.wave[p] += (v - frame.wave[p]) * blend
+    }
   }
 }

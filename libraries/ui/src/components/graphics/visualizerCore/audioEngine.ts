@@ -1,4 +1,4 @@
-import { AnalysisFrame, BIN_COUNT, MAX_RINGS, SpectrumProcessor } from './dsp'
+import { AnalysisFrame, BIN_COUNT, MAX_RINGS, SpectrumProcessor, WAVE_POINTS } from './dsp'
 import { SynthBeat } from './synthBeat'
 
 export type AudioSourceKind = 'none' | 'file' | 'synth'
@@ -10,6 +10,7 @@ export class VisualizerAudioEngine {
   private master: GainNode | null = null
   private analyser: AnalyserNode | null = null
   private freqData = new Uint8Array(0)
+  private timeData = new Uint8Array(0)
   private processor: SpectrumProcessor | null = null
   private element: HTMLAudioElement | null = null
   private objectUrl: string | null = null
@@ -18,6 +19,7 @@ export class VisualizerAudioEngine {
   private readonly idleFrame: AnalysisFrame = {
     spectrum: new Float32Array(BIN_COUNT),
     pulses: new Float32Array(MAX_RINGS),
+    wave: new Float32Array(WAVE_POINTS),
     loudness: 0,
   }
 
@@ -68,10 +70,13 @@ export class VisualizerAudioEngine {
   }
 
   // Sample the analyser and produce this frame's analysis; gentle idle motion when silent
-  update(dt: number, timeSec: number, sensitivity: number, ringCount: number): AnalysisFrame {
+  update(dt: number, timeSec: number, sensitivity: number, bands: number): AnalysisFrame {
     if (!this.analyser || !this.processor || !this.playing) return this.idle(timeSec)
     this.analyser.getByteFrequencyData(this.freqData)
-    return this.processor.process(this.freqData, dt, sensitivity, ringCount)
+    this.analyser.getByteTimeDomainData(this.timeData)
+    const frame = this.processor.process(this.freqData, dt, sensitivity, bands)
+    this.processor.processWave(this.timeData, dt, sensitivity)
+    return frame
   }
 
   dispose(): void {
@@ -95,6 +100,7 @@ export class VisualizerAudioEngine {
     this.master.connect(this.analyser)
     this.analyser.connect(this.ctx.destination)
     this.freqData = new Uint8Array(this.analyser.frequencyBinCount)
+    this.timeData = new Uint8Array(this.analyser.fftSize)
     this.processor = new SpectrumProcessor(this.ctx.sampleRate, this.analyser.fftSize)
     return this.ctx
   }
@@ -107,6 +113,10 @@ export class VisualizerAudioEngine {
     }
     for (let i = 0; i < MAX_RINGS; i++) {
       f.pulses[i] = 0.08 + 0.1 * (0.5 + 0.5 * Math.sin(t * 0.9 + i * 1.7))
+    }
+    for (let p = 0; p < WAVE_POINTS; p++) {
+      const x = p / WAVE_POINTS
+      f.wave[p] = 0.25 * Math.sin(x * Math.PI * 4 + t * 1.8) * (0.75 + 0.25 * Math.sin(t * 0.7))
     }
     f.loudness = 0.06
     return f
