@@ -7,12 +7,7 @@
   .release-meta-card {
     width: 100%;
     margin-bottom: calc(var(--gutter) * 2);
-
-    &.glass {
-      background-color: color-mix(in srgb, var(--bg-1) 55%, transparent);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
+    container-type: inline-size;
 
     .release-meta-card-cols {
       display: flex;
@@ -105,9 +100,37 @@
     flex-wrap: wrap;
   }
 
+  @container (max-width: 930px) {
+
+    .release-meta .release-meta-cols {
+      flex-direction: column;
+      gap: 0;
+
+      .release-meta-list:first-of-type li:last-of-type {
+        border-bottom: 1px solid var(--border-color-3);
+      }
+    }
+  }
+
+  @container (max-width: 330px) {
+
+    .release-meta-card .release-meta-card-cols {
+      flex-direction: column;
+
+      .release-artwork {
+        width: 100%;
+
+        .music-release-art {
+          max-width: 100%;
+          margin-inline: auto;
+        }
+      }
+    }
+  }
+
   @media screen and (max-width: 768px) {
 
-    .release-meta-card-cols {
+    .release-meta-card .release-meta-card-cols {
       flex-direction: column;
       align-items: center;
       text-align: center;
