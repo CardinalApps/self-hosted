@@ -1,13 +1,12 @@
 import {
   Controller,
   Get,
-  Query,
   Res,
-  UnauthorizedException,
   MessageEvent,
   Logger,
 } from '@nestjs/common'
 import {
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger'
 import { Subject } from 'rxjs'
@@ -15,19 +14,17 @@ import { Response } from 'express'
 import { v4 as uuid } from 'uuid'
 
 import { EventService } from './event.service'
-import { UserService } from '../user/user.service'
-import { TokenService } from '../auth/token.service'
-
-import { SubscribeDto } from './dtos/Subscribe.dto'
+import { User } from '../user/user.entity'
 
 import { log, LogModule, LogLevel } from '../../utils/logging'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 
 /**
  * The EventController implements Server-Sent Events manually in a GET handler
  * instead of using Nest.js's `@Sse()` decorator because it is too limited. There
  * is no difference to the client.
- * 
+ *
  * Based on https://github.com/nestjs/nest/issues/12670
  */
 @Controller()
@@ -35,8 +32,6 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 export class EventController {
   constructor(
     private readonly eventService: EventService,
-    private readonly tokenService: TokenService,
-    private readonly userService: UserService,
   ) {}
 
   /**
@@ -44,7 +39,6 @@ export class EventController {
    */
   @Get('/events/subscribe')
   @StandardEndpoint({
-    auth: false,
     summary: 'Subscribe to real time events.',
     description:
     `Subscribe to events. An \`EventSource\` can be used to listen to events (the
@@ -53,18 +47,20 @@ Swagger test page won't work).
 Each client connection is unique to that client app, and clients will only
 receive the events that are meant for them.
 
-The JWT must be sent in the \`authorization\` query param instead of the
-header.`,
+Authenticate with the standard \`Authorization\` header. Clients built on the
+native browser \`EventSource\` cannot send headers; those can send the JWT in
+the deprecated \`authorization\` query param instead.`,
+  })
+  @ApiQuery({
+    name: 'authorization',
+    required: false,
+    deprecated: true,
+    description: 'The JWT, for EventSource implementations that cannot send an Authorization header.',
   })
   async sse(
-    @Query() query: SubscribeDto,
+    @CurrentUser() user: User,
     @Res() response: Response,
   ) {
-    if (this.tokenService.verifyAccessToken(query.authorization) !== 'valid') throw new UnauthorizedException()
-
-    const user = await this.userService.getUserByLocalJWT(query.authorization)
-    if (!user) throw new UnauthorizedException()
-
     const subject = new Subject<MessageEvent>()
     const observer = {
       next: (msg: MessageEvent) => {

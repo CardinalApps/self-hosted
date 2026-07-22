@@ -45,6 +45,27 @@ export const registerTokenRefreshProvider = (fn: () => Promise<string>) => {
   tokenRefreshProvider = fn
 }
 
+let tokenRefreshInFlight: Promise<string> | null = null
+
+/**
+ * Invokes the registered token refresh provider. Concurrent callers share the
+ * same in-flight refresh instead of each triggering their own request. Returns
+ * null when no provider has been registered.
+ */
+export const runTokenRefresh = (): Promise<string> | null => {
+  if (!tokenRefreshProvider) {
+    return null
+  }
+
+  if (!tokenRefreshInFlight) {
+    tokenRefreshInFlight = tokenRefreshProvider().finally(() => {
+      tokenRefreshInFlight = null
+    })
+  }
+
+  return tokenRefreshInFlight
+}
+
 export type HomeServerAPIProps = {
   body?: Record<string, unknown>,
   headers?: Record<string, unknown>,
@@ -83,7 +104,7 @@ const homeServerAPI = async <T>(
     const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
     if (token && isJwtExpiringSoon(token, 10)) {
       try {
-        await tokenRefreshProvider()
+        await runTokenRefresh()
       } catch {
         // If proactive refresh fails, let the request proceed and rely on the
         // reactive 401 handler to deal with it

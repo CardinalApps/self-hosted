@@ -1,8 +1,14 @@
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { EventSource, type FetchLike } from 'eventsource'
 
 import { HOME_SERVER_HOST } from '../../env'
-import { getJWT, JWT_TYPE } from '../lib/auth/jwt'
+import { authorizedFetchHeaders, getJWT, isJwtExpiringSoon, JWT_TYPE } from '../lib/auth/jwt'
+import { runTokenRefresh } from '../lib/homeserver/homeServerAPI'
+import { homeServerUserSelectors } from '../store/slices/homeServerUser'
+
+const RECONNECT_BASE_DELAY_MS = 1000
+const RECONNECT_MAX_DELAY_MS = 30000
 
 /**
  * Establishes a connection to an API endpoint that implements server-side
@@ -25,29 +31,106 @@ import { getJWT, JWT_TYPE } from '../lib/auth/jwt'
  */
 export default function useServerSideEvents(endpoint = '/events/subscribe', apiVersion = 1) {
   const dispatch = useDispatch()
+  const loggedIn = useSelector(homeServerUserSelectors.loggedIn)
 
   useEffect(() => {
-    const jwt = getJWT(JWT_TYPE.HOME_SERVER_USER)
-
-    if (!jwt) {
+    if (!loggedIn) {
       return
     }
 
-    const eventSource = new EventSource(`${HOME_SERVER_HOST}/api/v${apiVersion}${endpoint}?authorization=${jwt}`)
+    let eventSource: EventSource | null = null
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+    let failedAttempts = 0
+    let disposed = false
 
-    eventSource.onmessage = ({ data }) => {
+    /* Auth headers are built at request time, so every connection attempt — including
+       the automatic retries after a network error — carries the current tokens */
+    const fetchWithAuthHeaders: FetchLike = (url, init) => fetch(url, {
+      ...init,
+      headers: {
+        ...init.headers,
+        ...authorizedFetchHeaders(JWT_TYPE.HOME_SERVER_USER),
+      },
+    })
+
+    // Schedules a reconnection with exponential backoff
+    const scheduleReconnect = () => {
+      if (disposed || reconnectTimer) {
+        return
+      }
+
+      const delay = Math.min(RECONNECT_BASE_DELAY_MS * 2 ** failedAttempts, RECONNECT_MAX_DELAY_MS)
+      failedAttempts += 1
+
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null
+        connect()
+      }, delay)
+    }
+
+    // Opens the SSE connection, refreshing a stale access token first
+    const connect = async () => {
+      const token = getJWT(JWT_TYPE.HOME_SERVER_USER)
+
+      if (!token) {
+        return
+      }
+
       try {
-        const event = JSON.parse(data)
-        dispatch({ type: `sse/${event.type}`, payload: event?.payload || null })
+        if (isJwtExpiringSoon(token, 10)) {
+          await runTokenRefresh()
+        }
       } catch {
-        console.error('Received an event that was not a valid JSON string.', data)
+        // Connect anyway and let the 401 handling below deal with it
+      }
+
+      if (disposed) {
+        return
+      }
+
+      const source = new EventSource(`${HOME_SERVER_HOST}/api/v${apiVersion}${endpoint}`, {
+        fetch: fetchWithAuthHeaders,
+      })
+      eventSource = source
+
+      source.onopen = () => {
+        failedAttempts = 0
+      }
+
+      source.onmessage = ({ data }) => {
+        try {
+          const event = JSON.parse(data)
+          dispatch({ type: `sse/${event.type}`, payload: event?.payload || null })
+        } catch {
+          console.error('Received an event that was not a valid JSON string.', data)
+        }
+      }
+
+      source.onerror = (error) => {
+        /* Network errors are retried by the EventSource itself, and each retry rebuilds
+           the auth headers. HTTP errors close the connection permanently (per the SSE
+           spec), so those reconnects are handled here — after a token refresh when the
+           server said 401. */
+        if (source.readyState !== EventSource.CLOSED) {
+          return
+        }
+
+        const refresh = error.code === 401 ? runTokenRefresh() : null
+
+        Promise.resolve(refresh).catch(() => null).finally(() => scheduleReconnect())
       }
     }
 
-    eventSource.onerror = () => {
-      console.error('EventSource error')
-    }
+    connect()
 
-    return () => eventSource.close()
-  }, [])
+    return () => {
+      disposed = true
+
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer)
+      }
+
+      eventSource?.close()
+    }
+  }, [loggedIn])
 }

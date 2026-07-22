@@ -58,8 +58,8 @@ describe('GET /api/v1/updates', () => {
 })
 
 describe('GET /api/v1/events/subscribe', () => {
-  it('returns 400 when authorization query param is missing', () => {
-    return request(testApp.app.getHttpServer()).get('/api/v1/events/subscribe').expect(400)
+  it('returns 401 without authentication', () => {
+    return request(testApp.app.getHttpServer()).get('/api/v1/events/subscribe').expect(401)
   })
 })
 
