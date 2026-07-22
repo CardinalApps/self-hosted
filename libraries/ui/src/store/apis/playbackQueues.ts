@@ -113,6 +113,31 @@ export const playbackQueueApi = baseHomeServerApi
         invalidatesTags: ['PlaybackQueue.List'],
       }),
 
+      /*
+        Adds tracks to an existing queue, either right after the current item ('next') or at
+        the end ('end'). The server's /extend endpoint is still a stub, so for now this call
+        succeeds without changing the queue — the client contract is settled here so the
+        server work can land independently.
+      */
+      extendQueue: builder.mutation<
+        void,
+        {
+          queueId: string,
+          trackIds: string[],
+          insert: 'next' | 'end',
+        }
+      >({
+        query: ({ queueId, trackIds, insert }) => ({
+          url: `/playback-queues/${queueId}/extend`,
+          method: 'POST',
+          body: {
+            insert,
+            items: trackIds.map((trackId) => ({ mediaId: trackId, mediaType: 'music_track' })),
+          },
+        }),
+        invalidatesTags: ['PlaybackQueue.List'],
+      }),
+
       deleteQueue: builder.mutation<
         boolean,
         string
@@ -132,4 +157,5 @@ export const {
   useCreateQueueMutation,
   useDeleteQueueMutation,
   useMoveQueueItemMutation,
+  useExtendQueueMutation,
 } = playbackQueueApi

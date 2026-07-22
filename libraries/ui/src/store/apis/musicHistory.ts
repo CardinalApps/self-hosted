@@ -26,6 +26,29 @@ export const musicHistoryApi = baseHomeServerApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
+      // One plain page of history, newest first, for consumers that only need to peek at
+      // recent listens (e.g. finding the last played track of a release) without the
+      // infinite scroll machinery.
+      getMusicHistory: builder.query<
+        [MusicHistoryEntryType[], number],
+        PaginationParams & {
+          order?: CommonOrderParams,
+          release?: boolean,
+          metadata?: boolean,
+        }
+      >({
+        query: ({ take, skip, order, release, metadata }) => {
+          return queryParams('/music/history', {
+            ...(take && { take }),
+            ...(typeof skip !== 'undefined' && { skip }),
+            ...(order && { order }),
+            ...(release && { release }),
+            ...(metadata && { metadata }),
+          })
+        },
+        providesTags: ['MusicHistoryList'],
+      }),
+
       /**
        * Infinite scroll.
        */
@@ -79,6 +102,7 @@ export const musicHistoryApi = baseHomeServerApi
   })
 
 export const {
+  useGetMusicHistoryQuery,
   useUpsertHistoryEntryMutation,
   useGetInfiniteMusicHistoryInfiniteQuery,
 } = musicHistoryApi
