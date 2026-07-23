@@ -19,7 +19,11 @@
 
   .queue-list {
     margin: 0;
+    margin-right: -3px;
     padding: 0;
+    /* Bleeds the box 3px into the card's own padding so the scrollbar backs off the
+       track rows without shifting them — the extra width and the padding cancel out. */
+    padding-right: 3px;
     list-style: none;
     overflow-y: auto;
     overflow-x: hidden;
