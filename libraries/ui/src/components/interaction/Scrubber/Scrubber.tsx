@@ -98,8 +98,10 @@ const Scrubber = ({
       canvas.width = Math.round(rect.width * dpr)
       canvas.height = Math.round(rect.height * dpr)
 
-      const accentColor = getComputedStyle(scrubberEl).getPropertyValue('--accent-color')
-      const palettes = deriveWaveformPalettes(tintColors, accentColor)
+      const computedStyle = getComputedStyle(scrubberEl)
+      const accentColor = computedStyle.getPropertyValue('--accent-color')
+      const mutedColor = computedStyle.getPropertyValue('--bg-1')
+      const palettes = deriveWaveformPalettes(tintColors, accentColor, mutedColor)
 
       const renderLayer = (palette: typeof palettes.vivid) => {
         const layer = document.createElement('canvas')
