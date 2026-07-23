@@ -12,10 +12,10 @@ import { JobTaskStatus, JobTaskType } from '../enums'
 import { JobProcessor } from '../types'
 
 /**
- * The generate_waveform job creates waveform data for music tracks.
+ * The generate_waveforms job creates waveform data for music tracks.
  */
 @Injectable({ scope: Scope.TRANSIENT })
-export class GenerateWaveformJobService implements JobProcessor {
+export class GenerateWaveformsJobService implements JobProcessor {
   constructor(
     @InjectRepository(JobTask)
     private jobTaskRepository: Repository<JobTask>,

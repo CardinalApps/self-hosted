@@ -10,7 +10,7 @@ import { JobTaskQueueService } from './job-task-queue.service'
 import { AlbumArtThumbnailsJobService } from './jobs/album-art-thumbnails.service'
 import { PhotoThumbnailsJobService } from './jobs/photo-thumbnails.service'
 import { PhotoVariationsJobService } from './jobs/photo-variations.service'
-import { GenerateWaveformJobService } from './jobs/generate-waveform.service'
+import { GenerateWaveformsJobService } from './jobs/generate-waveforms.service'
 
 import { Job } from './job.entity'
 import { JobTask } from './job-task.entity'
@@ -46,7 +46,7 @@ import { WaveformModule } from '../waveform/waveform.module'
     AlbumArtThumbnailsJobService,
     PhotoVariationsJobService,
     PhotoThumbnailsJobService,
-    GenerateWaveformJobService,
+    GenerateWaveformsJobService,
   ],
   providers: [
     JobService,
@@ -55,7 +55,7 @@ import { WaveformModule } from '../waveform/waveform.module'
     AlbumArtThumbnailsJobService,
     PhotoVariationsJobService,
     PhotoThumbnailsJobService,
-    GenerateWaveformJobService,
+    GenerateWaveformsJobService,
   ],
   controllers: [
     JobController,

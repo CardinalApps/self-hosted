@@ -4,7 +4,7 @@
  */
 
 // Bump this when the data format or analysis algorithm changes in a way that
-// requires regeneration. The generate_waveform job re-enqueues any track whose
+// requires regeneration. The generate_waveforms job re-enqueues any track whose
 // stored waveform has a lower version.
 export const WAVEFORM_VERSION = 1
 

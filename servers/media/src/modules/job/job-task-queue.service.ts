@@ -10,7 +10,7 @@ import { JobTask } from './job-task.entity'
 import { AlbumArtThumbnailsJobService } from './jobs/album-art-thumbnails.service'
 import { PhotoThumbnailsJobService } from './jobs/photo-thumbnails.service'
 import { PhotoVariationsJobService } from './jobs/photo-variations.service'
-import { GenerateWaveformJobService } from './jobs/generate-waveform.service'
+import { GenerateWaveformsJobService } from './jobs/generate-waveforms.service'
 
 import { EventService } from '../event/event.service'
 import { JobEvents } from './events'
@@ -60,7 +60,7 @@ export class JobTaskQueueService implements QueueService {
     AlbumArtThumbnailsJobService
     | PhotoThumbnailsJobService
     | PhotoVariationsJobService
-    | GenerateWaveformJobService
+    | GenerateWaveformsJobService
     | undefined
 
   /**
@@ -90,8 +90,8 @@ export class JobTaskQueueService implements QueueService {
         this.jobWorkerService = await this.moduleRef.resolve(PhotoVariationsJobService)
         break
 
-      case JobType.GENERATE_WAVEFORM:
-        this.jobWorkerService = await this.moduleRef.resolve(GenerateWaveformJobService)
+      case JobType.GENERATE_WAVEFORMS:
+        this.jobWorkerService = await this.moduleRef.resolve(GenerateWaveformsJobService)
         break
     }
 

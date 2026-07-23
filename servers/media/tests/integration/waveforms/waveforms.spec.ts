@@ -6,7 +6,7 @@ import { Repository } from 'typeorm'
 import { createTestApp, destroyTestApp, waitForBackgroundJobs, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
 import { JobService } from '../../../src/modules/job/job.service'
-import { GenerateWaveformJobService } from '../../../src/modules/job/jobs/generate-waveform.service'
+import { GenerateWaveformsJobService } from '../../../src/modules/job/jobs/generate-waveforms.service'
 import { WaveformService } from '../../../src/modules/waveform/waveform.service'
 import { WAVEFORM_VERSION } from '../../../src/modules/waveform/analysis'
 import { MusicTrack } from '../../../src/modules/music-track/music-track.entity'
@@ -99,7 +99,7 @@ beforeAll(async () => {
   waveformRepository = testApp.moduleRef.get(getRepositoryToken(MusicTrackWaveform))
   waveformService = testApp.moduleRef.get(WaveformService)
 
-  // The indexing run auto-starts a generate_waveform job; let it finish and
+  // The indexing run auto-starts a generate_waveforms job; let it finish and
   // clear its output so every test starts from a known state
   await waitForBackgroundJobs(testApp)
   await waveformRepository.createQueryBuilder().delete().execute()
@@ -182,12 +182,12 @@ describe('WaveformService', () => {
 })
 
 // -------------------------------------------------------------------------
-// generate_waveform job work queries
+// generate_waveforms job work queries
 // -------------------------------------------------------------------------
 
-describe('GenerateWaveformJobService', () => {
+describe('GenerateWaveformsJobService', () => {
   it('only counts tracks without a current waveform as work', async () => {
-    const jobService = await testApp.moduleRef.resolve(GenerateWaveformJobService)
+    const jobService = await testApp.moduleRef.resolve(GenerateWaveformsJobService)
 
     for (const track of tracks) {
       await waveformService.generateForTrack(track.id)

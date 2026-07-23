@@ -11,7 +11,7 @@ const i18n = {
   "job.photo_variations.name": {
     "en": "Photo variations",
   },
-  "job.generate_waveform.name": {
+  "job.generate_waveforms.name": {
     "en": "Music waveforms",
   },
   "job.status.in_queue": {
