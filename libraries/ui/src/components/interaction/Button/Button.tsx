@@ -151,8 +151,8 @@ const Button = ({
           className="button-choiced"
           open={choicesOpen}
           onClose={() => setChoicesOpen(false)}
-          position="tl"
-          origin="bl"
+          position="tr"
+          origin="br"
           offset={6}
           width={200}
           trigger={(

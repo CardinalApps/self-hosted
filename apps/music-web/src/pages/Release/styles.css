@@ -84,6 +84,7 @@
   }
 
   .release-play-cta-col {
+    container: release-play-cta / inline-size;
 
     .release-play-actions {
       display: flex;
@@ -93,21 +94,20 @@
 
     .release-drive-row {
       display: flex;
-
-      .action-button-animation-box {
-        width: 100%;
-      }
-
-      .button.action {
-        width: 100%;
-        justify-content: center;
-      }
     }
 
     .release-play-modes {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+
+      @container release-play-cta (max-width: 440px) {
+        grid-template-columns: 1fr;
+      }
+
+      > * {
+        min-width: 0;
+      }
 
       .popout-anchor {
         width: 100%;
@@ -170,16 +170,19 @@
     }
   }
 
+  @media screen and (max-width: 980px) {
+
+    .release-bottom-row {
+      grid-template-columns: 100%;
+    }
+  }
+
   @media screen and (max-width: 768px) {
 
     .release-meta-card .release-meta-card-cols {
       flex-direction: column;
       align-items: center;
       text-align: center;
-    }
-
-    .release-bottom-row {
-      grid-template-columns: 100%;
     }
   }
 }

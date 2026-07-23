@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
@@ -16,6 +15,7 @@ import i18n from './i18n.json'
 const ACTION_BUTTON_NAME = 'drive-playback'
 
 type DrivePlaybackProps = {
+  releaseId: string,
   trackIds: string[],
 }
 
@@ -24,15 +24,22 @@ type DrivePlaybackProps = {
  * until the server grows a dynamic queue type for it, pressing Drive plays the release
  * front to back as a placeholder.
  */
-function DrivePlayback({ trackIds }: DrivePlaybackProps) {
+function DrivePlayback({ releaseId, trackIds }: DrivePlaybackProps) {
   const dispatch = useAppDispatch()
   const { lang } = useAppSelector(settingsSelectors.current)
-  const playingIds = useAppSelector(audioSelectors.playingIds)
-  const loadingIds = useAppSelector(audioSelectors.loadingIds)
   const players = useAppSelector(audioSelectors.players)
-  const [drivePlayerId, setDrivePlayerId] = useState<string | null>(null)
-  const [partyTime, setPartyTime] = useState<boolean>(false)
   const { [ACTION_BUTTON_NAME]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
+
+  /*
+    Party while the player this button started is still going, and only on the release it
+    was started for. TrueShuffle can spot its players by their dynamic queue type; the
+    Drive queue type doesn't exist yet, so the started player's id and release live in the
+    layout slice, which also lets the party survive leaving and revisiting the page.
+  */
+  const drivePlayer = storedActionButton?.playerId && storedActionButton?.scopeId === releaseId
+    ? players?.[storedActionButton.playerId]
+    : undefined
+  const partyTime = !!drivePlayer && (drivePlayer.state === PLAYBACK_STATE.PLAYING || drivePlayer.state === PLAYBACK_STATE.LOADING)
   const isPartyTime = partyTime && storedActionButton?.gradientAnimation
 
   /**
@@ -58,18 +65,10 @@ function DrivePlayback({ trackIds }: DrivePlaybackProps) {
     if (!trackIds.length) return
     const result = await dispatch(play({ trackIds }))
     const generatedPlayerId = (result.payload as PlayReturn)?.create?.[0]?.generatedPlayerId
-    if (generatedPlayerId) setDrivePlayerId(generatedPlayerId)
+    if (generatedPlayerId) {
+      dispatch(layoutActions.setActionButton({ buttonName: ACTION_BUTTON_NAME, button: { playerId: generatedPlayerId, scopeId: releaseId } }))
+    }
   }
-
-  /*
-    Party while the player this button started is still going. TrueShuffle can spot its
-    players by their dynamic queue type; the Drive queue type doesn't exist yet, so this
-    button tracks the player it created instead.
-  */
-  useEffect(() => {
-    const player = drivePlayerId ? players?.[drivePlayerId] : undefined
-    setPartyTime(!!player && (player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING))
-  }, [playingIds, loadingIds, players, drivePlayerId])
 
   return (
     <Button
