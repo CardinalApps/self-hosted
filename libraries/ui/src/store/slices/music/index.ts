@@ -7,7 +7,7 @@ import previous from './thunks/previous'
 
 import { Library } from '../../apis/libraries'
 import { STORE_KEY, PLAYER, PLAYBACK_STATE, RepeatMode } from './constants'
-import { DynamicQueueType, QueueType } from '../../apis/playbackQueues'
+import { DynamicQueueType, QueueSeedMediaType, QueueType } from '../../apis/playbackQueues'
 
 /**
  * Queue items always arrive from the server in queue order. Their stored position is
@@ -24,6 +24,8 @@ export type QueueItem = {
 export type ServerQueue = {
   type: QueueType,
   dynamicType: DynamicQueueType,
+  seedMediaType?: QueueSeedMediaType,
+  seedMediaId?: string,
   queueId: string,
   items?: QueueItem[],
 }

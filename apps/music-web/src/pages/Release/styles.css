@@ -92,8 +92,10 @@
       gap: var(--gutter);
     }
 
-    .release-drive-row {
+    .release-mix-row {
       display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .release-play-modes {

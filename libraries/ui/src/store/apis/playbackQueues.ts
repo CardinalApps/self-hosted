@@ -6,7 +6,8 @@ import { baseHomeServerApi } from './baseHomeServerApi'
 import { QueueItem, ServerQueue } from '../slices/music'
 
 export type QueueType = 'static' | 'dynamic'
-export type DynamicQueueType = 'true_shuffle'
+export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore'
+export type QueueSeedMediaType = 'music_release'
 
 /**
  * @deprecated

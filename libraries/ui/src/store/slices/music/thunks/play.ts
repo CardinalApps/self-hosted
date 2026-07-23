@@ -8,13 +8,15 @@ import { AppDispatch, RootState } from '../../../'
 
 import { PLAYBACK_STATE, STORE_KEY } from '../constants'
 import homeServerAPI from '../../../../lib/homeserver/homeServerAPI'
-import { DynamicQueueType, QueueType } from '../../../apis/playbackQueues'
+import { DynamicQueueType, QueueSeedMediaType, QueueType } from '../../../apis/playbackQueues'
 
 export type PlayArgs = {
   trackIds?: string[],
   playerId?: string,
   queueType?: QueueType
   dynamicQueueType?: DynamicQueueType,
+  seedMediaType?: QueueSeedMediaType,
+  seedMediaId?: string,
   queueName?: string,
 }
 
@@ -64,6 +66,8 @@ const play = createAsyncThunk<
     playerId,
     queueType = 'static',
     dynamicQueueType,
+    seedMediaType,
+    seedMediaId,
   } = args
   const state = thunkAPI.getState()
   const lang = state.settings?.current?.lang
@@ -112,6 +116,7 @@ const play = createAsyncThunk<
         body: {
           type: queueType,
           ...(dynamicQueueType ? { dynamicType: dynamicQueueType } : {}),
+          ...(seedMediaType && seedMediaId ? { seedMediaType, seedMediaId } : {}),
           ...(currentLibraries?.length
             ? { libraries: currentLibraries.map((id) => ({ libraryId: id })) }
             : {}

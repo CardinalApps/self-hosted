@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Query,
@@ -29,7 +30,8 @@ import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
 import { QueryPlaybackQueueItemsDto } from './dtos/QueryPlaybackQueueItem.dto'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { QueueItemService } from './playback-queue-item.service'
-import { CreatePlaybackQueueNextItemsDto } from './dtos/CreatePlaybackQueueNextItems'
+import { DynamicPlayback } from './dynamic-playback-queue.service'
+import { ExtendPlaybackQueueDto } from './dtos/ExtendPlaybackQueue.dto'
 import { MovePlaybackQueueItemDto, MovePlaybackQueueItemParamsDto } from './dtos/MovePlaybackQueueItem.dto'
 
 @Controller('/playback-queues')
@@ -38,6 +40,7 @@ export class PlaybackQueueController {
   constructor(
     private readonly playbackQueueService: QueueService,
     private readonly playbackQueueItemService: QueueItemService,
+    private readonly dynamicQueueService: DynamicPlayback,
     private readonly eventService: EventService,
   ) {}
 
@@ -151,18 +154,37 @@ export class PlaybackQueueController {
   }
 
   /**
-   * Add items to a dynamic queue.
+   * Add items to a queue. Explicit items are inserted where the caller asked;
+   * without items, a dynamic queue generates its own next batch.
    */
   @Post('/:id/extend')
   @StandardEndpoint({
-    summary: 'Add items to a dynamic queue.',
+    summary: 'Add items to a queue.',
     //capabilities: ['Invitations.Create'],
   })
   async extend(
+    @Param() { id }: GetPlaybackQueueDto,
     @CurrentUser() user: User,
-    @Body() extendPlaybackQueueDto: CreatePlaybackQueueNextItemsDto,
-  ): Promise<void> {
-    console.log(extendPlaybackQueueDto)
-    return
+    @Body() { items, insert }: ExtendPlaybackQueueDto,
+  ): Promise<PlaybackQueueItem[]> {
+    const queue = await this.playbackQueueService.get(id)
+
+    if (!queue) {
+      throw new NotFoundException()
+    }
+
+    if (queue?.user?.userId !== user?.userId) {
+      throw new ForbiddenException()
+    }
+
+    if (items?.length) {
+      return await this.playbackQueueItemService.insertItems(queue, items, insert === 'next' ? 'next' : 'end')
+    }
+
+    if (queue.type === 'dynamic') {
+      return await this.dynamicQueueService.extendQueue(queue.queueId)
+    }
+
+    throw new BadRequestException('A static queue can only be extended with explicit items.')
   }
 }

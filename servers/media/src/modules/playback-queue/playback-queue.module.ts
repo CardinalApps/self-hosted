@@ -13,10 +13,12 @@ import { DynamicPlayback } from './dynamic-playback-queue.service'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { MusicTrackModule } from '../music-track/music-track.module'
 import { QueueItemService } from './playback-queue-item.service'
+import { MusicRelease } from '../music-release/music-release.entity'
+import { Rating } from '../rating/rating.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PlaybackQueue, PlaybackQueueItem]),
+    TypeOrmModule.forFeature([PlaybackQueue, PlaybackQueueItem, MusicRelease, Rating]),
     EventModule,
     LibraryModule,
     MusicTrackModule,

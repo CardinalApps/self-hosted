@@ -6,9 +6,6 @@ import { STORE_KEY, SIDEBAR_MODE, PAGE_LAYOUT } from './constants'
 
 export type ActionButton = {
   gradientAnimation?: string,
-  playerId?: string,
-  // The entity the action was started for, when its effects should only show in that context
-  scopeId?: string,
 }
 
 export type VirtualView = {
