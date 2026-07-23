@@ -2,7 +2,7 @@ export enum JobType {
   ALBUM_ART_THUMBNAILS = 'album_art_thumbnails',
   PHOTO_VARIATIONS = 'photo_variations',
   PHOTO_THUMBNAILS = 'photo_thumbnails',
-  GENERATE_WAVEFORM = 'generate_waveform',
+  GENERATE_WAVEFORMS = 'generate_waveforms',
 }
 
 export enum JobStatus {
