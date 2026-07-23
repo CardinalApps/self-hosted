@@ -1,9 +1,10 @@
-import { IsArray, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator'
 import { Library } from '../../library/library.entity'
 import { PlaybackQueueItem } from '../playback-queue-item.entity'
 
 export type QueueType = 'static' | 'dynamic'
-export type DynamicQueueType = 'true_shuffle'
+export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore'
+export type QueueSeedMediaType = 'music_release'
 
 export class CreatePlaybackQueueDto {
   @IsString()
@@ -12,6 +13,14 @@ export class CreatePlaybackQueueDto {
   @IsString()
   @IsOptional()
   dynamicType?: DynamicQueueType
+
+  @IsIn(['music_release'])
+  @IsOptional()
+  seedMediaType?: QueueSeedMediaType
+
+  @IsString()
+  @IsOptional()
+  seedMediaId?: string
 
   @IsArray()
   @IsOptional()

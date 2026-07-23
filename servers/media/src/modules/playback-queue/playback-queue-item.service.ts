@@ -2,9 +2,11 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { Repository, DataSource, Not, In, MoreThan, LessThan } from 'typeorm'
 
+import { PlaybackQueue } from './playback-queue.entity'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 
 import { EventService } from '../event/event.service'
+import { MusicHistory } from '../music-history/music-history.entity'
 
 import { DynamicPlayback } from './dynamic-playback-queue.service'
 import { QueryPlaybackQueueItemsDto } from './dtos/QueryPlaybackQueueItem.dto'
@@ -173,6 +175,106 @@ export class QueueItemService {
       await repository.update({ queueItemId }, { position })
 
       return await this.getQueueItems(repository, queueId)
+    })
+  }
+
+  /**
+   * Inserts explicit items into a queue, either at the end or directly after the
+   * item the user most recently played ("Play Next").
+   *
+   * The user's position in the queue is resolved from their playback history
+   * instead of being sent by the client, so every device agrees on where "next"
+   * is — a queue is server-side state, not client-side state.
+   */
+  async insertItems(
+    queue: PlaybackQueue,
+    itemsToInsert: Partial<PlaybackQueueItem>[],
+    insert: 'next' | 'end',
+  ): Promise<PlaybackQueueItem[]> {
+    const validItems = itemsToInsert.filter((item) => item.mediaType && item.mediaId)
+
+    if (!validItems.length) {
+      throw new BadRequestException('No valid items to insert.')
+    }
+
+    return await this.dataSource.transaction(async (manager) => {
+      const repository = manager.getRepository(PlaybackQueueItem)
+
+      /*
+        Two attempts: when the target gap has been subdivided into nothing, the queue is
+        spread back out once and the positions are computed again. A rebalanced queue
+        always has room, so the second attempt cannot fail.
+      */
+      for (let attempt = 0; attempt < 2; attempt++) {
+        let anchor: PlaybackQueueItem | null = null
+
+        if (insert === 'next') {
+          const lastPlayed = await manager.getRepository(MusicHistory).findOne({
+            where: {
+              queueItem: {
+                queue: {
+                  id: queue.id,
+                },
+              },
+            },
+            relations: {
+              queueItem: true,
+            },
+            order: {
+              updatedAt: 'desc',
+            },
+          })
+          anchor = lastPlayed?.queueItem ?? null
+        }
+
+        // 'end', or 'next' when nothing in this queue was played yet
+        if (!anchor) {
+          anchor = await repository.findOne({
+            where: {
+              queue: {
+                id: queue.id,
+              },
+            },
+            order: {
+              position: 'desc',
+            },
+          })
+        }
+
+        const next = anchor
+          ? await this.getNextItem(repository, queue.queueId, anchor.position, anchor.queueItemId)
+          : null
+
+        let cursor = anchor?.position ?? 0
+        const positions: number[] = []
+
+        for (let i = 0; i < validItems.length; i++) {
+          const position = this.midpoint(cursor, next?.position)
+          if (position === null) {
+            break
+          }
+          positions.push(position)
+          cursor = position
+        }
+
+        if (positions.length < validItems.length) {
+          await this.rebalance(repository, queue.queueId)
+          continue
+        }
+
+        const created = validItems.map((item, index) => ({
+          queue,
+          mediaType: item.mediaType,
+          mediaId: item.mediaId,
+          position: positions[index],
+        }))
+
+        await repository.insert(created)
+
+        return created as PlaybackQueueItem[]
+      }
+
+      throw new BadRequestException('The queue has no room for more items.')
     })
   }
 

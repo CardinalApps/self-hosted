@@ -11,7 +11,7 @@ import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { useGetMusicHistoryQuery } from '@cardinalapps/ui/src/store/apis/musicHistory'
 import { useExtendQueueMutation } from '@cardinalapps/ui/src/store/apis/playbackQueues'
 
-import DrivePlayback from './DrivePlayback'
+import ReleaseMixButton from './ReleaseMixButton'
 
 import i18n from './i18n.json'
 
@@ -38,9 +38,9 @@ const shuffle = (ids: string[]) => {
 }
 
 /**
- * The stack of "play this album" buttons: the Drive Playback action button on top, and a
- * grid of one-press playback modes under it. Every mode can also feed the current queue
- * instead of starting fresh, via its choices.
+ * The stack of "play this album" buttons: the House Mix and Encore action buttons on
+ * top, and a grid of one-press playback modes under them. Every mode can also feed the
+ * current queue instead of starting fresh, via its choices.
  */
 function ReleasePlayActions({
   releaseId,
@@ -160,8 +160,19 @@ function ReleasePlayActions({
 
   return (
     <div className="release-play-actions">
-      <div className="release-drive-row">
-        <DrivePlayback releaseId={releaseId} trackIds={orderedIds} />
+      <div className="release-mix-row">
+        <ReleaseMixButton
+          releaseId={releaseId}
+          dynamicQueueType="house_mix"
+          icon="fas fa-sliders-h"
+          label={i18n['music-release.play-actions.house-mix'][lang]}
+        />
+        <ReleaseMixButton
+          releaseId={releaseId}
+          dynamicQueueType="encore"
+          icon="fas fa-theater-masks"
+          label={i18n['music-release.play-actions.encore'][lang]}
+        />
       </div>
       <div className="release-play-modes">
         {modes.map((mode) => (

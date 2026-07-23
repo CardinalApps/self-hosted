@@ -92,8 +92,11 @@
   "music-release.disc-number": {
     "en": "Disc {num}"
   },
-  "music-release.play-actions.drive": {
-    "en": "Drive Playback"
+  "music-release.play-actions.house-mix": {
+    "en": "House Mix"
+  },
+  "music-release.play-actions.encore": {
+    "en": "Encore"
   },
   "music-release.play-actions.play": {
     "en": "Play"

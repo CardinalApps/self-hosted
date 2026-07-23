@@ -33,9 +33,15 @@ export class QueueService {
     const {
       type,
       dynamicType,
+      seedMediaType,
+      seedMediaId,
       libraries,
       staticItems,
     } = createQueueDto
+
+    // Throws 400/404 before anything is written when a required seed is missing or unknown
+    await this.dynamicQueueService.validateSeed(createQueueDto)
+
     const libraryEntities = libraries
       ? await Promise.all(libraries.map((lib) => this.libraryService.getLibrary(lib.libraryId)))
       : undefined
@@ -45,6 +51,8 @@ export class QueueService {
         user,
         type,
         dynamicType,
+        seedMediaType,
+        seedMediaId,
         libraries: libraryEntities,
       })
 

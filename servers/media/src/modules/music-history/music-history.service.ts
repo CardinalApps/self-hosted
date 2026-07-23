@@ -10,6 +10,7 @@ import { User } from '../user/user.entity'
 import { CreateMusicHistoryEntryDto } from './dtos/CreateMusicHistoryEntry.dto'
 import { GetMusicHistoryEntriesDto } from './dtos/GetMusicHistoryEntries.dto'
 import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
+import { PlaybackQueueEvents } from '../playback-queue/events'
 
 @Injectable()
 export class MusicHistoryService {
@@ -61,6 +62,11 @@ export class MusicHistoryService {
       user,
       track,
     })
+
+    // Playing a queue item is what tells dynamic queues to generate more items in time
+    if (queueItem) {
+      this.eventService.emitPrivate(PlaybackQueueEvents.ITEM_PLAYED, { queueItemId: queueItem.queueItemId })
+    }
 
     return saved
   }
