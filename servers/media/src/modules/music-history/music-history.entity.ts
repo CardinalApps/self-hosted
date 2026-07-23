@@ -30,7 +30,7 @@ export class MusicHistory extends BaseEntity {
   @JoinColumn()
   track: MusicTrack
 
-  @OneToOne(() => PlaybackQueueItem, (queueItem) => queueItem.id)
+  @OneToOne(() => PlaybackQueueItem, (queueItem) => queueItem.history)
   @JoinColumn()
   queueItem?: PlaybackQueueItem
 

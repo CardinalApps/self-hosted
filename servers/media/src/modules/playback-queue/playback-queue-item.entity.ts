@@ -19,7 +19,7 @@ export class PlaybackQueueItem extends BaseEntity {
   @ManyToOne(() => PlaybackQueue)
   queue: PlaybackQueue
 
-  @OneToOne(() => PlaybackQueue, { nullable: true })
+  @OneToOne(() => MusicHistory, (musicHistory) => musicHistory.queueItem, { nullable: true })
   history?: MusicHistory
 
   @Column({ nullable: false })
