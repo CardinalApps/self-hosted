@@ -12,6 +12,7 @@ import { EventModule } from '../event/event.module'
 import { MusicArtistModule } from '../music-artist/music-artist.module'
 import { LibraryModule } from '../library/library.module'
 import { MusicTrackModule } from '../music-track/music-track.module'
+import { RatingModule } from '../rating/rating.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MusicTrackModule } from '../music-track/music-track.module'
     EventModule,
     LibraryModule,
     MusicTrackModule,
+    RatingModule,
   ],
   exports: [
     TypeOrmModule,
