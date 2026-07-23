@@ -85,6 +85,21 @@ const Popout = ({
     resetClickOutside()
   }, [clickedOutside])
 
+  /* Esc closes the popout and stops there — swallowed in the capture phase so outer layers
+     with their own document-level Esc handlers (modals, sidebars) don't also react. */
+  useEffect(() => {
+    if (!open) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.stopImmediatePropagation()
+      onClose()
+    }
+
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
+  }, [open])
+
   const [originX, originY] = ANCHOR_FRACTIONS[origin]
   const [positionX, positionY] = ANCHOR_FRACTIONS[position]
 
