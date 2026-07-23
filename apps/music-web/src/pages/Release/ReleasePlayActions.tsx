@@ -161,7 +161,7 @@ function ReleasePlayActions({
   return (
     <div className="release-play-actions">
       <div className="release-drive-row">
-        <DrivePlayback trackIds={orderedIds} />
+        <DrivePlayback releaseId={releaseId} trackIds={orderedIds} />
       </div>
       <div className="release-play-modes">
         {modes.map((mode) => (

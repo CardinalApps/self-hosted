@@ -6,6 +6,9 @@ import { STORE_KEY, SIDEBAR_MODE, PAGE_LAYOUT } from './constants'
 
 export type ActionButton = {
   gradientAnimation?: string,
+  playerId?: string,
+  // The entity the action was started for, when its effects should only show in that context
+  scopeId?: string,
 }
 
 export type VirtualView = {
@@ -87,8 +90,10 @@ const layoutSlice = createSlice({
     setSidebarMode: (state, action: PayloadAction<SIDEBAR_MODE>) => {
       state.sidebarMode = action.payload
     },
+    // Merges into the existing entry so callers can update one field without wiping the others
     setActionButton: (state, action: PayloadAction<{ buttonName: string, button: ActionButton }>) => {
-      state.actionButtons[action.payload.buttonName] = action.payload.button
+      const { buttonName, button } = action.payload
+      state.actionButtons[buttonName] = { ...state.actionButtons[buttonName], ...button }
     },
     setShowLibrarySwitcher: (state, action: PayloadAction<boolean>) => {
       state.showLibrarySwitcher = action.payload
