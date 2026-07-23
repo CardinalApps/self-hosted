@@ -11,6 +11,9 @@ import { ReleaseType } from './enums'
 
 import { EventService } from '../event/event.service'
 import { MusicTrackService } from '../music-track/music-track.service'
+import { RatingService } from '../rating/rating.service'
+import { RatingMediaType } from '../rating/rating.entity'
+import { User } from '../user/user.entity'
 
 import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
 import { MusicArtist } from '../music-artist/music-artist.entity'
@@ -41,6 +44,7 @@ export class MusicReleaseService {
     private readonly eventService: EventService,
     private readonly libraryService: LibraryService,
     private readonly musicTrackService: MusicTrackService,
+    private readonly ratingService: RatingService,
   ) {}
 
   /**
@@ -53,7 +57,7 @@ export class MusicReleaseService {
   /**
    * Gets a single music release.
    */
-  async get(id: number | string, relations = {}): Promise<MusicRelease | null> {
+  async get(id: number | string, relations = {}, user?: User): Promise<MusicRelease | null> {
     const where = isNumeric(id)
       ? { id: id as number }
       : { musicReleaseId: id as string }
@@ -74,9 +78,14 @@ export class MusicReleaseService {
 
       if (release.tracks?.length) {
         const playCounts = await this.musicTrackService.getPlayCounts(release.tracks.map((track) => track.id))
+        const ratings = user
+          ? await this.ratingService.getRatingsForMedia(user, RatingMediaType.MUSIC_TRACK, release.tracks.map((track) => track.musicTrackId))
+          : null
+
         release.tracks = release.tracks.map((track) => ({
           ...track,
           playCount: playCounts.get(track.id) || 0,
+          ...(ratings ? { rating: ratings.get(track.musicTrackId) ?? null } : {}),
         }))
       }
 

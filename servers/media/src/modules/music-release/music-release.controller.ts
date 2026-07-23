@@ -21,6 +21,7 @@ import { MusicReleaseService } from './music-release.service'
 import { GetMusicReleaseDto } from './dtos/GetMusicRelease.dto'
 import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
 
+import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 import { EventService } from '../event/event.service'
 import { GetMusicReleaseCover } from './dtos/GetMusicReleaseCover.dto'
 import { getAppDir } from '../../utils/env'
@@ -43,6 +44,7 @@ export class MusicReleaseController {
     capabilities: ['MusicReleases.Read'],
   })
   async getMusicArtist(
+    @CurrentUser() user,
     @Param() { id }: { id: string },
     @Query() { artists, tracks, genres, thumbnails }: GetMusicReleaseDto,
   ): Promise<MusicRelease> {
@@ -51,7 +53,7 @@ export class MusicReleaseController {
       genres,
       ...(tracks ? { tracks: { metadata: true, artists: true } } : false),
       thumbnails,
-    })
+    }, user)
 
     if (!musicRelease) {
       throw new NotFoundException()

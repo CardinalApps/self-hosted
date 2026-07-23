@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 
 import { Rating, RatingMediaType } from './rating.entity'
 import { MusicTrack } from '../music-track/music-track.entity'
@@ -60,6 +60,26 @@ export class RatingService {
     }
 
     await this.ratingRepository.remove(existing)
+  }
+
+  /**
+   * Returns the user's ratings for a batch of media IDs, keyed by media ID.
+   * Unrated items are omitted, so callers should default missing entries to null.
+   */
+  async getRatingsForMedia(user: User, mediaType: RatingMediaType, mediaIds: string[]): Promise<Map<string, number>> {
+    if (!mediaIds.length) {
+      return new Map()
+    }
+
+    const rows = await this.ratingRepository.find({
+      where: {
+        user: { id: user.id },
+        mediaType,
+        mediaId: In(mediaIds),
+      },
+    })
+
+    return new Map(rows.map((row) => [row.mediaId, row.rating]))
   }
 
   /**
