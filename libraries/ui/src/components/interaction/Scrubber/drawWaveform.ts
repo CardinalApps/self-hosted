@@ -98,20 +98,25 @@ function mix(a: RGB, b: RGB, t: number): RGB {
 
 const BLACK: RGB = { r: 8, g: 8, b: 16 }
 const WHITE: RGB = { r: 255, g: 255, b: 255 }
-const GRAY: RGB = { r: 128, g: 128, b: 128 }
+const GRAY_FALLBACK: RGB = { r: 128, g: 128, b: 128 }
 
 /**
  * Builds the vivid (played) and dim (unplayed) palettes from a base color —
  * the dominant cover color when available, the accent color otherwise. The
- * bands form a tonal ramp of the base: lows darker, highs brighter.
+ * bands form a tonal ramp of the base: lows darker, highs brighter. The dim
+ * wash is mixed toward mutedColor (the theme's --bg-1) so it reads lighter
+ * on the light theme and darker on the dark theme, instead of a flat
+ * mid-grey that looks washed out on both.
  */
-export function deriveWaveformPalettes(tintColors: string[] | undefined, accentColor: string): {
+export function deriveWaveformPalettes(tintColors: string[] | undefined, accentColor: string, mutedColor?: string): {
   vivid: WaveformPalette,
   dim: WaveformPalette,
 } {
   const base = (tintColors?.map(parseColor).find(Boolean))
     ?? parseColor(accentColor)
     ?? { r: 120, g: 120, b: 200 }
+
+  const muted = (mutedColor ? parseColor(mutedColor) : null) ?? GRAY_FALLBACK
 
   const vivid: WaveformPalette = {
     low: mix(base, BLACK, 0.48),
@@ -123,10 +128,10 @@ export function deriveWaveformPalettes(tintColors: string[] | undefined, accentC
   }
 
   const dim: WaveformPalette = {
-    low: mix(vivid.low, GRAY, 0.72),
-    mid: mix(vivid.mid, GRAY, 0.72),
-    high: mix(vivid.high, GRAY, 0.72),
-    halo: mix(vivid.halo, GRAY, 0.72),
+    low: mix(vivid.low, muted, 0.72),
+    mid: mix(vivid.mid, muted, 0.72),
+    high: mix(vivid.high, muted, 0.72),
+    halo: mix(vivid.halo, muted, 0.72),
     haloAlpha: 0.06,
     depthAlpha: 0.08,
   }
