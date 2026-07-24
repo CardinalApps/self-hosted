@@ -164,7 +164,7 @@ function ReleasePlayActions({
         <ReleaseMixButton
           releaseId={releaseId}
           dynamicQueueType="house_mix"
-          icon="fas fa-sliders-h"
+          icon="fas fa-dna"
           label={i18n['music-release.play-actions.house-mix'][lang]}
         />
         <ReleaseMixButton
