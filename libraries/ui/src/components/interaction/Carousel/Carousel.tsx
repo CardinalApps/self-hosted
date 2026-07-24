@@ -26,6 +26,8 @@ type CarouselProps = {
   dragFree?: boolean,
   itemWidth?: string | number,
   itemsPerSlide?: number,
+  // Gives the pagination pill and the prev/next buttons the theme's glass treatment
+  glass?: boolean,
   items: React.ReactNode[],
   onChange?: (state: CarouselState) => void,
 }
@@ -47,6 +49,7 @@ const Carousel = ({
   dragFree = true,
   itemWidth = '100%',
   itemsPerSlide = 1,
+  glass = false,
   items = [],
   onChange = () => {},
 }: PropsWithChildren<CarouselProps>) => {
@@ -69,7 +72,7 @@ const Carousel = ({
 
   const prevBtn = () => (
     <Button
-      className="embla__prev"
+      className={clsx('embla__prev', glass && 'glass')}
       onClick={goToPrev}
       icon="fas fa-angle-left"
       circleIcon
@@ -78,7 +81,7 @@ const Carousel = ({
 
   const nextBtn = () => (
     <Button
-      className="embla__next"
+      className={clsx('embla__next', glass && 'glass')}
       onClick={goToNext}
       icon="fas fa-angle-right"
       circleIcon
@@ -86,7 +89,7 @@ const Carousel = ({
   )
 
   const pagination = () => (
-    <div className="carousel-pagination">{emblaApi?.selectedScrollSnap() + 1} / {maxPages}</div>
+    <div className={clsx('carousel-pagination', glass && 'glass')}>{emblaApi?.selectedScrollSnap() + 1} / {maxPages}</div>
   )
 
   useEffect(() => {
@@ -101,7 +104,7 @@ const Carousel = ({
       })
     }
     onChange?.(update)
-  }, [emblaApi, maxPages])
+  }, [emblaApi, maxPages, glass])
 
   return (
     <div
