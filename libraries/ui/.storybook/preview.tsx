@@ -1,7 +1,9 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import type { Preview } from "@storybook/react"
+import { useDispatch } from 'react-redux'
 
 import { store } from '../src/store'
+import { settingsActions } from '../src/store/slices/settings'
 import useAppliedTheme from '../src/hooks/useAppliedTheme'
 import ProviderWrapper from './Provider'
 
@@ -14,15 +16,22 @@ import '../public/styles/themes/Light.css'
 import '../public/styles/themes/Dark.css'
 import '../public/fonts/FontAwesome/css/all.css'
 
-// Mirrors AppBase: carries data-theme and the applied theme variables so theme
-// settings (accent, custom themes, overrides) live-preview in stories. The
-// toolbar still decides light/dark.
-const ThemedStoryFrame = ({ theme, children }: { theme: string, children: React.ReactNode }) => {
+// Mirrors AppBase: the settings store decides data-theme and the applied theme
+// variables, so store-dispatched theme changes (eg. the theme editor's switcher)
+// live-preview in stories. Toolbar picks are forwarded into the store.
+const ThemedStoryFrame = ({ toolbarTheme, children }: { toolbarTheme?: string, children: React.ReactNode }) => {
+  const dispatch = useDispatch()
   const frameRef = useRef<HTMLDivElement>(null)
-  useAppliedTheme(frameRef)
+  const { resolvedBaseTheme } = useAppliedTheme(frameRef)
+
+  useEffect(() => {
+    if (toolbarTheme) {
+      dispatch(settingsActions.set({ key: 'theme', value: toolbarTheme }))
+    }
+  }, [toolbarTheme])
 
   return (
-    <div ref={frameRef} className="app" data-theme={theme}>
+    <div ref={frameRef} className="app" data-theme={resolvedBaseTheme || 'light'}>
       {children}
     </div>
   )
@@ -53,10 +62,9 @@ const preview: Preview = {
   },
   decorators: [
     (Story, { context }) => {
-      const theme = context?.globals?.cardinalTheme || 'light'
       return (
         <ProviderWrapper store={store}>
-          <ThemedStoryFrame theme={theme}>
+          <ThemedStoryFrame toolbarTheme={context?.globals?.cardinalTheme}>
             <Story />
           </ThemedStoryFrame>
         </ProviderWrapper>

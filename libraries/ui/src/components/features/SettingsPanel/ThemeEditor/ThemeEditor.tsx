@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { accentColorFactory } from '@cardinalapps/app-settings/src/common/accent_color'
+import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
 import type { ThemeOverrides } from '@cardinalapps/app-settings/src/common/theme_overrides'
 import { exposedThemeTokens, themeTokens } from '@cardinalapps/app-settings/src/themeTokens'
@@ -33,6 +34,11 @@ const ACCENT_COLOR_DEFAULT = accentColorFactory(
   undefined as unknown as SupportedCardinalApp,
   'en',
 ).defaultValue as string
+
+const BUILT_IN_THEME_OPTIONS = themeFactory(
+  undefined as unknown as SupportedCardinalApp,
+  'en',
+).options as Record<string, string>
 
 // The exposed tokens grouped into sections, in manifest order
 const tokenGroups: { name: string, tokens: ThemeToken[] }[] = []
@@ -125,6 +131,14 @@ const ThemeEditor = () => {
     return token.varName in overrides
   }
 
+  /**
+   * Deliberately bespoke instead of a SettingsPanel field: the editor owns when a selection is
+   * actually applied, so it can later defer the switch (eg. while there are unsaved edits).
+   */
+  const handleThemeChange = (value: string) => {
+    dispatch(settingsActions.set({ key: 'theme', value }))
+  }
+
   const setOverride = (varName: string, value: string) => {
     if (varName === '--accent-color') {
       dispatch(settingsActions.set({ key: 'accent_color', value }))
@@ -188,6 +202,21 @@ const ThemeEditor = () => {
   return (
     <div className="theme-editor">
       <div ref={probeRef} className="theme-editor-probe" data-theme={appliedBaseTheme} aria-hidden="true" />
+      <div className="theme-editor-header">
+        <Select
+          name="theme"
+          size="s"
+          layout="underline"
+          multi={false}
+          min={1}
+          value={theme}
+          options={{
+            ...BUILT_IN_THEME_OPTIONS,
+            ...Object.fromEntries(customThemes.map((customTheme) => [`custom:${customTheme.id}`, customTheme.name])),
+          }}
+          onChange={handleThemeChange}
+        />
+      </div>
       {tokenGroups.map((group) => (
         <SlideToggle className="theme-editor-group" key={group.name} title={group.name}>
           <div className="group-rows">
