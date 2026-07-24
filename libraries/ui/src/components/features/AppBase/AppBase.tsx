@@ -45,10 +45,9 @@ import { settingsSelectors } from '../../../store/slices/settings'
 import syncSettings from '../../../store/slices/settings/thunks/sync'
 import { useGetInstanceQuery } from '../../../store/apis/instance'
 
-import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
-
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
+import useAppliedTheme from '../../../hooks/useAppliedTheme'
 
 import { getJWT, isJwtExpired, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
@@ -131,20 +130,11 @@ function AppBase({
   const firstTimeSetupComplete = useSelector(homeServerSelectors.firstTimeSetupComplete)
   const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
   const {
-    accent_color,
-    theme,
     lang,
     enable_custom_context_menu,
     developer_mode = initialDeveloperMode,
-    custom_themes: customThemes = [],
-  } = useSelector(settingsSelectors.current) as unknown as { lang: string, custom_themes: CustomTheme[], [key: string]: unknown }
-
-  // `theme` may be "light", "dark", or "custom:<id>". Custom themes fall back
-  // to a built-in base for CSS and everything not in their own overrides.
-  const selectedCustomTheme = (theme as string)?.startsWith('custom:')
-    ? customThemes.find((customTheme) => `custom:${customTheme.id}` === theme)
-    : undefined
-  const resolvedBaseTheme = selectedCustomTheme?.base || theme
+  } = useSelector(settingsSelectors.current) as unknown as { lang: string, [key: string]: unknown }
+  const { resolvedBaseTheme } = useAppliedTheme(appRef)
 
   const instanceQuery = useGetInstanceQuery()
   const { data: instanceData } = instanceQuery
@@ -261,43 +251,6 @@ function AppBase({
       dispatch(reloadHomeServerUser())
     }
   }, [homeServerUserLoggedIn])
-
-  /**
-   * Apply the user's custom accent color.
-   */
-  useEffect(() => {
-    if (accent_color && appRef.current) {
-      appRef.current.style.setProperty("--accent-color", accent_color)
-    }
-  }, [accent_color])
-
-  /**
-   * Apply a selected custom theme's variable overrides. Excludes
-   * --accent-color, which the effect above already owns independently of
-   * theme selection. Removes its own overrides on cleanup so switching back
-   * to a built-in theme (or a different custom theme) doesn't leave stale
-   * inline styles behind.
-   */
-  useEffect(() => {
-    if (!selectedCustomTheme || !appRef.current) {
-      return
-    }
-
-    const el = appRef.current
-    Object.entries(selectedCustomTheme.vars).forEach(([varName, value]) => {
-      if (varName !== '--accent-color' && value) {
-        el.style.setProperty(varName, value)
-      }
-    })
-
-    return () => {
-      Object.keys(selectedCustomTheme.vars).forEach((varName) => {
-        if (varName !== '--accent-color') {
-          el.style.removeProperty(varName)
-        }
-      })
-    }
-  }, [selectedCustomTheme])
 
   /**
    * Sync some props to the store.

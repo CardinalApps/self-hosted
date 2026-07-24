@@ -48,17 +48,9 @@
   --danger-bg: #a53737;
 
   /* Scrollbar */
-  --scrollbar-color: rgb(212, 212, 212);
+  --scrollbar-color: #d4d4d4;
 
   /* Checkered pattern */
   --checkered-color-1: #e7e7e7;
   --checkered-color-2: #fff;
-
-  .glass {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
 }

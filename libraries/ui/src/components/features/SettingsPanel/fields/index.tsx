@@ -4,6 +4,7 @@ import musicFields from './music'
 import adminServerFields from './admin'
 
 import titleField from '../layout/Title'
+import ThemeEditor from '../ThemeEditor'
 
 import i18n from '../i18n'
 
@@ -22,15 +23,20 @@ export const getFields = (app, lang) => {
       commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
-    theme: [
-      commonFields.theme,
-    ],
     appearance: [
+      commonFields.theme,
       commonFields.accentColor,
       commonFields.enableGlass,
       commonFields.floatingPlaybackSidebar,
       commonFields.customCss,
     ],
+  }
+
+  // The bespoke theme editor tab, identical for all apps
+  const themeNextTab = {
+    tabName: i18n['settings.tab-name-theme-next'][lang],
+    tabIcon: 'fas fa-swatchbook',
+    tabContent: <ThemeEditor />,
   }
 
   switch (app) {
@@ -46,14 +52,7 @@ export const getFields = (app, lang) => {
             adminServerFields.openAppsInNewTab,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -111,14 +110,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -152,14 +144,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -196,14 +181,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -224,14 +202,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -253,14 +224,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        // Theme settings tab
-        {
-          tabName: i18n['settings.tab-name-theme'][lang],
-          tabIcon: 'fas fa-swatchbook',
-          fields: [
-            ...defaults.theme,
-          ],
-        },
+        themeNextTab,
         // Appearance settings tab
         {
           tabName: i18n['settings.tab-name-appearance'][lang],
@@ -286,7 +250,7 @@ export const getDefaultFieldValues = (app, lang = 'en') => {
   }
 
   tabs.forEach((tab) => {
-    tab.fields.forEach((field) => {
+    tab.fields?.forEach((field) => {
       const fieldObj = field(app, lang)
       defaults[fieldObj.slug] = fieldObj.defaultValue
     })

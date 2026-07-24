@@ -9,6 +9,9 @@ export type ThemeToken = {
   // Only meaningful for type "color". Native <input type="color"> can't
   // represent alpha, so alpha-allowed colors need the opacity-slider variant.
   alphaAllowed?: boolean,
+  // Only meaningful for type "length": the slider bounds, in px.
+  min?: number,
+  max?: number,
   // Whether the (future) theme editor renders an input for this token.
   // Non-exposed tokens are still part of the contract (parity-tested against
   // the theme CSS files, still captured when a theme is duplicated) - they're
@@ -86,13 +89,19 @@ export const themeTokens: ThemeToken[] = [
   { varName: '--font-family', group: 'Typography', type: 'font', label: 'Font', exposed: true, perTheme: false },
 
   // --- Spacing (cross-theme) ---
-  { varName: '--gutter', group: 'Spacing', type: 'length', label: 'Base spacing', exposed: true, perTheme: false },
+  { varName: '--gutter', group: 'Spacing', type: 'length', label: 'Base spacing', min: 12, max: 32, exposed: true, perTheme: false },
   // Naming is historically inverted (base is the smallest radius, "-m" is the
   // largest) - labels below reflect the true size ordering instead of
   // renaming the variables, which would require touching every consumer.
-  { varName: '--border-radius', group: 'Spacing', type: 'length', label: 'Corner radius (small)', exposed: true, perTheme: false },
-  { varName: '--border-radius-s', group: 'Spacing', type: 'length', label: 'Corner radius (medium)', exposed: true, perTheme: false },
-  { varName: '--border-radius-m', group: 'Spacing', type: 'length', label: 'Corner radius (large)', exposed: true, perTheme: false },
+  { varName: '--border-radius', group: 'Spacing', type: 'length', label: 'Corner radius (small)', min: 0, max: 24, exposed: true, perTheme: false },
+  { varName: '--border-radius-s', group: 'Spacing', type: 'length', label: 'Corner radius (medium)', min: 0, max: 24, exposed: true, perTheme: false },
+  { varName: '--border-radius-m', group: 'Spacing', type: 'length', label: 'Corner radius (large)', min: 0, max: 24, exposed: true, perTheme: false },
+
+  // --- Glass (cross-theme) ---
+  { varName: '--glass-bg', group: 'Glass', type: 'color', label: 'Glass tint', alphaAllowed: true, exposed: true, perTheme: false },
+  { varName: '--glass-blur', group: 'Glass', type: 'length', label: 'Glass blur', min: 0, max: 60, exposed: true, perTheme: false },
+  { varName: '--glass-border-color', group: 'Glass', type: 'color', label: 'Glass border', alphaAllowed: true, exposed: true, perTheme: false },
+  { varName: '--glass-shadow', group: 'Glass', type: 'shadow', label: 'Glass shadow', exposed: false, perTheme: false },
 
   // --- Timing (cross-theme) - never user-facing ---
   { varName: '--transition-speed-fast', group: 'Timing', type: 'length', label: 'Transition speed (fast)', exposed: false, perTheme: false },
@@ -106,6 +115,11 @@ export const themeTokens: ThemeToken[] = [
  * (Light.css / Dark.css) rather than the shared themes.css.
  */
 export const perThemeTokens = themeTokens.filter((token) => token.perTheme)
+
+/**
+ * The subset of tokens whose values live in the shared themes.css.
+ */
+export const crossThemeTokens = themeTokens.filter((token) => !token.perTheme)
 
 /**
  * The subset of tokens the theme editor currently renders an input for.

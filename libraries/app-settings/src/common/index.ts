@@ -10,6 +10,7 @@ import { LANG_SLUG, langFactory } from './lang'
 import { NOTIFICATIONS_SLUG, notificationsFactory } from './notifications'
 import { START_PAGE_SLUG, startPageFactory } from './start_page'
 import { THEME_SLUG, themeFactory } from './theme'
+import { THEME_OVERRIDES_SLUG, themeOverridesFactory } from './theme_overrides'
 import { TELEMETRY_SLUG, telemetryFactory } from '../common/telemetry'
 import { OPEN_APPS_IN_NEW_TAB_SLUG, openAppsInNewTabFactory } from '../common/open_apps_in_new_tab'
 
@@ -26,6 +27,7 @@ export const commonFields = {
   [NOTIFICATIONS_SLUG]: notificationsFactory,
   [START_PAGE_SLUG]: startPageFactory,
   [THEME_SLUG]: themeFactory,
+  [THEME_OVERRIDES_SLUG]: themeOverridesFactory,
   [TELEMETRY_SLUG]: telemetryFactory,
   [OPEN_APPS_IN_NEW_TAB_SLUG]: openAppsInNewTabFactory,
 }

@@ -1,0 +1,49 @@
+.theme-editor {
+
+  .theme-editor-probe {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .theme-editor-group {
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color-3);
+    border-radius: 10px;
+    background-color: var(--bg-2);
+
+    summary {
+      padding: 15px 20px;
+      color: var(--text-color-2);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .group-rows {
+      padding: 0 20px 10px;
+    }
+  }
+
+  .theme-editor-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 6px 0;
+
+    .row-label {
+      color: var(--text-color-2);
+      font-size: 14px;
+    }
+
+    .row-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
