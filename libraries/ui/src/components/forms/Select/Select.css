@@ -233,11 +233,8 @@
     border-radius: 0;
     border-bottom: 2px solid var(--border-color-1);
 
-    .selected {
-
-      &.upper {
-        padding-left: 2px;
-      }
+    .upper {
+      padding-left: 2px;
     }
   }
 }
