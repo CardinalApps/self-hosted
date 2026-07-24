@@ -72,11 +72,16 @@ export class MusicHistoryService {
   }
 
   /**
-   * Returns all tracks according to the query.
+   * Returns the user's history entries according to the query.
    */
-  async query(getPlaybackEntriesDto: GetMusicHistoryEntriesDto): Promise<[MusicHistory[], number]> {
+  async query(user: User, getPlaybackEntriesDto: GetMusicHistoryEntriesDto): Promise<[MusicHistory[], number]> {
     const { take, skip, order, sort } = getPlaybackEntriesDto
     return await this.musicHistoryRepository.findAndCount({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
       take,
       skip,
       order: {

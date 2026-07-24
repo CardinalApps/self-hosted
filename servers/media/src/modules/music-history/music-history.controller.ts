@@ -60,7 +60,10 @@ export class MusicHistoryController {
   })
   @UseGuards(AuthGuard)
   @ApiSecurity(ApiSecurityTypes.LOCAL_USER_JWT)
-  async queryPlaybackHistory(@Query() query: GetMusicHistoryEntriesDto): Promise<[MusicHistory[], number]> {
-    return await this.playbackHistoryService.query(query)
+  async queryPlaybackHistory(
+    @CurrentUser() user,
+    @Query() query: GetMusicHistoryEntriesDto,
+  ): Promise<[MusicHistory[], number]> {
+    return await this.playbackHistoryService.query(user, query)
   }
 }
