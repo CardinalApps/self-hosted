@@ -76,16 +76,38 @@
   }
 }
 
-/* With no player and no queue to hold it up, the message would otherwise sit in the corner */
-.playback-sidebar-empty {
-  height: 100%;
-  padding: 0 20px;
+/*
+  The column of sections shown while nothing is playing. It bleeds through the card's
+  gutter to the sidebar's edges so the carousels inside can clip at the wall — clipping
+  at the gutter was shaving the artwork shadows off the track rows. Each section pads
+  itself back to the gutter to keep the content aligned with the rest of the sidebar.
+*/
+.playback-sidebar-idle {
+  min-height: 0;
+  flex-grow: 1;
+  margin: 0 -15px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-color-3);
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+/* The card chrome is shed above, so what remains is the header row and the carousel */
+.playback-sidebar-recently-played {
+  flex-shrink: 0;
+  overflow: visible;
+
+  > .card-header {
+    padding: 0 15px 10px;
+  }
+
+  > .card-content {
+    overflow: visible;
+  }
+
+  .embla__viewport {
+    padding: 0 15px;
+  }
 }
 
 .playback-sidebar.floating .playback-sidebar-card {
@@ -149,7 +171,6 @@
 /* A dark album turns the sidebar dark, and the theme's text colors stop reading on it */
 .playback-sidebar[data-contrast="light"] {
 
-  .playback-sidebar-empty,
   .playback-queue-title,
   .playback-queue-empty {
     color: rgba(255, 255, 255, 0.8);

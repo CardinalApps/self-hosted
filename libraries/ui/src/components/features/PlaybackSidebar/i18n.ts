@@ -1,11 +1,8 @@
 import { StringList } from '../../../types/i18n'
 
 const i18n: StringList = {
-  "playback-sidebar.nothing-playing": {
-    "en": "Nothing is playing right now.",
-  },
-  "playback-sidebar.nothing-playing.double-clicked": {
-    "en": "Why would double clicking do anything?",
+  "playback-sidebar.recently-played": {
+    "en": "Recently Played",
   },
   "playback-sidebar.queue-title": {
     "en": "Queue",

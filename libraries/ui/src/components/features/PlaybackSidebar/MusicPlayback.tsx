@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
 import AudioPlayer from '../AudioPlayer/AudioPlayer'
 import PlaybackQueue from './PlaybackQueue'
+import RecentlyPlayed from './RecentlyPlayed'
 
 import { audioSelectors } from '../../../store/slices/music'
 import { PLAYBACK_STATE } from '../../../store/slices/music/constants'
@@ -12,19 +13,16 @@ import { useVisiblePlayer } from '../../../hooks/useVisiblePlayer'
 
 import { usePlaybackSidebar } from './context'
 
-import i18n from './i18n'
-
 /**
  * The Music app's playback sidebar contents: a full sized player, and the queue
  * that feeds it.
  */
 const MusicPlayback = () => {
-  const { lang, enable_glass } = useSelector(settingsSelectors.current)
+  const { enable_glass } = useSelector(settingsSelectors.current)
   const players = useSelector(audioSelectors.players)
   const [visiblePlayer, setVisiblePlayer] = useVisiblePlayer()
   const { setGlassColors } = usePlaybackSidebar()
   const player = visiblePlayer ? players?.[visiblePlayer] : undefined
-  const [doubleClicked, setDoubleClicked] = useState(false)
 
   /*
     Hand the sidebar back its idle state when playback stops. The player unmounts without
@@ -34,20 +32,13 @@ const MusicPlayback = () => {
   useEffect(() => {
     if (!player) {
       setGlassColors([])
-    } else {
-      setDoubleClicked(false)
     }
   }, [player, setGlassColors])
 
   if (!player) {
     return (
-      <div className="playback-sidebar-empty" onDoubleClick={() => setDoubleClicked(true)}>
-        <p>
-          {doubleClicked
-            ? i18n['playback-sidebar.nothing-playing.double-clicked'][lang]
-            : i18n['playback-sidebar.nothing-playing'][lang]
-          }
-        </p>
+      <div className="playback-sidebar-idle">
+        <RecentlyPlayed />
       </div>
     )
   }
