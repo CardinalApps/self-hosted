@@ -1,0 +1,31 @@
+.range-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  input[type="range"] {
+    width: 140px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+  }
+
+  .readout {
+    min-width: 44px;
+    color: var(--text-color-2);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  &.size-s {
+
+    input[type="range"] {
+      width: 100px;
+    }
+
+    .readout {
+      min-width: 38px;
+      font-size: 12px;
+    }
+  }
+}

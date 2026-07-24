@@ -61,26 +61,26 @@ const i18n: StringList = {
   "settings.music.multi-player": {
     "en": "Multi-Player",
   },
-  "settings.theme.save": {
-    "en": "Save",
+  "settings.tab-name-theme-next": {
+    "en": "Theme (Next)",
   },
-  "settings.theme.duplicate": {
-    "en": "Duplicate",
+  "settings.theme-editor.reset": {
+    "en": "Reset to theme value",
   },
-  "settings.theme.delete": {
-    "en": "Delete",
+  "settings.theme-editor.font.default": {
+    "en": "Heebo (default)",
   },
-  "settings.theme.export": {
-    "en": "Export",
+  "settings.theme-editor.font.system": {
+    "en": "System",
   },
-  "settings.theme.saved-toast": {
-    "en": "Theme saved",
+  "settings.theme-editor.font.humanist": {
+    "en": "Helvetica",
   },
-  "settings.theme.exported-toast": {
-    "en": "Theme copied to clipboard",
+  "settings.theme-editor.font.serif": {
+    "en": "Serif",
   },
-  "settings.theme.delete-confirm": {
-    "en": "Delete the \"{name}\" theme? This can't be undone.",
+  "settings.theme-editor.font.mono": {
+    "en": "Monospace",
   },
 }
 
