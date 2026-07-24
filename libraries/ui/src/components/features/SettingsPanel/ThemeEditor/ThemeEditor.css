@@ -14,13 +14,11 @@
     border-radius: 10px;
     background-color: var(--bg-2);
 
-    summary {
+    .slide-toggle-header {
       padding: 15px 20px;
       color: var(--text-color-2);
       font-size: 15px;
       font-weight: 500;
-      cursor: pointer;
-      user-select: none;
     }
 
     .group-rows {
