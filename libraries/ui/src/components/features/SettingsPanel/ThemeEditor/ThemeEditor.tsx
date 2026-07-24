@@ -12,6 +12,7 @@ import ColorInput from '../../../forms/ColorInput'
 import RangeInput from '../../../forms/RangeInput'
 import Select from '../../../forms/Select'
 import Button from '../../../interaction/Button'
+import SlideToggle from '../../../interaction/SlideToggle'
 
 import { useAppDispatch } from '../../../../hooks/useAppDispatch'
 import { settingsActions, settingsSelectors } from '../../../../store/slices/settings'
@@ -188,8 +189,7 @@ const ThemeEditor = () => {
     <div className="theme-editor">
       <div ref={probeRef} className="theme-editor-probe" data-theme={appliedBaseTheme} aria-hidden="true" />
       {tokenGroups.map((group) => (
-        <details className="theme-editor-group" key={group.name} open>
-          <summary>{group.name}</summary>
+        <SlideToggle className="theme-editor-group" key={group.name} title={group.name}>
           <div className="group-rows">
             {group.tokens.map((token) => (
               <div className="theme-editor-row" key={token.varName}>
@@ -207,7 +207,7 @@ const ThemeEditor = () => {
               </div>
             ))}
           </div>
-        </details>
+        </SlideToggle>
       ))}
     </div>
   )

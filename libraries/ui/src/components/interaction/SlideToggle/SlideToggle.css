@@ -1,0 +1,30 @@
+.slide-toggle {
+
+  .slide-toggle-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .slide-toggle-arrow {
+    display: inline-flex;
+
+    i {
+      font-size: 14px;
+      color: var(--text-color-3);
+    }
+  }
+
+  .slide-toggle-content {
+    overflow: hidden;
+  }
+}
