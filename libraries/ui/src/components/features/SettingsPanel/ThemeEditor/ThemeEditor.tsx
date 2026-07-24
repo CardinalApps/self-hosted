@@ -13,7 +13,8 @@ import ColorInput from '../../../forms/ColorInput'
 import RangeInput from '../../../forms/RangeInput'
 import Select from '../../../forms/Select'
 import Button from '../../../interaction/Button'
-import SlideToggle from '../../../interaction/SlideToggle'
+import Card from '../../../layout/Card'
+import H3 from '../../../typography/H3'
 
 import { useAppDispatch } from '../../../../hooks/useAppDispatch'
 import { settingsActions, settingsSelectors } from '../../../../store/slices/settings'
@@ -218,8 +219,9 @@ const ThemeEditor = () => {
         />
       </div>
       {tokenGroups.map((group) => (
-        <SlideToggle className="theme-editor-group" key={group.name} title={group.name}>
-          <div className="group-rows">
+        <section className="theme-editor-group" key={group.name}>
+          <H3>{group.name}</H3>
+          <Card padding="thin" bg={2} border={3}>
             {group.tokens.map((token) => (
               <div className="theme-editor-row" key={token.varName}>
                 <span className="row-label" title={token.varName}>{token.label}</span>
@@ -235,8 +237,8 @@ const ThemeEditor = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </SlideToggle>
+          </Card>
+        </section>
       ))}
     </div>
   )
