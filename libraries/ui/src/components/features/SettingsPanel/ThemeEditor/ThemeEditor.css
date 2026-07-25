@@ -1,8 +1,22 @@
 .theme-editor {
 
   .theme-editor-header {
-    width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-bottom: 20px;
+
+    .custom-select {
+      width: 220px;
+      flex-shrink: 0;
+    }
+
+    .theme-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
   }
 
   .theme-editor-probe {

@@ -10,8 +10,9 @@ import { getSetting } from '@cardinalapps/app-settings/src'
 
 import Button from '../Button'
 
-import { settingsSelectors } from '../../../store/slices/settings'
-import { SupportedLang } from '@cardinalapps/app-settings/src/types'
+import { settingsActions, settingsSelectors } from '../../../store/slices/settings'
+import { SettingsObject, SupportedLang } from '@cardinalapps/app-settings/src/types'
+import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
 import { cloudUserSelectors } from '../../../store/slices/cloudUser'
 import { appSelectors } from '../../../store/slices/app'
 import { layoutActions } from '../../../store/slices/layout'
@@ -44,7 +45,8 @@ const UserMenu = ({
   const app = useSelector(appSelectors.app)
   const currentHomeServerUser = useSelector(homeServerUserSelectors.current)
   const currentCloudUser = useSelector(cloudUserSelectors.current)
-  const { lang, theme, enable_glass } = useSelector(settingsSelectors.current)
+  const { lang, theme, enable_glass, custom_themes } = useSelector(settingsSelectors.current)
+  const customThemes = (custom_themes || []) as CustomTheme[]
   const [menuIsOpen, setMenuIsOpen] = useState(false)
 
   const handleSettingsClick = () => {
@@ -57,6 +59,24 @@ const UserMenu = ({
 
   const enableGlassFieldFactory = getSetting('enable_glass')
   const enableGlassField = enableGlassFieldFactory(app, lang as SupportedLang)
+
+  /**
+   * Route the change by the field's declared storage, like the SettingsPanel does: client-stored
+   * settings never round-trip to the server.
+   */
+  const saveQuickSetting = (field: SettingsObject, value: unknown) => {
+    if (field.storage === 'client') {
+      dispatch(settingsActions.set({ key: field.slug, value }))
+      return
+    }
+
+    dispatch(set({
+      settings: {
+        [field.slug]: value,
+      },
+      app,
+    }))
+  }
 
   // const handleLogout = () => {
   //   setMenuIsOpen(false)
@@ -180,27 +200,20 @@ const UserMenu = ({
                             <Select
                               size="s"
                               name={themeField.slug}
-                              options={themeField.options as Record<string, string>}
+                              options={{
+                                ...(themeField.options as Record<string, string>),
+                                ...Object.fromEntries(customThemes.map((customTheme) => [`custom:${customTheme.id}`, customTheme.name])),
+                              }}
                               value={theme as string}
                               multi={false}
                               min={1}
-                              onChange={(val) => dispatch(set({
-                                settings: {
-                                  [themeField.slug]: val,
-                                },
-                                app: app,
-                              }))}
+                              onChange={(val) => saveQuickSetting(themeField, val)}
                             />
                             <ToggleSwitch
                               name={enableGlassField.slug}
                               label={i18n['user-menu.quick-settings.glass']['en']}
                               value={!!enable_glass}
-                              onChange={(val) => dispatch(set({
-                                settings: {
-                                  [enableGlassField.slug]: val,
-                                },
-                                app: app,
-                              }))}
+                              onChange={(val) => saveQuickSetting(enableGlassField, val)}
                             />
                           </div>
                           <div className="user-dropdown-button-group">

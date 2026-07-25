@@ -7,6 +7,7 @@ import Field from './Field'
 
 import Button from '../../interaction/Button'
 import ToggleSwitch from '../../forms/ToggleSwitch'
+import { ModalLayer } from '../../layout/Modal'
 import { CardinalApp } from '../../../lib/env/cardinal'
 import { layoutActions, layoutSelectors } from '../../../store/slices/layout'
 import { SettingsObject } from '@cardinalapps/app-settings/src/types'
@@ -40,6 +41,7 @@ const SettingsPanelStoryHost = (args: React.ComponentProps<typeof SettingsPanel>
           </motion.div>
         )}
       </AnimatePresence>
+      <ModalLayer />
     </div>
   )
 }

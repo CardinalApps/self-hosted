@@ -6,12 +6,12 @@ export const CUSTOM_THEMES_SLUG = 'custom_themes'
 export type CustomTheme = {
   id: string,
   name: string,
-  // Which built-in theme this custom theme falls back to for anything
-  // outside the manifest (eg. not-yet-exposed tokens).
+  // Which built-in theme supplies the value of everything not in `vars`
   base: 'light' | 'dark',
-  // A full snapshot of every manifest token's resolved value at the moment
-  // this theme was created or last saved - deliberately not sparse, so a
-  // theme never silently changes when its source theme is edited later.
+  /*
+   * A sparse map of theme CSS custom properties, eg. { "--bg-1": "#1a1a2e" }. Applied on top of the
+   * base theme at inline-style specificity; anything not present falls back to the base CSS.
+   */
   vars: Record<string, string>,
 }
 
