@@ -10,11 +10,14 @@ import { globalActions } from '../../constants/actions'
 import { STORE_KEY } from './constants'
 import { CardinalApp, getAppBasePathFromUrl } from '../../../lib/env/cardinal'
 
-// Seed client-stored defaults (eg. theme) for the running app so they are
-// present before the first server sync. The server no longer stores these.
-// Falls back to admin outside a known app (eg. storybook, kiosk).
+/*
+ * Seed every default for the running app so the UI has sane values before the first server sync -
+ * the theme settings in particular are user-scoped on the Media Server now, and rendering the app
+ * unthemed while that request is in flight would flash. Server values overlay these on sync.
+ * Falls back to admin outside a known app (eg. storybook, kiosk).
+ */
 const currentApp = (getAppBasePathFromUrl() as CardinalApp) || CardinalApp.ADMIN
-const clientDefaults = getDefaultSettings(currentApp, 'en', 'client')
+const seededDefaults = getDefaultSettings(currentApp, 'en')
 const langSetting = getSetting('lang')(currentApp, 'en')
 
 export type Setting = {
@@ -48,7 +51,7 @@ const initialState: InitialState = {
     error: null,
   },
   current: {
-    ...clientDefaults,
+    ...seededDefaults,
     [langSetting.slug]: langSetting.defaultValue,
     lang: 'en',
   },

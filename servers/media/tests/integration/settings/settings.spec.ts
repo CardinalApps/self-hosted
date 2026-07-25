@@ -2,6 +2,7 @@ import * as request from 'supertest'
 
 import { createTestApp, destroyTestApp, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
+import { SettingsService } from '../../../src/modules/settings/settings.service'
 import { getAllDefaultSettings } from '@cardinalapps/app-settings'
 
 let testApp: TestApp
@@ -166,16 +167,121 @@ describe('PATCH /api/v1/settings', () => {
 })
 
 // -------------------------------------------------------------------------
+// User-scoped settings.
+//
+// The theme settings belong to an account rather than the server, and are
+// shared by every Cardinal app so a user's look follows them around. They are
+// stored once against the user under the `global` app, which is why saving
+// from one app has to surface in all the others.
+// -------------------------------------------------------------------------
+
+describe('user-scoped settings', () => {
+  const theme = {
+    id: 'e2e-theme-id',
+    name: 'Integration Theme',
+    base: 'dark',
+    vars: { '--bg-1': '#1a1a2e', '--accent-color': '#7f5af0' },
+  }
+
+  it('surfaces a theme saved from admin in every other app', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ app: 'admin', settings: { custom_themes: [theme] } })
+      .expect(200)
+
+    for (const app of ['admin', 'music', 'photos', 'cinema']) {
+      const res = await request(testApp.app.getHttpServer())
+        .get(`/api/v1/settings/${app}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      expect(res.body.settings.custom_themes).toEqual([theme])
+    }
+  })
+
+  it('stores themes as JSON rather than flattening them to a string', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/settings/music')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(Array.isArray(res.body.settings.custom_themes)).toBe(true)
+    expect(res.body.settings.custom_themes[0].vars['--bg-1']).toBe('#1a1a2e')
+  })
+
+  it('shares the selected theme, accent colour and glass across apps', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        app: 'admin',
+        settings: { theme: 'dark', accent_color: '#e9219c', enable_glass: true },
+      })
+      .expect(200)
+
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/settings/music')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.settings.theme).toBe('dark')
+    expect(res.body.settings.accent_color).toBe('#e9219c')
+    expect(res.body.settings.enable_glass).toBe(true)
+  })
+
+  it('keeps one user\'s themes away from another user', async () => {
+    const settingsService = testApp.moduleRef.get(SettingsService)
+    const otherUserId = 'some-other-user-id'
+
+    const otherTheme = { ...theme, id: 'other-user-theme', name: 'Not Yours' }
+    await settingsService.set('admin' as never, { custom_themes: [otherTheme] }, otherUserId)
+
+    const otherUserSettings = await settingsService.getAppSettings('music' as never, otherUserId)
+    expect(otherUserSettings.custom_themes).toEqual([otherTheme])
+
+    // The guest's own themes are untouched by the other account's write
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/settings/music')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.settings.custom_themes).toEqual([theme])
+  })
+
+  it('leaves server-wide settings shared by every user', async () => {
+    const settingsService = testApp.moduleRef.get(SettingsService)
+
+    const forOneUser = await settingsService.getAppSettings('admin' as never, 'user-a')
+    const forAnother = await settingsService.getAppSettings('admin' as never, 'user-b')
+
+    expect(forOneUser.server_name).toBe(forAnother.server_name)
+    expect(forOneUser.max_rating).toBe(forAnother.max_rating)
+  })
+
+  it('refuses to store a user-scoped setting with no user', async () => {
+    const settingsService = testApp.moduleRef.get(SettingsService)
+
+    const updated = await settingsService.set('admin' as never, { custom_themes: [theme] })
+
+    expect(updated).toEqual([])
+
+    // Nothing leaked into the server-wide rows that every account reads
+    const serverWide = await settingsService.getAppSettings('admin' as never)
+    expect(serverWide.custom_themes).toBeUndefined()
+  })
+})
+
+// -------------------------------------------------------------------------
 // Default values per setting.
 //
 // Only settings that are stored in the server database are tested here.
-// Client-stored settings (theme, enable_glass, start_page) live in the browser
-// and never round-trip through the server, so they are not asserted on.
+// Client-stored settings (eg. start_page) live in the browser and never
+// round-trip through the server, so they are not asserted on.
 //
 // The setup call sends { theme: 'dark', serverName: 'Settings Test Server',
-// sendAnonymousUsageData: false }; theme is client-stored and ignored by the
-// server, while server_name and telemetry intentionally deviate from their
-// package defaults.
+// sendAnonymousUsageData: false }; server_name and telemetry intentionally
+// deviate from their package defaults.
 // -------------------------------------------------------------------------
 
 const defaults = getAllDefaultSettings('en')

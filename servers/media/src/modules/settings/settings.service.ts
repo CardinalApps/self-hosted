@@ -1,12 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { getDefaultSettings, getStoredSlugs } from '@cardinalapps/app-settings/dist/cjs'
+import { getDefaultSettings, getScopedSlugs, getStoredSlugs } from '@cardinalapps/app-settings/dist/cjs'
 
 import { Setting } from './setting.entity'
 import { SettingName, SettingValue, SettingsObject } from './types'
 
 import { CardinalApp } from '../../utils/apps'
+
+// The `app` value for settings that apply to every Cardinal app
+export const GLOBAL_APP = 'global'
+
+// The `userId` value for settings that belong to the server rather than a user
+export const SERVER_USER_ID = ''
+
+// Slugs stored per account. They are shared across apps, so they live under GLOBAL_APP.
+const userScopedSlugs = getScopedSlugs('en', 'user')
 
 @Injectable()
 export class SettingsService {
@@ -15,13 +24,23 @@ export class SettingsService {
     private settingRepository: Repository<Setting>,
   ) {}
 
-  // The server only persists home_server settings; client-stored settings (eg.
-  // theme) live in the browser and never round-trip through the database.
+  // The server only persists home_server settings; client-stored settings live
+  // in the browser and never round-trip through the database. User-scoped
+  // settings are excluded too: they belong to an account, so there is nothing
+  // sensible to seed them with before anyone has signed in.
   defaultSettings = {
-    [CardinalApp.ADMIN]: getDefaultSettings(CardinalApp.ADMIN, 'en', 'home_server'),
-    [CardinalApp.MUSIC]: getDefaultSettings(CardinalApp.MUSIC, 'en', 'home_server'),
-    [CardinalApp.PHOTOS]: getDefaultSettings(CardinalApp.PHOTOS, 'en', 'home_server'),
-    [CardinalApp.CINEMA]: getDefaultSettings(CardinalApp.CINEMA, 'en', 'home_server'),
+    [CardinalApp.ADMIN]: this.serverDefaults(CardinalApp.ADMIN),
+    [CardinalApp.MUSIC]: this.serverDefaults(CardinalApp.MUSIC),
+    [CardinalApp.PHOTOS]: this.serverDefaults(CardinalApp.PHOTOS),
+    [CardinalApp.CINEMA]: this.serverDefaults(CardinalApp.CINEMA),
+  }
+
+  // The app's home_server defaults, minus anything stored per account
+  private serverDefaults(app: CardinalApp): Record<string, unknown> {
+    return Object.fromEntries(
+      Object.entries(getDefaultSettings(app, 'en', 'home_server'))
+        .filter(([name]) => !userScopedSlugs.includes(name)),
+    )
   }
 
   /**
@@ -34,24 +53,49 @@ export class SettingsService {
   /**
    * Create or update one or more settings. Set `app` to `null` to have the
    * setting apply to all apps.
+   *
+   * User-scoped settings ignore `app` entirely and are written once against the
+   * signed-in account, so they follow that user into every Cardinal app. Saving
+   * one without a `userId` is a no-op rather than a server-wide write, so a
+   * missing user can never leak one account's preferences to everybody.
    */
-  async set(app: CardinalApp | null, settings: SettingsObject): Promise<Partial<Setting>[] | null> {
+  async set(
+    app: CardinalApp | null,
+    settings: SettingsObject,
+    userId?: string,
+  ): Promise<Partial<Setting>[] | null> {
     const appsToUpdate = app === null
       ? [CardinalApp.ADMIN, CardinalApp.MUSIC, CardinalApp.PHOTOS, CardinalApp.CINEMA]
       : [app]
     const entities: Partial<Setting>[] = []
+
+    Object.keys(settings)
+      .filter((name) => userScopedSlugs.includes(name))
+      .forEach((name) => {
+        if (!userId) {
+          return
+        }
+
+        entities.push({
+          app: GLOBAL_APP,
+          userId,
+          name,
+          value: settings[name] as string,
+        })
+      })
 
     appsToUpdate.forEach((app) => {
       // Drop any client-stored settings; they belong in the browser, not the db.
       const clientSlugs = getStoredSlugs(app, 'en', 'client')
 
       Object.keys(settings)
-        .filter((name) => !clientSlugs.includes(name))
+        .filter((name) => !clientSlugs.includes(name) && !userScopedSlugs.includes(name))
         .forEach((name) => {
           entities.push({
             app: app,
+            userId: SERVER_USER_ID,
             name: name,
-            value: settings[name].toString(),
+            value: settings[name] as string,
           })
         })
     })
@@ -60,8 +104,28 @@ export class SettingsService {
       return entities
     }
 
+    /*
+     * Written row by row rather than with a batched upsert. TypeORM's upsert leans on ON CONFLICT
+     * against the unique index, and a batch that mixes new and existing rows comes back with
+     * misaligned ids once the conflict target includes the defaulted userId column. Settings are
+     * written a handful of rows at a time, so the extra queries cost nothing and this behaves the
+     * same on SQLite and Postgres.
+     */
     try {
-      await this.settingRepository.upsert(entities, ['app', 'name'])
+      for (const entity of entities) {
+        const existing = await this.settingRepository.findOneBy({
+          app: entity.app,
+          name: entity.name,
+          userId: entity.userId,
+        })
+
+        if (existing) {
+          await this.settingRepository.update(existing.id, { value: entity.value })
+        } else {
+          await this.settingRepository.insert(entity)
+        }
+      }
+
       return entities
     } catch (error) {
       Logger.error(error)
@@ -70,35 +134,54 @@ export class SettingsService {
   }
 
   /**
-   * Get a setting and its current value.
+   * Get a server-wide setting and its current value.
    */
   async get(app: CardinalApp, name: SettingName): Promise<SettingValue | null> {
     let found = null
 
     try {
-      found = await this.settingRepository.findOneBy({ app, name })
+      found = await this.settingRepository.findOneBy({ app, name, userId: SERVER_USER_ID })
     } catch (error) {
       Logger.error(error, 'Settings')
     }
 
-    return found.value
+    return found?.value ?? null
   }
 
   /**
-   * Get all of the saved settings for an app.
+   * Get all of the saved settings for an app, resolved for the given user.
+   *
+   * Least to most specific: server-wide globals, then server-wide app settings,
+   * then the user's own settings. Omitting `userId` returns just the
+   * server-wide values.
    */
-  async getAppSettings(app: CardinalApp): Promise<SettingsObject | null> {
-    // Specific app settings should overwrite global settings
+  async getAppSettings(app: CardinalApp, userId?: string): Promise<SettingsObject | null> {
     try {
-      const globalSettings = await this.settingRepository.findBy({ app: 'global' })
-      const appSettings = await this.settingRepository.findBy({ app })
+      const globalSettings = await this.settingRepository.findBy({
+        app: GLOBAL_APP,
+        userId: SERVER_USER_ID,
+      })
+      const appSettings = await this.settingRepository.findBy({ app, userId: SERVER_USER_ID })
+      const userSettings = userId
+        ? await this.settingRepository.findBy({ app: GLOBAL_APP, userId })
+        : []
       const resolvedSettings = {}
 
-      globalSettings.forEach((setting) => {
-        resolvedSettings[setting.name] = setting.value
+      /*
+       * Server-wide rows can never supply a user-scoped setting. Databases from before these
+       * settings moved to the server still hold rows for them, and serving those would hand every
+       * account a value that was never theirs - an empty custom_themes string, for instance.
+       */
+      const applyServerWide = (settings: Setting[]) => settings.forEach((setting) => {
+        if (!userScopedSlugs.includes(setting.name)) {
+          resolvedSettings[setting.name] = setting.value
+        }
       })
 
-      appSettings.forEach((setting) => {
+      applyServerWide(globalSettings)
+      applyServerWide(appSettings)
+
+      userSettings.forEach((setting) => {
         resolvedSettings[setting.name] = setting.value
       })
 

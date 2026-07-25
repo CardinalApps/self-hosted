@@ -12,7 +12,7 @@ import Button from '../Button'
 
 import { settingsActions, settingsSelectors } from '../../../store/slices/settings'
 import { SettingsObject, SupportedLang } from '@cardinalapps/app-settings/src/types'
-import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
+import { asCustomThemes } from '@cardinalapps/app-settings/src/common/custom_themes'
 import { cloudUserSelectors } from '../../../store/slices/cloudUser'
 import { appSelectors } from '../../../store/slices/app'
 import { layoutActions } from '../../../store/slices/layout'
@@ -46,7 +46,7 @@ const UserMenu = ({
   const currentHomeServerUser = useSelector(homeServerUserSelectors.current)
   const currentCloudUser = useSelector(cloudUserSelectors.current)
   const { lang, theme, enable_glass, custom_themes } = useSelector(settingsSelectors.current)
-  const customThemes = (custom_themes || []) as CustomTheme[]
+  const customThemes = asCustomThemes(custom_themes)
   const [menuIsOpen, setMenuIsOpen] = useState(false)
 
   const handleSettingsClick = () => {
@@ -135,7 +135,7 @@ const UserMenu = ({
 
   return (
     <div className={clsx(`user-menu`, menuIsOpen && 'open', currentHomeServerUser?.cardinalId && 'cloud-user-logged-in')}>
-      <button className="avatar-btn" onClick={() => setMenuIsOpen(!menuIsOpen)}>
+      <button data-testid="user-menu-avatar" className="avatar-btn" onClick={() => setMenuIsOpen(!menuIsOpen)}>
         <UserTag user={currentHomeServerUser} showName={false} size="s" />
       </button>
       <div className="user-dropdown-under">
@@ -219,7 +219,7 @@ const UserMenu = ({
                           <div className="user-dropdown-button-group">
                             <ul>
                               <li>
-                                <Button onClick={handleSettingsClick} icon="fas fa-cog">
+                                <Button data-testid="user-menu-settings" onClick={handleSettingsClick} icon="fas fa-cog">
                                   {i18n['user-menu.app-settings']['en']}
                                 </Button>
                               </li>

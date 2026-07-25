@@ -29,9 +29,10 @@ export const getFields = (app, lang) => {
 
   // The bespoke theme editor tab, identical for all apps
   const themeTab = {
+    tabId: 'theme',
     tabName: i18n['settings.tab-name-theme'][lang],
     tabIcon: 'fas fa-swatchbook',
-    tabContent: <ThemeEditor />,
+    tabContent: <ThemeEditor app={app} />,
   }
 
   switch (app) {

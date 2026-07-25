@@ -26,6 +26,7 @@ export const JOURNEYS: Journey[] = [
   { id: 'guest-login', name: 'Sign in as the built-in Guest admin account' },
   { id: 'local-login', name: 'Sign in with a local username + password' },
   { id: 'view-overview', name: 'View the overview dashboard widgets' },
+  { id: 'cross-app-custom-theme', name: 'A custom theme built in one Cardinal app follows the account into another' },
   { id: 'change-release-channel', name: 'Switch release channel on the server widget' },
   { id: 'manage-local-users', name: 'Create / update / disable local users' },
   { id: 'invite-cloud-user', name: 'Generate and manage user invitations' },

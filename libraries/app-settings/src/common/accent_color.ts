@@ -20,7 +20,8 @@ export const accentColorFactory: SettingsFieldFactory = (app: SupportedCardinalA
   slug: ACCENT_COLOR_SLUG,
   label: i18n?.['settings.accent-color.title']?.[lang],
   type: 'swatches',
-  storage: 'client',
+  storage: 'home_server',
+  scope: 'user',
   defaultValue: '#cc4c43',
   options: { ...COLORS },
 })

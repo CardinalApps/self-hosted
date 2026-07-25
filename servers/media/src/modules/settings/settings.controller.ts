@@ -20,6 +20,7 @@ import { GetAppSettingsResponse } from './dtos/GetAppSettingsResponse.dto'
 import { UpsertSettings } from './dtos/UpsertSettings.dto'
 import { UpsertSettingsResponse } from './dtos/UpsertSettingsResponse.dto'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 
 @Controller()
 @ApiTags('Settings')
@@ -37,8 +38,11 @@ export class SettingsController {
   })
   @ApiParam({ name: 'app', enum: ['admin', 'music', 'photos', 'cinema'], description: 'The Cardinal app to get settings for.' })
   @ApiOkResponse({ type: GetAppSettingsResponse })
-  async getAppSettings(@Param() params: GetAppSettings): Promise<GetAppSettingsResponse> {
-    const settings = await this.settingsService.getAppSettings(params.app)
+  async getAppSettings(
+    @CurrentUser() user,
+    @Param() params: GetAppSettings,
+  ): Promise<GetAppSettingsResponse> {
+    const settings = await this.settingsService.getAppSettings(params.app, user?.userId)
 
     return {
       settings,
@@ -54,12 +58,15 @@ export class SettingsController {
     description: 'When saving app settings, set the `app` for which this update applies. Explicitly set the app to `null` to apply the update to all apps.',
   })
   @ApiOkResponse({ type: UpsertSettingsResponse })
-  async upsertSettings(@Body() { app, settings }: UpsertSettings): Promise<UpsertSettingsResponse> {
+  async upsertSettings(
+    @CurrentUser() user,
+    @Body() { app, settings }: UpsertSettings,
+  ): Promise<UpsertSettingsResponse> {
     if (!Object.keys(settings).length) {
       throw new BadRequestException()
     }
 
-    const updated = await this.settingsService.set(app || null, settings)
+    const updated = await this.settingsService.set(app || null, settings, user?.userId)
 
     if (!Array.isArray(updated)) {
       throw new InternalServerErrorException()

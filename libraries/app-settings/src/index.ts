@@ -1,5 +1,7 @@
 import {
   SettingsFieldFactory,
+  SettingScope,
+  SettingsObject,
   SupportedLang,
   SupportedCardinalApp,
   StorageLocation,
@@ -89,6 +91,31 @@ export const getStoredSlugs = (
     .map((fieldFactory) => fieldFactory(app, lang))
     .filter((field) => field.storage === storage)
     .map((field) => field.slug)
+}
+
+/**
+ * The scope a `home_server` setting is stored at. Settings that don't declare
+ * one belong to the server as a whole.
+ */
+export const settingScope = (field: SettingsObject): SettingScope => field.scope || 'server'
+
+/**
+ * Returns the slugs of every known setting stored at the given scope, across
+ * all apps. User-scoped settings are shared by every Cardinal app, so this is
+ * deliberately not app-specific.
+ */
+export const getScopedSlugs = (lang: SupportedLang, scope: SettingScope): string[] => {
+  const apps: SupportedCardinalApp[] = ['admin', 'music', 'photos', 'cinema']
+  const slugs = new Set<string>()
+
+  apps.forEach((app) => {
+    Object.values(getFieldsForApp(app))
+      .map((fieldFactory) => fieldFactory(app, lang))
+      .filter((field) => field.storage === 'home_server' && settingScope(field) === scope)
+      .forEach((field) => slugs.add(field.slug))
+  })
+
+  return [...slugs]
 }
 
 /**
