@@ -9,7 +9,7 @@ import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { useReleasesCoverColors } from '@cardinalapps/ui/src/hooks/useReleasesCoverColors'
-import { useReleaseCoverColorMap } from '@cardinalapps/ui/src/hooks/useReleaseCoverColorMap'
+import { useReleaseCovers } from '@cardinalapps/ui/src/hooks/useReleaseCovers'
 import { secondsToMMSS } from '@cardinalapps/ui/src/lib/formatting/time'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
@@ -68,7 +68,7 @@ function ArtistPage() {
   ), [discography])
 
   const backgroundColors = useReleasesCoverColors(releaseIdsWithArt)
-  const releaseColors = useReleaseCoverColorMap(releaseIdsWithArt)
+  const releaseCovers = useReleaseCovers(releaseIdsWithArt)
 
   /*
     The map reads like a defragmenter: oldest release first, so the discography grows from the
@@ -135,9 +135,13 @@ function ArtistPage() {
   }, [data?.summary?.files, chronological, discography, lang])
 
   const diskMapPalette = useMemo(
-    () => chronological.map((entry) => releaseColors[entry.musicReleaseId] || NO_COVER_COLOR),
-    [chronological, releaseColors],
+    () => chronological.map((entry) => releaseCovers[entry.musicReleaseId]?.color || NO_COVER_COLOR),
+    [chronological, releaseCovers],
   )
+
+  const diskMapCovers = useMemo(() => Object.fromEntries(
+    Object.entries(releaseCovers).map(([musicReleaseId, cover]) => [musicReleaseId, cover.src]),
+  ), [releaseCovers])
 
   const releaseLinks = useMemo(() => Object.fromEntries(
     discography.map((entry) => [
@@ -184,6 +188,7 @@ function ArtistPage() {
               palette={diskMapPalette}
               activeGroupId={hoveredReleaseId ?? undefined}
               groupLinks={releaseLinks}
+              groupImages={diskMapCovers}
             />
 
             <ArtistMeta artist={data} tracks={discographyTracks(discography) as MusicTrackType[]} />

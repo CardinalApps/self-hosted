@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { motion, useReducedMotion } from 'framer-motion'
 import clsx from 'clsx'
 
 import Card from '../../layout/Card'
@@ -26,6 +27,8 @@ type DiskMapProps = {
   activeGroupId?: string
   /** Where clicking a block navigates to, keyed by groupId. */
   groupLinks?: Record<string, string>
+  /** Artwork for the hover popout, keyed by groupId. Groups without one show text alone. */
+  groupImages?: Record<string, string>
   onBlockClick?: (block: DiskMapBlock) => void
   className?: string
   /** Overrides the summary line announced to assistive tech and shown as the fallback title. */
@@ -44,10 +47,38 @@ const DEFAULT_FRAME = { width: 400, height: 600 }
 const FRAME_STEP_PX = 10
 
 /* How long the mount sweep takes to cross the whole map: the last box's delay plus its own
-   animation. After this the sweep is switched off, which leaves the animation property free
-   for the hover wiggle — while both are live, hovering cancels the sweep and unhovering
-   restarts it, so a box fades out and back in instead of wiggling. */
+   animation. After this the sweep is switched off, so that its per-box delay stops applying
+   to anything else the box does. */
 const SWEEP_MS = 800
+
+/* A nudge, as if the box sat on a long spring and a finger pushed it: it is eased off centre,
+   let go, and then wobbles back through centre before settling. Low stiffness with light
+   damping is what makes the spring feel long rather than taut. */
+const PUSH_MS = 170
+const PUSH_TWEEN = { type: 'tween' as const, duration: PUSH_MS / 1000, ease: 'easeInOut' as const }
+const SETTLE_SPRING = { type: 'spring' as const, stiffness: 90, damping: 6, mass: 1 }
+const AT_REST = { x: 0, y: 0, rotate: 0 }
+
+const MIN_NUDGE_PX = 2
+const MAX_NUDGE_PX = 5
+const MAX_TILT_DEG = 3
+
+const COVER_PX = 100
+
+/* The spring is always the same one; what changes is the shove. Every hover gets its own
+   direction, strength and tilt, so running the cursor across the map doesn't look mechanical.
+   The tilt is rolled separately from the direction: tie the two together and the box reads as
+   hinged at a corner rather than wobbling about its middle. */
+const randomNudge = () => {
+  const angle = Math.random() * Math.PI * 2
+  const distance = MIN_NUDGE_PX + Math.random() * (MAX_NUDGE_PX - MIN_NUDGE_PX)
+
+  return {
+    x: Math.cos(angle) * distance,
+    y: Math.sin(angle) * distance,
+    rotate: (Math.random() * 2 - 1) * MAX_TILT_DEG,
+  }
+}
 
 /*
   Blocks in a group share one color, so without this a single-release map is a flat slab of
@@ -72,16 +103,36 @@ const DiskMap = ({
   animate = true,
   activeGroupId,
   groupLinks,
+  groupImages,
   onBlockClick,
   className,
   ariaLabel,
 }: DiskMapProps) => {
   const { navigate } = useContext(RouterContext)
   const { lang, enable_glass } = useSelector(settingsSelectors.current)
+  const shouldReduceMotion = useReducedMotion()
   const frameRef = useRef<HTMLDivElement>(null)
   const { width, height } = useElementSize(frameRef)
   const [hoveredBlockIndex, setHoveredBlockIndex] = useState<number | null>(null)
+  const [nudge, setNudge] = useState<ReturnType<typeof randomNudge> | null>(null)
+  const [pushing, setPushing] = useState(false)
   const [sweeping, setSweeping] = useState(animate)
+  const pushTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  /*
+    The push out and the wobble back are two moves, not one. Landing the box off centre in a
+    single frame and letting the spring take it from there snaps; easing it out and only then
+    handing it to the spring gives the finger somewhere to start.
+  */
+  const handleBlockEnter = (blockIndex: number) => {
+    clearTimeout(pushTimer.current)
+    setHoveredBlockIndex(blockIndex)
+    setNudge(randomNudge())
+    setPushing(true)
+    pushTimer.current = setTimeout(() => setPushing(false), PUSH_MS)
+  }
+
+  useEffect(() => () => clearTimeout(pushTimer.current), [])
 
   useEffect(() => {
     if (!animate) {
@@ -183,7 +234,7 @@ const DiskMap = ({
             const isActiveGroup = !!activeGroupId && block.groupId === activeGroupId
 
             return (
-              <div
+              <motion.div
                 key={block.id || rect.blockIndex}
                 className={clsx(
                   'disk-map-block',
@@ -199,10 +250,21 @@ const DiskMap = ({
                   width: `${rect.width * 100}%`,
                   height: `${rect.height * 100}%`,
                   backgroundColor: groupColors.get(block.groupId),
+                  // Rotation pivots on the middle of the box, not wherever the layout put it
+                  transformOrigin: 'center',
                   '--disk-map-shade': blockShades[rect.blockIndex],
-                  ...(animate ? { animationDelay: `${(rect.blockIndex / rects.length) * 500}ms` } : {}),
+                  /* Only while the sweep is running: left on, this staggers everything else
+                     the box does, so a box late in the map waits half a second to react. */
+                  ...(sweeping ? { animationDelay: `${(rect.blockIndex / rects.length) * 500}ms` } : {}),
                 } as React.CSSProperties}
-                onMouseEnter={() => setHoveredBlockIndex(rect.blockIndex)}
+                initial={false}
+                animate={
+                  !shouldReduceMotion && pushing && nudge && hoveredBlockIndex === rect.blockIndex
+                    ? nudge
+                    : AT_REST
+                }
+                transition={pushing ? PUSH_TWEEN : SETTLE_SPRING}
+                onMouseEnter={() => handleBlockEnter(rect.blockIndex)}
                 onClick={() => onBlockClick?.(block)}
               />
             )
@@ -216,20 +278,23 @@ const DiskMap = ({
           bg={1}
           border={2}
           padding="thin"
+          // Ties the popout to the run it came from, since the map is a field of colour
+          style={{ borderColor: groupColors.get(hoveredBlock.groupId) }}
         >
-          {!!hoveredBlock.label && <p className="disk-map-tooltip-label">{hoveredBlock.label}</p>}
+          <div className="disk-map-tooltip-cols">
+            {!!groupImages?.[hoveredBlock.groupId] && (
+              <Card className="disk-map-tooltip-cover" width={COVER_PX} height={COVER_PX} border={2} shadow={1} padding={0}>
+                <img src={groupImages[hoveredBlock.groupId]} alt="" />
+              </Card>
+            )}
 
-          {!!hoveredBlock.groupLabel && (
-            <p className="disk-map-tooltip-group">
-              <span
-                className="disk-map-tooltip-swatch"
-                style={{ backgroundColor: groupColors.get(hoveredBlock.groupId) }}
-              />
-              {hoveredBlock.groupLabel}
-            </p>
-          )}
+            <div className="disk-map-tooltip-text">
+              {!!hoveredBlock.label && <p className="disk-map-tooltip-label">{hoveredBlock.label}</p>}
+              {!!hoveredBlock.groupLabel && <p className="disk-map-tooltip-group">{hoveredBlock.groupLabel}</p>}
 
-          <Tags size="small" tags={[formatBytes(hoveredBlock.bytes), ...(hoveredBlock.details ?? [])]} />
+              <Tags size="small" tags={[formatBytes(hoveredBlock.bytes), ...(hoveredBlock.details ?? [])]} />
+            </div>
+          </div>
         </Card>
       )}
     </div>

@@ -26,33 +26,41 @@ const pickVivid = (colors: string[]): string | null => (
     : null
 )
 
+export type ReleaseCover = {
+  /** Blob URL of the cover itself. */
+  src: string
+  /** The liveliest of several colors sampled from it. */
+  color: string | null
+}
+
 /**
- * Samples one dominant color per release cover, keyed by release id.
+ * Loads a cover per release, keyed by release id, along with one color sampled
+ * from each.
  *
  * Where useReleasesCoverColors spreads a small palette across a discography,
- * this gives every release a color of its own, for visuals that draw one band
- * or marker per release. Releases whose cover can't be read are left out of the
- * map rather than given a placeholder color.
+ * this gives every release its own cover and color, for visuals that draw one
+ * band or marker per release. Releases whose cover can't be loaded are left out
+ * of the map rather than given a placeholder.
  */
-export function useReleaseCoverColorMap(
+export function useReleaseCovers(
   releaseIds: string[],
   size: ReleaseCoverSize = 'small_nocrop',
-): Record<string, string> {
-  const [colors, setColors] = useState<Record<string, string>>({})
+): Record<string, ReleaseCover> {
+  const [covers, setCovers] = useState<Record<string, ReleaseCover>>({})
 
-  // Re-sample only when the set of releases actually changes, not on every render
+  // Re-load only when the set of releases actually changes, not on every render
   const releaseKey = releaseIds.join(',')
   const ids = useMemo(() => releaseIds, [releaseKey])
 
   useEffect(() => {
     if (!ids.length) {
-      setColors({})
+      setCovers({})
       return
     }
 
     let stale = false
 
-    Promise.all(ids.map(async (releaseId): Promise<[string, string | null]> => {
+    Promise.all(ids.map(async (releaseId): Promise<[string, ReleaseCover | null]> => {
       try {
         const { blobUrl } = await homeServerAPI<{ blobUrl: string }>(
           queryParams(`/music/releases/${releaseId}/cover`, { size }),
@@ -60,14 +68,14 @@ export function useReleaseCoverColorMap(
           { blob: true },
         )
         const sampled = await sampleImageColors(blobUrl, CANDIDATES_PER_COVER)
-        return [releaseId, pickVivid(sampled)]
+        return [releaseId, { src: blobUrl, color: pickVivid(sampled) }]
       } catch {
         return [releaseId, null]
       }
     }))
-      .then((sampled) => {
+      .then((loaded) => {
         if (!stale) {
-          setColors(Object.fromEntries(sampled.filter(([, color]) => !!color)))
+          setCovers(Object.fromEntries(loaded.filter(([, cover]) => !!cover)))
         }
       })
 
@@ -76,5 +84,5 @@ export function useReleaseCoverColorMap(
     }
   }, [ids, size])
 
-  return colors
+  return covers
 }
