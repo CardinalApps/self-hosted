@@ -116,17 +116,31 @@ const createStore = () => {
 
   const writeThrottle = 500
   let storeLastSavedAt = 0
+  let pendingSave: ReturnType<typeof setTimeout> | null = null
 
-  // Cache the store after every change
-  store.subscribe(() => {
+  // Cache the store to localStorage
+  const save = () => {
     try {
-      if (Date.now() - storeLastSavedAt > writeThrottle) {
-        const state = store.getState()
-        localStorage.setItem(getStorageKey(), JSON.stringify(state) || '{}')
-        storeLastSavedAt = Date.now()
-      }
+      localStorage.setItem(getStorageKey(), JSON.stringify(store.getState()) || '{}')
+      storeLastSavedAt = Date.now()
     } catch (e) {
       console.error(e?.message)
+    }
+  }
+
+  /*
+   * Cache the store after every change. Changes inside the throttle window schedule a trailing
+   * write - without it, the last change of a rapid burst wouldn't persist until some later change
+   * reopened the window, and would be lost entirely if the page unloaded first.
+   */
+  store.subscribe(() => {
+    if (Date.now() - storeLastSavedAt > writeThrottle) {
+      save()
+    } else if (!pendingSave) {
+      pendingSave = setTimeout(() => {
+        pendingSave = null
+        save()
+      }, writeThrottle)
     }
   })
 
