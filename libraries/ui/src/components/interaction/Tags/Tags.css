@@ -42,4 +42,15 @@
       margin-right: 10px;
     }
   }
+
+  .tag.size-small {
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 11px;
+
+    i {
+      margin-right: 6px;
+    }
+  }
 }
