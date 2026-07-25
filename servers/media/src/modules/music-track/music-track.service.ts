@@ -76,7 +76,14 @@ export class MusicTrackService {
       release,
       artists,
       libraries,
+      playCount,
+      rating,
     } = getMusicTracksDto
+
+    /* Ordering by a computed figure requires computing it, whatever the caller asked for -
+       otherwise the sort silently falls back to an arbitrary order. */
+    const withPlayCount = playCount || orderBy === 'playCount'
+    const withRating = (rating || orderBy === 'rating') && !!user
 
     const qb = this.musicTrackRepository.createQueryBuilder('music_track')
 
@@ -93,19 +100,21 @@ export class MusicTrackService {
 
     // Join pre-aggregated play counts in a single pass rather than a
     // correlated subquery per row.
-    qb.leftJoin(
-      (subQuery) => subQuery
-        .select('history.track_id', 'track_id')
-        .addSelect('COUNT(history.id)', 'play_count')
-        .from(MusicHistory, 'history')
-        .groupBy('history.track_id'),
-      'play_counts',
-      'play_counts.track_id = music_track.id',
-    )
-    qb.addSelect('COALESCE(play_counts.play_count, 0)', 'music_track_play_count')
+    if (withPlayCount) {
+      qb.leftJoin(
+        (subQuery) => subQuery
+          .select('history.track_id', 'track_id')
+          .addSelect('COUNT(history.id)', 'play_count')
+          .from(MusicHistory, 'history')
+          .groupBy('history.track_id'),
+        'play_counts',
+        'play_counts.track_id = music_track.id',
+      )
+      qb.addSelect('COALESCE(play_counts.play_count, 0)', 'music_track_play_count')
+    }
 
     // Join the current user's rating if a user is provided
-    if (user) {
+    if (withRating) {
       qb.addSelect((subQuery) =>
         subQuery
           .select('rating.rating', 'rating')
@@ -118,7 +127,7 @@ export class MusicTrackService {
 
     if (orderBy === 'playCount') {
       qb.orderBy('music_track_play_count', order)
-    } else if (orderBy === 'rating' && user) {
+    } else if (orderBy === 'rating' && withRating) {
       qb.orderBy('music_track_rating', order)
     } else {
       qb.orderBy(`music_track.${orderBy}`, order)
@@ -137,8 +146,8 @@ export class MusicTrackService {
       const raw = rawMap.get(track.id)
       return {
         ...track,
-        playCount: parseInt(raw?.music_track_play_count, 10) || 0,
-        rating: raw?.music_track_rating ?? null,
+        ...(withPlayCount ? { playCount: parseInt(raw?.music_track_play_count, 10) || 0 } : {}),
+        ...(withRating ? { rating: raw?.music_track_rating ?? null } : {}),
       }
     })
 
