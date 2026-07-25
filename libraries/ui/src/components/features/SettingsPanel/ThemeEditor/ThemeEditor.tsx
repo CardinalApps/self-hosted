@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
+import clsx from 'clsx'
 
 import { accentColorFactory, COLORS as ACCENT_COLOR_PRESETS } from '@cardinalapps/app-settings/src/common/accent_color'
 import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
@@ -286,6 +287,11 @@ const ThemeEditor = () => {
     }))
   }
 
+  // The accent color is the one token that offers the app's preset palette alongside a custom color
+  const presetsFor = (token: ThemeToken) => (
+    token.varName === '--accent-color' ? ACCENT_COLOR_PRESETS : undefined
+  )
+
   // Pick the right input for the token
   const renderInput = (token: ThemeToken) => {
     if (token.type === 'font') {
@@ -320,7 +326,7 @@ const ThemeEditor = () => {
         name={token.varName}
         value={currentValue(token)}
         alpha={token.alphaAllowed}
-        presets={token.varName === '--accent-color' ? ACCENT_COLOR_PRESETS : undefined}
+        presets={presetsFor(token)}
         size="s"
         onChange={(value) => setOverride(token.varName, value)}
       />
@@ -386,7 +392,7 @@ const ThemeEditor = () => {
           {group.tokens.map((token) => (
             <div className="theme-editor-row" key={token.varName}>
               <span className="row-label" title={token.varName}>{token.label}</span>
-              <div className="row-controls">
+              <div className={clsx('row-controls', !!presetsFor(token) && 'stacked')}>
                 {renderInput(token)}
                 <Button
                   circleIcon
