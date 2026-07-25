@@ -11,13 +11,18 @@ import { MusicTrack } from '../music-track/music-track.entity'
 import { MusicTrackService } from '../music-track/music-track.service'
 import { MusicRelease } from '../music-release/music-release.entity'
 import { Rating } from '../rating/rating.entity'
+import { MusicArtist } from '../music-artist/music-artist.entity'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { PlaybackQueueEvents } from './events'
-import { CreatePlaybackQueueDto } from './dtos/CreatePlaybackQueue'
+import { CreatePlaybackQueueDto, DynamicQueueType } from './dtos/CreatePlaybackQueue'
 
 const TRUE_SHUFFLE_INIT_BATCH = 200
 const HOUSE_MIX_INIT_BATCH = 50
 const ENCORE_INIT_BUFFER = 25
+const THE_DEPTHS_INIT_BATCH = 40
+
+// Dynamic types that cannot be created without a seed release or artist
+const SEEDED_DYNAMIC_TYPES: DynamicQueueType[] = ['house_mix', 'encore', 'the_depths']
 
 /*
   When a played item has fewer than REFILL_THRESHOLD items after it, the queue
@@ -63,6 +68,9 @@ export class DynamicPlayback implements OnModuleInit {
     @InjectRepository(MusicRelease)
     private musicReleaseRepository: Repository<MusicRelease>,
 
+    @InjectRepository(MusicArtist)
+    private musicArtistRepository: Repository<MusicArtist>,
+
     @InjectRepository(Rating)
     private ratingRepository: Repository<Rating>,
 
@@ -82,12 +90,26 @@ export class DynamicPlayback implements OnModuleInit {
   async validateSeed(createPlaybackQueueDto: CreatePlaybackQueueDto): Promise<void> {
     const { type, dynamicType, seedMediaType, seedMediaId } = createPlaybackQueueDto
 
-    if (type !== 'dynamic' || (dynamicType !== 'house_mix' && dynamicType !== 'encore')) {
+    if (type !== 'dynamic' || !SEEDED_DYNAMIC_TYPES.includes(dynamicType)) {
       return
     }
 
     if (!seedMediaType || !seedMediaId) {
       throw new BadRequestException(`The ${dynamicType} queue type requires a seed.`)
+    }
+
+    if (seedMediaType === 'music_artist') {
+      const artist = await this.musicArtistRepository.findOne({
+        where: {
+          musicArtistId: seedMediaId,
+        },
+      })
+
+      if (!artist) {
+        throw new NotFoundException('The seed artist does not exist.')
+      }
+
+      return
     }
 
     const release = await this.musicReleaseRepository.findOne({
@@ -113,6 +135,8 @@ export class DynamicPlayback implements OnModuleInit {
         return await this.initHouseMixQueue(queue)
       case 'encore':
         return await this.initEncoreQueue(queue)
+      case 'the_depths':
+        return await this.initTheDepthsQueue(queue)
       default:
         Logger.error('Missing queue.dynamicType', 'DynamicPlayback')
         return false
@@ -168,6 +192,9 @@ export class DynamicPlayback implements OnModuleInit {
         case 'encore':
           nextTrackIds = await this.nextRelatedTracks(queue, existingItems, batchSize)
           break
+        case 'the_depths':
+          nextTrackIds = await this.nextTheDepthsTracks(queue, existingItems, batchSize)
+          break
         default:
           Logger.error('Missing queue.dynamicType', 'DynamicPlayback')
           return []
@@ -219,7 +246,7 @@ export class DynamicPlayback implements OnModuleInit {
    * was tuned to the release.
    */
   private async initHouseMixQueue(queue: PlaybackQueue): Promise<boolean> {
-    const releaseTracks = await this.getSeedReleaseTracks(queue)
+    const releaseTracks = await this.getSeedTracks(queue)
 
     if (!releaseTracks.length) {
       Logger.warn('A house_mix queue was created for a release with no tracks', 'DynamicPlayback')
@@ -245,7 +272,7 @@ export class DynamicPlayback implements OnModuleInit {
    * is queued up behind it for when the album ends.
    */
   private async initEncoreQueue(queue: PlaybackQueue): Promise<boolean> {
-    const releaseTracks = await this.getSeedReleaseTracks(queue)
+    const releaseTracks = await this.getSeedTracks(queue)
 
     if (!releaseTracks.length) {
       Logger.warn('An encore queue was created for a release with no tracks', 'DynamicPlayback')
@@ -262,6 +289,83 @@ export class DynamicPlayback implements OnModuleInit {
       Logger.error(err)
       return false
     }
+  }
+
+  /**
+   * Initialize a The Depths queue.
+   *
+   * The Depths digs through the parts of the seed that the user has never got
+   * around to: least-played first, unplayed tracks ahead of everything else. It
+   * is the counterweight to House Mix, which leans on what is already popular.
+   */
+  private async initTheDepthsQueue(queue: PlaybackQueue): Promise<boolean> {
+    const seedTracks = await this.getSeedTracks(queue)
+
+    if (!seedTracks.length) {
+      Logger.warn('A the_depths queue was created for a seed with no tracks', 'DynamicPlayback')
+      return false
+    }
+
+    const buried = await this.leastPlayedFirst(seedTracks, THE_DEPTHS_INIT_BATCH, [])
+
+    try {
+      await this.appendQueueItems(queue, buried)
+      return true
+    } catch (err) {
+      Logger.error(err)
+      return false
+    }
+  }
+
+  /**
+   * The next batch for a The Depths queue: whatever is still unheard in the
+   * seed, and once the seed is exhausted it drifts outward to related tracks
+   * the same way the other seeded types do.
+   */
+  private async nextTheDepthsTracks(
+    queue: PlaybackQueue,
+    existingItems: PlaybackQueueItem[],
+    batchSize: number,
+  ): Promise<string[]> {
+    const queuedTrackIds = existingItems.map((item) => item.mediaId)
+    const seedTracks = await this.getSeedTracks(queue)
+    const buried = await this.leastPlayedFirst(seedTracks, batchSize, queuedTrackIds)
+
+    if (buried.length >= batchSize) {
+      return buried
+    }
+
+    const related = await this.nextRelatedTracks(queue, existingItems, batchSize - buried.length)
+    return [...buried, ...related]
+  }
+
+  /**
+   * Orders tracks by how little the user has played them, unplayed first, with
+   * ties broken randomly so that repeat visits don't dig up the same run.
+   */
+  private async leastPlayedFirst(
+    tracks: MusicTrack[],
+    count: number,
+    excludeTrackIds: string[],
+  ): Promise<string[]> {
+    if (count <= 0 || !tracks.length) {
+      return []
+    }
+
+    const excluded = new Set(excludeTrackIds)
+    const candidates = tracks.filter((track) => !excluded.has(track.musicTrackId))
+
+    if (!candidates.length) {
+      return []
+    }
+
+    const playCounts = await this.musicTrackService.getPlayCounts(candidates.map((track) => track.id))
+
+    return candidates
+      .map((track) => ({ track, plays: playCounts.get(track.id) || 0, jitter: Math.random() }))
+      .sort((a, b) => a.plays - b.plays || a.jitter - b.jitter)
+      .slice(0, count)
+      .map((scored) => scored.track.musicTrackId)
   }
 
   /**
@@ -295,7 +399,7 @@ export class DynamicPlayback implements OnModuleInit {
 
     // A queue tail of untracked media can't seed anything; fall back to the original seed
     if (!seedTracks.length) {
-      seedTracks = await this.getSeedReleaseTracks(queue)
+      seedTracks = await this.getSeedTracks(queue)
     }
 
     return await this.generateRelatedBatch(queue, seedTracks, batchSize, existingItems.map((item) => item.mediaId), true)
@@ -464,10 +568,36 @@ export class DynamicPlayback implements OnModuleInit {
   }
 
   /**
-   * Returns the seed release's tracks in album order.
+   * Returns the seed's tracks in playing order. A release seed yields its own
+   * tracks in album order; an artist seed yields the artist's whole catalogue,
+   * newest release first, which is the order the Music app treats as "play".
    */
-  private async getSeedReleaseTracks(queue: PlaybackQueue): Promise<MusicTrack[]> {
-    if (queue.seedMediaType !== 'music_release' || !queue.seedMediaId) {
+  private async getSeedTracks(queue: PlaybackQueue): Promise<MusicTrack[]> {
+    if (!queue.seedMediaId) {
+      return []
+    }
+
+    if (queue.seedMediaType === 'music_artist') {
+      return await this.musicTrackRepository.find({
+        where: {
+          artists: {
+            musicArtistId: queue.seedMediaId,
+          },
+        },
+        order: {
+          release: {
+            createdAt: 'desc',
+          },
+          discNumber: 'asc',
+          trackNumber: 'asc',
+        },
+        relations: {
+          release: true,
+        },
+      })
+    }
+
+    if (queue.seedMediaType !== 'music_release') {
       return []
     }
 
