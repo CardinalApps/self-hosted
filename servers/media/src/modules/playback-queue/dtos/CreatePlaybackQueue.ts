@@ -3,8 +3,8 @@ import { Library } from '../../library/library.entity'
 import { PlaybackQueueItem } from '../playback-queue-item.entity'
 
 export type QueueType = 'static' | 'dynamic'
-export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore'
-export type QueueSeedMediaType = 'music_release'
+export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore' | 'the_depths'
+export type QueueSeedMediaType = 'music_release' | 'music_artist'
 
 export class CreatePlaybackQueueDto {
   @IsString()
@@ -14,7 +14,7 @@ export class CreatePlaybackQueueDto {
   @IsOptional()
   dynamicType?: DynamicQueueType
 
-  @IsIn(['music_release'])
+  @IsIn(['music_release', 'music_artist'])
   @IsOptional()
   seedMediaType?: QueueSeedMediaType
 
