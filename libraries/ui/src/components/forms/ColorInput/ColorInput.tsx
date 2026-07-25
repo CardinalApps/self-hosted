@@ -43,7 +43,11 @@ const ColorInput = ({
     setDraftHex(parsed.hex)
   }, [value])
 
-  // Commit a typed hex value, reverting the field if it isn't a valid color.
+  /*
+   * Commit a typed hex value, reverting the field if it isn't a valid color. Only fires onChange
+   * when the color actually changed - blurring an untouched field must not count as an edit
+   * (edits can have side effects, eg. the theme editor forking a custom theme).
+   */
   const commitHex = (typed: string) => {
     const committed = parseCssColor(typed.trim())
     if (!committed) {
@@ -52,7 +56,9 @@ const ColorInput = ({
     }
 
     setDraftHex(committed.hex)
-    onChange(serializeCssColor(committed.hex, alpha ? parsed.alpha : 1))
+    if (committed.hex !== parsed.hex) {
+      onChange(serializeCssColor(committed.hex, alpha ? parsed.alpha : 1))
+    }
   }
 
   return (
