@@ -22,9 +22,6 @@ const i18n: StringList = {
   "settings.tab-name-theme": {
     "en": "Theme",
   },
-  "settings.tab-name-appearance": {
-    "en": "Appearance",
-  },
   "settings.tab-name-server": {
     "en": "Server",
   },
@@ -61,9 +58,6 @@ const i18n: StringList = {
   "settings.music.multi-player": {
     "en": "Multi-Player",
   },
-  "settings.tab-name-theme-next": {
-    "en": "Theme (Next)",
-  },
   "settings.theme-editor.reset": {
     "en": "Reset to theme value",
   },
@@ -78,6 +72,18 @@ const i18n: StringList = {
   },
   "settings.theme-editor.reset-theme": {
     "en": "Reset",
+  },
+  "settings.theme-editor.rename": {
+    "en": "Rename",
+  },
+  "settings.theme-editor.rename-title": {
+    "en": "Rename Theme",
+  },
+  "settings.theme-editor.rename-cancel": {
+    "en": "Cancel",
+  },
+  "settings.theme-editor.rename-save": {
+    "en": "Save",
   },
   "settings.theme-editor.copy": {
     "en": "Copy",

@@ -2,27 +2,32 @@
 
   .theme-editor-header {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
     margin-bottom: 20px;
 
     .custom-select {
-      width: 100%;
-      max-width: 190px;
-      flex-shrink: 0;
+      width: 220px;
     }
 
     .theme-actions {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 6px;
-      margin-left: auto;
 
       .button {
         padding: 8px 14px;
         font-size: 13px;
       }
+    }
+  }
+
+  .theme-rename {
+
+    .text-input {
+      margin-top: 20px;
     }
   }
 

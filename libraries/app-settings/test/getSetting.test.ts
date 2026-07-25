@@ -16,7 +16,7 @@ test('get default settings', () => {
   const defaults = getDefaultSettings('admin', 'en')
 
   expect(defaults?.lang).toEqual('en')
-  expect(defaults?.custom_css).toEqual('')
+  expect(defaults?.theme).toEqual('light')
 })
 
 test('get a setting slug', () => {
