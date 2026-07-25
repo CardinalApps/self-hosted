@@ -3,6 +3,7 @@
   .theme-editor-header {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
 
@@ -14,8 +15,13 @@
     .theme-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-left: auto;
+
+      .button {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
     }
   }
 
@@ -30,9 +36,14 @@
   .theme-editor-group {
     margin-bottom: 25px;
 
-    .h3 {
-      margin-bottom: 10px;
-      font-size: 18px;
+    .card-header {
+      min-height: auto;
+      padding-top: 16px;
+      padding-bottom: 6px;
+
+      .h3 {
+        font-size: 18px;
+      }
     }
   }
 
