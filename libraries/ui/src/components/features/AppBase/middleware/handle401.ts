@@ -4,7 +4,7 @@ import refreshToken from '../../../../store/slices/homeServerUser/thunks/refresh
 
 import { globalActions } from '../../../../store/constants/actions'
 
-import { deleteAllJWTs } from '../../../../lib/auth/jwt'
+import { deleteAllJWTs, getJWT, JWT_TYPE } from '../../../../lib/auth/jwt'
 
 import i18n from '../i18n'
 
@@ -12,14 +12,24 @@ import i18n from '../i18n'
 // refresh attempts
 let isRefreshing = false
 
+// Tear down whatever session state is left and send the user back to the login
+// screen. The toast is announced only when there was a session to lose: a
+// logged-out visitor's bootstrap refresh 401s too, and telling them they are
+// "unauthorized" for never having logged in is noise, not information.
 function fullLogout(dispatch, lang, serverErrorMessage) {
+  const hadSession = Boolean(getJWT(JWT_TYPE.HOME_SERVER_USER))
+
   deleteAllJWTs()
   dispatch({ type: globalActions.RESET })
-  dispatch(toastActions.addToQueue({
-    type: 'danger',
-    title: i18n['login.error.401.title'][lang],
-    body: serverErrorMessage ? `<p>${serverErrorMessage}</p>` : i18n['login.error.401.body'][lang],
-  }))
+
+  if (hadSession) {
+    dispatch(toastActions.addToQueue({
+      type: 'danger',
+      title: i18n['login.error.401.title'][lang],
+      body: serverErrorMessage ? `<p>${serverErrorMessage}</p>` : i18n['login.error.401.body'][lang],
+    }))
+  }
+
   dispatch(healthCheck())
 }
 
