@@ -7,6 +7,7 @@ import { Role } from "../roles"
 export const MediaServerAspects = [
   'CurrentUser',
   'AdminApp',
+  'UserSettings',
   'Users',
   'Invitations',
   'RoleAssignments',
@@ -43,6 +44,13 @@ export const MediaServerCapabilities = [
   'CurrentUser.Update',
 
   'AdminApp.Login',
+
+  /*
+   * Writing a setting that belongs to the whole install, like the server name. Account-scoped
+   * settings (a user's theme, for instance) need no capability - they only ever affect the one
+   * account, so every signed-in user can always write their own.
+   */
+  'UserSettings.Update',
 
   'Users.Create',
   'Users.Read',
