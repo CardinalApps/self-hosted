@@ -15,8 +15,8 @@ import ReleaseMixButton from './ReleaseMixButton'
 
 import i18n from './i18n.json'
 
-// History entries report progress as a percentage; at this point a track counts as heard
-const FINISHED_PROGRESS_PERCENT = 90
+// History entries report progress as a 0-1 ratio; at this point a track counts as heard
+const FINISHED_PROGRESS_RATIO = 0.9
 const HISTORY_LOOKBACK = 100
 
 type ReleasePlayActionsProps = {
@@ -83,7 +83,7 @@ function ReleasePlayActions({
     const lastIndex = orderedTracks.findIndex((track) => trackId(track) === lastPlayedId)
     if (lastIndex === -1) return []
 
-    const finished = Number(lastEntry.progress) >= FINISHED_PROGRESS_PERCENT
+    const finished = Number(lastEntry.progress) >= FINISHED_PROGRESS_RATIO
     const startIndex = finished ? lastIndex + 1 : lastIndex
     return startIndex < orderedTracks.length
       ? orderedTracks.slice(startIndex).map(trackId)
