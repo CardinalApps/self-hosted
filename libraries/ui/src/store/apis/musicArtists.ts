@@ -9,11 +9,91 @@ export type MusicAritstsOrderBy = Extract<ToolbarOrderByType,
   'createdAt'
   | 'name'
 >
+export type MusicArtistFormatType = {
+  extension: string,
+  numTracks: number,
+  bytes: number,
+  avgBitrate: number | null,
+  minDuration: number | null,
+  maxDuration: number | null,
+}
+
+export type MusicArtistReleaseListeningType = {
+  musicReleaseId: string,
+  numTracks: number,
+  tracksHeard: number,
+  plays: number,
+  favorites: number,
+  lastPlayedAt: string | null,
+}
+
+export type MusicArtistReleaseSummaryType = {
+  musicReleaseId: string,
+  /** The consensus year across the release's tracks, from embedded tags. */
+  year: number | null,
+  numTracks: number,
+  runtimeSeconds: number,
+  bytes: number,
+  extensions: string[],
+  lossless: boolean,
+}
+
+export type MusicArtistTrackFileType = {
+  musicTrackId: string,
+  musicReleaseId: string | null,
+  title: string | null,
+  bytes: number,
+  extension: string,
+  lossless: boolean,
+}
+
+export type MusicArtistListeningType = {
+  plays: number,
+  tracksHeard: number,
+  favorites: number,
+  firstPlayedAt: string | null,
+  lastPlayedAt: string | null,
+  releases: MusicArtistReleaseListeningType[],
+}
+
+/**
+ * Mirrors MusicArtistSummary on the Media Server. Only present when the request
+ * asked for `summary`; `listening` only when a user was logged in.
+ */
+export type MusicArtistSummaryType = {
+  numReleases: number,
+  numTracks: number,
+  runtimeSeconds: number,
+  shortestTrackSeconds: number | null,
+  longestTrackSeconds: number | null,
+  firstYear: number | null,
+  lastYear: number | null,
+  genres: { name: string, numReleases: number }[],
+  labels: string[],
+  bytes: number,
+  formats: MusicArtistFormatType[],
+  numLossless: number,
+  sampleRates: number[],
+  bitDepths: number[],
+  encoders: string[],
+  mediaTypes: string[],
+  countries: string[],
+  integratedLufs: number | null,
+  truePeakDb: number | null,
+  musicbrainzArtistId: string | null,
+  releases: MusicArtistReleaseSummaryType[],
+  /** One entry per track that has an indexed file; the DiskMap is drawn from these. */
+  files: MusicArtistTrackFileType[],
+  listening?: MusicArtistListeningType,
+}
+
 export type MusicArtistType = {
   id: number,
   name: string,
+  musicArtistId?: string,
   releases: Record<string, unknown>[],
   tracks: Record<string, unknown>[],
+  summary?: MusicArtistSummaryType,
   [key: string]: unknown,
 }
 
@@ -90,11 +170,27 @@ export const musicArtistsApi = baseHomeServerApi
        */
       getMusicArtist: builder.query<
         MusicArtistType,
-        { id: string }
+        {
+          id: string,
+          releases?: boolean,
+          tracks?: boolean,
+          metadata?: boolean,
+          summary?: boolean,
+          playCount?: boolean,
+          rating?: boolean,
+        }
       >({
-        query: ({ id }) => {
-          return queryParams(`/music/artist/${id}`)
+        query: ({ id, releases, tracks, metadata, summary, playCount, rating }) => {
+          return queryParams(`/music/artist/${id}`, {
+            ...(typeof releases === 'boolean' && { releases }),
+            ...(typeof tracks === 'boolean' && { tracks }),
+            ...(typeof metadata === 'boolean' && { metadata }),
+            ...(summary && { summary }),
+            ...(playCount && { playCount }),
+            ...(rating && { rating }),
+          })
         },
+        providesTags: ['MusicArtists'],
       }),
     }),
   })
