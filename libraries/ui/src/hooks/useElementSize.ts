@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 
 export type ElementSize = {
   width: number,
@@ -10,22 +10,21 @@ export type ElementSize = {
  * string or a React ref object.
  */
 export default function useElementSize(selector: string | React.RefObject<HTMLElement>) {
-  const element: HTMLElement | null = typeof selector === 'string'
-    ? document.querySelector(selector)
-    : selector.current
   const [size, setSize] = useState<ElementSize>({ width: 0, height: 0 })
 
-  const updateSize = useCallback(() => {
-    if (element) {
-      setSize({
-        width: element.offsetWidth,
-        height: element.offsetHeight,
-      })
-    }
-  }, [element])
-
   useEffect(() => {
+    /* Resolved here rather than during render because a ref holds nothing until after mount,
+       which would leave the observer with nothing to watch and the size stuck at zero. */
+    const element: HTMLElement | null = typeof selector === 'string'
+      ? document.querySelector(selector)
+      : selector.current
+
     if (!element) return
+
+    const updateSize = () => setSize({
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+    })
 
     updateSize()
 
@@ -33,7 +32,7 @@ export default function useElementSize(selector: string | React.RefObject<HTMLEl
     observer.observe(element)
 
     return () => observer.disconnect()
-  }, [element, updateSize])
+  }, [selector])
 
   return size
 }
