@@ -6,40 +6,42 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import { audioSelectors, Player } from '@cardinalapps/ui/src/store/slices/music'
 import { PLAYBACK_STATE } from '@cardinalapps/ui/src/store/slices/music/constants'
 import { layoutActions, layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
-import { DynamicQueueType } from '@cardinalapps/ui/src/store/apis/playbackQueues'
+import { DynamicQueueType, QueueSeedMediaType } from '@cardinalapps/ui/src/store/apis/playbackQueues'
 import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { randomHexColor } from '@cardinalapps/ui/src/lib/color/randomHexColor'
 
-type ReleaseMixButtonProps = {
-  releaseId: string,
+type MixButtonProps = {
+  seedMediaType: QueueSeedMediaType,
+  seedMediaId: string,
   dynamicQueueType: DynamicQueueType,
   icon: string,
   label: string,
 }
 
 /**
- * An action button that starts a dynamic queue seeded by this release. Every
- * press starts a brand new queue on the server; the server keeps it topped up
- * with fitting tracks from there on.
+ * An action button that starts a dynamic queue seeded by one release or artist.
+ * Every press starts a brand new queue on the server; the server keeps it topped
+ * up with fitting tracks from there on.
  */
-function ReleaseMixButton({
-  releaseId,
+function MixButton({
+  seedMediaType,
+  seedMediaId,
   dynamicQueueType,
   icon,
   label,
-}: ReleaseMixButtonProps) {
+}: MixButtonProps) {
   const dispatch = useAppDispatch()
   const players = useAppSelector(audioSelectors.players)
   const { [dynamicQueueType]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
 
   /*
-    Party while a player of this queue type, seeded by this release, is going.
+    Party while a player of this queue type, seeded by this same media, is going.
     The queue rides along in the player state, so this survives navigation and
-    stays scoped to the release it was started from.
+    stays scoped to the release or artist it was started from.
   */
   const partyTime = !!Object.values(players).find((player: Player) => (
     player.queue?.dynamicType === dynamicQueueType
-    && player.queue?.seedMediaId === releaseId
+    && player.queue?.seedMediaId === seedMediaId
     && (player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING)
   ))
   const isPartyTime = partyTime && storedActionButton?.gradientAnimation
@@ -65,8 +67,8 @@ function ReleaseMixButton({
     dispatch(play({
       queueType: 'dynamic',
       dynamicQueueType,
-      seedMediaType: 'music_release',
-      seedMediaId: releaseId,
+      seedMediaType,
+      seedMediaId,
     }))
   }
 
@@ -93,4 +95,4 @@ function ReleaseMixButton({
   )
 }
 
-export default ReleaseMixButton
+export default MixButton

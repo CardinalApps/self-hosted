@@ -5,31 +5,196 @@
   "music-artists.title": {
     "en": "Music Artists"
   },
-  "music-artist.releases": {
+  "music-artist.disk-map.loose-tracks": {
+    "en": "Other tracks"
+  },
+  "music-artist.meta.collection": {
+    "en": "Collection"
+  },
+  "music-artist.meta.on-disk": {
+    "en": "On Disk"
+  },
+  "music-artist.meta.listening": {
+    "en": "Your Listening"
+  },
+  "music-artist.meta.name": {
+    "en": "Name"
+  },
+  "music-artist.meta.releases": {
     "en": "Releases"
   },
-  "music-artist.releases.albums": {
-    "en": "Albums"
+  "music-artist.meta.tracks": {
+    "en": "Tracks"
   },
-  "music-artist.releases.eps": {
-    "en": "EPs"
+  "music-artist.meta.runtime": {
+    "en": "Runtime"
   },
-  "music-artist.releases.singles": {
-    "en": "Singles"
+  "music-artist.meta.runtime.hours-minutes": {
+    "en": "{h} hr {m} min"
   },
-  "music-artist.releases.compilations": {
-    "en": "Compilations"
+  "music-artist.meta.runtime.minutes": {
+    "en": "{m} min"
   },
-  "music-artist.releases.soundtracks": {
-    "en": "Soundtracks"
+  "music-artist.meta.years": {
+    "en": "Active years"
   },
-  "music-artist.releases.live": {
+  "music-artist.meta.genres": {
+    "en": "Genres"
+  },
+  "music-artist.meta.labels": {
+    "en": "Labels"
+  },
+  "music-artist.meta.track-length": {
+    "en": "Track length"
+  },
+  "music-artist.meta.size": {
+    "en": "Size on disk"
+  },
+  "music-artist.meta.per-track": {
+    "en": "Avg. per track"
+  },
+  "music-artist.meta.formats": {
+    "en": "Formats"
+  },
+  "music-artist.meta.lossless": {
+    "en": "Lossless"
+  },
+  "music-artist.meta.bitrate": {
+    "en": "Bitrate"
+  },
+  "music-artist.meta.sample-rate": {
+    "en": "Quality"
+  },
+  "music-artist.meta.encoders": {
+    "en": "Encoders"
+  },
+  "music-artist.meta.media": {
+    "en": "Media"
+  },
+  "music-artist.meta.country": {
+    "en": "Country"
+  },
+  "music-artist.meta.loudness": {
+    "en": "Loudness"
+  },
+  "music-artist.meta.plays": {
+    "en": "Plays"
+  },
+  "music-artist.meta.heard": {
+    "en": "Tracks heard"
+  },
+  "music-artist.meta.heard-of": {
+    "en": "{heard} of {total}"
+  },
+  "music-artist.meta.favorites": {
+    "en": "Favorites"
+  },
+  "music-artist.meta.most-played": {
+    "en": "Most played"
+  },
+  "music-artist.meta.times-played": {
+    "en": "×{count}"
+  },
+  "music-artist.meta.first-played": {
+    "en": "First played"
+  },
+  "music-artist.meta.last-played": {
+    "en": "Last played"
+  },
+  "music-artist.meta.added": {
+    "en": "Added"
+  },
+  "music-artist.meta.kbps": {
+    "en": "{kbps} kbps"
+  },
+  "music-artist.meta.khz": {
+    "en": "{khz} kHz"
+  },
+  "music-artist.meta.bit-depth": {
+    "en": "{bits}-bit"
+  },
+  "music-artist.meta.lufs": {
+    "en": "{lufs} LUFS"
+  },
+  "music-artist.meta.peak": {
+    "en": "peak {peak} dB"
+  },
+  "music-artist.meta.plus-more": {
+    "en": "+{count}"
+  },
+  "music-artist.play-actions.house-mix": {
+    "en": "House Mix"
+  },
+  "music-artist.play-actions.from-the-depths": {
+    "en": "From the Depths"
+  },
+  "music-artist.play-actions.play": {
+    "en": "Play"
+  },
+  "music-artist.play-actions.chronology": {
+    "en": "Chronology"
+  },
+  "music-artist.play-actions.true-shuffle": {
+    "en": "True Shuffle"
+  },
+  "music-artist.play-actions.favorites": {
+    "en": "Favorites"
+  },
+  "music-artist.play-actions.unheard": {
+    "en": "Unheard"
+  },
+  "music-artist.play-actions.top-tracks": {
+    "en": "Top Tracks"
+  },
+  "music-artist.play-actions.play-next": {
+    "en": "Play next"
+  },
+  "music-artist.play-actions.add-to-queue": {
+    "en": "Add to queue"
+  },
+  "music-artist.timeline.title": {
+    "en": "Discography"
+  },
+  "music-artist.timeline.gap": {
+    "en": "{years} years"
+  },
+  "music-artist.timeline.heard": {
+    "en": "heard {heard}/{total}"
+  },
+  "music-artist.timeline.tracks": {
+    "en": "{count} tracks"
+  },
+  "music-artist.timeline.runtime.hours-minutes": {
+    "en": "{h}h {m}m"
+  },
+  "music-artist.timeline.runtime.minutes": {
+    "en": "{m}m"
+  },
+  "music-artist.timeline.type.album": {
+    "en": "Album"
+  },
+  "music-artist.timeline.type.ep": {
+    "en": "EP"
+  },
+  "music-artist.timeline.type.single": {
+    "en": "Single"
+  },
+  "music-artist.timeline.type.compilation": {
+    "en": "Compilation"
+  },
+  "music-artist.timeline.type.soundtrack": {
+    "en": "Soundtrack"
+  },
+  "music-artist.timeline.type.live": {
     "en": "Live"
   },
-  "music-artist.releases.remixes": {
-    "en": "Remixes"
+  "music-artist.timeline.type.remix": {
+    "en": "Remix"
   },
-  "music-artist.releases.other": {
-    "en": "Other"
+  "music-artist.timeline.type.dj-mix": {
+    "en": "DJ Mix"
+  },
+  "music-artist.timeline.type.inferred": {
+    "en": "Type inferred from the track count and runtime"
   }
 }
