@@ -52,14 +52,20 @@
     }
   }
 
-  .presets {
+  .custom-color {
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(5, 28px);
     gap: 6px;
 
     .preset {
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
       padding: 0;
       border: 1px solid var(--border-color-2);
       border-radius: var(--border-radius);
@@ -77,6 +83,12 @@
     }
   }
 
+  &.with-presets {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
   &.size-s {
 
     .swatch {
@@ -88,11 +100,6 @@
       width: 80px;
       padding: 5px 8px;
       font-size: 12px;
-    }
-
-    .presets .preset {
-      width: 18px;
-      height: 18px;
     }
   }
 }

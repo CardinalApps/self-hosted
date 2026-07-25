@@ -8,7 +8,8 @@
     margin-bottom: 20px;
 
     .custom-select {
-      width: 220px;
+      width: 100%;
+      max-width: 190px;
       flex-shrink: 0;
     }
 
@@ -66,6 +67,14 @@
       justify-content: flex-end;
       flex-wrap: wrap;
       gap: 8px;
+
+      &.stacked {
+        align-items: flex-end;
+
+        .custom-color {
+          min-height: 30px;
+        }
+      }
     }
   }
 }

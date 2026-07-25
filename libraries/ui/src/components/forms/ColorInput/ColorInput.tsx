@@ -90,41 +90,7 @@ const ColorInput = ({
   }
 
   return (
-    <div className={clsx('color-input', className, `size-${size}`)} style={style}>
-      <label className="swatch">
-        <span className="swatch-color" style={{ backgroundColor: serializeCssColor(parsed.hex, parsed.alpha) }} />
-        <input
-          type="color"
-          name={name}
-          value={parsed.hex}
-          onChange={(e) => apply(serializeCssColor(e.target.value, alpha ? parsed.alpha : 1))}
-          onBlur={() => emit.flush()}
-        />
-      </label>
-      <input
-        type="text"
-        className="hex"
-        value={draftHex}
-        spellCheck={false}
-        onChange={(e) => setDraftHex(e.target.value)}
-        onBlur={(e) => commitHex(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault()
-            commitHex((e.target as HTMLInputElement).value)
-          }
-        }}
-      />
-      {alpha && (
-        <RangeInput
-          min={0}
-          max={100}
-          unit="%"
-          size="s"
-          value={Math.round(parsed.alpha * 100)}
-          onChange={(percent) => apply(serializeCssColor(parsed.hex, percent / 100))}
-        />
-      )}
+    <div className={clsx('color-input', className, `size-${size}`, !!presets && 'with-presets')} style={style}>
       {!!presets && (
         <div className="presets">
           {Object.entries(presets).map(([hex, label]) => {
@@ -143,6 +109,42 @@ const ColorInput = ({
           })}
         </div>
       )}
+      <div className="custom-color">
+        <label className="swatch">
+          <span className="swatch-color" style={{ backgroundColor: serializeCssColor(parsed.hex, parsed.alpha) }} />
+          <input
+            type="color"
+            name={name}
+            value={parsed.hex}
+            onChange={(e) => apply(serializeCssColor(e.target.value, alpha ? parsed.alpha : 1))}
+            onBlur={() => emit.flush()}
+          />
+        </label>
+        <input
+          type="text"
+          className="hex"
+          value={draftHex}
+          spellCheck={false}
+          onChange={(e) => setDraftHex(e.target.value)}
+          onBlur={(e) => commitHex(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              commitHex((e.target as HTMLInputElement).value)
+            }
+          }}
+        />
+        {alpha && (
+          <RangeInput
+            min={0}
+            max={100}
+            unit="%"
+            size="s"
+            value={Math.round(parsed.alpha * 100)}
+            onChange={(percent) => apply(serializeCssColor(parsed.hex, percent / 100))}
+          />
+        )}
+      </div>
     </div>
   )
 }
