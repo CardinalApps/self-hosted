@@ -38,20 +38,11 @@ export default {
   "settings.music-playback.always-load-whole-song": {
     "en": "Always load the whole song before playing it. This will add a significant delay when loading a new song, but will prevent intermittent buffering when files are being retrieved over a slow network connection.",
   },
-  "settings.custom-css.title": {
-    "en": "Custom CSS",
-  },
   "settings.server-name.title": {
     "en": "Server name",
   },
   "settings.server-name.desc": {
     "en": "Your server's name will be shared with people that you invite.",
-  },
-  "settings.custom-css.notice": {
-    "en": "Notice",
-  },
-  "settings.custom-css.instructions": {
-    "en": "If you break something, press <code class='inline win32-only'>Ctrl+Alt+I</code><code class='inline darwin-only'>Cmd+Option+I</code> and run <code class='inline'>disableCustomCSS()</code> in the console.",
   },
   "settings.developer.title": {
     "en": "Developer",

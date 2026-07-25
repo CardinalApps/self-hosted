@@ -21,20 +21,15 @@ export const getFields = (app, lang) => {
       //commonFields.lang,
       //commonFields.startPage,
       commonFields.enableCustomContextMenu,
-      commonFields.developerMode,
-    ],
-    appearance: [
-      commonFields.theme,
-      commonFields.accentColor,
       commonFields.enableGlass,
       commonFields.floatingPlaybackSidebar,
-      commonFields.customCss,
+      commonFields.developerMode,
     ],
   }
 
   // The bespoke theme editor tab, identical for all apps
-  const themeNextTab = {
-    tabName: i18n['settings.tab-name-theme-next'][lang],
+  const themeTab = {
+    tabName: i18n['settings.tab-name-theme'][lang],
     tabIcon: 'fas fa-swatchbook',
     tabContent: <ThemeEditor />,
   }
@@ -49,18 +44,11 @@ export const getFields = (app, lang) => {
           tabIcon: 'fas fa-home',
           fields: [
             commonFields.enableCustomContextMenu,
+            commonFields.enableGlass,
             adminServerFields.openAppsInNewTab,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
         // --- Server administration (system-wide, all users) ---
         // Server settings tab
         {
@@ -110,15 +98,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
         // Music settings tab
         {
           tabName: i18n['settings.tab-name-music-playback'][lang],
@@ -144,15 +124,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
         // People settings tab
         // {
         //   tabName: i18n['settings.tab-name-people'][lang],
@@ -181,15 +153,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
       ]
 
     case 'books':
@@ -202,15 +166,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
       ]
 
     // Used by kiosk
@@ -224,55 +180,7 @@ export const getFields = (app, lang) => {
             ...defaults.general,
           ],
         },
-        themeNextTab,
-        // Appearance settings tab
-        {
-          tabName: i18n['settings.tab-name-appearance'][lang],
-          tabIcon: 'fas fa-palette',
-          fields: [
-            ...defaults.appearance,
-          ],
-        },
+        themeTab,
       ]
-  }
-}
-
-/**
- * Returns an object of all fields and their default values for the given app
- * settings. "Default" here means as set by the factory.
- */
-export const getDefaultFieldValues = (app, lang = 'en') => {
-  const tabs = getFields(app, lang)
-  const defaults = {}
-
-  if (!tabs) {
-    return defaults
-  }
-
-  tabs.forEach((tab) => {
-    tab.fields?.forEach((field) => {
-      const fieldObj = field(app, lang)
-      defaults[fieldObj.slug] = fieldObj.defaultValue
-    })
-  })
-
-  return defaults
-}
-
-/**
- * Returns an object of global default settings that are important enough that
- * they should always be set in every app.
- *
- * "Default" here means as set by the factory.
- */
-export const getImportantDefaultSettings = () => {
-  const langSetting = commonFields.lang()
-  const themeSetting = commonFields.theme()
-  const accentColorSetting = commonFields.accentColor()
-
-  return {
-    [langSetting.slug]: langSetting.defaultValue,
-    [themeSetting.slug]: themeSetting.defaultValue,
-    [accentColorSetting.slug]: accentColorSetting.defaultValue,
   }
 }

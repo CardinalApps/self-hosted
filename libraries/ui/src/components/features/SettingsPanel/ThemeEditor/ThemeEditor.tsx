@@ -14,9 +14,11 @@ import type { SupportedCardinalApp, SupportedLang } from '@cardinalapps/app-sett
 import ColorInput from '../../../forms/ColorInput'
 import RangeInput from '../../../forms/RangeInput'
 import Select from '../../../forms/Select'
+import TextInput from '../../../forms/TextInput'
 import Button from '../../../interaction/Button'
 import Confirm from '../../../interaction/Confirm'
 import Card from '../../../layout/Card'
+import Modal from '../../../layout/Modal'
 import H3 from '../../../typography/H3'
 
 import { useAppDispatch } from '../../../../hooks/useAppDispatch'
@@ -43,6 +45,8 @@ const BUILT_IN_THEME_OPTIONS = themeFactory(
   undefined as unknown as SupportedCardinalApp,
   'en',
 ).options as Record<string, string>
+
+const THEME_NAME_MAX_LENGTH = 24
 
 // The exposed tokens grouped into sections, in manifest order
 const tokenGroups: { name: string, tokens: ThemeToken[] }[] = []
@@ -82,6 +86,7 @@ const ThemeEditor = () => {
   const [appliedBaseTheme, setAppliedBaseTheme] = useState('light')
   const [baseValues, setBaseValues] = useState<Record<string, string>>({})
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [renameDraft, setRenameDraft] = useState<string | null>(null)
 
   /**
    * Track which built-in theme the surrounding app actually has applied. Read from the DOM rather
@@ -171,23 +176,32 @@ const ThemeEditor = () => {
     })
   }
 
-  const updateSelectedThemeVars = (vars: Record<string, string>) => {
+  const updateSelectedTheme = (patch: Partial<CustomTheme>) => {
     dispatch(settingsActions.set({
       key: 'custom_themes',
       value: customThemes.map((customTheme) => (
-        customTheme.id === selectedCustomTheme.id ? { ...customTheme, vars } : customTheme
+        customTheme.id === selectedCustomTheme.id ? { ...customTheme, ...patch } : customTheme
       )),
     }))
   }
 
+  /*
+   * Inputs can emit before the editor has read the base values - Select in particular normalizes
+   * an empty value on mount and reports it as a change. Overriding a token with nothing is
+   * meaningless, and acting on it would fork a custom theme the user never asked for.
+   */
   const setOverride = (varName: string, value: string) => {
+    if (!value) {
+      return
+    }
+
     if (varName === '--accent-color') {
       dispatch(settingsActions.set({ key: 'accent_color', value }))
       return
     }
 
     if (selectedCustomTheme) {
-      updateSelectedThemeVars({ ...selectedCustomTheme.vars, [varName]: value })
+      updateSelectedTheme({ vars: { ...selectedCustomTheme.vars, [varName]: value } })
     } else {
       forkActiveTheme({ [varName]: value })
     }
@@ -205,7 +219,7 @@ const ThemeEditor = () => {
 
     const vars = { ...selectedCustomTheme.vars }
     delete vars[varName]
-    updateSelectedThemeVars(vars)
+    updateSelectedTheme({ vars })
   }
 
   const handleDuplicate = () => {
@@ -213,7 +227,15 @@ const ThemeEditor = () => {
   }
 
   const handleResetTheme = () => {
-    updateSelectedThemeVars({})
+    updateSelectedTheme({ vars: {} })
+  }
+
+  const handleRenameSave = () => {
+    const name = renameDraft?.trim().slice(0, THEME_NAME_MAX_LENGTH)
+    if (name) {
+      updateSelectedTheme({ name })
+    }
+    setRenameDraft(null)
   }
 
   /**
@@ -351,6 +373,13 @@ const ThemeEditor = () => {
           onChange={handleThemeChange}
         />
         <div className="theme-actions">
+          <Button
+            solid
+            disabled={!selectedCustomTheme}
+            onClick={() => setRenameDraft(selectedCustomTheme.name)}
+          >
+            {i18n['settings.theme-editor.rename'][lang]}
+          </Button>
           <Button solid disabled={!selectedCustomTheme} onClick={handleCopy}>
             {i18n['settings.theme-editor.copy'][lang]}
           </Button>
@@ -379,6 +408,32 @@ const ThemeEditor = () => {
           confirmButtonIsDangerous
           onClose={handleDeleteClose}
         />
+      )}
+      {renameDraft !== null && selectedCustomTheme && (
+        <Modal
+          width={420}
+          onClose={() => setRenameDraft(null)}
+          footer={(
+            <>
+              <Button textual onClick={() => setRenameDraft(null)}>
+                {i18n['settings.theme-editor.rename-cancel'][lang]}
+              </Button>
+              <Button textual disabled={!renameDraft.trim()} onClick={handleRenameSave}>
+                {i18n['settings.theme-editor.rename-save'][lang]}
+              </Button>
+            </>
+          )}
+        >
+          <div className="theme-rename">
+            <H3>{i18n['settings.theme-editor.rename-title'][lang]}</H3>
+            <TextInput
+              value={renameDraft}
+              maxLength={THEME_NAME_MAX_LENGTH}
+              onChange={setRenameDraft}
+              onEnter={handleRenameSave}
+            />
+          </div>
+        </Modal>
       )}
       {tokenGroups.map((group) => (
         <Card

@@ -19,6 +19,8 @@ type ModalProps = {
   loading?: boolean,
   clickOutsideToClose?: boolean,
   canClose?: boolean,
+  // Rendered in the card's footer, where actions sit bottom right
+  footer?: ReactNode,
   onClose?: () => void,
   children?: ReactNode,
 }
@@ -28,6 +30,7 @@ const Modal = ({
   loading = false,
   clickOutsideToClose = false,
   canClose = true,
+  footer,
   onClose,
   children,
 }: PropsWithChildren<ModalProps>) => {
@@ -94,7 +97,11 @@ const Modal = ({
               <Icon fa="fas fa-times" />
             </button>
             <div>
-              <Card className="modal-content" style={{ ...(width && { maxWidth: width }) }}>
+              <Card
+                className="modal-content"
+                style={{ ...(width && { maxWidth: width }) }}
+                footer={loading ? undefined : footer}
+              >
                 {loading
                   ? <Loading className="modal-loading" />
                   : children
