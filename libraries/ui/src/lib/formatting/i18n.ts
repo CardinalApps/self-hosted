@@ -5,6 +5,15 @@ const i18n = {
   "time.ago": {
     "en": "ago",
   },
+  "country.worldwide": {
+    "en": "Worldwide",
+  },
+  "country.europe": {
+    "en": "Europe",
+  },
+  "country.unknown": {
+    "en": "Unknown",
+  },
 }
 
 export default i18n
