@@ -57,11 +57,14 @@
     .row-label {
       color: var(--text-color-2);
       font-size: 14px;
+      flex-shrink: 0;
     }
 
     .row-controls {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 8px;
     }
   }

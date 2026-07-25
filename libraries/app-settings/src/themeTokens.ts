@@ -27,6 +27,9 @@ export type ThemeToken = {
  * knows about: what it's for, how it should be edited, and whether it's
  * currently user-editable. CSS remains authoritative for values - this
  * manifest describes the contract only.
+ *
+ * Order matters: the theme editor renders its sections in the order the
+ * groups first appear here, so per-theme and cross-theme tokens interleave.
  */
 export const themeTokens: ThemeToken[] = [
   // --- Backgrounds (per-theme) ---
@@ -42,6 +45,18 @@ export const themeTokens: ThemeToken[] = [
   { varName: '--text-color-3', group: 'Foregrounds', type: 'color', label: 'Text 3', exposed: true, perTheme: true },
   { varName: '--text-color-4', group: 'Foregrounds', type: 'color', label: 'Text 4', exposed: true, perTheme: true },
   { varName: '--text-color-5', group: 'Foregrounds', type: 'color', label: 'Text 5', exposed: true, perTheme: true },
+
+  // --- Colors (cross-theme) ---
+  { varName: '--accent-color', group: 'Colors', type: 'color', label: 'Accent color', exposed: true, perTheme: false },
+
+  // --- Glass (cross-theme) ---
+  { varName: '--glass-bg', group: 'Glass', type: 'color', label: 'Glass tint', alphaAllowed: true, exposed: true, perTheme: false },
+  { varName: '--glass-blur', group: 'Glass', type: 'length', label: 'Glass blur', min: 0, max: 60, exposed: true, perTheme: false },
+  { varName: '--glass-border-color', group: 'Glass', type: 'color', label: 'Glass border', alphaAllowed: true, exposed: true, perTheme: false },
+  { varName: '--glass-shadow', group: 'Glass', type: 'shadow', label: 'Glass shadow', exposed: false, perTheme: false },
+
+  // --- Typography (cross-theme) ---
+  { varName: '--font-family', group: 'Typography', type: 'font', label: 'Font', exposed: true, perTheme: false },
 
   // --- Inputs (per-theme) ---
   { varName: '--input-bg', group: 'Inputs', type: 'color', label: 'Input background', exposed: true, perTheme: true },
@@ -82,12 +97,6 @@ export const themeTokens: ThemeToken[] = [
   { varName: '--checkered-color-1', group: 'Checkered pattern', type: 'color', label: 'Checkered pattern 1', exposed: false, perTheme: true },
   { varName: '--checkered-color-2', group: 'Checkered pattern', type: 'color', label: 'Checkered pattern 2', exposed: false, perTheme: true },
 
-  // --- Colors (cross-theme) ---
-  { varName: '--accent-color', group: 'Colors', type: 'color', label: 'Accent color', exposed: true, perTheme: false },
-
-  // --- Typography (cross-theme) ---
-  { varName: '--font-family', group: 'Typography', type: 'font', label: 'Font', exposed: true, perTheme: false },
-
   // --- Spacing (cross-theme) ---
   { varName: '--gutter', group: 'Spacing', type: 'length', label: 'Base spacing', min: 12, max: 32, exposed: true, perTheme: false },
   // Naming is historically inverted (base is the smallest radius, "-m" is the
@@ -96,12 +105,6 @@ export const themeTokens: ThemeToken[] = [
   { varName: '--border-radius', group: 'Spacing', type: 'length', label: 'Corner radius (small)', min: 0, max: 24, exposed: true, perTheme: false },
   { varName: '--border-radius-s', group: 'Spacing', type: 'length', label: 'Corner radius (medium)', min: 0, max: 24, exposed: true, perTheme: false },
   { varName: '--border-radius-m', group: 'Spacing', type: 'length', label: 'Corner radius (large)', min: 0, max: 24, exposed: true, perTheme: false },
-
-  // --- Glass (cross-theme) ---
-  { varName: '--glass-bg', group: 'Glass', type: 'color', label: 'Glass tint', alphaAllowed: true, exposed: true, perTheme: false },
-  { varName: '--glass-blur', group: 'Glass', type: 'length', label: 'Glass blur', min: 0, max: 60, exposed: true, perTheme: false },
-  { varName: '--glass-border-color', group: 'Glass', type: 'color', label: 'Glass border', alphaAllowed: true, exposed: true, perTheme: false },
-  { varName: '--glass-shadow', group: 'Glass', type: 'shadow', label: 'Glass shadow', exposed: false, perTheme: false },
 
   // --- Timing (cross-theme) - never user-facing ---
   { varName: '--transition-speed-fast', group: 'Timing', type: 'length', label: 'Transition speed (fast)', exposed: false, perTheme: false },
