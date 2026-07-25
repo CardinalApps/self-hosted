@@ -7,18 +7,20 @@ import Popout from '../../layout/Popout'
 import Icon from '../../typography/Icon'
 import { settingsSelectors } from '../../../store/slices/settings'
 
-import { providerLogos, providerNames } from './logos'
+import { providers } from './logos'
 import { buildExternalLinks, type ExternalIds } from './providers'
 
 import i18n from './i18n'
 
 import './ExternalLinks.css'
 
+// Wide enough for the longest label to stay on one line beside the widest logo
+const POPOUT_WIDTH = 310
+
 type ExternalLinksProps = {
   ids: ExternalIds
   /** Rendered instead of nothing when no identifier is present. Off by default. */
   showWhenEmpty?: boolean
-  align?: string
   className?: string
 }
 
@@ -31,7 +33,6 @@ type ExternalLinksProps = {
 const ExternalLinks = ({
   ids,
   showWhenEmpty = false,
-  align = 'left',
   className,
 }: ExternalLinksProps) => {
   const { lang } = useSelector(settingsSelectors.current)
@@ -51,29 +52,27 @@ const ExternalLinks = ({
       innerClassName="external-links-popout"
       open={isOpen}
       onClose={() => setIsOpen(false)}
-      position="tl"
-      origin="bl"
-      offset={6}
-      width={240}
+      position="tr"
+      origin="br"
+      offset={8}
+      width={POPOUT_WIDTH}
+      title={title}
       trigger={(
         <MenuButton
           open={isOpen}
           onOpenChange={setIsOpen}
-          align={align}
-          icon={<Icon fa="fas fa-external-link-alt" />}
+          icon={<Icon fa="fas fa-bars" />}
           title={title}
         />
       )}
     >
-      <p className="external-links-title">{title}</p>
-
       {!links.length && (
         <p className="external-links-empty">{i18n['external-links.empty'][lang]}</p>
       )}
 
       <ul className="external-links-list">
         {links.map((link) => {
-          const Logo = providerLogos[link.providerId]
+          const { name, wordmark, logo: Logo } = providers[link.providerId]
 
           return (
             <li key={link.id}>
@@ -83,12 +82,18 @@ const ExternalLinks = ({
                 rel="noreferrer noopener"
                 onClick={() => setIsOpen(false)}
               >
-                <span className="external-links-logo">
-                  <Logo />
+                <span className="external-links-provider">
+                  {wordmark ? <Logo /> : (
+                    <>
+                      <span className="external-links-mark"><Logo /></span>
+                      {name}
+                    </>
+                  )}
                 </span>
-                <span className="external-links-label">
-                  <span className="external-links-provider">{providerNames[link.providerId]}</span>
-                  <span className="external-links-kind">{i18n[link.labelKey][lang]}</span>
+
+                <span className="external-links-action">
+                  {i18n[link.labelKey][lang]}
+                  <i className="fas fa-external-link-alt" />
                 </span>
               </a>
             </li>
