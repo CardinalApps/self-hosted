@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 
+import ExternalLinks from '@cardinalapps/ui/src/components/interaction/ExternalLinks'
 import List from '@cardinalapps/ui/src/components/interaction/List'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
 import { countryName } from '@cardinalapps/ui/src/lib/formatting/country'
@@ -27,8 +28,8 @@ type MetaRow = {
 }
 
 /**
- * The artist's numbers in two columns: what the collection holds, what it costs
- * on disk, and what the current user has done with it.
+ * The artist's numbers in one scrolling column: what the collection holds, what
+ * it costs on disk, and what the current user has done with it.
  */
 function ArtistMeta({
   artist,
@@ -219,20 +220,20 @@ function ArtistMeta({
   }))
 
   return (
-    <div className="artist-meta">
-      <div className="artist-meta-cols">
-        <div className="artist-meta-col">
-          <p className="meta-section-title">{t('music-artist.meta.collection')}</p>
-          <List className="artist-meta-list" layout="compact" items={toListItems(collection)} />
+    <div className="artist-meta-pane">
+      <div className="artist-meta-row">
+        <ExternalLinks ids={{ musicbrainzArtistId: summary?.musicbrainzArtistId }} />
+      </div>
 
-          <p className="meta-section-title">{t('music-artist.meta.listening')}</p>
-          <List className="artist-meta-list" layout="compact" items={toListItems(yourListening)} />
-        </div>
+      <div className="artist-meta">
+        <p className="meta-section-title">{t('music-artist.meta.collection')}</p>
+        <List className="artist-meta-list" layout="compact" items={toListItems(collection)} />
 
-        <div className="artist-meta-col">
-          <p className="meta-section-title">{t('music-artist.meta.on-disk')}</p>
-          <List className="artist-meta-list" layout="compact" items={toListItems(onDisk)} />
-        </div>
+        <p className="meta-section-title">{t('music-artist.meta.on-disk')}</p>
+        <List className="artist-meta-list" layout="compact" items={toListItems(onDisk)} />
+
+        <p className="meta-section-title">{t('music-artist.meta.listening')}</p>
+        <List className="artist-meta-list" layout="compact" items={toListItems(yourListening)} />
       </div>
     </div>
   )

@@ -2,25 +2,25 @@ import { StringList } from "../../../types/i18n"
 
 const i18n: StringList = {
   "external-links.title": {
-    "en": "Look up",
+    "en": "External Links",
   },
   "external-links.empty": {
     "en": "No external IDs were found in these files.",
   },
   "external-links.musicbrainz.artist": {
-    "en": "Artist",
+    "en": "Go to Artist",
   },
   "external-links.musicbrainz.release-group": {
-    "en": "Release group",
+    "en": "Go to Release group",
   },
   "external-links.musicbrainz.release": {
-    "en": "Release",
+    "en": "Go to Release",
   },
   "external-links.musicbrainz.recording": {
-    "en": "Recording",
+    "en": "Go to Recording",
   },
   "external-links.musicbrainz.isrc": {
-    "en": "ISRC",
+    "en": "Go to ISRC",
   },
   "external-links.discogs.barcode": {
     "en": "Search by barcode",
@@ -29,7 +29,7 @@ const i18n: StringList = {
     "en": "Search by catalog no.",
   },
   "external-links.amazon.asin": {
-    "en": "ASIN",
+    "en": "Go to ASIN",
   },
 }
 

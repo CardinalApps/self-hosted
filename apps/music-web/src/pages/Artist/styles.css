@@ -11,27 +11,44 @@
     margin-bottom: calc(var(--gutter) * 2);
   }
 
-  .artist-hero-links {
-    position: absolute;
-    top: var(--gutter);
-    right: var(--gutter);
-    z-index: 2;
-  }
-
   .artist-hero-cols {
+    --artist-hero-height: 600px;
+
     display: flex;
     gap: calc(var(--gutter) * 2);
     align-items: flex-start;
   }
 
   .artist-disk-map {
-    flex-shrink: 0;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    height: var(--artist-hero-height);
+  }
+
+  .artist-meta-pane {
+    flex: 1 1 0;
+    min-width: 0;
+    height: var(--artist-hero-height);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .artist-meta-row {
+    margin-bottom: var(--gutter);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
   }
 
   .artist-meta {
+    min-height: 0;
     flex-grow: 1;
-    min-width: 0;
-    padding-right: 34px;
+    overflow-y: auto;
+    /* Reserved up front, so a classic scrollbar doesn't reflow every right-aligned value the
+       moment the sections finish loading and the list outgrows the map. */
+    scrollbar-gutter: stable;
 
     .meta-section-title {
       margin-bottom: 8px;
@@ -44,16 +61,6 @@
         margin-top: var(--gutter);
       }
     }
-  }
-
-  .artist-meta-cols {
-    display: flex;
-    gap: calc(var(--gutter) * 2);
-  }
-
-  .artist-meta-col {
-    flex: 1;
-    min-width: 0;
   }
 
   .artist-meta-list {
@@ -242,22 +249,28 @@
       flex-direction: column;
     }
 
+    /* Stacked, the flex basis measures height instead of width, which would flatten the map */
     .artist-disk-map {
+      order: 2;
+      flex: 0 0 auto;
       width: 100%;
     }
 
-    .artist-meta {
+    /* Nothing left to match heights with once the map is out from beside it, so the list runs
+       its full length rather than scrolling inside the card. */
+    .artist-meta-pane {
+      flex: 0 0 auto;
       width: 100%;
-      padding-right: 0;
+      height: auto;
+    }
+
+    .artist-meta {
+      overflow-y: visible;
+      scrollbar-gutter: auto;
     }
   }
 
   @container artist-layout (max-width: 620px) {
-
-    .artist-meta-cols {
-      flex-direction: column;
-      gap: 0;
-    }
 
     .artist-timeline {
       --timeline-gutter: 60px;

@@ -1,5 +1,7 @@
 import type { Meta } from '@storybook/react'
 
+import Tags from '../Tags'
+
 import ExternalLinks from './ExternalLinks'
 
 const meta = {
@@ -30,8 +32,9 @@ const TRACK_IDS = {
   isrc: 'USA2P1400001',
 }
 
+// The popout hangs to the left of its trigger, so the frame keeps room on that side for it
 const Frame = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ padding: 20, minHeight: 380 }}>{children}</div>
+  <div style={{ padding: 20, paddingLeft: 320, minHeight: 400 }}>{children}</div>
 )
 
 /**
@@ -79,5 +82,17 @@ export const Empty = () => (
 export const EmptyShown = () => (
   <Frame>
     <ExternalLinks ids={{}} showWhenEmpty />
+  </Frame>
+)
+
+/**
+ * Where it's used: at the head of a page's row of key stats.
+ */
+export const InAStatsRow = () => (
+  <Frame>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+      <ExternalLinks ids={RELEASE_IDS} />
+      <Tags tags={['13 releases', '183 tracks', '2.3 GB']} />
+    </div>
   </Frame>
 )

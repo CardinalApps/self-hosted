@@ -4,7 +4,6 @@ import clsx from 'clsx'
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import DiskMap, { type DiskMapBlock } from '@cardinalapps/ui/src/components/interaction/DiskMap'
-import ExternalLinks from '@cardinalapps/ui/src/components/interaction/ExternalLinks'
 import { NetworkError } from '@cardinalapps/ui/src/components/layout/AccessError/AccessError'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
@@ -177,10 +176,6 @@ function ArtistPage() {
     >
       <div className="artist-layout">
         <Card className={clsx('artist-hero-card', enable_glass && 'glass')} padding="thin">
-          <div className="artist-hero-links">
-            <ExternalLinks ids={{ musicbrainzArtistId: data?.summary?.musicbrainzArtistId }} align="right" />
-          </div>
-
           <div className="artist-hero-cols">
             <DiskMap
               className="artist-disk-map"
