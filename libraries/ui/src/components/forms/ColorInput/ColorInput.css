@@ -52,6 +52,31 @@
     }
   }
 
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .preset {
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 1px solid var(--border-color-2);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: transform var(--transition-speed-fast);
+
+      &:hover {
+        transform: scale(1.15);
+      }
+
+      &.active {
+        border-color: var(--text-color-1);
+        transform: scale(1.15);
+      }
+    }
+  }
+
   &.size-s {
 
     .swatch {
@@ -63,6 +88,11 @@
       width: 80px;
       padding: 5px 8px;
       font-size: 12px;
+    }
+
+    .presets .preset {
+      width: 18px;
+      height: 18px;
     }
   }
 }

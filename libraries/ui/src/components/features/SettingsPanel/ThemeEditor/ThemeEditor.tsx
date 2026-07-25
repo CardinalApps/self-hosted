@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { v4 as uuid } from 'uuid'
 
-import { accentColorFactory } from '@cardinalapps/app-settings/src/common/accent_color'
+import { accentColorFactory, COLORS as ACCENT_COLOR_PRESETS } from '@cardinalapps/app-settings/src/common/accent_color'
 import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
 import { exposedThemeTokens, themeTokens } from '@cardinalapps/app-settings/src/themeTokens'
@@ -320,6 +320,7 @@ const ThemeEditor = () => {
         name={token.varName}
         value={currentValue(token)}
         alpha={token.alphaAllowed}
+        presets={token.varName === '--accent-color' ? ACCENT_COLOR_PRESETS : undefined}
         size="s"
         onChange={(value) => setOverride(token.varName, value)}
       />
@@ -344,11 +345,11 @@ const ThemeEditor = () => {
           onChange={handleThemeChange}
         />
         <div className="theme-actions">
-          <Button solid onClick={handleDuplicate}>
-            {i18n['settings.theme-editor.duplicate'][lang]}
+          <Button solid disabled={!selectedCustomTheme} onClick={handleCopy}>
+            {i18n['settings.theme-editor.copy'][lang]}
           </Button>
-          <Button solid disabled={!selectedCustomTheme} onClick={() => setConfirmingDelete(true)}>
-            {i18n['settings.theme-editor.delete'][lang]}
+          <Button solid onClick={handlePaste}>
+            {i18n['settings.theme-editor.paste'][lang]}
           </Button>
           <Button
             solid
@@ -357,11 +358,11 @@ const ThemeEditor = () => {
           >
             {i18n['settings.theme-editor.reset-theme'][lang]}
           </Button>
-          <Button solid disabled={!selectedCustomTheme} onClick={handleCopy}>
-            {i18n['settings.theme-editor.copy'][lang]}
+          <Button solid onClick={handleDuplicate}>
+            {i18n['settings.theme-editor.duplicate'][lang]}
           </Button>
-          <Button solid onClick={handlePaste}>
-            {i18n['settings.theme-editor.paste'][lang]}
+          <Button solid disabled={!selectedCustomTheme} onClick={() => setConfirmingDelete(true)}>
+            {i18n['settings.theme-editor.delete'][lang]}
           </Button>
         </div>
       </div>
