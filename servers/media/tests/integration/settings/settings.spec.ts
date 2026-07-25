@@ -273,6 +273,82 @@ describe('user-scoped settings', () => {
 })
 
 // -------------------------------------------------------------------------
+// Authorization for server-scoped settings.
+//
+// Anyone signed in can write their own account-scoped settings, but changing a
+// setting that belongs to the whole install needs UserSettings.Update. The
+// guest account is an administrator, so a lesser role is needed to test the
+// restriction.
+// -------------------------------------------------------------------------
+
+describe('server-scoped settings authorization', () => {
+  let newcomerToken: string
+
+  beforeAll(async () => {
+    const userService = testApp.moduleRef.get(UserService)
+    await userService.createUser({
+      dto: { username: 'settings-newcomer', password: 'somepassword', role: 'newcomer' },
+    })
+
+    // Newcomers can sign into the media apps but not the admin panel, so this logs in as music
+    const loginRes = await request(testApp.app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .set('cardinal-app', 'music')
+      .send({ username: 'settings-newcomer', password: 'somepassword' })
+      .expect(201)
+
+    newcomerToken = loginRes.body.JWT
+  })
+
+  it('refuses a server-wide setting from a user without the capability', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${newcomerToken}`)
+      .send({ app: 'music', settings: { server_name: 'Not Your Server' } })
+      .expect(403)
+
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/settings/admin')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    expect(res.body.settings.server_name).not.toBe('Not Your Server')
+  })
+
+  it('refuses the whole payload when a server-wide setting rides along with an allowed one', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${newcomerToken}`)
+      .send({ app: 'music', settings: { theme: 'dark', max_rating: 99 } })
+      .expect(403)
+  })
+
+  it('still lets that user save their own account-scoped settings', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${newcomerToken}`)
+      .send({ app: 'music', settings: { theme: 'dark', accent_color: '#0f6bdd' } })
+      .expect(200)
+
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/settings/music')
+      .set('Authorization', `Bearer ${newcomerToken}`)
+      .expect(200)
+
+    expect(res.body.settings.theme).toBe('dark')
+    expect(res.body.settings.accent_color).toBe('#0f6bdd')
+  })
+
+  it('lets an administrator write server-wide settings', async () => {
+    await request(testApp.app.getHttpServer())
+      .patch('/api/v1/settings')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ app: 'admin', settings: { server_name: 'Settings Test Server' } })
+      .expect(200)
+  })
+})
+
+// -------------------------------------------------------------------------
 // Default values per setting.
 //
 // Only settings that are stored in the server database are tested here.
