@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { v4 as uuid } from 'uuid'
 
 import { accentColorFactory } from '@cardinalapps/app-settings/src/common/accent_color'
 import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
-import type { ThemeOverrides } from '@cardinalapps/app-settings/src/common/theme_overrides'
 import { exposedThemeTokens, themeTokens } from '@cardinalapps/app-settings/src/themeTokens'
 import type { ThemeToken } from '@cardinalapps/app-settings/src/themeTokens'
 import type { SupportedCardinalApp, SupportedLang } from '@cardinalapps/app-settings/src/types'
@@ -13,6 +13,7 @@ import ColorInput from '../../../forms/ColorInput'
 import RangeInput from '../../../forms/RangeInput'
 import Select from '../../../forms/Select'
 import Button from '../../../interaction/Button'
+import Confirm from '../../../interaction/Confirm'
 import Card from '../../../layout/Card'
 import H3 from '../../../typography/H3'
 
@@ -28,7 +29,6 @@ type ThemeEditorSettings = {
   theme: string,
   accent_color: string,
   custom_themes: CustomTheme[],
-  theme_overrides: ThemeOverrides,
 }
 
 const ACCENT_COLOR_DEFAULT = accentColorFactory(
@@ -62,23 +62,23 @@ const fontOptions = (lang: SupportedLang): Record<string, string> => ({
 })
 
 /**
- * The bespoke theme editor: every exposed theme token as a live input, grouped
- * into collapsible sections. Edits are stored as sparse overrides in the
- * theme_overrides setting and applied by useAppliedTheme; anything untouched
- * keeps following the active theme's CSS.
+ * The bespoke theme editor: every exposed theme token as a live input, grouped into titled cards.
+ * Built-in themes are immutable - the first edit forks the active theme into a new custom theme
+ * and selects it. Edits to a custom theme write into it directly; there is no save step.
  */
 const ThemeEditor = () => {
   const dispatch = useAppDispatch()
   const settings = useSelector(settingsSelectors.current) as unknown as ThemeEditorSettings
   const { lang, theme, accent_color: accentColor } = settings
   const customThemes = settings.custom_themes || []
-  const overrides = settings.theme_overrides || {}
 
   const selectedCustomTheme = customThemes.find((customTheme) => `custom:${customTheme.id}` === theme)
+  const themeVars = selectedCustomTheme?.vars || {}
 
   const probeRef = useRef<HTMLDivElement>(null)
   const [appliedBaseTheme, setAppliedBaseTheme] = useState('light')
   const [baseValues, setBaseValues] = useState<Record<string, string>>({})
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   /**
    * Track which built-in theme the surrounding app actually has applied. Read from the DOM rather
@@ -117,27 +117,62 @@ const ThemeEditor = () => {
       return accentColor || ACCENT_COLOR_DEFAULT
     }
 
-    return overrides[token.varName]
-      ?? selectedCustomTheme?.vars?.[token.varName]
+    return themeVars[token.varName]
       ?? baseValues[token.varName]
       ?? ''
   }
 
-  // Whether the token currently diverges from what its theme defines
+  // Whether the token currently diverges from what the base theme defines
   const isOverridden = (token: ThemeToken): boolean => {
     if (token.varName === '--accent-color') {
       return !!accentColor && accentColor !== ACCENT_COLOR_DEFAULT
     }
 
-    return token.varName in overrides
+    return token.varName in themeVars
   }
 
   /**
    * Deliberately bespoke instead of a SettingsPanel field: the editor owns when a selection is
-   * actually applied, so it can later defer the switch (eg. while there are unsaved edits).
+   * actually applied, so it can later defer the switch if it ever needs to.
    */
   const handleThemeChange = (value: string) => {
     dispatch(settingsActions.set({ key: 'theme', value }))
+  }
+
+  // The lowest "Custom Theme N" name not yet taken by an existing theme
+  const nextCustomThemeName = (): string => {
+    const pattern = /^Custom Theme (\d+)$/
+    const highest = customThemes.reduce((max, customTheme) => {
+      const match = customTheme.name.match(pattern)
+      return match ? Math.max(max, parseInt(match[1], 10)) : max
+    }, 0)
+    return i18n['settings.theme-editor.custom-theme-name'][lang].replace('{n}', String(highest + 1))
+  }
+
+  /**
+   * Create a new custom theme with the given vars on the active theme's base, and select it. This
+   * is the only way a custom theme comes into existence: editing an immutable built-in theme forks
+   * it automatically, and Duplicate forks the current theme verbatim.
+   */
+  const forkActiveTheme = (vars: Record<string, string>) => {
+    const newTheme: CustomTheme = {
+      id: uuid(),
+      name: nextCustomThemeName(),
+      base: (selectedCustomTheme?.base || theme) as CustomTheme['base'],
+      vars,
+    }
+
+    dispatch(settingsActions.set({ key: 'custom_themes', value: [...customThemes, newTheme] }))
+    dispatch(settingsActions.set({ key: 'theme', value: `custom:${newTheme.id}` }))
+  }
+
+  const updateSelectedThemeVars = (vars: Record<string, string>) => {
+    dispatch(settingsActions.set({
+      key: 'custom_themes',
+      value: customThemes.map((customTheme) => (
+        customTheme.id === selectedCustomTheme.id ? { ...customTheme, vars } : customTheme
+      )),
+    }))
   }
 
   const setOverride = (varName: string, value: string) => {
@@ -146,7 +181,11 @@ const ThemeEditor = () => {
       return
     }
 
-    dispatch(settingsActions.set({ key: 'theme_overrides', value: { ...overrides, [varName]: value } }))
+    if (selectedCustomTheme) {
+      updateSelectedThemeVars({ ...selectedCustomTheme.vars, [varName]: value })
+    } else {
+      forkActiveTheme({ [varName]: value })
+    }
   }
 
   const clearOverride = (varName: string) => {
@@ -155,9 +194,35 @@ const ThemeEditor = () => {
       return
     }
 
-    const next = { ...overrides }
-    delete next[varName]
-    dispatch(settingsActions.set({ key: 'theme_overrides', value: next }))
+    if (!selectedCustomTheme) {
+      return
+    }
+
+    const vars = { ...selectedCustomTheme.vars }
+    delete vars[varName]
+    updateSelectedThemeVars(vars)
+  }
+
+  const handleDuplicate = () => {
+    forkActiveTheme({ ...themeVars })
+  }
+
+  const handleResetTheme = () => {
+    updateSelectedThemeVars({})
+  }
+
+  const handleDeleteClose = (confirmed: boolean) => {
+    setConfirmingDelete(false)
+
+    if (!confirmed || !selectedCustomTheme) {
+      return
+    }
+
+    dispatch(settingsActions.set({ key: 'theme', value: selectedCustomTheme.base }))
+    dispatch(settingsActions.set({
+      key: 'custom_themes',
+      value: customThemes.filter((customTheme) => customTheme.id !== selectedCustomTheme.id),
+    }))
   }
 
   // Pick the right input for the token
@@ -217,7 +282,30 @@ const ThemeEditor = () => {
           }}
           onChange={handleThemeChange}
         />
+        <div className="theme-actions">
+          <Button solid onClick={handleDuplicate}>
+            {i18n['settings.theme-editor.duplicate'][lang]}
+          </Button>
+          <Button solid disabled={!selectedCustomTheme} onClick={() => setConfirmingDelete(true)}>
+            {i18n['settings.theme-editor.delete'][lang]}
+          </Button>
+          <Button
+            solid
+            disabled={!selectedCustomTheme || !Object.keys(themeVars).length}
+            onClick={handleResetTheme}
+          >
+            {i18n['settings.theme-editor.reset-theme'][lang]}
+          </Button>
+        </div>
       </div>
+      {confirmingDelete && selectedCustomTheme && (
+        <Confirm
+          title={i18n['settings.theme-editor.delete-title'][lang]}
+          message={i18n['settings.theme-editor.delete-message'][lang].replace('{name}', selectedCustomTheme.name)}
+          confirmButtonIsDangerous
+          onClose={handleDeleteClose}
+        />
+      )}
       {tokenGroups.map((group) => (
         <section className="theme-editor-group" key={group.name}>
           <H3>{group.name}</H3>

@@ -14,9 +14,6 @@ export default {
   "settings.custom-themes.title": {
     "en": "Saved themes",
   },
-  "settings.theme-overrides.title": {
-    "en": "Theme overrides",
-  },
   "settings.accent-color.title": {
     "en": "Accent colour",
   },

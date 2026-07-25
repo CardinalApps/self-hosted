@@ -67,6 +67,24 @@ const i18n: StringList = {
   "settings.theme-editor.reset": {
     "en": "Reset to theme value",
   },
+  "settings.theme-editor.custom-theme-name": {
+    "en": "Custom Theme {n}",
+  },
+  "settings.theme-editor.duplicate": {
+    "en": "Duplicate",
+  },
+  "settings.theme-editor.delete": {
+    "en": "Delete",
+  },
+  "settings.theme-editor.reset-theme": {
+    "en": "Reset",
+  },
+  "settings.theme-editor.delete-title": {
+    "en": "Delete theme",
+  },
+  "settings.theme-editor.delete-message": {
+    "en": "Delete \"{name}\"? This can't be undone.",
+  },
   "settings.theme-editor.font.default": {
     "en": "Heebo (default)",
   },
