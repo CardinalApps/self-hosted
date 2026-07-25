@@ -43,8 +43,23 @@ const buildBlocks = (
   }))
 ))
 
+// Stands in for real artwork, so the hover popout has something to show
+const fakeCover = (color: string, initial: string) => `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160">`
+  + `<rect width="160" height="160" fill="${color}"/>`
+  + `<text x="80" y="106" font-size="72" text-anchor="middle" font-family="sans-serif"`
+  + ` fill="rgba(255,255,255,0.85)">${initial}</text></svg>`,
+)}`
+
+const buildCovers = (releases: typeof DISCOGRAPHY): Record<string, string> => Object.fromEntries(
+  releases.map((release, index) => [
+    release.title,
+    fakeCover(PALETTE[index % PALETTE.length], release.title.slice(0, 1)),
+  ]),
+)
+
 export const FiveReleases = () => (
-  <DiskMap blocks={buildBlocks(DISCOGRAPHY)} palette={PALETTE} />
+  <DiskMap blocks={buildBlocks(DISCOGRAPHY)} palette={PALETTE} groupImages={buildCovers(DISCOGRAPHY)} />
 )
 
 export const OneRelease = () => (
@@ -125,7 +140,12 @@ export const LinkedHighlight = () => {
 
   return (
     <>
-      <DiskMap blocks={buildBlocks(DISCOGRAPHY)} palette={PALETTE} activeGroupId={activeGroupId} />
+      <DiskMap
+        blocks={buildBlocks(DISCOGRAPHY)}
+        palette={PALETTE}
+        groupImages={buildCovers(DISCOGRAPHY)}
+        activeGroupId={activeGroupId}
+      />
       <ul style={{ marginTop: 16, listStyle: 'none' }}>
         {DISCOGRAPHY.map((release, index) => (
           <li
