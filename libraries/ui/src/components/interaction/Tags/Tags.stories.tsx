@@ -67,4 +67,19 @@ export const ManyTags: Story = {
   },
 }
 
+/**
+ * For dense places where a regular tag would dominate, like a tooltip or a
+ * metadata line under a title.
+ */
+export const Small: Story = {
+  args: {
+    size: 'small',
+    tags: [
+      '31.2 MB',
+      { label: '05:48', icon: 'fas fa-clock' } as TagProps,
+      'FLAC 16-bit/44.1 kHz',
+    ],
+  },
+}
+
 export default meta

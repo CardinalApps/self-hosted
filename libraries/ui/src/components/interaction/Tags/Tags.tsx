@@ -1,11 +1,13 @@
 import type { PropsWithChildren } from 'react'
 
-import Tag, { TagProps } from './Tag'
+import Tag, { TagProps, TagSize } from './Tag'
 
 import './Tags.css'
 
 export type TagsProps = {
   tags: Array<TagProps | string>,
+  /** Applied to every tag that doesn't set its own size. */
+  size?: TagSize,
 }
 
 /**
@@ -13,6 +15,7 @@ export type TagsProps = {
  */
 const Tags = ({
   tags: givenTags = [],
+  size,
 }: PropsWithChildren<TagsProps>) => {
   const makeParams = (givenTag) => {
     if (typeof givenTag === 'string') {
@@ -35,6 +38,7 @@ const Tags = ({
             href={params.href}
             icon={params?.icon}
             color={params?.color}
+            size={params?.size ?? size}
             onClick={params?.onClick}
           />
         )
