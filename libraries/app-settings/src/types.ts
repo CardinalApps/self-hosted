@@ -32,11 +32,24 @@ export type StorageLocation =
   'client' |
   'home_server'
 
+/**
+ * Who a `home_server` setting belongs to.
+ *
+ * `server` settings are one value for the whole Media Server, shared by every
+ * user (eg. the server name). `user` settings are stored per account, so they
+ * follow the user to any device and any Cardinal app they sign into.
+ */
+export type SettingScope =
+  'server' |
+  'user'
+
 export type SettingsObject = {
   slug: string
   label: string
   type: InputType
   storage: StorageLocation
+  // Only meaningful when storage is `home_server`. Defaults to `server`.
+  scope?: SettingScope
   options?: Record<string | number | symbol, unknown> | unknown[] | string
   defaultValue?: string | number | unknown[] | object | null | undefined | boolean
   description?: string

@@ -2,14 +2,16 @@ import { useEffect } from 'react'
 import type { RefObject } from 'react'
 import { useSelector } from 'react-redux'
 
+import { asCustomThemes } from '@cardinalapps/app-settings/src/common/custom_themes'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
+import { resolveBaseTheme } from '@cardinalapps/app-settings/src/common/theme'
 
 import { settingsSelectors } from '../store/slices/settings'
 
 type ThemeSettings = {
   theme: string,
   accent_color: string,
-  custom_themes: CustomTheme[],
+  custom_themes: unknown,
 }
 
 /**
@@ -21,13 +23,16 @@ const useAppliedTheme = (ref: RefObject<HTMLElement | null>) => {
   const {
     theme,
     accent_color: accentColor,
-    custom_themes: customThemes = [],
+    custom_themes: storedThemes,
   } = useSelector(settingsSelectors.current) as unknown as ThemeSettings
+
+  const customThemes: CustomTheme[] = asCustomThemes(storedThemes)
 
   const selectedCustomTheme = theme?.startsWith('custom:')
     ? customThemes.find((customTheme) => `custom:${customTheme.id}` === theme)
     : undefined
-  const resolvedBaseTheme = selectedCustomTheme?.base || theme
+
+  const resolvedBaseTheme = resolveBaseTheme(theme, customThemes)
 
   /**
    * Apply the user's custom accent color.

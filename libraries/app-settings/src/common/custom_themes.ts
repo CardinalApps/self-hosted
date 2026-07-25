@@ -15,10 +15,22 @@ export type CustomTheme = {
   vars: Record<string, string>,
 }
 
+/**
+ * Narrows a stored `custom_themes` value to a usable list.
+ *
+ * The setting is user-scoped on the Media Server, so its value arrives over the network and can be
+ * anything - a database that predates the move still holds rows for it. Consumers render the app
+ * shell from this, so a bad value has to degrade to "no custom themes" rather than throw.
+ */
+export const asCustomThemes = (value: unknown): CustomTheme[] => (
+  Array.isArray(value) ? value.filter((theme) => !!theme?.id) as CustomTheme[] : []
+)
+
 export const customThemesFactory: SettingsFieldFactory = (app: SupportedCardinalApp, lang: SupportedLang) => ({
   slug: CUSTOM_THEMES_SLUG,
   label: i18n?.['settings.custom-themes.title']?.[lang],
   type: 'json',
-  storage: 'client',
+  storage: 'home_server',
+  scope: 'user',
   defaultValue: [] as CustomTheme[],
 })

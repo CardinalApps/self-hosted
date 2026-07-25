@@ -59,16 +59,20 @@ test(
       await clickSetupNext(page, 'usage-data')
       await clickSetupNext(page, 'privacy')
       await clickSetupNext(page, 'help')
+
       await submitSetup(page)
 
       await page.waitForURL((url) => !url.pathname.includes('/admin/setup'), { timeout: 15_000 })
 
-      // theme + telemetry both live in the per-app settings table (see
-      // app.service.ts initialSetup → settingsService.set(...)). The
-      // telemetry key in the wizard's payload (`sendAnonymousUsageData`)
-      // maps to the `telemetry` setting on the admin app.
-      const theme = await getMediaServerSetting('admin', 'theme')
-      expect(theme).toBe('dark')
+      /*
+       * The wizard keeps the theme in local state and posts it with the rest of the setup data at
+       * the end, where it is stored against the account that just completed setup. What matters on
+       * this side of the wizard is that the pick is the theme actually applied to the app the user
+       * lands in - the attribute the theme CSS is keyed on.
+       */
+      await expect(page.locator('[data-theme]').first()).toHaveAttribute('data-theme', 'dark')
+
+      // telemetry is server-wide - the wizard's `sendAnonymousUsageData` maps to it
       const telemetry = await getMediaServerSetting('admin', 'telemetry')
       expect(String(telemetry)).toBe('false')
     } finally {

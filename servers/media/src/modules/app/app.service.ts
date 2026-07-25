@@ -215,13 +215,17 @@ export class AppService {
       // noop
     }
 
-    // Initialize the settings table
+    /*
+     * Initialize the settings table. The theme is user-scoped, so the wizard's pick is stored
+     * against whoever just completed setup rather than server-wide - that is the account the
+     * client logs into next, so they land on the theme they chose.
+     */
     try {
       const savedSettings = await this.settingsService.set(CardinalApp.ADMIN, {
         theme: setupData?.theme,
         server_name: setupData.serverName,
         telemetry: setupData?.sendAnonymousUsageData,
-      })
+      }, accountToLogInto)
       setupStageSuccess.settingsTable = !!savedSettings.length
     } catch (error) {
       // noop

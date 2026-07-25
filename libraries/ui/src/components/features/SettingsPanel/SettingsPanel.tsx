@@ -150,7 +150,11 @@ const SettingsPanel = ({
                 <Fragment key={index}>
                   {tab?.section && <li className="section">{tab.section}</li>}
                   <li className={`${index === activeTabIndex ? 'active' : ''}`}>
-                    <button type="button" onClick={() => setActiveTabIndex(index)}>
+                    <button
+                      type="button"
+                      data-testid={`settings-tab-${tab?.tabId || index}`}
+                      onClick={() => setActiveTabIndex(index)}
+                    >
                       <Icon fa={tab?.tabIcon} />
                       <span>{tab?.tabName}</span>
                     </button>

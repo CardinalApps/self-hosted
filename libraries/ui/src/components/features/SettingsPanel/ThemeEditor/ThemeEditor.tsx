@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid'
 import clsx from 'clsx'
 
 import { accentColorFactory, COLORS as ACCENT_COLOR_PRESETS } from '@cardinalapps/app-settings/src/common/accent_color'
-import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
+import { asCustomThemes } from '@cardinalapps/app-settings/src/common/custom_themes'
+import { resolveBaseTheme, themeFactory } from '@cardinalapps/app-settings/src/common/theme'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
 import { exposedThemeTokens, themeTokens } from '@cardinalapps/app-settings/src/themeTokens'
 import type { ThemeToken } from '@cardinalapps/app-settings/src/themeTokens'
@@ -22,8 +23,11 @@ import Modal from '../../../layout/Modal'
 import H3 from '../../../typography/H3'
 
 import { useAppDispatch } from '../../../../hooks/useAppDispatch'
+import useDebouncedCallback from '../../../../hooks/useDebouncedCallback'
 import { settingsActions, settingsSelectors } from '../../../../store/slices/settings'
+import set from '../../../../store/slices/settings/thunks/set'
 import { toastActions } from '../../../../store/slices/toast'
+import { CardinalApp } from '../../../../lib/env/cardinal'
 
 import i18n from '../i18n'
 
@@ -33,7 +37,7 @@ type ThemeEditorSettings = {
   lang: SupportedLang,
   theme: string,
   accent_color: string,
-  custom_themes: CustomTheme[],
+  custom_themes: unknown,
 }
 
 const ACCENT_COLOR_DEFAULT = accentColorFactory(
@@ -47,6 +51,13 @@ const BUILT_IN_THEME_OPTIONS = themeFactory(
 ).options as Record<string, string>
 
 const THEME_NAME_MAX_LENGTH = 24
+
+/*
+ * How long edits settle before they are written to the Media Server. Theme settings are stored per
+ * account, so every edit is a request - without this, dragging a colour would send one every time
+ * the input emits.
+ */
+const SERVER_PERSIST_DELAY = 600
 
 // The exposed tokens grouped into sections, in manifest order
 const tokenGroups: { name: string, tokens: ThemeToken[] }[] = []
@@ -73,11 +84,11 @@ const fontOptions = (lang: SupportedLang): Record<string, string> => ({
  * Built-in themes are immutable - the first edit forks the active theme into a new custom theme
  * and selects it. Edits to a custom theme write into it directly; there is no save step.
  */
-const ThemeEditor = () => {
+const ThemeEditor = ({ app }: { app: CardinalApp }) => {
   const dispatch = useAppDispatch()
   const settings = useSelector(settingsSelectors.current) as unknown as ThemeEditorSettings
   const { lang, theme, accent_color: accentColor } = settings
-  const customThemes = settings.custom_themes || []
+  const customThemes = asCustomThemes(settings.custom_themes)
 
   const selectedCustomTheme = customThemes.find((customTheme) => `custom:${customTheme.id}` === theme)
   const themeVars = selectedCustomTheme?.vars || {}
@@ -87,6 +98,28 @@ const ThemeEditor = () => {
   const [baseValues, setBaseValues] = useState<Record<string, string>>({})
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [renameDraft, setRenameDraft] = useState<string | null>(null)
+
+  const unsavedSettings = useRef<Record<string, unknown>>({})
+
+  const persistSettings = useDebouncedCallback(() => {
+    const settings = unsavedSettings.current
+    unsavedSettings.current = {}
+
+    if (Object.keys(settings).length) {
+      dispatch(set({ settings, app }))
+    }
+  }, SERVER_PERSIST_DELAY)
+
+  /**
+   * Apply a theme setting locally right away so the editor previews live, and persist it to the
+   * Media Server once the edits settle. The `set` thunk only lands in the store on success, so it
+   * can't drive the preview on its own.
+   */
+  const saveSetting = (key: string, value: unknown) => {
+    dispatch(settingsActions.set({ key, value }))
+    unsavedSettings.current[key] = value
+    persistSettings()
+  }
 
   /**
    * Track which built-in theme the surrounding app actually has applied. Read from the DOM rather
@@ -144,7 +177,7 @@ const ThemeEditor = () => {
    * actually applied, so it can later defer the switch if it ever needs to.
    */
   const handleThemeChange = (value: string) => {
-    dispatch(settingsActions.set({ key: 'theme', value }))
+    saveSetting('theme', value)
   }
 
   // The lowest "Custom Theme N" name not yet taken by an existing theme
@@ -158,8 +191,8 @@ const ThemeEditor = () => {
   }
 
   const addAndSelectTheme = (newTheme: CustomTheme) => {
-    dispatch(settingsActions.set({ key: 'custom_themes', value: [...customThemes, newTheme] }))
-    dispatch(settingsActions.set({ key: 'theme', value: `custom:${newTheme.id}` }))
+    saveSetting('custom_themes', [...customThemes, newTheme])
+    saveSetting('theme', `custom:${newTheme.id}`)
   }
 
   /**
@@ -171,18 +204,17 @@ const ThemeEditor = () => {
     addAndSelectTheme({
       id: uuid(),
       name: nextCustomThemeName(),
-      base: (selectedCustomTheme?.base || theme) as CustomTheme['base'],
+      // Resolved rather than copied: a fork of a theme whose base has gone stale would otherwise
+      // inherit the stale value, and a base that isn't a built-in theme applies no CSS at all
+      base: resolveBaseTheme(theme, customThemes),
       vars,
     })
   }
 
   const updateSelectedTheme = (patch: Partial<CustomTheme>) => {
-    dispatch(settingsActions.set({
-      key: 'custom_themes',
-      value: customThemes.map((customTheme) => (
-        customTheme.id === selectedCustomTheme.id ? { ...customTheme, ...patch } : customTheme
-      )),
-    }))
+    saveSetting('custom_themes', customThemes.map((customTheme) => (
+      customTheme.id === selectedCustomTheme.id ? { ...customTheme, ...patch } : customTheme
+    )))
   }
 
   /*
@@ -196,7 +228,7 @@ const ThemeEditor = () => {
     }
 
     if (varName === '--accent-color') {
-      dispatch(settingsActions.set({ key: 'accent_color', value }))
+      saveSetting('accent_color', value)
       return
     }
 
@@ -209,7 +241,7 @@ const ThemeEditor = () => {
 
   const clearOverride = (varName: string) => {
     if (varName === '--accent-color') {
-      dispatch(settingsActions.set({ key: 'accent_color', value: ACCENT_COLOR_DEFAULT }))
+      saveSetting('accent_color', ACCENT_COLOR_DEFAULT)
       return
     }
 
@@ -302,11 +334,8 @@ const ThemeEditor = () => {
       return
     }
 
-    dispatch(settingsActions.set({ key: 'theme', value: selectedCustomTheme.base }))
-    dispatch(settingsActions.set({
-      key: 'custom_themes',
-      value: customThemes.filter((customTheme) => customTheme.id !== selectedCustomTheme.id),
-    }))
+    saveSetting('theme', resolveBaseTheme(theme, customThemes))
+    saveSetting('custom_themes', customThemes.filter((customTheme) => customTheme.id !== selectedCustomTheme.id))
   }
 
   // The accent color is the one token that offers the app's preset palette alongside a custom color
@@ -376,6 +405,7 @@ const ThemeEditor = () => {
           <Button
             solid
             disabled={!selectedCustomTheme}
+            data-testid="theme-rename"
             onClick={() => setRenameDraft(selectedCustomTheme.name)}
           >
             {i18n['settings.theme-editor.rename'][lang]}
@@ -393,7 +423,7 @@ const ThemeEditor = () => {
           >
             {i18n['settings.theme-editor.reset-theme'][lang]}
           </Button>
-          <Button solid onClick={handleDuplicate}>
+          <Button solid data-testid="theme-duplicate" onClick={handleDuplicate}>
             {i18n['settings.theme-editor.duplicate'][lang]}
           </Button>
           <Button solid disabled={!selectedCustomTheme} onClick={() => setConfirmingDelete(true)}>
@@ -418,7 +448,7 @@ const ThemeEditor = () => {
               <Button textual onClick={() => setRenameDraft(null)}>
                 {i18n['settings.theme-editor.rename-cancel'][lang]}
               </Button>
-              <Button textual disabled={!renameDraft.trim()} onClick={handleRenameSave}>
+              <Button textual data-testid="theme-rename-save" disabled={!renameDraft.trim()} onClick={handleRenameSave}>
                 {i18n['settings.theme-editor.rename-save'][lang]}
               </Button>
             </>
@@ -427,6 +457,7 @@ const ThemeEditor = () => {
           <div className="theme-rename">
             <H3>{i18n['settings.theme-editor.rename-title'][lang]}</H3>
             <TextInput
+              data-testid="theme-rename-input"
               value={renameDraft}
               maxLength={THEME_NAME_MAX_LENGTH}
               onChange={setRenameDraft}
