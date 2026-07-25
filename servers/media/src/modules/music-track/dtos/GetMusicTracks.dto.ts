@@ -43,4 +43,19 @@ export class GetMusicTracksDto extends MusicTracksPagination {
   @IsArray()
   @IsOptional()
   libraries?: string[]
+
+  /**
+   * Aggregating play counts touches the whole history table, so callers that
+   * only need track rows can switch it off. Ordering by playCount turns it back
+   * on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  playCount?: boolean = true
+
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  rating?: boolean = true
 }
