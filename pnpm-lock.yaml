@@ -479,6 +479,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -512,6 +515,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -539,6 +545,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@playwright/test':
         specifier: ^1.52.0
         version: 1.59.1
@@ -563,6 +572,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -596,6 +608,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -626,6 +641,9 @@ importers:
       '@cardinalapps/app-settings':
         specifier: workspace:*
         version: link:../app-settings
+      '@cardinalapps/topology':
+        specifier: workspace:*
+        version: link:../topology
       '@reduxjs/toolkit':
         specifier: 2.6.1
         version: 2.6.1(react-redux@9.2.0(@types/react@18.2.79)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
@@ -653,6 +671,9 @@ importers:
       embla-carousel-wheel-gestures:
         specifier: ^8.1.0
         version: 8.1.0(embla-carousel@8.6.0)
+      eventsource:
+        specifier: 4.1.0
+        version: 4.1.0
       framer-motion:
         specifier: 12.23.22
         version: 12.23.22(@emotion/is-prop-valid@1.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -680,6 +701,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.3.1(react@18.3.1)
+      react-error-boundary:
+        specifier: ^6.1.2
+        version: 6.1.2(react@18.3.1)
       react-hook-form:
         specifier: 7.22.5
         version: 7.22.5(react@18.3.1)
@@ -943,6 +967,9 @@ importers:
       '@cardinalapps/eslint-config':
         specifier: workspace:*
         version: link:../../config/eslint
+      '@cardinalapps/typescript-config':
+        specifier: workspace:*
+        version: link:../../config/typescript
       '@nestjs/cli':
         specifier: ^10.4.2
         version: 10.4.9(@swc/core@1.15.43(@swc/helpers@0.5.17))
@@ -4888,6 +4915,14 @@ packages:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
 
+  eventsource-parser@3.1.0:
+    resolution: {integrity: sha512-kJezFj9YFAMLeORyi7aCLxLbD5/qWMQnoMVlVPyHIll7lgRJCc3JVln9Vgl9nwQi0YkMnhdGTMNn7CkRRAptMg==}
+    engines: {node: '>=18.0.0'}
+
+  eventsource@4.1.0:
+    resolution: {integrity: sha512-2GuF51iuHX6A9xdTccMTsNb7VO0lHZihApxhvQzJB5A03DvHDd2FQepodbMaztPBmBcE/ox7o2gqaxGhYB9LhQ==}
+    engines: {node: '>=20.0.0'}
+
   execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
     engines: {node: '>=10'}
@@ -6593,6 +6628,11 @@ packages:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
       react: ^18.3.1
+
+  react-error-boundary@6.1.2:
+    resolution: {integrity: sha512-3DpCr5HVdZ0caUjYE/kIHBEJN0mNP3ZCgf16c48uJ5TbWjorKVp+YG8W3XqlJ7vJAVNw6wNIImyPXmFydwmyng==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
 
   react-hook-form@7.22.5:
     resolution: {integrity: sha512-Q2zaeQFXdVQ8l3hcywhltH+Nzj4vo50wMVujHDVN/1Xy9IOaSZJwYBXA2CYTpK6rq41fnXviw3jTLb04c7Gu9Q==}
@@ -12763,6 +12803,12 @@ snapshots:
 
   events@3.3.0: {}
 
+  eventsource-parser@3.1.0: {}
+
+  eventsource@4.1.0:
+    dependencies:
+      eventsource-parser: 3.1.0
+
   execa@5.1.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -14771,6 +14817,10 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-error-boundary@6.1.2(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   react-hook-form@7.22.5(react@18.3.1):
     dependencies:
