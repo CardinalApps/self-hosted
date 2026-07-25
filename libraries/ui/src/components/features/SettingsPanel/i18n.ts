@@ -79,6 +79,21 @@ const i18n: StringList = {
   "settings.theme-editor.reset-theme": {
     "en": "Reset",
   },
+  "settings.theme-editor.copy": {
+    "en": "Copy",
+  },
+  "settings.theme-editor.paste": {
+    "en": "Paste",
+  },
+  "settings.theme-editor.copied-toast": {
+    "en": "Theme copied to clipboard",
+  },
+  "settings.theme-editor.imported-toast": {
+    "en": "Theme imported",
+  },
+  "settings.theme-editor.import-error-toast": {
+    "en": "The clipboard doesn't contain a valid theme",
+  },
   "settings.theme-editor.delete-title": {
     "en": "Delete theme",
   },

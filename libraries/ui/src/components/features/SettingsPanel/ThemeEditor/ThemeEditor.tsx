@@ -7,6 +7,7 @@ import { themeFactory } from '@cardinalapps/app-settings/src/common/theme'
 import type { CustomTheme } from '@cardinalapps/app-settings/src/common/custom_themes'
 import { exposedThemeTokens, themeTokens } from '@cardinalapps/app-settings/src/themeTokens'
 import type { ThemeToken } from '@cardinalapps/app-settings/src/themeTokens'
+import { parseSharedTheme } from '@cardinalapps/app-settings/src/themeShare'
 import type { SupportedCardinalApp, SupportedLang } from '@cardinalapps/app-settings/src/types'
 
 import ColorInput from '../../../forms/ColorInput'
@@ -19,6 +20,7 @@ import H3 from '../../../typography/H3'
 
 import { useAppDispatch } from '../../../../hooks/useAppDispatch'
 import { settingsActions, settingsSelectors } from '../../../../store/slices/settings'
+import { toastActions } from '../../../../store/slices/toast'
 
 import i18n from '../i18n'
 
@@ -149,21 +151,23 @@ const ThemeEditor = () => {
     return i18n['settings.theme-editor.custom-theme-name'][lang].replace('{n}', String(highest + 1))
   }
 
+  const addAndSelectTheme = (newTheme: CustomTheme) => {
+    dispatch(settingsActions.set({ key: 'custom_themes', value: [...customThemes, newTheme] }))
+    dispatch(settingsActions.set({ key: 'theme', value: `custom:${newTheme.id}` }))
+  }
+
   /**
-   * Create a new custom theme with the given vars on the active theme's base, and select it. This
-   * is the only way a custom theme comes into existence: editing an immutable built-in theme forks
-   * it automatically, and Duplicate forks the current theme verbatim.
+   * Create a new custom theme with the given vars on the active theme's base, and select it.
+   * Editing an immutable built-in theme forks it automatically, and Duplicate forks the current
+   * theme verbatim.
    */
   const forkActiveTheme = (vars: Record<string, string>) => {
-    const newTheme: CustomTheme = {
+    addAndSelectTheme({
       id: uuid(),
       name: nextCustomThemeName(),
       base: (selectedCustomTheme?.base || theme) as CustomTheme['base'],
       vars,
-    }
-
-    dispatch(settingsActions.set({ key: 'custom_themes', value: [...customThemes, newTheme] }))
-    dispatch(settingsActions.set({ key: 'theme', value: `custom:${newTheme.id}` }))
+    })
   }
 
   const updateSelectedThemeVars = (vars: Record<string, string>) => {
@@ -209,6 +213,63 @@ const ThemeEditor = () => {
 
   const handleResetTheme = () => {
     updateSelectedThemeVars({})
+  }
+
+  /**
+   * Copy the selected custom theme to the clipboard as JSON, without its local id.
+   */
+  const handleCopy = async () => {
+    if (!selectedCustomTheme) {
+      return
+    }
+
+    await navigator.clipboard.writeText(JSON.stringify({
+      name: selectedCustomTheme.name,
+      base: selectedCustomTheme.base,
+      vars: selectedCustomTheme.vars,
+    }, null, 2))
+
+    dispatch(toastActions.addToQueue({
+      type: 'success',
+      title: i18n['settings.theme-editor.copied-toast'][lang],
+      ttl: 3000,
+    }))
+  }
+
+  /**
+   * Import a theme from clipboard JSON. The payload is untrusted, so it goes through strict
+   * validation against the token manifest before anything is stored.
+   */
+  const handlePaste = async () => {
+    let raw = ''
+    try {
+      raw = await navigator.clipboard.readText()
+    } catch {
+      // Clipboard access denied; fall through to the invalid-theme toast
+    }
+
+    const shared = parseSharedTheme(raw)
+    if (!shared) {
+      dispatch(toastActions.addToQueue({
+        type: 'danger',
+        title: i18n['settings.theme-editor.import-error-toast'][lang],
+        ttl: 5000,
+      }))
+      return
+    }
+
+    addAndSelectTheme({
+      id: uuid(),
+      name: shared.name || nextCustomThemeName(),
+      base: shared.base,
+      vars: shared.vars,
+    })
+
+    dispatch(toastActions.addToQueue({
+      type: 'success',
+      title: i18n['settings.theme-editor.imported-toast'][lang],
+      ttl: 3000,
+    }))
   }
 
   const handleDeleteClose = (confirmed: boolean) => {
@@ -296,6 +357,12 @@ const ThemeEditor = () => {
           >
             {i18n['settings.theme-editor.reset-theme'][lang]}
           </Button>
+          <Button solid disabled={!selectedCustomTheme} onClick={handleCopy}>
+            {i18n['settings.theme-editor.copy'][lang]}
+          </Button>
+          <Button solid onClick={handlePaste}>
+            {i18n['settings.theme-editor.paste'][lang]}
+          </Button>
         </div>
       </div>
       {confirmingDelete && selectedCustomTheme && (
@@ -307,26 +374,30 @@ const ThemeEditor = () => {
         />
       )}
       {tokenGroups.map((group) => (
-        <section className="theme-editor-group" key={group.name}>
-          <H3>{group.name}</H3>
-          <Card padding="thin" bg={2} border={3}>
-            {group.tokens.map((token) => (
-              <div className="theme-editor-row" key={token.varName}>
-                <span className="row-label" title={token.varName}>{token.label}</span>
-                <div className="row-controls">
-                  {renderInput(token)}
-                  <Button
-                    circleIcon
-                    icon="fas fa-undo"
-                    title={i18n['settings.theme-editor.reset'][lang]}
-                    disabled={!isOverridden(token)}
-                    onClick={() => clearOverride(token.varName)}
-                  />
-                </div>
+        <Card
+          className="theme-editor-group"
+          key={group.name}
+          padding="thin"
+          bg={2}
+          border={3}
+          header={<H3>{group.name}</H3>}
+        >
+          {group.tokens.map((token) => (
+            <div className="theme-editor-row" key={token.varName}>
+              <span className="row-label" title={token.varName}>{token.label}</span>
+              <div className="row-controls">
+                {renderInput(token)}
+                <Button
+                  circleIcon
+                  icon="fas fa-undo"
+                  title={i18n['settings.theme-editor.reset'][lang]}
+                  disabled={!isOverridden(token)}
+                  onClick={() => clearOverride(token.varName)}
+                />
               </div>
-            ))}
-          </Card>
-        </section>
+            </div>
+          ))}
+        </Card>
       ))}
     </div>
   )
