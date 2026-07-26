@@ -8,7 +8,7 @@ export const MediaServerAspects = [
   'CurrentUser',
   'MediaServer',
   'AdminApp',
-  'UserSettings',
+  'ServerSettings',
   'Users',
   'Invitations',
   'RoleAssignments',
@@ -48,12 +48,7 @@ export const MediaServerCapabilities = [
 
   'AdminApp.Login',
 
-  /*
-   * Writing a setting that belongs to the whole install, like the server name. Account-scoped
-   * settings (a user's theme, for instance) need no capability - they only ever affect the one
-   * account, so every signed-in user can always write their own.
-   */
-  'UserSettings.Update',
+  'ServerSettings.Update',
 
   'Users.Create',
   'Users.Read',

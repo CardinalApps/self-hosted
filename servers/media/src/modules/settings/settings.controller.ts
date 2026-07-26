@@ -65,11 +65,11 @@ export class SettingsController {
   @Patch('/settings')
   @StandardEndpoint({
     summary: 'Save app settings.',
-    description: 'When saving app settings, set the `app` for which this update applies. Explicitly set the app to `null` to apply the update to all apps. Account-scoped settings ignore `app` entirely and are always saved against the caller; settings that belong to the whole install require the `UserSettings.Update` capability.',
-    manualCapabilities: ['UserSettings.Update'],
+    description: 'When saving app settings, set the `app` for which this update applies. Explicitly set the app to `null` to apply the update to all apps. Account-scoped settings ignore `app` entirely and are always saved against the caller; settings that belong to the whole install require the `ServerSettings.Update` capability.',
+    manualCapabilities: ['ServerSettings.Update'],
     manualCapabilitiesAreAllRequired: false,
     errors: {
-      403: ['The payload changes a setting that belongs to the whole server and the user lacks UserSettings.Update'],
+      403: ['The payload changes a setting that belongs to the whole server and the user lacks ServerSettings.Update'],
     },
   })
   @ApiOkResponse({ type: UpsertSettingsResponse })
@@ -89,7 +89,7 @@ export class SettingsController {
     const changesServerSettings = Object.keys(settings).some((slug) => serverScopedSlugs.includes(slug))
     const granted = (user?.roles || []).flatMap((assignment) => getMediaServerRole(assignment.role)?.capabilities || [])
 
-    if (changesServerSettings && !hasCapabilities<MediaServerCapability>(['UserSettings.Update'], granted)) {
+    if (changesServerSettings && !hasCapabilities<MediaServerCapability>(['ServerSettings.Update'], granted)) {
       throw new ForbiddenException()
     }
 
