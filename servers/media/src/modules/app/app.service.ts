@@ -2,6 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as worker_threads from 'worker_threads'
 import { Injectable, Logger } from '@nestjs/common'
+import { InjectDataSource } from '@nestjs/typeorm'
+import { DataSource } from 'typeorm'
 import { differenceInDays, isValid } from 'date-fns'
 import * as ms from 'ms'
 import * as semver from 'semver'
@@ -14,6 +16,18 @@ import { SettingsService } from '../settings/settings.service'
 import { IndexingService } from '../indexing/indexing.service'
 import { JobService } from '../job/job.service'
 import { EventService } from '../event/event.service'
+
+import { User } from '../user/user.entity'
+import { RoleAssignment } from '../rbac/role-assignment.entity'
+import { Setting } from '../settings/setting.entity'
+import { Library } from '../library/library.entity'
+import { Invitation } from '../invitation/invitation.entity'
+import { Rating } from '../rating/rating.entity'
+import { PlaybackQueue } from '../playback-queue/playback-queue.entity'
+import { PlaybackQueueItem } from '../playback-queue/playback-queue-item.entity'
+import { PhotoAlbum } from '../photo-album/photo-album.entity'
+import { PhotoAlbumEntry } from '../photo-album/photo-album-entry.entity'
+import { PhotoAlbumMetadata } from '../photo-album/photo-album-metadata.entity'
 
 import {
   ServerInitType,
@@ -36,6 +50,8 @@ const AUTO_CHECK_FOR_UPDATES_FREQUENCY = ms('4 hours')
 @Injectable()
 export class AppService {
   constructor(
+    @InjectDataSource()
+    private dataSource: DataSource,
     private databaseService: DatabaseService,
     private userService: UserService,
     private authService: AuthService,
@@ -263,49 +279,113 @@ export class AppService {
   }
 
   /**
-   * Performs a factory reset of the server.
+   * Deletes everything that belongs to the people who have used this server:
+   * their accounts, the libraries and queues they made, and every setting
+   * saved against them or against the install as a whole.
+   *
+   * Rows are removed in one transaction because they reference each other. On
+   * SQLite that means deleting children before their parents; PostgreSQL can
+   * sort it out itself given a single CASCADE truncate.
+   */
+  private async deleteAllAccountData(): Promise<boolean> {
+    const queueLibrariesTable = this.dataSource
+      .getMetadata(PlaybackQueue)
+      .manyToManyRelations
+      .find((relation) => relation.propertyName === 'libraries')
+      ?.junctionEntityMetadata
+      ?.tableName
+
+    const queryRunner = this.dataSource.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    try {
+      if (this.dataSource.options.type === 'postgres') {
+        const tables = [PlaybackQueueItem, PlaybackQueue, PhotoAlbumEntry, PhotoAlbumMetadata, PhotoAlbum, Rating, Invitation, Library, RoleAssignment, Setting, User]
+          .map((entity) => `"${this.dataSource.getMetadata(entity).tableName}"`)
+          .concat(queueLibrariesTable ? [`"${queueLibrariesTable}"`] : [])
+          .join(', ')
+        await queryRunner.query(`TRUNCATE ${tables} RESTART IDENTITY CASCADE`)
+      } else {
+        if (queueLibrariesTable) {
+          await queryRunner.query(`DELETE FROM "${queueLibrariesTable}"`)
+        }
+        await queryRunner.manager.clear(PlaybackQueueItem)
+        await queryRunner.manager.clear(PlaybackQueue)
+        await queryRunner.manager.clear(PhotoAlbumEntry)
+        await queryRunner.manager.clear(PhotoAlbumMetadata)
+        await queryRunner.manager.clear(PhotoAlbum)
+        await queryRunner.manager.clear(Rating)
+        await queryRunner.manager.clear(Invitation)
+        await queryRunner.manager.clear(Library)
+        await queryRunner.manager.clear(RoleAssignment)
+        await queryRunner.manager.clear(Setting)
+        await queryRunner.manager.clear(User)
+      }
+
+      await queryRunner.commitTransaction()
+      return true
+    } catch (error) {
+      Logger.error(error, 'App')
+      await queryRunner.rollbackTransaction()
+      return false
+    } finally {
+      await queryRunner.release()
+    }
+  }
+
+  /**
+   * Returns the options table to how a fresh install finds it. Only the
+   * installation date survives, since the software was installed when it was
+   * installed.
+   *
+   * The instance ID is deliberately regenerated. Cardinal's cloud keys a
+   * self-hosted claim by instance ID and offers no way to release one, so a
+   * server that kept its ID through a reset could never be claimed again:
+   * every attempt answers `400 This instance has already been claimed`, and
+   * MaybeTriggerClaim retries on every request that carries a cloud token. A
+   * new ID lets the server be claimed by whoever sets it up next - including
+   * the same account that owned it before.
+   */
+  private async resetInstallationOptions(): Promise<boolean> {
+    const saved = await this.databaseService.saveOptions({
+      [OPTIONS.FIRST_TIME_SETUP_DONE.name]: false,
+      [OPTIONS.INSTANCE_ID.name]: uuid(),
+      [OPTIONS.CLAIM_ID.name]: '',
+      [OPTIONS.CLAIMED_AT.name]: '',
+    })
+
+    return saved.every((option) => !!option)
+  }
+
+  /**
+   * Performs a factory reset of the server, returning it to the state a fresh
+   * install starts in: no accounts beyond the guest, nothing indexed, and
+   * first time setup waiting to run again.
+   *
+   * The steps run in order because each one clears rows the next one needs
+   * gone before it can delete its own.
    */
   async factoryReset(): Promise<boolean> {
-    const serverOwner = await this.userService.getServerOwner()
-
-    const unlinkServerOwner = async () => {
-      if (!serverOwner) {
+    const steps: Record<string, () => Promise<boolean>> = {
+      'media data': () => this.resetMediaData(),
+      'accounts and their data': () => this.deleteAllAccountData(),
+      'guest account': async () => !!await this.userService.recreateGuestAccount(),
+      'default settings': async () => {
+        await this.settingsService.ensureDefaultAppSettings()
         return true
-      } else {
-        return await this.userService.deleteServerOwner()
+      },
+      'options': () => this.resetInstallationOptions(),
+    }
+
+    let success = true
+
+    for (const [step, run] of Object.entries(steps)) {
+      if (!await run()) {
+        Logger.error(`Factory reset could not reset ${step}.`, 'App')
+        success = false
       }
     }
-
-    const resetFirstTimeSetupFlag = async () => {
-      return !!await this.databaseService.saveOption(OPTIONS.FIRST_TIME_SETUP_DONE.name, false)
-    }
-
-    // Drop the cached claim pointer so the next FTS run (or any future
-    // owner-claim attempt via MaybeTriggerClaim) actually tries to claim
-    // again — otherwise ClaimService.claimServerWithCloudIfNotClaimed
-    // short-circuits on the stale CLAIM_ID, pointing at an auth-server
-    // claim that belonged to the now-deleted owner.
-    const clearClaim = async () => {
-      const saved = await Promise.all([
-        this.databaseService.saveOption(OPTIONS.CLAIM_ID.name, ''),
-        this.databaseService.saveOption(OPTIONS.CLAIMED_AT.name, ''),
-      ])
-      return saved.every((opt) => !!opt)
-    }
-
-    const recreateGuestAccount = async () => {
-      return !!await this.userService.recreateGuestAccount()
-    }
-
-    const settled = await Promise.all([
-      this.resetMediaData(),
-      unlinkServerOwner(),
-      resetFirstTimeSetupFlag(),
-      clearClaim(),
-      recreateGuestAccount(),
-    ])
-
-    const success = settled.every((result) => result === true)
 
     if (success) {
       this.eventService.emitPublic(AppEvents.FACTORY_RESET_SUCCESS)

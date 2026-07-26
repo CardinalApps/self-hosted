@@ -1,8 +1,8 @@
-import { IsString } from 'class-validator'
+import { IsEnum, IsString } from 'class-validator'
 import { ResetType, ResetValidationPhrase } from '../enums'
 
 export class ServerResetDto {
-  @IsString()
+  @IsEnum(ResetType)
   type: ResetType
 
   /**
