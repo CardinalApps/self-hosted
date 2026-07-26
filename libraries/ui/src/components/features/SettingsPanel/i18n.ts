@@ -31,8 +31,29 @@ const i18n: StringList = {
   "settings.tab-name-libraries": {
     "en": "Libraries",
   },
+  "settings.section-global": {
+    "en": "Global",
+  },
   "settings.section-server": {
     "en": "Server",
+  },
+  "settings.section-music": {
+    "en": "Music",
+  },
+  "settings.section-photos": {
+    "en": "Photos",
+  },
+  "settings.section-cinema": {
+    "en": "Cinema",
+  },
+  "settings.section-books": {
+    "en": "Books",
+  },
+  "settings.tab-name-cinema": {
+    "en": "Cinema",
+  },
+  "settings.tab-name-books": {
+    "en": "Books",
   },
   "settings.tab-name-people": {
     "en": "People",

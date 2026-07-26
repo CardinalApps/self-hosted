@@ -20,8 +20,8 @@ export const getFields = (app, lang) => {
     general: [
       //commonFields.lang,
       //commonFields.startPage,
-      commonFields.enableCustomContextMenu,
       commonFields.enableGlass,
+      commonFields.enableCustomContextMenu,
       commonFields.floatingPlaybackSidebar,
       commonFields.developerMode,
     ],
@@ -35,20 +35,23 @@ export const getFields = (app, lang) => {
     tabContent: <ThemeEditor app={app} />,
   }
 
+  // General settings tab, identical for all apps. Every field on it is a
+  // user-scoped home_server setting, so it applies across every app the
+  // user's account touches, not just the one it was changed in.
+  const generalTab = {
+    // The "Global" section heading is rendered before this tab.
+    section: i18n['settings.section-global'][lang],
+    tabName: i18n['settings.tab-name-general'][lang],
+    tabIcon: 'fas fa-home',
+    fields: [
+      ...defaults.general,
+    ],
+  }
+
   switch (app) {
     case 'admin':
       return [
-        // --- Personal preferences (this admin, this device) ---
-        // General settings tab (developer_mode lives under Advanced for admin)
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            commonFields.enableCustomContextMenu,
-            commonFields.enableGlass,
-            adminServerFields.openAppsInNewTab,
-          ],
-        },
+        generalTab,
         themeTab,
         // --- Server administration (system-wide, all users) ---
         // Server settings tab
@@ -60,6 +63,7 @@ export const getFields = (app, lang) => {
           fields: [
             adminServerFields.serverName,
             adminServerFields.autoCheckForUpdates,
+            adminServerFields.openAppsInNewTab,
           ],
         },
         // Users & Access settings tab
@@ -85,7 +89,6 @@ export const getFields = (app, lang) => {
           tabName: i18n['settings.tab-name-advanced'][lang],
           tabIcon: 'fas fa-flask',
           fields: [
-            commonFields.developerMode,
             adminServerFields.factoryReset,
           ],
         },
@@ -93,17 +96,12 @@ export const getFields = (app, lang) => {
 
     case 'music':
       return [
-        // General settings tab
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            ...defaults.general,
-          ],
-        },
+        generalTab,
         themeTab,
         // Music settings tab
         {
+          // The "Music" section heading is rendered before this tab.
+          section: i18n['settings.section-music'][lang],
           tabName: i18n['settings.tab-name-music-playback'][lang],
           tabIcon: 'fas fa-headphones-alt',
           fields: [
@@ -119,17 +117,12 @@ export const getFields = (app, lang) => {
 
     case 'photos':
       return [
-        // General settings tab
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            ...defaults.general,
-          ],
-        },
+        generalTab,
         themeTab,
         // People settings tab
         // {
+        //   // The "Photos" section heading is rendered before this tab.
+        //   section: i18n['settings.section-photos'][lang],
         //   tabName: i18n['settings.tab-name-people'][lang],
         //   tabIcon: 'fas fa-user-circle',
         //   fields: [
@@ -148,41 +141,36 @@ export const getFields = (app, lang) => {
 
     case 'cinema':
       return [
-        // General settings tab
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            ...defaults.general,
-          ],
-        },
+        generalTab,
         themeTab,
+        // Cinema settings tab
+        // {
+        //   // The "Cinema" section heading is rendered before this tab.
+        //   section: i18n['settings.section-cinema'][lang],
+        //   tabName: i18n['settings.tab-name-cinema'][lang],
+        //   tabIcon: 'fas fa-film',
+        //   fields: [],
+        // },
       ]
 
     case 'books':
       return [
-        // General settings tab
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            ...defaults.general,
-          ],
-        },
+        generalTab,
         themeTab,
+        // Books settings tab
+        // {
+        //   // The "Books" section heading is rendered before this tab.
+        //   section: i18n['settings.section-books'][lang],
+        //   tabName: i18n['settings.tab-name-books'][lang],
+        //   tabIcon: 'fas fa-book',
+        //   fields: [],
+        // },
       ]
 
     // Used by kiosk
     default:
       return [
-        // General settings tab
-        {
-          tabName: i18n['settings.tab-name-general'][lang],
-          tabIcon: 'fas fa-home',
-          fields: [
-            ...defaults.general,
-          ],
-        },
+        generalTab,
         themeTab,
       ]
   }

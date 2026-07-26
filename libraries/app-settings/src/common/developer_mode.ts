@@ -7,6 +7,7 @@ export const developerModeFactory: SettingsFieldFactory = (app: SupportedCardina
   slug: DEVELOPER_MODE_SLUG,
   label: i18n?.['settings.developer.enable-label']?.[lang],
   type: 'toggle',
-  storage: 'client',
+  storage: 'home_server',
+  scope: 'user',
   defaultValue: false,
 })
