@@ -1,4 +1,5 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { settingsSelectors } from '../../../../store/slices/settings'
 import { indexingSelectors, SSEIndexingUpdate } from '../../../../store/slices/indexing'
@@ -16,7 +17,7 @@ import { useAppDispatch } from '../../../../hooks/useAppDispatch'
 import { useAppSelector } from '../../../../hooks/useAppSelector'
 import useHasCapability from '../../../../hooks/useHasCapability'
 
-import MenuButton from '../../../interaction/MenuButton'
+import Popout from '../../../layout/Popout'
 import Icon from '../../../typography/Icon'
 
 import i18n from '../i18n'
@@ -28,6 +29,7 @@ import { RouterContext } from '../../../../context/router'
  */
 const ActivityIcon = () => {
   const dispatch = useAppDispatch()
+  const [isOpen, setIsOpen] = useState(false)
   const { Link } = useContext(RouterContext)
   const { lang, open_apps_in_new_tab } = useAppSelector(settingsSelectors.current)
   const userCanReadIndexing = useHasCapability('Indexing.Read')
@@ -125,19 +127,28 @@ const ActivityIcon = () => {
   }
 
   return (
-    <MenuButton
-      solid={false}
-      size="m"
-      align={'center'}
+    <Popout
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      position="tc"
+      origin="bm"
+      offset={10}
       title={i18n['activity-icon.title'][lang]}
-      icon={
-        <Icon
-          fa={`fas fa-bolt`}
-          style={somethingIsActive ? { color: 'var(--accent-color)', animation: 'iconPulse 3s infinite' } : {}}
-        />
+      trigger={
+        <button
+          className={clsx('popout-icon-trigger', { open: isOpen })}
+          type="button"
+          title={i18n['activity-icon.title'][lang]}
+          onClick={() => setIsOpen((o) => !o)}
+        >
+          <Icon
+            fa={`fas fa-bolt`}
+            style={somethingIsActive ? { color: 'var(--accent-color)', animation: 'iconPulse 3s infinite' } : {}}
+          />
+        </button>
       }
     >
-      <MenuButton.Section className="currently-active">
+      <section className="activity-popout">
         {!somethingIsActive &&
           <div className="no-activity">
             {i18n['activity.none'][lang]}
@@ -169,8 +180,8 @@ const ActivityIcon = () => {
             </div>
           )
         })}
-      </MenuButton.Section>
-    </MenuButton>
+      </section>
+    </Popout>
   )
 }
 

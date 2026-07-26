@@ -234,46 +234,6 @@
     }
   }
 
-  .currently-active {
-
-    .no-activity {
-      margin-bottom: 5px;
-      font-size: 14px;
-      font-weight: 400;
-    }
-
-    .activity {
-      margin-bottom: 5px;
-
-      &:last-of-type {
-        margin-bottom: 0;
-      }
-
-      a {
-        margin: 0 -10px;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 8px;
-        color: var(--text-color-1);
-
-        &:hover {
-          background-color: var(--bg-3);
-        }
-      }
-
-      .name {
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .status {
-        font-size: 13px;
-        font-weight: 500;
-      }
-    }
-  }
 
   .toolbar {
     margin-bottom: 0;
@@ -284,7 +244,6 @@
   }
 
   @media screen and (max-width: 768px) {
-    height: auto;
     margin-left: 0;
     margin-right: 0;
 
@@ -338,6 +297,49 @@
     
     .logo-col {
       width: var(--logo-col-size-collapsed);
+    }
+  }
+}
+
+/* Scoped to the popout rather than the header, since on a phone it opens from the sidebar nav */
+.activity-popout {
+  padding: 15px 20px 10px 20px;
+
+  .no-activity {
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .activity {
+    margin-bottom: 5px;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    a {
+      margin: 0 -10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 8px;
+      color: var(--text-color-1);
+
+      &:hover {
+        background-color: var(--bg-3);
+      }
+    }
+
+    .name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .status {
+      font-size: 13px;
+      font-weight: 500;
     }
   }
 }
