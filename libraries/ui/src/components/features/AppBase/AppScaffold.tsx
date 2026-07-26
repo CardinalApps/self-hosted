@@ -62,7 +62,7 @@ function AppScaffold({
     >
       {header}
       <div className={clsx('sidebar-nav-col')}>
-        <SidebarNav overflow={sidebarOptions?.overflow}>
+        <SidebarNav overflow={sidebarOptions?.overflow} mobileHeaderPortal>
           {sidebarOptions?.navigation}
         </SidebarNav>
       </div>

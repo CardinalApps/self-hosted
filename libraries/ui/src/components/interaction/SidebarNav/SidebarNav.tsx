@@ -21,6 +21,11 @@ type SidebarNavProps = {
   overrideAppLayout?: string,
   overrideIsCollapsed?: boolean,
   overflow?: boolean,
+  /*
+    Opens a slot at the top of the mobile drawer for controls that have no room in the
+    header on a phone. Only one nav may offer it, since the filler finds it by id.
+  */
+  mobileHeaderPortal?: boolean,
   style?: CSSProperties,
 }
 
@@ -32,6 +37,7 @@ const SidebarNav = ({
   overrideAppLayout,
   overrideIsCollapsed,
   overflow = false,
+  mobileHeaderPortal = false,
   style,
 }: PropsWithChildren<SidebarNavProps>) => {
   const ulRef = useRef(null)
@@ -170,10 +176,18 @@ const SidebarNav = ({
           overflow ? 'overflow-enabled' : '',
           hasBackground() ? 'show-bg' : '',
           resolveIsCollapsed() ? 'collapsed' : 'expanded',
+          mobileHeaderPortal ? 'has-mobile-header' : '',
         )}
         onClick={() => dispatch(layoutActions.setMobileNavIsOpen(false))}
         style={style}
       >
+        {!!mobileHeaderPortal &&
+          <div
+            id="sidebar-nav-mobile-header"
+            className="sidebar-nav-mobile-header"
+            onClick={(e) => e.stopPropagation()}
+          />
+        }
         <ul
           className="sidebar-list"
           ref={ulRef}
