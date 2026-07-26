@@ -275,6 +275,12 @@ const ToolbarItems = ({
     return null
   }
 
+  /*
+    Breadcrumbs are the page title, which mobile shows in the drawer but never in the bar, so a
+    toolbar carrying nothing else would open on an empty drawer. Better to offer no button at all.
+  */
+  const hasMobileControls = items.flat().some((item) => item?.render !== BREADCRUMBS_SLUG)
+
   // Slim toolbars are a handful of single-button groups that fit anywhere, so they never
   // collapse into the mobile filter drawer
   return slim || windowSize.width > 768
@@ -299,16 +305,18 @@ const ToolbarItems = ({
       </div>
     :
       // Mobile toolbar
-      <>
-        {MobileFilterGroup()}
-        {!!mobileToolbarModalIsOpen &&
-          <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
-            <div className="mobile-toolbar-drawer">
-              {ProvidedItemsGroup()}
-            </div>
-          </Drawer>
-        }
-      </>
+      hasMobileControls && (
+        <>
+          {MobileFilterGroup()}
+          {!!mobileToolbarModalIsOpen &&
+            <Drawer onClose={() => setMobileToolbarModalIsOpen(false)}>
+              <div className="mobile-toolbar-drawer">
+                {ProvidedItemsGroup()}
+              </div>
+            </Drawer>
+          }
+        </>
+      )
 }
 
 export default ToolbarItems
