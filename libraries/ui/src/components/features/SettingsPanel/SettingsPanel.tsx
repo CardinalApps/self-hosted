@@ -84,7 +84,7 @@ const SettingsPanel = ({
   const settingsPanelTop = useSelector(layoutSelectors.settingsPanelTop)
   const canUpdateServerSettings = useHasCapability('ServerSettings.Update')
   const [tabs] = useState(permittedTabs(getFields(app, settings?.lang), app, settings?.lang, canUpdateServerSettings))
-  const [activeTabIndex, setActiveTabIndex] = useState(0)
+  const persistedActiveTabIndex = useSelector(layoutSelectors.settingsPanelActiveTabIndex)
 
   // Close the settings panel and notify the caller.
   const handleClose = () => {
@@ -114,6 +114,12 @@ const SettingsPanel = ({
       return tabs
     }
   }
+
+  // Restores the last-viewed tab, falling back to the first tab if the persisted
+  // index no longer lines up with this app's tab list (eg. after an update).
+  const tabCount = withCustomTabs(tabs).length
+  const activeTabIndex = persistedActiveTabIndex >= 0 && persistedActiveTabIndex < tabCount ? persistedActiveTabIndex : 0
+  const setActiveTabIndex = (index) => dispatch(layoutActions.setSettingsPanelActiveTabIndex(index))
 
   /**
    * Updates a setting. Client-stored settings (eg. theme) stay in the local
