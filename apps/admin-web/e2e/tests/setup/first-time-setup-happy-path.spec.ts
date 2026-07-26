@@ -37,10 +37,10 @@ import {
       reads INSTANCE_ID from the media server's own options and POSTs
       /user/claims to the auth server with it.
     - So the claim row is keyed by the *real* media-server instanceId,
-      not by anything the browser sends. We look it up here via
-      `getMediaServerOption('instance_id')` after factoryReset and use
-      that for both pre-test cleanup (any stale claim from a prior run)
-      and the post-Finish assertion.
+      not by anything the browser sends. It has to be read *after*
+      factoryReset, which mints a new instance ID (the cloud never
+      releases a claim, so a reset server that kept its ID could never
+      be claimed again).
 */
 
 test(
@@ -51,11 +51,6 @@ test(
 
     await factoryResetMediaServer()
     const instanceId = await getMediaServerOption('instance_id') as string
-    // factoryReset preserves INSTANCE_ID across runs, so a leftover claim
-    // from a previous FTS run can still be in mongo. Clear it before
-    // walking the wizard — the auth server's POST /user/claims would
-    // otherwise hit a duplicate-instanceId conflict.
-    await deleteSelfHostedClaim(instanceId)
 
     const jwt = await registerUser(testEmail, testPassword)
     const userId = getUserIdFromJwt(jwt)
