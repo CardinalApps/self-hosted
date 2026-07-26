@@ -88,6 +88,17 @@ export default function useHowler() {
       },
     })
 
+    /*
+      Web Audio hands back silence for a media element that was fetched without CORS, which is
+      what the visualizers would be left analysing, and Howler never sets the attribute itself.
+      It is only read when a load begins, hence the reload — nothing has buffered yet here.
+    */
+    const node = howl._sounds?.[0]?._node
+    if (node instanceof HTMLMediaElement) {
+      node.crossOrigin = 'anonymous'
+      node.load()
+    }
+
     /**
      * Send playback history to the media server.
      */

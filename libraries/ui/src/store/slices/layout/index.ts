@@ -35,6 +35,9 @@ export type LayoutSliceState = {
   settingsPanelOpen: boolean,
   settingsPanelTop: string,
   playbackSidebarOpen: boolean,
+  /* Which visualizer the player's artwork is showing, by variant name; null is the cover art.
+     Kept loose because it outlives the build that wrote it, sitting in the persisted store. */
+  playbackVisualizer: string | null,
 
   // The actual current mode of the sidebar
   sidebarMode: SIDEBAR_MODE,
@@ -56,6 +59,7 @@ const initialState: LayoutSliceState = {
   settingsPanelOpen: false,
   settingsPanelTop: '50px',
   playbackSidebarOpen: false,
+  playbackVisualizer: null,
   sidebarMode: SIDEBAR_MODE.expanded,
   userSelectedSidebarMode: SIDEBAR_MODE.expanded,
 }
@@ -107,6 +111,9 @@ const layoutSlice = createSlice({
     // Opening the playback sidebar hides the mini player, so the two are never on screen together
     setPlaybackSidebarOpen: (state, action: PayloadAction<boolean>) => {
       state.playbackSidebarOpen = action.payload
+    },
+    setPlaybackVisualizer: (state, action: PayloadAction<string | null>) => {
+      state.playbackVisualizer = action.payload
     },
     togglePlaybackSidebar: (state) => {
       state.playbackSidebarOpen = !state.playbackSidebarOpen
@@ -186,6 +193,7 @@ const layoutSlice = createSlice({
     settingsPanelOpen: (state) => state.settingsPanelOpen,
     settingsPanelTop: (state) => state.settingsPanelTop,
     playbackSidebarOpen: (state) => state.playbackSidebarOpen,
+    playbackVisualizer: (state) => state.playbackVisualizer,
   },
 })
 

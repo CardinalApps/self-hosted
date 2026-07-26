@@ -9,6 +9,7 @@ import MarqueeText from '../../typography/MarqueeText'
 import Loading from '../../layout/Loading'
 import Scrubber from '../../interaction/Scrubber'
 import PlaybackControlBar from '../PlaybackSidebar/PlaybackControlBar'
+import ReleaseArtwork from './ReleaseArtwork'
 
 import { audioSelectors, audioActions } from '../../../store/slices/music'
 import { CACHED_SEEK_SESSION_STORAGE_KEY, PLAYBACK_STATE } from '../../../store/slices/music/constants'
@@ -259,12 +260,12 @@ const AudioPlayer = ({
         </p>
       </div>
       <div className="controls">
-        <div className={clsx('release-image', !track?.release?.thumbnails && 'no-image')}>
-          {coverSrc
-            ? <img src={coverSrc} />
-            : <Icon fa="fas fa-music" />
-          }
-        </div>
+        <ReleaseArtwork
+          coverSrc={coverSrc}
+          hasThumbnails={!!track?.release?.thumbnails}
+          interactive={size === 'wide'}
+          mediaElement={howl?._sounds?.[0]?._node}
+        />
         <div className="audio-player-buttons">
           <Icon
             fa="fas fa-backward"

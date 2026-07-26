@@ -1,13 +1,7 @@
 import { CSSProperties, ChangeEvent, useEffect, useRef, useState } from 'react'
 
 import { VisualizerAudioEngine, AudioSourceKind } from './audioEngine'
-import { AnalysisFrame } from './dsp'
-
-export interface VisualizerRenderer<P> {
-  resize(w: number, h: number): void
-  render(frame: AnalysisFrame, params: P, timeSec: number, dt: number): void
-  dispose(): void
-}
+import { VisualizerRenderer } from './renderer'
 
 interface VisualizerHarnessProps<P> {
   /** Must be a stable reference (module-level function) — the harness only calls it on mount */

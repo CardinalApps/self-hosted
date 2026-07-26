@@ -1,4 +1,5 @@
-import { AnalysisFrame, BIN_COUNT, MAX_RINGS, SpectrumProcessor, WAVE_POINTS } from './dsp'
+import { AnalysisFrame, createAnalysisFrame, fillIdleFrame, SpectrumProcessor } from './dsp'
+import { createAnalyser } from './mediaAnalysis'
 import { SynthBeat } from './synthBeat'
 
 export type AudioSourceKind = 'none' | 'file' | 'synth'
@@ -16,12 +17,7 @@ export class VisualizerAudioEngine {
   private objectUrl: string | null = null
   private synth: SynthBeat | null = null
 
-  private readonly idleFrame: AnalysisFrame = {
-    spectrum: new Float32Array(BIN_COUNT),
-    pulses: new Float32Array(MAX_RINGS),
-    wave: new Float32Array(WAVE_POINTS),
-    loudness: 0,
-  }
+  private readonly idleFrame: AnalysisFrame = createAnalysisFrame()
 
   source: AudioSourceKind = 'none'
   playing = false
@@ -71,7 +67,7 @@ export class VisualizerAudioEngine {
 
   // Sample the analyser and produce this frame's analysis; gentle idle motion when silent
   update(dt: number, timeSec: number, sensitivity: number, bands: number): AnalysisFrame {
-    if (!this.analyser || !this.processor || !this.playing) return this.idle(timeSec)
+    if (!this.analyser || !this.processor || !this.playing) return fillIdleFrame(this.idleFrame, timeSec)
     this.analyser.getByteFrequencyData(this.freqData)
     this.analyser.getByteTimeDomainData(this.timeData)
     const frame = this.processor.process(this.freqData, dt, sensitivity, bands)
@@ -92,33 +88,12 @@ export class VisualizerAudioEngine {
     if (this.ctx) return this.ctx
     this.ctx = new AudioContext()
     this.master = this.ctx.createGain()
-    this.analyser = this.ctx.createAnalyser()
-    this.analyser.fftSize = 4096
-    this.analyser.smoothingTimeConstant = 0.5
-    this.analyser.minDecibels = -85
-    this.analyser.maxDecibels = -22
+    this.analyser = createAnalyser(this.ctx)
     this.master.connect(this.analyser)
     this.analyser.connect(this.ctx.destination)
     this.freqData = new Uint8Array(this.analyser.frequencyBinCount)
     this.timeData = new Uint8Array(this.analyser.fftSize)
     this.processor = new SpectrumProcessor(this.ctx.sampleRate, this.analyser.fftSize)
     return this.ctx
-  }
-
-  // Slow breathing so the rings feel alive before any audio starts
-  private idle(t: number): AnalysisFrame {
-    const f = this.idleFrame
-    for (let b = 0; b < BIN_COUNT; b++) {
-      f.spectrum[b] = 0.05 + 0.045 * (0.5 + 0.5 * Math.sin(t * 1.3 + b * 0.33))
-    }
-    for (let i = 0; i < MAX_RINGS; i++) {
-      f.pulses[i] = 0.08 + 0.1 * (0.5 + 0.5 * Math.sin(t * 0.9 + i * 1.7))
-    }
-    for (let p = 0; p < WAVE_POINTS; p++) {
-      const x = p / WAVE_POINTS
-      f.wave[p] = 0.25 * Math.sin(x * Math.PI * 4 + t * 1.8) * (0.75 + 0.25 * Math.sin(t * 0.7))
-    }
-    f.loudness = 0.06
-    return f
   }
 }

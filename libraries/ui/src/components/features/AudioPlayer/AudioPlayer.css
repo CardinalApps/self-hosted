@@ -43,6 +43,28 @@
   .total-time {
     white-space: nowrap;
   }
+
+  .release-image {
+
+    &.interactive {
+      cursor: pointer;
+    }
+
+    .release-image-layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition-property: opacity;
+      transition-timing-function: ease;
+
+      &.visible {
+        opacity: 1;
+      }
+    }
+  }
 }
 
 .audio-player[data-size="mini"] {
