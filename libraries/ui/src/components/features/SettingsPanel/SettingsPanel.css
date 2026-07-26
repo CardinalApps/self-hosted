@@ -149,10 +149,14 @@
 
     .tab-fields {
       display: none;
-      overflow-y: visible;
+      overflow: visible;
 
       &.active {
         display: block;
+      }
+
+      .card-content {
+        overflow: visible;
       }
     }
   }
