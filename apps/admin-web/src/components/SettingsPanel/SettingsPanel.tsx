@@ -26,11 +26,6 @@ function HomeServerSettingsPanel() {
           tabIcon: 'fas fa-bullhorn',
           tabContent: <Reporting />,
         },
-        // {
-        //   tabName: i18n['advanced.tab.name'][lang],
-        //   tabIcon: 'fas fa-microscope',
-        //   tabContent: <Advanced />,
-        // },
       ]}
     />
   )

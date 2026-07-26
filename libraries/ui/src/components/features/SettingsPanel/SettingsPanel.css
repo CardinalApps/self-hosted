@@ -173,6 +173,7 @@
 
     &.type-toggle,
     &.type-number,
+    &.type-button,
     &.type-select {
       min-height: 68px;
       margin-bottom: 15px;
@@ -187,6 +188,13 @@
 
       .toggle-switch {
         background-color: var(--bg-4);
+      }
+    }
+
+    &.type-button {
+
+      .field-input {
+        flex-shrink: 0;
       }
     }
 

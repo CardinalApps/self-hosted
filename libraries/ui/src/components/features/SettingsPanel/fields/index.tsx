@@ -85,6 +85,7 @@ export const getFields = (app, lang) => {
           tabIcon: 'fas fa-flask',
           fields: [
             commonFields.developerMode,
+            adminServerFields.factoryReset,
           ],
         },
       ]

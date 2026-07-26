@@ -24,6 +24,7 @@ const fieldTypes = {
   toggle: 'toggle',
   textArea: 'textArea',
   swatches: 'swatches',
+  button: 'button',
 }
 
 export { fieldTypes }

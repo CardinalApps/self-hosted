@@ -58,6 +58,24 @@ const i18n: StringList = {
   "settings.music.multi-player": {
     "en": "Multi-Player",
   },
+  "settings.factory-reset.label": {
+    "en": "Factory Reset",
+  },
+  "settings.factory-reset.description": {
+    "en": "Return this Media Server to the state it was in when it was installed.",
+  },
+  "settings.factory-reset.button": {
+    "en": "Factory Reset",
+  },
+  "settings.factory-reset.confirm-title": {
+    "en": "Factory Reset",
+  },
+  "settings.factory-reset.confirm-message": {
+    "en": "<p>A factory reset deindexes your media and wipes everything else. It will also unlink your cloud account from this Media Server. Your media files are not touched.</p><p>Your Media Server will be unresponsive while this runs, and you will be returned to First Time Setup when it finishes.</p>",
+  },
+  "settings.factory-reset.error-toast": {
+    "en": "The factory reset did not complete",
+  },
   "settings.theme-editor.reset": {
     "en": "Reset to theme value",
   },

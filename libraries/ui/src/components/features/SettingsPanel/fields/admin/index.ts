@@ -5,6 +5,7 @@ import openAppsInNewTab from './openAppsInNewTab'
 import maxRating from './maxRating'
 import enableHalfRatings from './enableHalfRatings'
 import inactiveSessionTimeout from './inactiveSessionTimeout'
+import factoryReset from './factoryReset'
 
 export default {
   autoCheckForUpdates,
@@ -14,4 +15,5 @@ export default {
   maxRating,
   enableHalfRatings,
   inactiveSessionTimeout,
+  factoryReset,
 }
