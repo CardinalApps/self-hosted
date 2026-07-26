@@ -31,8 +31,8 @@ import {
   database layer.
 
   Like the happy-path spec, the claim is keyed by the media-server's
-  real instance_id, so we look that up after factoryReset and use it for
-  cleanup on both ends.
+  real instance_id, so we read that after factoryReset (which mints a new
+  one) and use it for cleanup on both ends.
 */
 
 test(
@@ -43,7 +43,6 @@ test(
 
     await factoryResetMediaServer()
     const instanceId = await getMediaServerOption('instance_id') as string
-    await deleteSelfHostedClaim(instanceId)
 
     const jwt = await registerUser(testEmail, testPassword)
     await confirmUserEmail(getUserIdFromJwt(jwt))
