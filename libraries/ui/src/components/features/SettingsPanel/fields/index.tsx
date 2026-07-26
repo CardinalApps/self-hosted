@@ -21,8 +21,9 @@ export const getFields = (app, lang) => {
       //commonFields.lang,
       //commonFields.startPage,
       commonFields.enableGlass,
-      commonFields.enableCustomContextMenu,
+      commonFields.openAppsInNewTab,
       commonFields.floatingPlaybackSidebar,
+      commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
   }
@@ -63,7 +64,6 @@ export const getFields = (app, lang) => {
           fields: [
             adminServerFields.serverName,
             adminServerFields.autoCheckForUpdates,
-            adminServerFields.openAppsInNewTab,
           ],
         },
         // Users & Access settings tab

@@ -4,6 +4,7 @@ import enableCustomContextMenu from './enableCustomContextMenu'
 import enableGlass from './enableGlass'
 import floatingPlaybackSidebar from './floatingPlaybackSidebar'
 import developerMode from './developerMode'
+import openAppsInNewTab from './openAppsInNewTab'
 
 export default {
   lang,
@@ -12,4 +13,5 @@ export default {
   enableGlass,
   floatingPlaybackSidebar,
   developerMode,
+  openAppsInNewTab,
 }
