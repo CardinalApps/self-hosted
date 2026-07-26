@@ -106,6 +106,7 @@ const Select = ({
 }: SelectProps) => {
   const ref = useRef(null)
   const searchRef = useRef(null)
+  const optionsRef = useRef(null)
   const { clickedOutside, resetClickOutside } = useClickOutside(ref)
   const { lang } = useSelector(settingsSelectors.current)
   const [selected, setSelected] = useState(value ? anyToSelected(value) : undefined)
@@ -291,6 +292,22 @@ const Select = ({
   }, [popoutOpen])
 
   /**
+   * Scroll the selected option into view, centered, without animating.
+   */
+  useEffect(() => {
+    if (popoutOpen) {
+      setTimeout(() => {
+        const container = optionsRef.current
+        const selectedOption = container?.querySelector('.option.selected')
+
+        if (container && selectedOption) {
+          container.scrollTop = selectedOption.offsetTop - container.clientHeight / 2 + selectedOption.offsetHeight / 2
+        }
+      }, 0)
+    }
+  }, [popoutOpen])
+
+  /**
    * Propagate changes.
    */
   useEffect(() => {
@@ -377,6 +394,7 @@ const Select = ({
         {!!popoutOpen && (
           <motion.div
             className="options"
+            ref={optionsRef}
             initial={{ translateY: -6, opacity: 0 }}
             animate={{ translateY: 0, opacity: 1 }}
           >
