@@ -2,6 +2,7 @@ import { useContext, useState } from 'react'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { layoutSelectors } from '@cardinalapps/ui/src/store/slices/layout'
 import { MusicHistoryEntryType, useGetInfiniteMusicHistoryInfiniteQuery } from '@cardinalapps/ui/src/store/apis/musicHistory'
+import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { CommonOrderParams } from '@cardinalapps/ui/src/store/types/api'
 import { ITEMS_PER_RTK_PAGE } from '@cardinalapps/ui/src/store/utils/infiniteScroll'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
@@ -59,6 +60,19 @@ function MusicHistoryInfiniteScroll({
     },
   )
 
+  /**
+   * With nothing indexed there is no way to build up any history, so the
+   * history empty state would be a dead end. Fall back to the app-wide
+   * "index your media" one instead.
+   */
+  const {
+    data: tracksData,
+    isSuccess: tracksIsSuccess,
+  } = useGetMusicTracksQuery({
+    take: 1,
+  })
+
+  const hasIndexedMusic = !!(Array.isArray(tracksData) ? tracksData[0] : []).length
 
   const getItem = (historyEntry: MusicHistoryEntryType) => {
     const musicRelease = historyEntry.track?.release
@@ -107,16 +121,16 @@ function MusicHistoryInfiniteScroll({
         data={data}
         gap={8}
         getItem={getItem}
-        isSuccess={isSuccess}
-        isLoading={isLoading}
+        isSuccess={isSuccess && tracksIsSuccess}
+        isLoading={isLoading || !tracksIsSuccess}
         hasNextPage={hasNextPage}
         hasPreviousPage={hasPreviousPage}
         fetchNextPage={fetchNextPage}
         fetchPreviousPage={fetchPreviousPage}
         isFetchingNextPage={isFetchingNextPage}
         isFetchingPreviousPage={isFetchingPreviousPage}
-        emptyTitle={i18n['music-history.empty.title'][lang]}
-        emptyMessage={i18n['music-history.empty.message'][lang]}
+        emptyTitle={hasIndexedMusic ? i18n['music-history.empty.title'][lang] : undefined}
+        emptyMessage={hasIndexedMusic ? i18n['music-history.empty.message'][lang] : undefined}
         emptyButton={false}
       />
     </>
