@@ -81,6 +81,7 @@ export const getFields = (app, lang) => {
         },
         // Advanced settings tab
         {
+          tabId: 'advanced',
           tabName: i18n['settings.tab-name-advanced'][lang],
           tabIcon: 'fas fa-flask',
           fields: [
