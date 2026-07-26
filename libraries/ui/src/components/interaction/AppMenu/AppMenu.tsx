@@ -47,7 +47,7 @@ const AppMenu = ({
       title={i18n['icon.title'][lang]}
       trigger={
         <button
-          className={clsx('app-menu-trigger', { open: isOpen })}
+          className={clsx('popout-icon-trigger', 'app-menu-trigger', { open: isOpen })}
           type="button"
           title={i18n['icon.title'][lang]}
           onClick={() => setIsOpen((o) => !o)}

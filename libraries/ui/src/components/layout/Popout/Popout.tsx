@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
@@ -21,6 +21,22 @@ const ANCHOR_FRACTIONS: Record<PopoutAnchor, [number, number]> = {
   br: [1, 1],
 }
 
+/*
+  The anchors laid out as [y][x], so a placement can be taken apart into a fraction per axis and
+  put back together again. Spelled out rather than derived from the letters, because the centre
+  column is named 'c' on the top row but 'm' on the middle and bottom ones.
+*/
+const ANCHOR_GRID: PopoutAnchor[][] = [
+  ['tl', 'tc', 'tr'],
+  ['ml', 'mm', 'mr'],
+  ['bl', 'bm', 'br'],
+]
+
+const toAnchor = (xFraction: number, yFraction: number) => ANCHOR_GRID[yFraction * 2][xFraction * 2]
+
+// How close the panel may sit to a viewport edge before it counts as overflowing
+const VIEWPORT_MARGIN = 8
+
 /**
  * `offset` only makes sense as a push along an axis where the origin and
  * position fractions sit on opposite edges (0 vs 1) — that's the only case
@@ -31,6 +47,45 @@ const getOffsetDirection = (originFraction: number, positionFraction: number) =>
   if (originFraction === 1 && positionFraction === 0) return 1
   if (originFraction === 0 && positionFraction === 1) return -1
   return 0
+}
+
+/**
+ * Where the panel's leading edge lands on one axis, in viewport coordinates. Derived from the
+ * trigger and the panel's own size, so it can be asked of a placement the panel isn't using yet.
+ */
+const getAxisStart = (
+  triggerStart: number,
+  triggerSize: number,
+  originFraction: number,
+  positionFraction: number,
+  offset: number,
+  panelSize: number,
+) => {
+  const direction = getOffsetDirection(originFraction, positionFraction)
+  return triggerStart + (originFraction * triggerSize) + (direction * offset) - (positionFraction * panelSize)
+}
+
+// How far the panel would spill past either viewport edge, in pixels, for a candidate placement
+const getOverflow = (start: number, panelSize: number, viewportSize: number) => {
+  const before = Math.max(0, VIEWPORT_MARGIN - start)
+  const after = Math.max(0, (start + panelSize) - (viewportSize - VIEWPORT_MARGIN))
+  return before + after
+}
+
+/**
+ * The placements to consider for one axis, best first. An axis the panel opens *along* (the one
+ * `offset` pushes on) flips to the far side of the trigger, which is the familiar
+ * drop-down-becomes-drop-up. An axis it merely lines up on can't flip — mirroring a centred anchor
+ * returns the same anchor — so it re-aligns to whichever trigger edge pulls it back on screen.
+ */
+const getAxisCandidates = (originFraction: number, positionFraction: number) => {
+  const preferred: [number, number] = [originFraction, positionFraction]
+
+  if (getOffsetDirection(originFraction, positionFraction) !== 0) {
+    return [preferred, [1 - originFraction, 1 - positionFraction] as [number, number]]
+  }
+
+  return [preferred, [1, 1] as [number, number], [0, 0] as [number, number]]
 }
 
 const getAxisPosition = (originFraction: number, positionFraction: number, offset: number) => {
@@ -77,7 +132,77 @@ const Popout = ({
   children,
 }: PropsWithChildren<PopoutProps>) => {
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [placement, setPlacement] = useState({ position, origin })
   const { clickedOutside, resetClickOutside } = useClickOutside(wrapperRef)
+
+  /*
+    Pick the placement that spills the least off screen, per axis, keeping the asked-for one on a
+    tie. Least-overflow rather than first-that-fits so a trigger jammed against an edge still gets
+    the best of a bad set. Measured from the trigger and the panel's own size rather than from
+    where the panel currently sits, so the answer doesn't depend on the placement already applied
+    and can't oscillate.
+  */
+  useLayoutEffect(() => {
+    if (!open) {
+      setPlacement({ position, origin })
+      return
+    }
+
+    const measure = () => {
+      const trigger = wrapperRef.current?.getBoundingClientRect()
+      const panel = panelRef.current?.getBoundingClientRect()
+      if (!trigger || !panel) return
+
+      const resolveAxis = (
+        triggerStart: number,
+        triggerSize: number,
+        panelSize: number,
+        viewportSize: number,
+        originFraction: number,
+        positionFraction: number,
+      ) => {
+        const candidates = getAxisCandidates(originFraction, positionFraction)
+        let best = candidates[0]
+        let bestOverflow = Infinity
+
+        candidates.forEach(([candidateOrigin, candidatePosition]) => {
+          const start = getAxisStart(triggerStart, triggerSize, candidateOrigin, candidatePosition, offset, panelSize)
+          const overflow = getOverflow(start, panelSize, viewportSize)
+          if (overflow < bestOverflow) {
+            best = [candidateOrigin, candidatePosition]
+            bestOverflow = overflow
+          }
+        })
+
+        return best
+      }
+
+      const [originX, positionX] = resolveAxis(
+        trigger.left, trigger.width, panel.width, window.innerWidth,
+        ANCHOR_FRACTIONS[origin][0], ANCHOR_FRACTIONS[position][0],
+      )
+      const [originY, positionY] = resolveAxis(
+        trigger.top, trigger.height, panel.height, window.innerHeight,
+        ANCHOR_FRACTIONS[origin][1], ANCHOR_FRACTIONS[position][1],
+      )
+
+      setPlacement({
+        origin: toAnchor(originX, originY),
+        position: toAnchor(positionX, positionY),
+      })
+    }
+
+    measure()
+
+    window.addEventListener('resize', measure)
+    window.addEventListener('scroll', measure, true)
+
+    return () => {
+      window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure, true)
+    }
+  }, [open, position, origin, offset, width])
 
   useEffect(() => {
     if (!clickedOutside) return
@@ -100,8 +225,8 @@ const Popout = ({
     return () => document.removeEventListener('keydown', onKeyDown, true)
   }, [open])
 
-  const [originX, originY] = ANCHOR_FRACTIONS[origin]
-  const [positionX, positionY] = ANCHOR_FRACTIONS[position]
+  const [originX, originY] = ANCHOR_FRACTIONS[placement.origin]
+  const [positionX, positionY] = ANCHOR_FRACTIONS[placement.position]
 
   const outerStyle: CSSProperties = {
     left: getAxisPosition(originX, positionX, offset),
@@ -125,7 +250,7 @@ const Popout = ({
             animate={{ opacity: 1, y: 0, transition: { type: 'spring', mass: 0.1 } }}
             exit={{ opacity: 0, y: -4, transition: { type: 'spring', mass: 0.1 } }}
           >
-            <div className={clsx('popout-inner', innerClassName)} style={innerStyle}>
+            <div ref={panelRef} className={clsx('popout-inner', innerClassName)} style={innerStyle}>
               {title && <p className="popout-title">{title}</p>}
               {children}
             </div>
