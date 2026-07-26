@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect } from 'react'
 import type { PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
+import { getScopedSlugs } from '@cardinalapps/app-settings/src'
 
 import Loading from '../../layout/Loading'
 import H2 from '../../typography/H2'
@@ -19,6 +20,7 @@ import sync from '../../../store/slices/settings/thunks/sync'
 import Field from './Field'
 
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
+import useHasCapability from '../../../hooks/useHasCapability'
 
 import { getFields } from './fields'
 
@@ -28,12 +30,43 @@ import i18n from './i18n'
 
 import './SettingsPanel.css'
 
+// Settings that belong to the whole install rather than to one account
+const serverScopedSlugs = getScopedSlugs('en', 'server')
+
 type SettingsPanelProps = {
   app: CardinalApp,
   customTabs?: unknown[],
   lang?: string,
   onChange?: (key?: string, value?: unknown) => void,
   onClose?: () => void,
+}
+
+/*
+ * Drops the fields for settings that belong to the whole install when the user has no capability to
+ * save them. The server answers those writes with a 403, so rendering the input only offers a
+ * guaranteed failure, and unlike a disabled button it would show a value the user could mistake for
+ * their own. A tab left holding nothing but section titles goes with them.
+ */
+const permittedTabs = (tabs, app, lang, canUpdateServerSettings) => {
+  if (canUpdateServerSettings) {
+    return tabs
+  }
+
+  return tabs.flatMap((tab) => {
+    if (!tab.fields) {
+      return [tab]
+    }
+
+    const permitted = tab.fields
+      .map((fieldFactory) => ({ fieldFactory, field: fieldFactory(app, lang) }))
+      .filter(({ field }) => !serverScopedSlugs.includes(field.slug))
+
+    if (!permitted.some(({ field }) => field.type !== 'title')) {
+      return []
+    }
+
+    return [{ ...tab, fields: permitted.map(({ fieldFactory }) => fieldFactory) }]
+  })
 }
 
 const SettingsPanel = ({
@@ -49,7 +82,8 @@ const SettingsPanel = ({
   const currentUser = useSelector(homeServerUserSelectors.current)
   const modalIsOpen = useSelector(modalSelectors.isOpen)
   const settingsPanelTop = useSelector(layoutSelectors.settingsPanelTop)
-  const [tabs] = useState(getFields(app, settings?.lang))
+  const canUpdateServerSettings = useHasCapability('ServerSettings.Update')
+  const [tabs] = useState(permittedTabs(getFields(app, settings?.lang), app, settings?.lang, canUpdateServerSettings))
   const [activeTabIndex, setActiveTabIndex] = useState(0)
 
   // Close the settings panel and notify the caller.
