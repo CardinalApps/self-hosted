@@ -27,7 +27,11 @@ import { ToolbarItems as ToolbarItemsType } from './types'
 
 import './Toolbar.css'
 
-
+/*
+  Marks a group the collider has pushed into the overflow popout. A class rather than an inline
+  display so the divider rule can tell a hidden neighbour from a visible one.
+*/
+const COLLAPSED_INTO_OVERFLOW = 'collapsed-into-overflow'
 
 type ToolbarItemsProps = {
   name?: string,
@@ -90,14 +94,14 @@ const ToolbarItems = ({
       const groups = Array.from(toolbarRef.current!.querySelectorAll<HTMLElement>(':scope > .toolbar-group:not(.toolbar-overflow-trigger)'))
 
       // Show all groups first so the toolbar reflects its full width
-      groups.forEach((g) => (g.style.display = ''))
+      groups.forEach((g) => g.classList.remove(COLLAPSED_INTO_OVERFLOW))
 
       let hidden = 0
       while (
         colliderEl.getBoundingClientRect().left - toolbar.getBoundingClientRect().right < 20 &&
         hidden < groups.length
       ) {
-        groups[groups.length - 1 - hidden].style.display = 'none'
+        groups[groups.length - 1 - hidden].classList.add(COLLAPSED_INTO_OVERFLOW)
         hidden++
       }
       setNumHidden(hidden)

@@ -187,7 +187,11 @@
   display: none;
 }
 
-.toolbar-collider > .toolbar-group:where(:has(> .toolbar-item:not(:empty))) ~ .toolbar-group:where(:has(> .toolbar-item:not(:empty))):before {
+.toolbar-collider > .toolbar-group.collapsed-into-overflow {
+  display: none;
+}
+
+.toolbar-collider > .toolbar-group:where(:has(> .toolbar-item:not(:empty)):not(.collapsed-into-overflow)) ~ .toolbar-group:where(:has(> .toolbar-item:not(:empty)):not(.collapsed-into-overflow)):before {
   content: '';
   width: 1px;
   position: absolute;
