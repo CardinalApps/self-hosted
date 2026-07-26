@@ -298,6 +298,18 @@
     left: 10px;
     right: 10px;
   }
+
+  @media (max-width: 768px) {
+
+    .page-content {
+      padding-left: 20px;
+    }
+
+    .app-header {
+      left: 20px;
+      right: 20px;
+    }
+  }
 }
 
 [data-layout="procedural"] {
