@@ -9,20 +9,30 @@ import RecentlyPlayed from './RecentlyPlayed'
 import { audioSelectors } from '../../../store/slices/music'
 import { PLAYBACK_STATE } from '../../../store/slices/music/constants'
 import { settingsSelectors } from '../../../store/slices/settings'
+import { useGetMusicTracksQuery } from '../../../store/apis/musicTracks'
 import { useVisiblePlayer } from '../../../hooks/useVisiblePlayer'
 
 import { usePlaybackSidebar } from './context'
+
+import i18n from './i18n'
 
 /**
  * The Music app's playback sidebar contents: a full sized player, and the queue
  * that feeds it.
  */
 const MusicPlayback = () => {
-  const { enable_glass } = useSelector(settingsSelectors.current)
+  const { enable_glass, lang } = useSelector(settingsSelectors.current)
   const players = useSelector(audioSelectors.players)
   const [visiblePlayer, setVisiblePlayer] = useVisiblePlayer()
   const { setGlassColors } = usePlaybackSidebar()
   const player = visiblePlayer ? players?.[visiblePlayer] : undefined
+
+  const { data: tracksData, isSuccess: tracksIsSuccess } = useGetMusicTracksQuery({
+    take: 1,
+  })
+
+  // Held until the probe answers, so a slow reply doesn't flash the message at someone who has media
+  const noIndexedMusic = tracksIsSuccess && !(Array.isArray(tracksData) ? tracksData[0] : []).length
 
   /*
     Hand the sidebar back its idle state when playback stops. The player unmounts without
@@ -36,6 +46,14 @@ const MusicPlayback = () => {
   }, [player, setGlassColors])
 
   if (!player) {
+    if (noIndexedMusic) {
+      return (
+        <p className="playback-sidebar-no-media">
+          {i18n['playback-sidebar.no-media'][lang as string]}
+        </p>
+      )
+    }
+
     return (
       <div className="playback-sidebar-idle">
         <RecentlyPlayed />

@@ -92,6 +92,18 @@
   overflow-y: auto;
 }
 
+.playback-sidebar-no-media {
+  flex-grow: 1;
+  margin: 0;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-color-3);
+}
+
 /* The card chrome is shed above, so what remains is the header row and the carousel */
 .playback-sidebar-recently-played {
   flex-shrink: 0;
