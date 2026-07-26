@@ -7,6 +7,7 @@
   padding-bottom: 8px;
   position: relative;
   --sidebar-collapsed-width: 74px;
+  --mobile-header-height: 64px;
   --easing: cubic-bezier(0.16, 1, 0.3, 1);
   transition: padding 300ms;
 
@@ -93,6 +94,7 @@
       
       .sidebar-list {
         width: 230px;
+        padding-top: 10px;
         position: absolute;
         top: 9px;
         left: 20px;
@@ -312,6 +314,10 @@
   }
 }
 
+.sidebar-nav-mobile-header {
+  display: none;
+}
+
 .sidebar-nav-mobile-overlay {
   width: 100vh;
   height: 100vh;
@@ -358,10 +364,36 @@
       width: 100%;
       max-height: 85%;
       overflow-y: auto;
-      padding: 30px 30px 85px 30px;
+      padding: 10px 30px 85px 30px;
       border-top-right-radius: 32px;
       border-top-left-radius: 32px;
       background-color: var(--bg-2);
+    }
+
+    &.has-mobile-header {
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+
+      .sidebar-nav-mobile-header {
+        height: var(--mobile-header-height);
+        flex-shrink: 0;
+        padding: 20px 30px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-top-right-radius: 32px;
+        border-top-left-radius: 32px;
+        background-color: var(--bg-2);
+        position: relative;
+        z-index: 1;
+      }
+
+      ul {
+        max-height: calc(85% - var(--mobile-header-height));
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+      }
     }
   }
 

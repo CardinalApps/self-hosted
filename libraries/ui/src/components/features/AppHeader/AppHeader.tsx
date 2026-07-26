@@ -1,5 +1,7 @@
-import { useContext, useState, type PropsWithChildren, type ReactNode } from 'react'
+import { useContext, useEffect, useState, type PropsWithChildren, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { useAppSelector } from '../../../hooks/useAppSelector'
+import useWindowSize from '../../../hooks/useWindowSize'
 import { appSelectors } from '../../../store/slices/app'
 import { useAppDispatch } from '../../../hooks/useAppDispatch'
 import { RouterContext } from '../../../context/router'
@@ -27,6 +29,9 @@ import i18n from './i18n'
 
 import './AppHeader.css'
 
+// Matches the width at which SidebarNav.css turns the nav into a bottom drawer
+const MOBILE_MAX_WIDTH = 768
+
 type AppHeaderProps = {
   onSwitchAccountClick?: () => void,
   loginButton?: ReactNode,
@@ -49,6 +54,20 @@ const AppHeader = ({
   const sidebarMode = useAppSelector(layoutSelectors.sidebarMode)
   const app = useAppSelector(appSelectors.app)
   const appName = useAppSelector(appSelectors.name)
+  const windowSize = useWindowSize()
+  const isMobile = !!windowSize.width && windowSize.width <= MOBILE_MAX_WIDTH
+
+  /*
+    The slot belongs to the sidebar nav, which commits after this header, so it can only be
+    looked up once both are mounted.
+  */
+  const [mobileHeaderSlot, setMobileHeaderSlot] = useState<Element | null>(null)
+  useEffect(() => {
+    setMobileHeaderSlot(document.querySelector('#sidebar-nav-mobile-header'))
+  }, [])
+
+  // Without a slot to move them to, the controls stay in the header rather than vanishing
+  const inMobileDrawer = isMobile && !!mobileHeaderSlot
 
   const majorBadges = () => {
     const badges = []
@@ -114,7 +133,7 @@ const AppHeader = ({
           <div className="major-badges">
             {majorBadges()}
           </div>
-          <LibrarySwitcher />
+          {!inMobileDrawer && <LibrarySwitcher />}
           {/* Playback sidebar toggle */}
           {!!showPlaybackSidebarToggle &&
             <div className="icon">
@@ -122,9 +141,11 @@ const AppHeader = ({
             </div>
           }
           {/* Activity icon */}
-          <div className="icon">
-            <ActivityIcon />
-          </div>
+          {!inMobileDrawer &&
+            <div className="icon">
+              <ActivityIcon />
+            </div>
+          }
           {/* App menu icon */}
           <div className="icon">
             <AppMenu align="center" target={open_apps_in_new_tab ? '_blank' : undefined} />
@@ -143,6 +164,15 @@ const AppHeader = ({
           </div>
         </section>
       </div>
+      {!!inMobileDrawer && createPortal(
+        <>
+          <LibrarySwitcher />
+          <div className="icon">
+            <ActivityIcon />
+          </div>
+        </>,
+        mobileHeaderSlot,
+      )}
       {showBadgeModal === 'kiosk' && (
         <Modal onClose={() => setShowBadgeModal(null)}>
           <WrittenText>

@@ -10,6 +10,11 @@
   --logo-col-size-expanded: 278px;
   --logo-col-size-collapsed: 94px;
 
+  @media screen and (max-width: 768px) {
+    --logo-col-size-expanded: auto;
+    --logo-col-size-collapsed: auto;
+  }
+
   .user-avatar {
     box-shadow: none;
   }
@@ -27,17 +32,6 @@
   justify-content: space-between;
   transition: box-shadow 400ms;
   background-color: var(--bg-1);
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: -30px;
-    left: -30px;
-    right: -3px;
-    bottom: -20px;
-    background-color: var(--bg-2);
-    z-index: -1;
-  }
 
   &.glass {
     box-shadow: var(--box-shadow-2);
@@ -65,7 +59,7 @@
     width: var(--logo-col-size-expanded);
 
     @media screen and (max-width: 768px) {
-      width: var(--logo-col-size-collapsed);
+      padding-right: 10px;
     }
   }
 
