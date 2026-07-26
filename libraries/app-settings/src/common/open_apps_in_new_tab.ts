@@ -8,5 +8,6 @@ export const openAppsInNewTabFactory: SettingsFieldFactory = (app: SupportedCard
   label: i18n?.['settings.open-apps-in-new-tab.label']?.[lang],
   type: 'toggle',
   storage: 'home_server',
+  scope: 'user',
   defaultValue: true,
 })
