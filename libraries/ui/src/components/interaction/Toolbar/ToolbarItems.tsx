@@ -284,9 +284,11 @@ const ToolbarItems = ({
         {ProvidedItemsGroup()}
         {collider && numHidden > 0 && (
           <div className="toolbar-group toolbar-overflow-trigger" ref={overflowTriggerRef}>
-            <button className="overflow-button" onClick={() => setOverflowOpen((o) => !o)}>
-              <i className="toolbar-icon fas fa-ellipsis-h" />
-            </button>
+            <div className="toolbar-item overflow-trigger-item">
+              <button className="overflow-button" onClick={() => setOverflowOpen((o) => !o)}>
+                <i className="toolbar-icon fas fa-ellipsis-h" />
+              </button>
+            </div>
             {overflowOpen && (
               <div className="toolbar-overflow-popout" ref={setOverflowRef}>
                 {ProvidedItemsGroup()}
