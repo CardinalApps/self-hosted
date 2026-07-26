@@ -20,11 +20,17 @@ import {
 } from '@nestjs/swagger'
 import { HttpAdapterHost } from '@nestjs/core'
 import { AllSettingsSlugs, getSetting } from '@cardinalapps/app-settings/dist/cjs'
+import {
+  getMediaServerRole,
+  hasCapabilities,
+  MediaServerCapability,
+} from '@cardinalapps/access-control/dist/cjs'
 
 import { AppService } from './app.service'
 import { DatabaseService } from '../database/database.service'
 import { SettingsService } from '../settings/settings.service'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 
 import { ServerSetupDto } from './dtos/ServerSetup.dto'
 import { ServerResetDto } from './dtos/ServerReset.dto'
@@ -305,24 +311,41 @@ export class AppController {
   @Post('/reset')
   @StandardEndpoint({
     summary: 'Reset server state.',
+    description: 'Deindexing media requires the `Indexing.Deindex` capability; a factory reset requires `MediaServer.FactoryReset`. Both types are gated behind a validation phrase that the user must type out: `Deindex media` and `Factory reset` respectively.',
+    manualCapabilities: ['Indexing.Deindex', 'MediaServer.FactoryReset'],
+    manualCapabilitiesAreAllRequired: false,
+    errors: {
+      400: ['The validation phrase does not match the reset type'],
+      403: ['The user lacks the capability for the requested reset type'],
+    },
   })
-  async reset(@Body() { type, validationString }: ServerResetDto): Promise<boolean> {
-    if (type === ResetType.MEDIA && validationString !== ResetValidationPhrase.MEDIA) {
-      throw new Error('You must enter the validation phrase.')
-    }
-    if (type === ResetType.FACTORY && validationString !== ResetValidationPhrase.FACTORY) {
-      throw new Error('You must enter the validation phrase.')
+  async reset(
+    @CurrentUser() user,
+    @Body() { type, validationString }: ServerResetDto,
+  ): Promise<boolean> {
+    const factoryReset = type === ResetType.FACTORY
+    const required: MediaServerCapability = factoryReset ? 'MediaServer.FactoryReset' : 'Indexing.Deindex'
+    const granted = (user?.roles || []).flatMap((assignment) => getMediaServerRole(assignment.role)?.capabilities || [])
+
+    if (!hasCapabilities<MediaServerCapability>([required], granted)) {
+      throw new ForbiddenException()
     }
 
-    try {
-      if (type === ResetType.MEDIA) {
-        return await this.appService.resetMediaData()
-      } else if (type === ResetType.FACTORY) {
-        return await this.appService.factoryReset()
-      }
-    } catch (error) {
-      Logger.error(error)
+    if (validationString !== (factoryReset ? ResetValidationPhrase.FACTORY : ResetValidationPhrase.MEDIA)) {
+      throw new BadRequestException('You must enter the validation phrase.')
     }
+
+    const success = factoryReset
+      ? await this.appService.factoryReset()
+      : await this.appService.resetMediaData()
+
+    // A half-finished reset leaves the server in a state the user can't see, so it must not
+    // read as success
+    if (!success) {
+      throw new InternalServerErrorException(`The reset did not complete. ${helpCode('0012')}`)
+    }
+
+    return true
   }
 
   /**
