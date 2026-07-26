@@ -56,6 +56,9 @@ export default {
   "settings.updates.auto-check-label": {
     "en": "Automatically check for updates",
   },
+  "settings.updates.auto-check-desc": {
+    "en": "Your Media Server will notify you when updates are available. Updates are installed <a href='https://help.cardinalapps.io/guides/cardinal-media-server/update' target='_blank'>with Docker</a>.",
+  },
   "settings.updates.manual-check-label": {
     "en": "Check now",
   },
