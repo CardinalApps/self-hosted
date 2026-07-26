@@ -38,11 +38,12 @@
     }
 
     @media screen and (max-width: 768px) {
-      
+
       .card {
+        min-width: 100% !important;
         max-width: none !important;
       }
-      
+
     }
   }
 
