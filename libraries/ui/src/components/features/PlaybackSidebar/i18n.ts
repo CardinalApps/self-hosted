@@ -13,6 +13,9 @@ const i18n: StringList = {
   "playback-sidebar.queue-reorder": {
     "en": "Drag to reorder",
   },
+  "playback-sidebar.no-media": {
+    "en": "Index your media to use the Playback Sidebar.",
+  },
 }
 
 export default i18n
