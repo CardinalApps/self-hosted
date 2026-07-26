@@ -128,7 +128,18 @@ export class JobQueueService implements QueueService {
    * is only complete once the entire job task queue is complete.
    */
   async tick(job: Job, cb: (error, result?) => void): Promise<void> {
-    if (![JobStatus.IN_QUEUE, JobStatus.PAUSED, JobStatus.RUNNING].includes(job.status)) {
+    // Read the job again rather than trusting the copy queued earlier; it may have been canceled
+    // or deleted while it waited for its turn
+    const current = await this.jobService.getJob(job.id)
+
+    // Expected after a reset, which deletes the jobs it cancels
+    if (!current) {
+      log(LogModule.JOBS, LogLevel.DEBUG, `Did not start job ${job.type} because it no longer exists`)
+      cb('job_not_found')
+      return
+    }
+
+    if (![JobStatus.IN_QUEUE, JobStatus.PAUSED, JobStatus.RUNNING].includes(current.status)) {
       Logger.error(`Did not start job ${job.type} because the status was not one of the following at job start time: ${JobStatus.IN_QUEUE}, ${JobStatus.PAUSED}, ${JobStatus.RUNNING}.`, 'Jobs')
       cb('invalid_job_status')
       return
@@ -136,7 +147,7 @@ export class JobQueueService implements QueueService {
 
     try {
       const taskQueue = await this.moduleRef.resolve(JobTaskQueueService)
-      taskQueue.start(job)
+      taskQueue.start(current)
       taskQueue.queue.on('drain', () => {
         cb(null)
       })

@@ -213,16 +213,20 @@ export class JobTaskQueueService implements QueueService {
       job: { id: this.job.id },
     })
 
-    // Create a draft JobTask
-    const task = await this.jobTaskRepository.save({
-      target: id,
-      status: JobTaskStatus.DRAFT,
-      job: {
-        id: this.job.id,
-      },
-    } as Partial<JobTask>)
-
+    /*
+     * The draft is written inside the try because the job it belongs to can be deleted out from
+     * under a task that is already in flight. That write fails on the foreign key, and outside
+     * of the try it takes the whole process down instead of just the task.
+     */
     try {
+      const task = await this.jobTaskRepository.save({
+        target: id,
+        status: JobTaskStatus.DRAFT,
+        job: {
+          id: this.job.id,
+        },
+      } as Partial<JobTask>)
+
       const taskAfterWork = await this.jobWorkerService.executeTask(task)
       if (taskAfterWork.status === JobTaskStatus.COMPLETED) {
         cb(null, task)

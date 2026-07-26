@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 import { v4 as uuid } from 'uuid'
+import * as ms from 'ms'
 import * as fileType from 'file-type'
 
 import { Run } from './entities/run.entity'
@@ -44,6 +45,9 @@ import {
 } from '../../utils/media'
 import { makeMediaFilePathRelative } from '../../utils/file'
 import { log, LogModule, LogLevel } from '../../utils/logging'
+
+// How long a caller waits for a queued pause before it stops expecting one
+const PAUSE_TIMEOUT = ms('30 seconds')
 
 @Injectable()
 export class IndexingService {
@@ -125,6 +129,11 @@ export class IndexingService {
    */
   private pauseAfterCurrentFileIndexingComplete = false
 
+  /**
+   * Callers waiting for a queued pause to take effect. See `whenPaused()`.
+   */
+  private pauseWaiters: (() => void)[] = []
+
   onModuleDestroy(): void {
     clearInterval(this.broadcaster)
   }
@@ -194,6 +203,12 @@ export class IndexingService {
     this.runEntity = null
     this.currentRun = null
     this.filesToIndexQueue = []
+
+    // A stop during the scan queues a rescan that belongs to the run being abandoned
+    this.nextResumeRequiresRescan = false
+    this.pauseAfterCurrentFileIndexingComplete = false
+
+    this.releasePauseWaiters()
     this.scannerService.reset()
   }
 
@@ -404,8 +419,52 @@ export class IndexingService {
    */
   private async pauseForReal() {
     this.pauseAfterCurrentFileIndexingComplete = false
+
+    // The last file of the run can finish between the pause being queued up and this running
+    if (!this.currentRun) {
+      return this.releasePauseWaiters()
+    }
+
     this.state = IndexingStates.PAUSED
     this.eventService.emitPublic(IndexingEvents.PAUSED)
+    this.releasePauseWaiters()
+  }
+
+  /**
+   * Resolves once a queued pause has taken effect, or right away if there is
+   * nothing to wait for. A pause only happens between files, so this resolving
+   * is what tells a caller that no file is halfway through being written.
+   *
+   * The run finishing on its own counts as the wait being over.
+   */
+  private whenPaused(): Promise<void> {
+    if (this.state !== IndexingStates.INDEXING) {
+      return Promise.resolve()
+    }
+
+    /*
+     * A file that throws outside of the import loop's own error handling takes the loop down
+     * with it, and nothing would settle the wait. The deindex path runs inside a request, so
+     * it gives up rather than hanging.
+     */
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        Logger.warn('Timed out waiting for indexing to pause', 'Indexing')
+        resolve()
+      }, PAUSE_TIMEOUT)
+
+      this.pauseWaiters.push(() => {
+        clearTimeout(timeout)
+        resolve()
+      })
+    })
+  }
+
+  /**
+   * Lets go of everything waiting on the pause.
+   */
+  private releasePauseWaiters(): void {
+    this.pauseWaiters.splice(0).forEach((release) => release())
   }
 
   /**
@@ -437,25 +496,43 @@ export class IndexingService {
 
   /**
    * Manaully stops the indexing service before it completes normally.
-   * 
+   *
+   * The run is paused first so that the scan is discarded and the file in
+   * flight is finished with; by the time this returns, the service has stopped
+   * writing.
+   *
    * Returns true if the stop was successful, otherwise false.
+   *
+   * @param startFollowUpJobs - Whether the run should hand off to the jobs that
+   * normally follow indexing (thumbnails, waveforms). Callers that are about to
+   * delete the media pass false, otherwise the run being stopped queues up work
+   * against files that are on their way out.
    */
-  async stop(): Promise<boolean> {
-    if (this.state === IndexingStates.INDEXING || this.state === IndexingStates.PAUSED) {
-      this.eventService.emitPublic(IndexingEvents.STOPPED)
-      await this.complete(true)
-      Logger.log(`Indexing stopped`, 'Indexing')
-      return true
-    } else {
+  async stop({ startFollowUpJobs = true } = {}): Promise<boolean> {
+    if (this.state !== IndexingStates.INDEXING && this.state !== IndexingStates.PAUSED) {
       return false
     }
+
+    this.pause()
+    await this.whenPaused()
+
+    this.eventService.emitPublic(IndexingEvents.STOPPED)
+
+    // The run may have finished on its own while the pause was being waited out
+    if (this.currentRun) {
+      await this.complete(true, startFollowUpJobs)
+    }
+
+    Logger.log(`Indexing stopped`, 'Indexing')
+
+    return true
   }
 
   /**
    * The last step of an indexing run. This will reset the indexing service
    * state and emit the final event.
    */
-  private async complete(stoppedByUser = false): Promise<void> {
+  private async complete(stoppedByUser = false, startFollowUpJobs = true): Promise<void> {
     const totalAdded = this.currentRun.music.indexed + this.currentRun.photos.indexed + this.currentRun.movies.indexed + this.currentRun.tv.indexed
     const totalSkipped = this.currentRun.music.skipped + this.currentRun.photos.skipped + this.currentRun.movies.skipped + this.currentRun.tv.skipped
 
@@ -474,7 +551,7 @@ export class IndexingService {
       ? RunStates.STOPPED_BY_USER
       : RunStates.COMPLETED
 
-    if (this.filesToIndexQueue.length) {
+    if (!stoppedByUser && this.filesToIndexQueue.length) {
       Logger.warn('Indexing was completed without an empty queue. This is probably a bug.', 'Indexing')
     }
 
@@ -486,7 +563,16 @@ export class IndexingService {
       .execute()
 
     this.eventService.emitAll(IndexingEvents.CURRENT_PROGRESS, this.getCurrentRunPublic())
-    this.eventService.emitAll(IndexingEvents.COMPLETED, this.getCurrentRunPublic())
+
+    /*
+     * Clients always hear that the run ended, but only the private channel starts the follow up
+     * jobs, so skipping it is how a run ends without queueing work for the files it indexed.
+     */
+    if (startFollowUpJobs) {
+      this.eventService.emitAll(IndexingEvents.COMPLETED, this.getCurrentRunPublic())
+    } else {
+      this.eventService.emitPublic(IndexingEvents.COMPLETED, this.getCurrentRunPublic())
+    }
 
     if (this.dataSource.options.type === 'postgres') {
       await this.analyzeIndexedTables()
@@ -531,6 +617,11 @@ export class IndexingService {
 
     // Whenever a file is found
     const onFileFound = (path, mediaType: MediaType) => {
+      // An aborted scan keeps producing files for a moment after the run has ended
+      if (!this.currentRun) {
+        return
+      }
+
       log(LogModule.INDEXING, LogLevel.DEBUG, `Found file ${path.split('/').pop()}`)
 
       const fileToIndex: FileToIndexInQueue = { path, mediaType }
@@ -613,6 +704,11 @@ export class IndexingService {
    * automatically triggers the completion of the run after all files are indexed.
    */
   private async importLoop() {
+    // An abandoned scan still reaches here when it winds down, long after its run ended
+    if (this.state !== IndexingStates.INDEXING) {
+      return
+    }
+
     // If the scan was terminated early, let's just wait for the user to unpause and rescan
     if (this.nextResumeRequiresRescan) {
       return Logger.log('Not indexing files until rescan', 'Indexing')
