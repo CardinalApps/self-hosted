@@ -7,6 +7,7 @@ export const enableCustomContextMenuFactory: SettingsFieldFactory = (app: Suppor
   slug: ENABLE_CUSTOM_CONTEXT_MENU_SLUG,
   label: i18n?.['settings.custom-context-menu.enable-label']?.[lang],
   type: 'toggle',
-  storage: 'client',
+  storage: 'home_server',
+  scope: 'user',
   defaultValue: false, // In Electron this should be true
 })
