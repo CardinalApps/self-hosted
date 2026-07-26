@@ -316,6 +316,14 @@ function AppBase({
                     />
                 : <AppLoading />
               }
+              <div
+                className={clsx('settings-panel-underlay', {
+                  // The panel always opens in the highest position ('50px'), which is also
+                  // what settingsPanelTop resets to once the panel is closed — so visibility
+                  // must gate on settingsPanelOpen too, not just the top value.
+                  visible: settingsPanelOpen && settingsPanelTop === '50px',
+                })}
+              />
               <AnimatePresence>
                 {settingsPanelOpen && settingsPanel && (
                   <motion.div
