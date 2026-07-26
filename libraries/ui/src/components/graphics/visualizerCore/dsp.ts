@@ -16,6 +16,30 @@ export interface AnalysisFrame {
   loudness: number
 }
 
+// An empty frame, sized for every consumer of the analysis
+export const createAnalysisFrame = (): AnalysisFrame => ({
+  spectrum: new Float32Array(BIN_COUNT),
+  pulses: new Float32Array(MAX_RINGS),
+  wave: new Float32Array(WAVE_POINTS),
+  loudness: 0,
+})
+
+// Slow breathing, so a visualizer is alive before any audio reaches it
+export const fillIdleFrame = (frame: AnalysisFrame, t: number): AnalysisFrame => {
+  for (let b = 0; b < BIN_COUNT; b++) {
+    frame.spectrum[b] = 0.05 + 0.045 * (0.5 + 0.5 * Math.sin(t * 1.3 + b * 0.33))
+  }
+  for (let i = 0; i < MAX_RINGS; i++) {
+    frame.pulses[i] = 0.08 + 0.1 * (0.5 + 0.5 * Math.sin(t * 0.9 + i * 1.7))
+  }
+  for (let p = 0; p < WAVE_POINTS; p++) {
+    const x = p / WAVE_POINTS
+    frame.wave[p] = 0.25 * Math.sin(x * Math.PI * 4 + t * 1.8) * (0.75 + 0.25 * Math.sin(t * 0.7))
+  }
+  frame.loudness = 0.06
+  return frame
+}
+
 // Turns raw FFT snapshots into a stable, musical-feeling analysis frame. All buffers are
 // preallocated; process() performs zero allocations so the render loop never triggers GC.
 export class SpectrumProcessor {
