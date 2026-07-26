@@ -189,6 +189,32 @@ export class JobService {
   }
 
   /**
+   * Stops every job that has not finished yet.
+   *
+   * Each one is paused before it is canceled, so that its queue stops taking on
+   * new tasks while the cancel tears it down. Both go through `updateJob`
+   * because the events it emits are what the running queues listen to.
+   */
+  async stopAllJobs(): Promise<void> {
+    const unfinished = await this.jobRepository.find({
+      where: {
+        status: In([JobStatus.DRAFT, JobStatus.IN_QUEUE, JobStatus.PREPARING, JobStatus.RUNNING, JobStatus.PAUSED]),
+      },
+    })
+
+    if (!unfinished.length) {
+      return
+    }
+
+    for (const job of unfinished) {
+      await this.updateJob(job.id, { status: JobStatus.PAUSED })
+      await this.updateJob(job.id, { status: JobStatus.CANCELED })
+    }
+
+    log(LogModule.JOBS, LogLevel.INFO, `Stopped ${unfinished.length} ${unfinished.length === 1 ? 'job' : 'jobs'}`)
+  }
+
+  /**
    * Deletes all jobs from the database.
    */
   async deleteAllJobs() {

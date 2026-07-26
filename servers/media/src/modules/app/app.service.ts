@@ -263,6 +263,14 @@ export class AppService {
    * Resets all media data.
    */
   async resetMediaData(): Promise<boolean> {
+    /*
+     * Indexing and jobs both write rows that point at the media being deleted here. Left running,
+     * those writes land after the delete as foreign keys pointing at nothing, which takes the
+     * server down. Both stops wait for the work that is already underway.
+     */
+    await this.indexingService.stop({ startFollowUpJobs: false })
+    await this.jobService.stopAllJobs()
+
     // Sequential: job_task has a FK to file, so jobs must be cleared before indexed data
     const results = [
       await this.jobService.deleteAllJobs(),
