@@ -276,7 +276,7 @@ describe('user-scoped settings', () => {
 // Authorization for server-scoped settings.
 //
 // Anyone signed in can write their own account-scoped settings, but changing a
-// setting that belongs to the whole install needs UserSettings.Update. The
+// setting that belongs to the whole install needs ServerSettings.Update. The
 // guest account is an administrator, so a lesser role is needed to test the
 // restriction.
 // -------------------------------------------------------------------------
