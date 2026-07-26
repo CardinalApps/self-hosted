@@ -150,9 +150,10 @@ Path convention: `apps/admin-web/e2e/tests/<area>/<file>.spec.ts`.
   - Reloading the page in the middle of the wizard restarts from step 1 (or resumes — match whatever the UI does; assert that behavior).
 - **`first-time-setup-skipped-when-done.spec.ts`** — `@journey:first-time-setup`
   - On a server that's already set up, visiting `/admin/setup` **redirects the URL to `/admin/login`** (verified via `playwright-cli`). Assert with `page.waitForURL(/\/admin\/login$/)`, regardless of auth state. URL-based assertion is i18n-safe.
-- **`factory-reset.spec.ts`** — `@journey:factory-reset`
-  - From a settings/server menu (verify exact location), the owner can trigger factory reset; confirmation modal appears; confirming wipes data and redirects back to `/admin/setup`.
-  - Non-owner roles do not see the factory-reset action at all.
+- **`factory-reset.spec.ts`** — `@journey:factory-reset` — **[x] landed**
+  - The action lives in the settings panel's Advanced tab (`settings-tab-advanced` → `factory-reset-button`). Confirming requires typing `Factory reset` verbatim; a mistyped phrase fires no request and keeps the modal open. Confirming wipes the server, drops every stored JWT, and lands on `/admin/setup`.
+  - The reset mints a new `instance_id`, so a server the cloud has already claimed can be claimed again by whoever sets it up next.
+  - Under-privileged users are refused by `POST /reset` with a 403. The button renders **disabled** rather than hidden (matching Deindex on the Indexing page); asserting that in a browser is blocked by the RBAC gap documented in `tests/access-control/users-page-gated.spec.ts` — every role granting `AdminApp.Login` also grants `*.*`.
 
 ### `login/` — non-SSO login methods *(new area)*
 
