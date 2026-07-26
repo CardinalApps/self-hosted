@@ -44,12 +44,6 @@ export const MediaServerCapabilities = [
   'CurrentUser.Read',
   'CurrentUser.Update',
 
-  /*
-   * Wiping the whole install back to its out-of-the-box state: every account, library, setting,
-   * and indexed file, across every Cardinal app the server hosts. Deliberately its own capability
-   * rather than part of an existing one, because no role short of a full administrator should ever
-   * be able to do it.
-   */
   'MediaServer.FactoryReset',
 
   'AdminApp.Login',
