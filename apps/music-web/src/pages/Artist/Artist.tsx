@@ -150,10 +150,12 @@ function ArtistPage() {
   ), [discography])
 
   return (
+    // The page title is the category rather than the artist, so it would head the page wrongly
     <AppPage
       className="music-artist-page"
       layout={PAGE_LAYOUT.standard}
       pageTitle={i18n['music-artist.title']['en']}
+      showMobileTitle={false}
       networkError={error as NetworkError}
       loading={isLoading}
       capabilities={['MusicArtists.Read']}

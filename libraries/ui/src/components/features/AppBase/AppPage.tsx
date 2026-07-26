@@ -12,6 +12,7 @@ import {
   SIDEBAR_MODE,
 } from '../../../store/slices/layout'
 import { settingsSelectors } from '../../../store/slices/settings'
+import H1 from '../../typography/H1'
 import HasCapabilities from '../../layout/HasCapabilities'
 import AccessError, { NetworkError } from '../../layout/AccessError/AccessError'
 import CrashError from '../../layout/CrashError'
@@ -19,6 +20,14 @@ import AnimatedGradient from '../../layout/AnimatedGradient'
 import { ErrorBoundary } from '../../../lib/react-error-boundary'
 import useScrollPointRestoration from '../../../hooks/useScrollPointRestoration'
 import { createPortal } from 'react-dom'
+
+/*
+  Layouts that name the page in the page flow on a phone, where the header has no room for a
+  title. Opt in per layout: some, like the Photos map, fill the viewport and have nowhere to put it.
+*/
+const MOBILE_TITLE_LAYOUTS: string[] = [
+  PAGE_LAYOUT.standard,
+]
 
 type AppPageProps = {
   layout?: string,
@@ -31,6 +40,8 @@ type AppPageProps = {
   toolbar?: ReactNode,
   toolbarPortal?: boolean,
   showLibrarySwitcher?: boolean,
+  // Overrides the layout's default for the in-flow mobile page title
+  showMobileTitle?: boolean,
   networkError?: NetworkError,
   virtualLayout?: ReactNode,
   style?: CSSProperties,
@@ -53,6 +64,7 @@ function AppPage({
   toolbar,
   toolbarPortal = true,
   showLibrarySwitcher = false,
+  showMobileTitle,
   networkError,
   style,
   animatedGradientColors,
@@ -160,6 +172,9 @@ function AppPage({
             ? <AccessError networkError={networkError} />
             : <>
                 {!!toolbar && toolbarPortalIsReady && renderToolbar()}
+                {!!pageTitle && (showMobileTitle ?? MOBILE_TITLE_LAYOUTS.includes(layout)) &&
+                  <H1 className="app-page-title">{pageTitle}</H1>
+                }
                 <HasCapabilities capabilities={capabilities}>
                   {children}
                 </HasCapabilities>

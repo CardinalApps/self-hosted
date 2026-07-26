@@ -67,10 +67,12 @@ function ReleasePage() {
   const orderedTracks = useMemo(() => tracksbyDiscInOrder.flat(), [tracksbyDiscInOrder])
 
   return (
+    // The page title is the category rather than the release, so it would head the page wrongly
     <AppPage
       className="music-release-page"
       layout={PAGE_LAYOUT.standard}
       pageTitle={i18n['music-release.title']['en']}
+      showMobileTitle={false}
       networkError={error as NetworkError}
       loading={isLoading}
       capabilities={['MusicReleases.Read']}
