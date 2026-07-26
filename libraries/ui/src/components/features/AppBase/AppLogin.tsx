@@ -12,6 +12,7 @@ import homeServerAPI, { CARDINAL_APP_HEADER } from '../../../lib/homeserver/home
 import LoginScreen from '../LoginScreen'
 
 import { homeServerUserSelectors, homeServerUserActions } from '../../../store/slices/homeServerUser'
+import { layoutSelectors, layoutActions } from '../../../store/slices/layout'
 import homeServerLogin from '../../../store/slices/homeServerUser/thunks/login'
 import { RouterContext } from '../../../context/router'
 
@@ -43,6 +44,7 @@ function AppLogin({
   const [enableGuestAccount, setEnableGuestAccount] = useState<boolean>()
   const homeServerUserLoggedInAt = useSelector(homeServerUserSelectors.loggedInAt)
   const loginRedirectCompletedFor = useSelector(homeServerUserSelectors.loginRedirectCompletedFor)
+  const settingsPanelOpen = useSelector(layoutSelectors.settingsPanelOpen)
 
   const fetchPublicUsers = () => {
     return new Promise((resolve) => {
@@ -129,6 +131,16 @@ function AppLogin({
   const continueAsCurrentUser = () => {
     navigate(routes.ROOT)
   }
+
+  /**
+   * The panel can still be open from the previous session, and it has no
+   * trigger on the login screen to close it with.
+   */
+  useEffect(() => {
+    if (settingsPanelOpen) {
+      dispatch(layoutActions.setSettingsPanelOpen(false))
+    }
+  }, [])
 
   /**
    * Load all users.
