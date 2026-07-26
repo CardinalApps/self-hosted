@@ -12,7 +12,12 @@ import {
   SIDEBAR_MODE,
 } from '../../../store/slices/layout'
 
+import useWindowSize from '../../../hooks/useWindowSize'
+
 import './SidebarNav.css'
+
+// Matches the width below which SidebarNav.css drops the collapsed rail for the bottom drawer
+const MOBILE_MAX_WIDTH = 768
 
 type SidebarNavProps = {
   className?: string,
@@ -46,6 +51,8 @@ const SidebarNav = ({
   const mobileNavIsOpen = useSelector(layoutSelectors.mobileNavIsOpen)
   const sidebarMode = useSelector(layoutSelectors.sidebarMode)
   const isCollapsed = sidebarMode === SIDEBAR_MODE.collapsed
+  const windowSize = useWindowSize()
+  const isMobile = !!windowSize.width && windowSize.width <= MOBILE_MAX_WIDTH
 
   /**
    * Logic for determining the current layout to use.
@@ -106,7 +113,8 @@ const SidebarNav = ({
   const expandLabel = (e) => {
     const li = e.target.closest('li')
 
-    if (!li) {
+    // A tap synthesises a mousemove, and the drawer has no rail to expand out of
+    if (!li || isMobile) {
       return
     }
 
@@ -159,10 +167,10 @@ const SidebarNav = ({
   }
 
   useEffect(() => {
-    if (sidebarMode === SIDEBAR_MODE.expanded) {
+    if (isMobile || sidebarMode === SIDEBAR_MODE.expanded) {
       collapseAllLabels()
     }
-  }, [sidebarMode])
+  }, [sidebarMode, isMobile])
 
   return (
     <>
