@@ -40,6 +40,12 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+
+    /* The tag list gives up its own box so that the tags and the links menu after them wrap
+       as one row, rather than the menu being pushed onto a line of its own. */
+    > .tags {
+      display: contents;
+    }
   }
 
   .artist-meta {

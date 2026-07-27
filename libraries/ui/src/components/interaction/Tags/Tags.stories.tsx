@@ -82,4 +82,28 @@ export const Small: Story = {
   },
 }
 
+/**
+ * Over artwork or a gradient, where a solid tag would read as a hole punched in
+ * the picture. Shown here on a stand-in gradient, since the tint is only worth
+ * anything with something behind it.
+ */
+export const Glass: Story = {
+  args: {
+    glass: true,
+    tags: [
+      { label: '5 releases', icon: 'fas fa-compact-disc' } as TagProps,
+      { label: '55 tracks', icon: 'fas fa-file-audio' } as TagProps,
+      { label: 'Progressive Metal, Rock, +3', icon: 'fas fa-tags' } as TagProps,
+      { label: '745 MB', icon: 'fas fa-hdd' } as TagProps,
+    ],
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ padding: 30, borderRadius: 8, background: 'linear-gradient(120deg, #3a2f6b, #b5462f)' }}>
+        <Story />
+      </div>
+    ),
+  ],
+}
+
 export default meta
