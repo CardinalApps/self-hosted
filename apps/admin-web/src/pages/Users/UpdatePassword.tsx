@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
+import H5 from '@cardinalapps/ui/src/components/typography/H5'
 
 import Modal from '@cardinalapps/ui/src/components/layout/Modal'
 import Form from '@cardinalapps/ui/src/components/forms/Form'
@@ -60,6 +61,7 @@ function UpdatePassword({ user }: UpdatePasswordProps) {
         <Modal
           loading={passwordUpdateResult.isLoading}
           onClose={() => setShowUpdatePasswordModal(false)}
+          header={<H5>{i18n['users.update-password.title'][lang]}</H5>}
         >
           <Form
             onSubmit={handleUpdatePassword}
@@ -67,7 +69,7 @@ function UpdatePassword({ user }: UpdatePasswordProps) {
               <Button data-testid="user-update-password-submit" type="submit">{i18n['users.updated.password.submit'][lang]}</Button>
             }
           >
-            <FormField labelFor="password" label={i18n['users.updated.password.success'][lang]}>
+            <FormField labelFor="password" label={i18n['users.update-password.field-label'][lang]}>
               <TextInput id="password" name="password" type="password" />
             </FormField>
           </Form>

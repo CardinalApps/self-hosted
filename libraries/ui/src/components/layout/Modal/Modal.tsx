@@ -19,6 +19,8 @@ type ModalProps = {
   loading?: boolean,
   clickOutsideToClose?: boolean,
   canClose?: boolean,
+  // Rendered in the card's header, which stays put while the body scrolls. Unlike the footer, it survives `loading`.
+  header?: ReactNode,
   // Rendered in the card's footer, where actions sit bottom right
   footer?: ReactNode,
   onClose?: () => void,
@@ -30,6 +32,7 @@ const Modal = ({
   loading = false,
   clickOutsideToClose = false,
   canClose = true,
+  header,
   footer,
   onClose,
   children,
@@ -100,6 +103,7 @@ const Modal = ({
               <Card
                 className="modal-content"
                 style={{ ...(width && { maxWidth: width }) }}
+                header={header}
                 footer={loading ? undefined : footer}
               >
                 {loading
