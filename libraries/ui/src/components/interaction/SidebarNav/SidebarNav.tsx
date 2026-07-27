@@ -80,6 +80,10 @@ const SidebarNav = ({
    * Logic for determining if the menu should be expanded or collapsed.
    */
   const resolveIsCollapsed = () => {
+    // The drawer is the whole viewport, so there is no rail to collapse into and nothing may force one
+    if (isMobile) {
+      return false
+    }
     if (overrideIsCollapsed !== undefined) {
       return overrideIsCollapsed
     }
