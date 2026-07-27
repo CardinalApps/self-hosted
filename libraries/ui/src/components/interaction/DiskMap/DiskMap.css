@@ -125,6 +125,33 @@
     animation: disk-map-fill var(--transition-speed-med) backwards;
   }
 
+  &.is-kiosk {
+
+    /* A text colour rather than a background one, so the blocks stay a shade off whatever
+       card they are sitting on in either theme. */
+    .disk-map-block {
+      background-color: var(--text-color-4);
+      opacity: 0.3;
+    }
+
+    .disk-map-kiosk-notice {
+      left: 10px;
+      right: 10px;
+      top: 50%;
+      position: absolute;
+      transform: translateY(-50%);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-color-2);
+
+      &.glass {
+        background: var(--glass-bg);
+        color: white;
+      }
+    }
+  }
+
   &.disk-map-empty {
     overflow: hidden;
     border-radius: var(--border-radius);

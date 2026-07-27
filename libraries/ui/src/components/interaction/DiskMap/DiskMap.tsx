@@ -7,6 +7,8 @@ import Card from '../../layout/Card'
 import Tags from '../Tags'
 import { RouterContext } from '../../../context/router'
 import useElementSize from '../../../hooks/useElementSize'
+import { useAppSelector } from '../../../hooks/useAppSelector'
+import { appSelectors } from '../../../store/slices/app'
 import { settingsSelectors } from '../../../store/slices/settings'
 
 import { buildGroupColors, formatBytes, layoutDiskMap, type DiskMapBlock } from './layout'
@@ -88,6 +90,20 @@ const randomNudge = () => {
 */
 const SHADE_STEPS = [1, 0.91, 1.07, 0.96, 1.03]
 
+/*
+  A kiosk server indexes no files, so there is nothing to map. Rather than an empty frame, the
+  map is drawn as a dead grid of placeholder blocks: it still reads as the component it is,
+  while being obviously switched off. The sizes vary, since a grid of identical boxes doesn't
+  look like a disk map, but only enough to keep the rows full — a wide spread leaves the packer
+  a sliver at the bottom, which reads as a fault rather than as a placeholder. The sequence is
+  fixed rather than random so the grid never re-packs between renders.
+*/
+const KIOSK_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
+  id: `kiosk-${index}`,
+  groupId: 'kiosk',
+  bytes: 10 + ((index * 3) % 7),
+}))
+
 /**
  * Draws a set of files the way a defragmenter draws a disk: one box per file,
  * sized by its bytes, laid out in order so that files of the same group form a
@@ -110,6 +126,7 @@ const DiskMap = ({
 }: DiskMapProps) => {
   const { navigate } = useContext(RouterContext)
   const { lang, enable_glass } = useSelector(settingsSelectors.current)
+  const kioskMode = useAppSelector(appSelectors.kioskMode)
   const shouldReduceMotion = useReducedMotion()
   const frameRef = useRef<HTMLDivElement>(null)
   const { width, height } = useElementSize(frameRef)
@@ -170,6 +187,43 @@ const DiskMap = ({
       return SHADE_STEPS[ordinal % SHADE_STEPS.length]
     })
   }, [blocks])
+
+  const kioskRects = useMemo(
+    () => kioskMode
+      ? layoutDiskMap(KIOSK_BLOCKS, { width: frameWidth, height: frameHeight, minBlockPx: MIN_BLOCK_PX })
+      : [],
+    [kioskMode, frameWidth, frameHeight],
+  )
+
+  if (kioskMode) {
+    return (
+      <div ref={frameRef} className={clsx('disk-map', 'is-kiosk', className)}>
+        <div className="disk-map-blocks" aria-hidden="true">
+          {kioskRects.map((rect) => (
+            <div
+              key={rect.blockIndex}
+              className="disk-map-block"
+              style={{
+                left: `${rect.x * 100}%`,
+                top: `${rect.y * 100}%`,
+                width: `${rect.width * 100}%`,
+                height: `${rect.height * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+
+        <Card
+          className={clsx('disk-map-kiosk-notice', enable_glass && 'glass')}
+          bg={1}
+          border={2}
+          padding="thin"
+        >
+          {i18n['disk-map.kiosk-disabled'][lang]}
+        </Card>
+      </div>
+    )
+  }
 
   const hoveredBlock = hoveredBlockIndex === null ? null : blocks[hoveredBlockIndex]
   const hoveredRect = hoveredBlockIndex === null ? null : rects[hoveredBlockIndex]
