@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import type { Meta } from '@storybook/react'
+
+import { appActions } from '../../../store/slices/app'
 
 import DiskMap from './DiskMap'
 import type { DiskMapBlock } from './layout'
@@ -172,3 +175,21 @@ export const NoAnimation = () => (
 export const Empty = () => (
   <DiskMap blocks={[]} palette={PALETTE} />
 )
+
+/**
+ * A kiosk server has no files behind its library, so whatever blocks are handed
+ * over are ignored in favour of a dead grid.
+ */
+export const KioskMode = () => {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(appActions.setKioskMode(true))
+
+    return () => {
+      dispatch(appActions.setKioskMode(false))
+    }
+  }, [])
+
+  return <DiskMap blocks={buildBlocks(DISCOGRAPHY)} palette={PALETTE} />
+}
