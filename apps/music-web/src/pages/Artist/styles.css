@@ -97,11 +97,22 @@
     margin-bottom: calc(var(--gutter) * 2);
   }
 
-  .artist-mix-row,
-  .artist-play-modes {
+  .artist-mix-row {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+  }
+
+  .artist-play-modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+
+    /* The grid item is the choices popout, so it is the button inside it that has to be told
+       to fill the cell. The toggle beside it keeps its own width. */
+    .button-choiced .button:not(.choices-toggle) {
+      flex-grow: 1;
+    }
   }
 
   .artist-timeline {
