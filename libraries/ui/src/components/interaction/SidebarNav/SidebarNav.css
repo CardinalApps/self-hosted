@@ -9,7 +9,7 @@
   --sidebar-collapsed-width: 74px;
   --mobile-header-height: 64px;
   --easing: cubic-bezier(0.16, 1, 0.3, 1);
-  transition: padding 300ms;
+  transition: padding 300ms, width 600ms var(--easing);
 
   ::-webkit-scrollbar {
     width: 0;
@@ -25,19 +25,13 @@
 
       @media (min-width: 768px) {
         a {
-          width: 48px;
+          width: 64px;
           overflow: hidden;
 
           &:hover {
 
-            i {
-              left: 8px;
-            }
+            
           }
-        }
-
-        i {
-          left: 0;
         }
       }
       
@@ -219,10 +213,6 @@
     &:hover {
       opacity: 1;
     }
-  }
-
-  &.collapsed {
-    padding-left: 6px;
   }
 
   .toggle-collapse {
