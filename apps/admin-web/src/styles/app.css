@@ -2,12 +2,6 @@
   height: 100vh;
 }
 
-#admin-app {
-  --sidebar-nav-width: 250px;
-  --sidebar-nav-gutter: 40px;
-  --header-height: 72px;
-}
-
 .theme-switcher.light {
   transform: rotateY(180deg);
 }
