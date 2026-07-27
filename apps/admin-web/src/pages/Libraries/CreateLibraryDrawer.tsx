@@ -71,7 +71,7 @@ function CreateLibraryDrawer({ selectedDirectories, onClose }: CreateLibraryDraw
             </WrittenText>
           )
           : (
-            <Alert type='warning' message={i18n['libraries.create.none-selected'][lang]} />
+            <Alert type='neutral' message={i18n['libraries.create.none-selected'][lang]} />
           )
         }
       </Drawer.Section>

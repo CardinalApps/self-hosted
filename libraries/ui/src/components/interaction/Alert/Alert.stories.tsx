@@ -9,7 +9,7 @@ const meta = {
   argTypes: {
     type: {
       control: { type: 'select' },
-      options: ['success', 'warning', 'error'],
+      options: ['success', 'warning', 'error', 'info', 'neutral'],
       table: { category: 'Appearance' },
     },
     message: { control: 'text', table: { category: 'Content' } },
@@ -65,11 +65,19 @@ export const ErrorWithButton: Story = {
   },
 }
 
+export const Neutral: Story = {
+  args: {
+    type: 'neutral',
+    message: 'Select one or more folders for your new library.',
+  },
+}
+
 export const AllTypes = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 600 }}>
     <Alert type="success" message="Library scan complete. 147 new tracks added." />
     <Alert type="warning" message="Your storage is nearly full." />
     <Alert type="error" message="Failed to connect to the media server." />
+    <Alert type="neutral" message="Select one or more folders for your new library." />
   </div>
 )
 

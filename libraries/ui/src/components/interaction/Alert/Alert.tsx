@@ -4,7 +4,7 @@ import Icon from '../../typography/Icon'
 import './Alert.css'
 
 type AlertProps = {
-  type?: 'success' | 'warning' | 'error' | 'info',
+  type?: 'success' | 'warning' | 'error' | 'info' | 'neutral',
   message: string | React.ReactNode,
   buttons?: Array<{
     label: string,
@@ -23,6 +23,7 @@ const Alert = ({
   const getIcon = () => {
     switch (type) {
       case 'info':
+      case 'neutral':
         return <Icon fa="fas fa-info-circle" />
       case 'success':
         return <Icon fa="fas fa-check-circle" />
