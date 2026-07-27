@@ -143,9 +143,9 @@ function ArtistPlayActions({
         <MixButton
           seedMediaType="music_artist"
           seedMediaId={artistId}
-          dynamicQueueType="the_depths"
+          dynamicQueueType="undertow"
           icon="fas fa-anchor"
-          label={t('music-artist.play-actions.from-the-depths')}
+          label={t('music-artist.play-actions.undertow')}
         />
       </div>
 

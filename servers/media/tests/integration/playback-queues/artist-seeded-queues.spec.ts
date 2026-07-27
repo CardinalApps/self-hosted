@@ -22,7 +22,7 @@ let artistId: string
   - Worn Album (3 tracks): every track played several times
   - Buried Album (3 tracks): never played
 
-  The Depths must surface the Buried Album before anything off the Worn Album.
+  Undertow must surface the Buried Album before anything off the Worn Album.
 */
 const wornTrackIds: string[] = []
 const buriedTrackIds: string[] = []
@@ -142,14 +142,14 @@ describe('artist seeded queues', () => {
   it('rejects a seeded queue with no seed', async () => {
     await createQueue({
       type: 'dynamic',
-      dynamicType: 'the_depths',
+      dynamicType: 'undertow',
     }, 400)
   })
 
   it('rejects an artist seed that does not exist', async () => {
     await createQueue({
       type: 'dynamic',
-      dynamicType: 'the_depths',
+      dynamicType: 'undertow',
       seedMediaType: 'music_artist',
       seedMediaId: 'de1e7ed0-0000-4000-8000-000000000000',
     }, 404)
@@ -157,19 +157,19 @@ describe('artist seeded queues', () => {
 })
 
 // -------------------------------------------------------------------------
-// POST /api/v1/playback-queues (the_depths)
+// POST /api/v1/playback-queues (undertow)
 // -------------------------------------------------------------------------
 
-describe('the_depths queues', () => {
+describe('undertow queues', () => {
   it('queues the artists least played tracks first', async () => {
     const queue = await createQueue({
       type: 'dynamic',
-      dynamicType: 'the_depths',
+      dynamicType: 'undertow',
       seedMediaType: 'music_artist',
       seedMediaId: artistId,
     })
 
-    expect(queue.dynamicType).toBe('the_depths')
+    expect(queue.dynamicType).toBe('undertow')
 
     const items = await getItems(queue.queueId)
     const mediaIds = items.map((item) => item.mediaId)
@@ -185,7 +185,7 @@ describe('the_depths queues', () => {
   it('never repeats a track within the initial batch', async () => {
     const queue = await createQueue({
       type: 'dynamic',
-      dynamicType: 'the_depths',
+      dynamicType: 'undertow',
       seedMediaType: 'music_artist',
       seedMediaId: artistId,
     })
@@ -200,7 +200,7 @@ describe('the_depths queues', () => {
 
     const queue = await createQueue({
       type: 'dynamic',
-      dynamicType: 'the_depths',
+      dynamicType: 'undertow',
       seedMediaType: 'music_release',
       seedMediaId: buriedRelease.musicReleaseId,
     })

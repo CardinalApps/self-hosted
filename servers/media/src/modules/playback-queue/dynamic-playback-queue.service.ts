@@ -19,10 +19,10 @@ import { CreatePlaybackQueueDto, DynamicQueueType } from './dtos/CreatePlaybackQ
 const TRUE_SHUFFLE_INIT_BATCH = 200
 const HOUSE_MIX_INIT_BATCH = 50
 const ENCORE_INIT_BUFFER = 25
-const THE_DEPTHS_INIT_BATCH = 40
+const UNDERTOW_INIT_BATCH = 40
 
 // Dynamic types that cannot be created without a seed release or artist
-const SEEDED_DYNAMIC_TYPES: DynamicQueueType[] = ['house_mix', 'encore', 'the_depths']
+const SEEDED_DYNAMIC_TYPES: DynamicQueueType[] = ['house_mix', 'encore', 'undertow']
 
 /*
   When a played item has fewer than REFILL_THRESHOLD items after it, the queue
@@ -135,8 +135,8 @@ export class DynamicPlayback implements OnModuleInit {
         return await this.initHouseMixQueue(queue)
       case 'encore':
         return await this.initEncoreQueue(queue)
-      case 'the_depths':
-        return await this.initTheDepthsQueue(queue)
+      case 'undertow':
+        return await this.initUndertowQueue(queue)
       default:
         Logger.error('Missing queue.dynamicType', 'DynamicPlayback')
         return false
@@ -192,8 +192,8 @@ export class DynamicPlayback implements OnModuleInit {
         case 'encore':
           nextTrackIds = await this.nextRelatedTracks(queue, existingItems, batchSize)
           break
-        case 'the_depths':
-          nextTrackIds = await this.nextTheDepthsTracks(queue, existingItems, batchSize)
+        case 'undertow':
+          nextTrackIds = await this.nextUndertowTracks(queue, existingItems, batchSize)
           break
         default:
           Logger.error('Missing queue.dynamicType', 'DynamicPlayback')
@@ -292,21 +292,21 @@ export class DynamicPlayback implements OnModuleInit {
   }
 
   /**
-   * Initialize a The Depths queue.
+   * Initialize an Undertow queue.
    *
-   * The Depths digs through the parts of the seed that the user has never got
+   * Undertow drags up the parts of the seed that the user has never got
    * around to: least-played first, unplayed tracks ahead of everything else. It
    * is the counterweight to House Mix, which leans on what is already popular.
    */
-  private async initTheDepthsQueue(queue: PlaybackQueue): Promise<boolean> {
+  private async initUndertowQueue(queue: PlaybackQueue): Promise<boolean> {
     const seedTracks = await this.getSeedTracks(queue)
 
     if (!seedTracks.length) {
-      Logger.warn('A the_depths queue was created for a seed with no tracks', 'DynamicPlayback')
+      Logger.warn('An undertow queue was created for a seed with no tracks', 'DynamicPlayback')
       return false
     }
 
-    const buried = await this.leastPlayedFirst(seedTracks, THE_DEPTHS_INIT_BATCH, [])
+    const buried = await this.leastPlayedFirst(seedTracks, UNDERTOW_INIT_BATCH, [])
 
     try {
       await this.appendQueueItems(queue, buried)
@@ -318,11 +318,11 @@ export class DynamicPlayback implements OnModuleInit {
   }
 
   /**
-   * The next batch for a The Depths queue: whatever is still unheard in the
+   * The next batch for an Undertow queue: whatever is still unheard in the
    * seed, and once the seed is exhausted it drifts outward to related tracks
    * the same way the other seeded types do.
    */
-  private async nextTheDepthsTracks(
+  private async nextUndertowTracks(
     queue: PlaybackQueue,
     existingItems: PlaybackQueueItem[],
     batchSize: number,
