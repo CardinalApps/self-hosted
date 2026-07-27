@@ -126,7 +126,7 @@ function Users() {
         {lastSeen
           ? (
             <span title={formatDate(lastSeen)}>
-              {formatTimeAgo(lastSeen)}
+              {formatTimeAgo(lastSeen, lang)}
             </span>
             )
           : i18n['users.settings.info.last-seen.never'][lang]

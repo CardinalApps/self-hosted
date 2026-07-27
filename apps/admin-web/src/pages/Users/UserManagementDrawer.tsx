@@ -88,7 +88,7 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
             {
               name: i18n['users.settings.info.last-seen'][lang],
               label: user?.activityStatusUpdatedAt
-                ? `${formatDate(user?.activityStatusUpdatedAt)} (${formatTimeAgo(user?.activityStatusUpdatedAt)})`
+                ? `${formatDate(user?.activityStatusUpdatedAt)} (${formatTimeAgo(user?.activityStatusUpdatedAt, lang)})`
                 : i18n['users.settings.info.last-seen.never'][lang],
             },
             {
