@@ -66,7 +66,7 @@ export const getFields = (app, lang) => {
             adminServerFields.autoCheckForUpdates,
           ],
         },
-        // Users & Access settings tab
+        // Authentication settings tab
         {
           tabName: i18n['settings.tab-name-users-access'][lang],
           tabIcon: 'fas fa-user-shield',
@@ -74,13 +74,22 @@ export const getFields = (app, lang) => {
             adminServerFields.inactiveSessionTimeout,
           ],
         },
-        // Libraries settings tab
+        // Ratings settings tab
         {
           tabName: i18n['settings.tab-name-libraries'][lang],
-          tabIcon: 'fas fa-folder-open',
+          tabIcon: 'fas fa-star',
           fields: [
             adminServerFields.maxRating,
             adminServerFields.enableHalfRatings,
+          ],
+        },
+        // Internal Metrics settings tab
+        {
+          tabId: 'internal-metrics',
+          tabName: i18n['settings.tab-name-data-collaboration'][lang],
+          tabIcon: 'fas fa-chart-line',
+          fields: [
+            adminServerFields.telemetry,
           ],
         },
         // Advanced settings tab

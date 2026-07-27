@@ -26,10 +26,10 @@ const i18n: StringList = {
     "en": "Server",
   },
   "settings.tab-name-users-access": {
-    "en": "Users & Access",
+    "en": "Authentication",
   },
   "settings.tab-name-libraries": {
-    "en": "Libraries",
+    "en": "Ratings",
   },
   "settings.section-global": {
     "en": "Global",
@@ -70,6 +70,9 @@ const i18n: StringList = {
   "settings.tab-name-advanced": {
     "en": "Advanced",
   },
+  "settings.tab-name-data-collaboration": {
+    "en": "Internal Metrics",
+  },
   "settings.language.title": {
     "en": "Language",
   },
@@ -83,7 +86,7 @@ const i18n: StringList = {
     "en": "Factory Reset",
   },
   "settings.factory-reset.description": {
-    "en": "Return this Media Server to the state it was in when it was installed.",
+    "en": "Completely reset your Media Server.",
   },
   "settings.factory-reset.button": {
     "en": "Factory Reset",
