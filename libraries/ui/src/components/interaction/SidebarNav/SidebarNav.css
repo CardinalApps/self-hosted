@@ -17,13 +17,13 @@
   }
 
   &.collapsed {
-    @media (min-width: 768px) {
+    @media (min-width: 769px) {
       width: var(--sidebar-collapsed-width);
     }
 
     li {
 
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
         a {
           width: 64px;
           overflow: hidden;
@@ -65,7 +65,7 @@
 
   &.overflow-enabled {
 
-    @media (min-width: 768px) {
+    @media (min-width: 769px) {
       height: 70vh;
 
       /* &:after {
@@ -181,7 +181,7 @@
     transition: margin 400ms, height 400ms, opacity 200ms;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 769px) {
 
     &:before {
       content: '';
