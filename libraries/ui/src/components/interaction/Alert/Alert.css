@@ -79,6 +79,24 @@
     }
   }
 
+  &.neutral {
+    color: var(--text-color-1);
+    background: var(--bg-3);
+
+    p {
+      color: var(--text-color-1);
+    }
+
+    button {
+      color: var(--text-color-1);
+      border: 1px solid var(--border-color-1);
+
+      &:hover {
+        background: var(--bg-4) !important;
+      }
+    }
+  }
+
   i {
     margin-right: 15px;
     font-size: 18px;
