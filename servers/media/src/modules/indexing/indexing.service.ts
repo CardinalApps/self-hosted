@@ -558,7 +558,7 @@ export class IndexingService {
     await this.dataSource
       .createQueryBuilder()
       .update(Run)
-      .set({ status: endingRunStatus })
+      .set({ status: endingRunStatus, completedAt: new Date() })
       .where('runId = :runId', { runId: this.currentRun.runId })
       .execute()
 

@@ -8,6 +8,7 @@ export type RunType = {
   status: string,
   type: string,
   createdAt: string,
+  completedAt: string | null,
   indexed: number,
   deleted: number,
   skipped: number,

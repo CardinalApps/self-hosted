@@ -121,8 +121,11 @@ function RunsHistory() {
       return []
     }
     return pagedRuns.map((run) => {
+      // Runs indexed before completedAt existed, and runs still in flight, have only a start time
+      const shownAt = run?.completedAt ?? run?.createdAt
+
       return {
-        title: formatDate(run?.createdAt),
+        title: formatDate(shownAt),
         icon: run?.status === 'completed'
           ? { fa: 'fas fa-check', className: 'success-color' }
           : run?.status === 'stopped_by_user'
@@ -131,7 +134,7 @@ function RunsHistory() {
               ? { fa: 'fas fa-times', className: 'success-color' }
               : null,
         name: runSummaryString(run),
-        label: formatTimeAgo(run?.createdAt, lang, 'exact'),
+        label: formatTimeAgo(shownAt, lang, 'exact'),
         controls: ['view'],
         onView: () => handleOpenLogs(run.id, run.runId),
       } as ListItem

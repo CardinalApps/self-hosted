@@ -253,6 +253,18 @@ describe('music indexing', () => {
     const completedRun = res.body[0].find((r: { status: RunStates }) => r.status === RunStates.COMPLETED)
     expect(completedRun).toBeDefined()
   })
+
+  it('stamps the completed run with a finish time at or after its start', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/index/runs')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    const completedRun = res.body[0].find((r: { status: RunStates }) => r.status === RunStates.COMPLETED)
+    expect(completedRun.completedAt).toBeTruthy()
+    expect(new Date(completedRun.completedAt).getTime())
+      .toBeGreaterThanOrEqual(new Date(completedRun.createdAt).getTime())
+  })
 })
 
 // -------------------------------------------------------------------------
