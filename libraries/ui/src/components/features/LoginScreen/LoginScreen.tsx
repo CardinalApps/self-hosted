@@ -226,10 +226,6 @@ const LoginScreen = ({
                 </div>
               } */}
             </div>
-            <div className="login-screen-help-link">
-              <a href="https://cardinalapps.io/contact" target="_blank">{i18n['footer.report'][lang]}</a>
-              <Icon fa="fas fa-external-link-alt" />
-            </div>
           </footer>
         </Card>
       </motion.div>

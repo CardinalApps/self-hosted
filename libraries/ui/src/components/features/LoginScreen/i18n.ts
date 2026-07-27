@@ -46,9 +46,6 @@ const i18n: StringList = {
   "footer.log-out": {
     "en": "Log out",
   },
-  "footer.report": {
-    "en": "Report Server",
-  },
   "app.log-in": {
     "en": "Log into",
   },
