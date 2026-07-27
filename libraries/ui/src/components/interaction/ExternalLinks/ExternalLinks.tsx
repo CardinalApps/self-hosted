@@ -62,6 +62,7 @@ const ExternalLinks = ({
           open={isOpen}
           onOpenChange={setIsOpen}
           icon={<Icon fa="fas fa-bars" />}
+          size="m"
           title={title}
         />
       )}
