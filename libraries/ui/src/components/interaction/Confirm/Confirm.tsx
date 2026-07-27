@@ -60,9 +60,12 @@ const Confirm = ({
   }
 
   return (
-    <Modal onClose={() => maybeClose(false)} canClose={!loading}>
+    <Modal
+      onClose={() => maybeClose(false)}
+      canClose={!loading}
+      header={<H3>{title || i18n['confirm.defaults.title'][lang]}</H3>}
+    >
       <div className="confirmation-dialogue">
-        <H3>{title || i18n['confirm.defaults.title'][lang]}</H3>
         <WrittenText>
           {message || i18n['confirm.defaults.message'][lang]}
         </WrittenText>

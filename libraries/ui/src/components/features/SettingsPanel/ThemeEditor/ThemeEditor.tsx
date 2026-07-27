@@ -443,6 +443,7 @@ const ThemeEditor = ({ app }: { app: CardinalApp }) => {
         <Modal
           width={420}
           onClose={() => setRenameDraft(null)}
+          header={<H3>{i18n['settings.theme-editor.rename-title'][lang]}</H3>}
           footer={(
             <>
               <Button textual onClick={() => setRenameDraft(null)}>
@@ -455,7 +456,6 @@ const ThemeEditor = ({ app }: { app: CardinalApp }) => {
           )}
         >
           <div className="theme-rename">
-            <H3>{i18n['settings.theme-editor.rename-title'][lang]}</H3>
             <TextInput
               data-testid="theme-rename-input"
               value={renameDraft}
