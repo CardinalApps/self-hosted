@@ -21,6 +21,10 @@ export class Run extends BaseEntity {
   @Column()
   status: string
 
+  // Set when the run stops, so history can report a finish time rather than a start time
+  @Column({ nullable: true })
+  completedAt: Date
+
   @Column({ default: RunType.FULL })
   type: string
 }
