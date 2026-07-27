@@ -8,6 +8,8 @@ export type TagsProps = {
   tags: Array<TagProps | string>,
   /** Applied to every tag that doesn't set its own size. */
   size?: TagSize,
+  /** Applied to every tag that doesn't set its own. */
+  glass?: boolean,
 }
 
 /**
@@ -16,6 +18,7 @@ export type TagsProps = {
 const Tags = ({
   tags: givenTags = [],
   size,
+  glass,
 }: PropsWithChildren<TagsProps>) => {
   const makeParams = (givenTag) => {
     if (typeof givenTag === 'string') {
@@ -39,6 +42,7 @@ const Tags = ({
             icon={params?.icon}
             color={params?.color}
             size={params?.size ?? size}
+            glass={params?.glass ?? glass}
             onClick={params?.onClick}
           />
         )

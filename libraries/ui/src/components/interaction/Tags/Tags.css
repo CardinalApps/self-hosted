@@ -15,7 +15,6 @@
     border-radius: 16px;
     color: var(--text-color-2);
     border: 1px solid var(--border-color-1);
-    cursor: pointer;
     white-space: nowrap;
     background-color: var(--bg-3);
     -webkit-appearance: none;
@@ -34,12 +33,25 @@
       background-color: var(--danger-bg);
     }
 
+    &.is-clickable {
+      cursor: pointer;
+    }
+
     &.active {
       background-color: var(--bg-5);
     }
 
+    /* The global .glass rule is the same weight as .tags .tag, so the parts of it that clash
+       are restated here. Text goes white because the tint sits over whatever is behind it. */
+    &.glass {
+      background: var(--glass-bg);
+      border-color: var(--glass-border-color);
+      color: white;
+    }
+
     i {
       margin-right: 10px;
+      font-size: 14px;
     }
   }
 
@@ -51,6 +63,7 @@
 
     i {
       margin-right: 6px;
+      font-size: 11px;
     }
   }
 }

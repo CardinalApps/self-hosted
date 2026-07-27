@@ -13,6 +13,8 @@ export type TagProps = {
   color?: 'success' | 'warning' | 'danger',
   /** Small tags are for dense places, like a tooltip or a metadata line. */
   size?: TagSize,
+  /** For tags sitting on artwork or a gradient, rather than on a card. */
+  glass?: boolean,
   onClick?: (e) => void,
 }
 
@@ -25,10 +27,16 @@ const Tag = ({
   href,
   color,
   size = 'regular',
+  glass,
   onClick,
 }: TagProps) => {
   const { Link } = useContext(RouterContext)
-  const className = clsx('tag', size !== 'regular' && `size-${size}`)
+  const className = clsx(
+    'tag',
+    size !== 'regular' && `size-${size}`,
+    glass && 'glass',
+    (href || onClick) && 'is-clickable',
+  )
 
   if (href) {
     return (

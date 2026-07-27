@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux'
 
 import ExternalLinks from '@cardinalapps/ui/src/components/interaction/ExternalLinks'
 import List from '@cardinalapps/ui/src/components/interaction/List'
+import Tags, { type TagProps } from '@cardinalapps/ui/src/components/interaction/Tags'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
 import { countryName } from '@cardinalapps/ui/src/lib/formatting/country'
 import { secondsToMMSS } from '@cardinalapps/ui/src/lib/formatting/time'
@@ -14,8 +15,12 @@ import { isLosslessExtension } from './discography'
 import i18n from './i18n.json'
 
 const UNKNOWN = '—'
-const MAX_GENRES = 3
 const MAX_ENCODERS = 2
+
+/* The key-stat tags name two genres and count the rest, and the count is capped rather than
+   true: past five an exact tail says nothing that "a lot" doesn't. */
+const TAG_GENRES_NAMED = 2
+const TAG_GENRES_COUNTED = 5
 
 type ArtistMetaProps = {
   artist: MusicArtistType,
@@ -35,7 +40,7 @@ function ArtistMeta({
   artist,
   tracks,
 }: ArtistMetaProps) {
-  const { lang } = useSelector(settingsSelectors.current)
+  const { lang, enable_glass } = useSelector(settingsSelectors.current)
   const summary = artist?.summary
   const listening = summary?.listening
 
@@ -166,22 +171,53 @@ function ArtistMeta({
     return `${top.title} ${times}`
   }
 
+  /*
+    The four figures worth having before the table is read at all. They are named in the tag
+    itself rather than labelled, so they are lifted out of the sections below rather than
+    repeated there.
+  */
+  const keyStats = (): TagProps[] => {
+    const genres = (summary?.genres ?? []).map((genre) => genre.name)
+    const namedGenres = genres.slice(0, TAG_GENRES_NAMED)
+    const otherGenres = Math.min(genres.length - namedGenres.length, TAG_GENRES_COUNTED - TAG_GENRES_NAMED)
+
+    const genreList = otherGenres > 0
+      ? [...namedGenres, template('music-artist.meta.plus-more', { count: String(otherGenres) })]
+      : namedGenres
+
+    const stats: (TagProps | null)[] = [
+      summary?.numReleases ? {
+        icon: 'fas fa-compact-disc',
+        label: template(
+          summary.numReleases === 1 ? 'music-artist.meta.tag.release' : 'music-artist.meta.tag.releases',
+          { count: String(summary.numReleases) },
+        ),
+      } : null,
+      summary?.numTracks ? {
+        icon: 'fas fa-file-audio',
+        label: template(
+          summary.numTracks === 1 ? 'music-artist.meta.tag.track' : 'music-artist.meta.tag.tracks',
+          { count: String(summary.numTracks) },
+        ),
+      } : null,
+      genreList.length ? { icon: 'fas fa-tags', label: genreList.join(', ') } : null,
+      summary?.bytes ? { icon: 'fas fa-hdd', label: formatBytes(summary.bytes) } : null,
+    ]
+
+    return stats.filter(Boolean)
+  }
+
+  const stats = keyStats()
+
   const collection: MetaRow[] = [
     { labelKey: 'music-artist.meta.name', value: artist?.name ?? null },
-    { labelKey: 'music-artist.meta.releases', value: summary ? String(summary.numReleases) : null },
-    { labelKey: 'music-artist.meta.tracks', value: summary ? String(summary.numTracks) : null },
     { labelKey: 'music-artist.meta.runtime', value: summary?.runtimeSeconds ? formatRuntime(summary.runtimeSeconds) : null },
     { labelKey: 'music-artist.meta.years', value: years() },
-    {
-      labelKey: 'music-artist.meta.genres',
-      value: summarizeList((summary?.genres ?? []).map((genre) => genre.name), MAX_GENRES),
-    },
     { labelKey: 'music-artist.meta.labels', value: summarizeList(summary?.labels ?? [], MAX_ENCODERS) },
     { labelKey: 'music-artist.meta.track-length', value: trackLength() },
   ]
 
   const onDisk: MetaRow[] = [
-    { labelKey: 'music-artist.meta.size', value: summary?.bytes ? formatBytes(summary.bytes) : null },
     {
       labelKey: 'music-artist.meta.per-track',
       value: summary?.bytes && summary?.numTracks ? formatBytes(Math.round(summary.bytes / summary.numTracks)) : null,
@@ -222,6 +258,7 @@ function ArtistMeta({
   return (
     <div className="artist-meta-pane">
       <div className="artist-meta-row">
+        <Tags tags={stats} glass={enable_glass as boolean} />
         <ExternalLinks ids={{ musicbrainzArtistId: summary?.musicbrainzArtistId }} />
       </div>
 

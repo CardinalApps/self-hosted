@@ -20,12 +20,6 @@
   "music-artist.meta.name": {
     "en": "Name"
   },
-  "music-artist.meta.releases": {
-    "en": "Releases"
-  },
-  "music-artist.meta.tracks": {
-    "en": "Tracks"
-  },
   "music-artist.meta.runtime": {
     "en": "Runtime"
   },
@@ -38,17 +32,11 @@
   "music-artist.meta.years": {
     "en": "Active years"
   },
-  "music-artist.meta.genres": {
-    "en": "Genres"
-  },
   "music-artist.meta.labels": {
     "en": "Labels"
   },
   "music-artist.meta.track-length": {
     "en": "Track length"
-  },
-  "music-artist.meta.size": {
-    "en": "Size on disk"
   },
   "music-artist.meta.per-track": {
     "en": "Avg. per track"
@@ -121,6 +109,18 @@
   },
   "music-artist.meta.plus-more": {
     "en": "+{count}"
+  },
+  "music-artist.meta.tag.release": {
+    "en": "{count} release"
+  },
+  "music-artist.meta.tag.releases": {
+    "en": "{count} releases"
+  },
+  "music-artist.meta.tag.track": {
+    "en": "{count} track"
+  },
+  "music-artist.meta.tag.tracks": {
+    "en": "{count} tracks"
   },
   "music-artist.play-actions.house-mix": {
     "en": "House Mix"
