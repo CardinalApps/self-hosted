@@ -50,6 +50,10 @@ import triggerLifecycle from './utils/triggerLifecycle'
 import { getStorageKey } from './utils/getStorageKey'
 import deleteInfiniteQueryCache from './utils/deleteInfiniteQueryCache'
 import deleteApiCache from './utils/deleteApiCache'
+import isResetAppRequested from './utils/isResetAppRequested'
+import clearResetAppQueryParam from './utils/clearResetAppQueryParam'
+
+import { deleteAllJWTs } from '../lib/auth/jwt'
 
 /**
  * All apps use a store of this shape.
@@ -79,8 +83,20 @@ export type RootState = ReturnType<typeof rootReducer>
  * exists. Also clean up some RTK API calls before hydrating.
  */
 const createStore = () => {
+  const resetAppRequested = isResetAppRequested()
   const preloadedState = createDefaultStore(slices)
-  const cachedStore = getCachedStore()
+  const cachedStore = resetAppRequested ? {} : getCachedStore()
+
+  if (resetAppRequested) {
+    try {
+      localStorage.removeItem(getStorageKey())
+    } catch (e) {
+      console.error(e?.message)
+    }
+
+    deleteAllJWTs()
+    clearResetAppQueryParam()
+  }
 
   merge(preloadedState, cachedStore)
 
