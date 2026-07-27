@@ -1,6 +1,4 @@
 import { useSelector } from 'react-redux'
-import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
-import ms from 'ms'
 
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
@@ -10,6 +8,7 @@ import UserTag from '@cardinalapps/ui/src/components/interaction/UserTag'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 
 import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUsers'
+import { formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
 
 import ReloadButton from './ReloadButton'
 import i18n from './i18n.json'
@@ -19,17 +18,6 @@ function WidgetActiveUsers() {
   const { lang } = useSelector(settingsSelectors.current)
   const { data, refetch } = useGetActiveUsersQuery({})
   const activeUsers = data || []
-
-  const formatTimeAgo = (timeString) => {
-    const date = new Date(timeString)
-    const msAgo = Date.now() - date.getTime()
-
-    if (msAgo < ms('1 minute')) {
-      return i18n['active-users.less-than-a-minute-ago'][lang]
-    } else {
-      return `${formatDistanceToNowStrict(new Date(timeString))} ${i18n['active-users.ago'][lang]}`
-    }
-  }
 
   return (
     <CardGrid.Card
@@ -50,7 +38,7 @@ function WidgetActiveUsers() {
               return (
                 <div key={user.userId} className={'active-user'}>
                   <UserTag user={user} size="s" />
-                  <p className={'time-ago'}>{formatTimeAgo(user.activityStatusUpdatedAt)}</p>
+                  <p className={'time-ago'}>{formatTimeAgo(user.activityStatusUpdatedAt, lang)}</p>
                 </div>
               )
             })}
