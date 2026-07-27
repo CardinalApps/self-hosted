@@ -103,9 +103,12 @@ export class AppController {
 
   /**
    * Responds to health checks. This may also:
-   * 
+   *
    * 1. Include information about pending updates.
    * 1. Trigger an update check (infrequently).
+   *
+   * Used by Cardinal's internal deploy tooling to verify a release went live; keep the
+   * response shape stable and update that tooling's docs if it changes.
    */
   @Get('/health')
   @StandardEndpoint({
@@ -270,6 +273,10 @@ export class AppController {
   /**
    * Get a list of versions of things in the Media Server. In the `build_tag`,
    * the timestamp is of the build, not the commit.
+   *
+   * Used by Cardinal's internal deploy tooling to verify a release went live; keep the
+   * response shape stable and update that tooling's docs if it changes. Note this
+   * endpoint requires auth, unlike `/health` above.
    */
   @Get('/versions')
   @StandardEndpoint({
