@@ -16,9 +16,9 @@ import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar
 import i18n from './i18n.json'
 import './styles.css'
 
-const TOOLBAR_NAME = 'admin-roles'
+const TOOLBAR_NAME = 'admin-access-control'
 
-function Roles() {
+function AccessControl() {
   const { lang } = useSelector(settingsSelectors.current)
   const [globallySelectedAspect, setGloballySelectedAspect] = useState<MediaServerAspect>()
   const [globallySelectedRole, setGloballySelectedRole] = useState<MediaServerRoleNames>()
@@ -55,4 +55,4 @@ function Roles() {
   )
 }
 
-export default Roles
+export default AccessControl

@@ -12,7 +12,7 @@ import Users from '../../pages/Users'
 import Jobs from '../../pages/Jobs'
 import Libraries from '../../pages/Libraries'
 import FirstTimeSetup from '../../pages/FirstTimeSetup'
-import Roles from '../../pages/Roles'
+import AccessControl from '../../pages/AccessControl'
 import CardinalAdminSSOButton from '../CardinalAdminSSOButton'
 
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
@@ -97,7 +97,7 @@ function AppRoot() {
             />
             <Route
               path={AdminRoutes.access_control}
-              element={<Roles />}
+              element={<AccessControl />}
             />
             <Route
               path={AdminRoutes.indexing}
