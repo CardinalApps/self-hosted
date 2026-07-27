@@ -262,11 +262,12 @@
     }
 
     .field-meta {
+      display: flex;
+      flex-direction: column;
       flex-grow: 1;
     }
 
     .field-label {
-      margin-bottom: 5px;
       color: var(--text-color-2);
       font-size: 15px;
       font-weight: 400;
