@@ -6,10 +6,6 @@
   --sidebar-nav-width: 250px;
   --sidebar-nav-gutter: 40px;
   --header-height: 72px;
-
-  &.sidebarCollapsed {
-    --sidebar-nav-width: 66px;
-  }
 }
 
 .theme-switcher.light {
