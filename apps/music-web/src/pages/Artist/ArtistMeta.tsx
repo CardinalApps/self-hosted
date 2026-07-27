@@ -40,7 +40,7 @@ function ArtistMeta({
   artist,
   tracks,
 }: ArtistMetaProps) {
-  const { lang, enable_glass } = useSelector(settingsSelectors.current)
+  const { lang } = useSelector(settingsSelectors.current)
   const summary = artist?.summary
   const listening = summary?.listening
 
@@ -258,7 +258,7 @@ function ArtistMeta({
   return (
     <div className="artist-meta-pane">
       <div className="artist-meta-row">
-        <Tags tags={stats} glass={enable_glass as boolean} />
+        <Tags tags={stats} />
         <ExternalLinks ids={{ musicbrainzArtistId: summary?.musicbrainzArtistId }} />
       </div>
 
