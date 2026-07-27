@@ -153,7 +153,7 @@ export default {
     "en": "Enable guest account",
   },
   "settings.telemetry.label": {
-    "en": "Enable telemetry",
+    "en": "Share telemetry data with Cardinal Apps Inc.",
   },
   "settings.telemetry.desc": {
     "en": "This setting applies to all apps. All data is anonymized. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more.</a>",
