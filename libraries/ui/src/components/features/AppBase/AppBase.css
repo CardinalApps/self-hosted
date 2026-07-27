@@ -317,6 +317,25 @@
     right: 10px;
   }
 
+  .sidebar-nav {
+
+    &.collapsed {
+      
+      li {
+
+        a {
+          width: 48px;
+        }
+
+        @media (min-width: 768px) {
+          i {
+            left: 0;
+          }
+        }
+      }
+    }
+  }
+
   @media (max-width: 768px) {
 
     .page-content {
@@ -467,7 +486,7 @@
   margin-right: 40px;
   flex-shrink: 0;
   flex-grow: 0;
-  transition: opacity 1000ms;
+  transition: opacity 1000ms, width 600ms;
   position: fixed;
   left: 0;
   z-index: 2000;
