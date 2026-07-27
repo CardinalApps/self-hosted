@@ -4,7 +4,7 @@ import {
   loginAsGuest,
 } from '@cardinalapps/e2e-helpers'
 
-// /admin/roles renders two cards: .roles-list (system roles) and
+// /admin/access-control renders two cards: .roles-list (system roles) and
 // .capabilities-list (capabilities per role).
 
 /*
@@ -27,8 +27,8 @@ test(
   { tag: '@journey:manage-roles' },
   async ({ page }) => {
     await loginAsGuest(page)
-    await page.click('a[href="/admin/roles"]')
-    await page.waitForURL((url) => url.pathname === '/admin/roles', { timeout: 10_000 })
+    await page.click('a[href="/admin/access-control"]')
+    await page.waitForURL((url) => url.pathname === '/admin/access-control', { timeout: 10_000 })
     await expect(page.locator('.roles-list')).toBeVisible({ timeout: 10_000 })
     await expect(page.locator('.capabilities-list')).toBeVisible()
   },

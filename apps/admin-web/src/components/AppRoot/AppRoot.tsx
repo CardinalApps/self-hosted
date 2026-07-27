@@ -96,7 +96,7 @@ function AppRoot() {
               element={<Users />}
             />
             <Route
-              path={AdminRoutes.roles}
+              path={AdminRoutes.access_control}
               element={<Roles />}
             />
             <Route

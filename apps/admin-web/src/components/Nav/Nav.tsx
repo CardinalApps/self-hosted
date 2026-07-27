@@ -27,28 +27,6 @@ function Nav({ children }: PropsWithChildren) {
         </Link>
       </li>
 
-      {/* Users */}
-      <li
-        className={activeItem === AdminRoutes.users ? 'active' : ''}
-        key="users"
-      >
-        <Link to={AdminRoutes.users}>
-          <Icon fa="fas fa-user" />
-          <span>{i18n['nav.users']['en']}</span>
-        </Link>
-      </li>
-
-      {/* Roles */}
-      <li
-        className={activeItem === AdminRoutes.roles ? 'active' : ''}
-        key="roles"
-      >
-        <Link to={AdminRoutes.roles}>
-          <Icon fa="fas fa-key" />
-          <span>{i18n['nav.roles']['en']}</span>
-        </Link>
-      </li>
-
       {/* Indexing */}
       <li
         className={`${activeItem === AdminRoutes.indexing ? 'active' : ''}`}
@@ -79,6 +57,28 @@ function Nav({ children }: PropsWithChildren) {
         <Link to={AdminRoutes.libraries}>
           <Icon fa="fas fa-folder-open" style={{}} />
           <span>{i18n['nav.libraries']['en']}</span>
+        </Link>
+      </li>
+
+      {/* Users */}
+      <li
+        className={activeItem === AdminRoutes.users ? 'active' : ''}
+        key="users"
+      >
+        <Link to={AdminRoutes.users}>
+          <Icon fa="fas fa-user" />
+          <span>{i18n['nav.users']['en']}</span>
+        </Link>
+      </li>
+
+      {/* Access Control */}
+      <li
+        className={activeItem === AdminRoutes.access_control ? 'active' : ''}
+        key="roles"
+      >
+        <Link to={AdminRoutes.access_control}>
+          <Icon fa="fas fa-key" />
+          <span>{i18n['nav.roles']['en']}</span>
         </Link>
       </li>
 
