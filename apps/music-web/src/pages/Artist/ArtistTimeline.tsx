@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
@@ -14,7 +14,7 @@ import type { DiscographyEntry } from './discography'
 
 import i18n from './i18n.json'
 
-const COVER_SIZE = 96
+const COVER_SIZE = 200
 // Below this many years apart, releases are just a normal gap between albums
 const GAP_YEARS = 3
 
@@ -96,8 +96,11 @@ function ArtistTimeline({
               onMouseLeave={() => onHoverRelease?.(null)}
             >
               {gap >= GAP_YEARS && (
-                <p className="artist-timeline-gap">
+                // The years drive how much air the gap gets, which the stylesheet caps
+                <p className="artist-timeline-gap" style={{ '--gap-years': gap } as CSSProperties}>
+                  <i className="fas fa-chevron-up" />
                   {template('music-artist.timeline.gap', { years: String(gap) })}
+                  <i className="fas fa-chevron-down" />
                 </p>
               )}
 
