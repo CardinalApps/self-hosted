@@ -131,7 +131,7 @@ function RunsHistory() {
               ? { fa: 'fas fa-times', className: 'success-color' }
               : null,
         name: runSummaryString(run),
-        label: formatTimeAgo(run?.createdAt),
+        label: formatTimeAgo(run?.createdAt, lang, 'exact'),
         controls: ['view'],
         onView: () => handleOpenLogs(run.id, run.runId),
       } as ListItem
@@ -225,7 +225,7 @@ function RunsHistory() {
                 </Span>
               </Table.Col>,
               <Table.Col key={`${log.id}-action`}>{i18n[`run.logs.event.${log.event}`]?.[lang] ?? log.event}</Table.Col>,
-              <Table.Col key={`${log.id}-time`}><Span truncate={true}>{formatTimeAgo(log.createdAt)}</Span></Table.Col>,
+              <Table.Col key={`${log.id}-time`}><Span truncate={true}>{formatTimeAgo(log.createdAt, lang, 'exact')}</Span></Table.Col>,
             ])}
             page={logsPage}
             maxPages={logsMaxPages}

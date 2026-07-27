@@ -68,7 +68,7 @@ function History() {
           </>
         ),
         icon: { fa: 'fas fa-check', className: 'success-color' },
-        label: formatTimeAgo(job?.createdAt),
+        label: formatTimeAgo(job?.createdAt, lang, 'exact'),
         controls: ['view'],
         onView: () => setDetailsId(job.id),
       } as ListItem

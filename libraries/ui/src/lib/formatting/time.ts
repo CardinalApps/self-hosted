@@ -3,20 +3,21 @@ import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 
 import i18n from './i18n'
 
-/**
- * Returns a string like "1 minute ago" or "4 hours ago".
- * 
- * @param {string} timeString
- * @param {string} [lang]
+export type TimeAgoMode = 'activity' | 'exact'
+
+/*
+ * Returns a string like "1 minute ago" or "4 hours ago". In 'activity' mode the last minute collapses into a presence
+ * label, which suits "is this person around right now" but lies about finished events; 'exact' always reports the
+ * real distance.
  */
-export const formatTimeAgo = (timeString, lang = 'en') => {
+export const formatTimeAgo = (timeString, lang = 'en', mode: TimeAgoMode = 'activity') => {
   const date = new Date(timeString)
   const msAgo = Date.now() - date.getTime()
 
-  if (msAgo < ms('1 minute')) {
+  if (mode === 'activity' && msAgo < ms('1 minute')) {
     return i18n['time.less-than-a-minute-ago'][lang]
   } else {
-    return `${formatDistanceToNowStrict(new Date(timeString))} ${i18n['time.ago'][lang]}`
+    return `${formatDistanceToNowStrict(date)} ${i18n['time.ago'][lang]}`
   }
 }
 

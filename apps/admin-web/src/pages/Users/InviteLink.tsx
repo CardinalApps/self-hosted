@@ -169,7 +169,7 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
                         <Span>
                           {
                             i18n['users.invite.link.created-at-by'][lang]
-                              .replace('{ago}', formatTimeAgo(invitation?.createdAt))
+                              .replace('{ago}', formatTimeAgo(invitation?.createdAt, lang, 'exact'))
                           }
                         </Span>
                       </P>
