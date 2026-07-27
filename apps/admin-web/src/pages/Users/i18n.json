@@ -254,8 +254,11 @@
   "users.updated.disabled.success": {
     "en": "User has been disabled."
   },
-  "users.updated.password.success": {
+  "users.update-password.title": {
     "en": "Set new password"
+  },
+  "users.update-password.field-label": {
+    "en": "New password"
   },
   "users.updated.password.submit": {
     "en": "Update"

@@ -4,6 +4,7 @@ import type { Meta } from '@storybook/react'
 import Modal from './Modal'
 import ModalLayer from './ModalLayer'
 import Button from '../../interaction/Button'
+import H5 from '../../typography/H5'
 import WrittenText from '../../typography/WrittenText'
 
 const meta = {
@@ -28,6 +29,33 @@ export const SmallContent = () => {
           <WrittenText>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas egestas dictum commodo. Cras egestas massa in convallis tincidunt. Interdum et malesuada fames ac ante ipsum primis in faucibus. Vivamus pretium dui tempor feugiat fringilla. Etiam nec imperdiet lectus, varius consectetur ex. Aliquam dolor sapien, malesuada ut iaculis vel, rutrum eleifend lorem. Maecenas gravida arcu non orci sodales aliquet facilisis a risus. Aenean gravida nisl tellus, id pulvinar velit cursus vitae. Vivamus tempus congue aliquam. Sed convallis tincidunt rutrum. Phasellus eu vulputate dolor. Nullam dolor urna, viverra at enim vel, feugiat venenatis dui.</p>
             <Button onClick={() => setIsOpen(false)}>Close modal</Button>
+          </WrittenText>
+        </Modal>
+      }
+    </div>
+  )
+}
+
+export const WithHeaderAndFooter = () => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div>
+      <ModalLayer />
+      <div style={{ display: 'flex', gap: 15 }}>
+        <Button onClick={() => setIsOpen(true)}>
+          Open modal
+        </Button>
+      </div>
+      {isOpen &&
+        <Modal
+          width={480}
+          onClose={() => setIsOpen(false)}
+          header={<H5>Set new password</H5>}
+          footer={<Button onClick={() => setIsOpen(false)}>Update</Button>}
+        >
+          <WrittenText>
+            <p>The header sits in the card header, so it stays put while the body scrolls.</p>
           </WrittenText>
         </Modal>
       }
