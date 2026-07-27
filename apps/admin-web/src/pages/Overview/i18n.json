@@ -20,12 +20,6 @@
   "active-users.guest-account": {
     "en": "Guest account"
   },
-  "active-users.less-than-a-minute-ago": {
-    "en": "Active now"
-  },
-  "active-users.ago": {
-    "en": "ago"
-  },
   "app.name.admin": {
     "en": "Admin"
   },
