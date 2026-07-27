@@ -10,6 +10,8 @@ import { EventModule } from '../event/event.module'
 import { LibraryModule } from '../library/library.module'
 import { StaticPlayback } from './static-playback-queue.service'
 import { DynamicPlayback } from './dynamic-playback-queue.service'
+import { TrackSelection } from './dynamic-queues/track-selection.service'
+import { DYNAMIC_QUEUE_SERVICES, dynamicQueueRegistryProvider } from './dynamic-queues/dynamic-queue.registry'
 import { PlaybackQueueItem } from './playback-queue-item.entity'
 import { MusicTrackModule } from '../music-track/music-track.module'
 import { QueueItemService } from './playback-queue-item.service'
@@ -31,7 +33,15 @@ import { Rating } from '../rating/rating.entity'
     StaticPlayback,
     DynamicPlayback,
   ],
-  providers: [QueueService, QueueItemService, StaticPlayback, DynamicPlayback],
+  providers: [
+    QueueService,
+    QueueItemService,
+    StaticPlayback,
+    DynamicPlayback,
+    TrackSelection,
+    ...DYNAMIC_QUEUE_SERVICES,
+    dynamicQueueRegistryProvider,
+  ],
   controllers: [PlaybackQueueController],
 })
 export class PlaybackQueueModule {}
