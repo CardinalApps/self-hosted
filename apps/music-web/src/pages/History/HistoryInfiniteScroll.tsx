@@ -97,7 +97,7 @@ function MusicHistoryInfiniteScroll({
           </div>
           <div className="date-col">
             <time title={formatDate(historyEntry?.updatedAt)}>
-              {formatTimeAgo(historyEntry?.updatedAt)}
+              {formatTimeAgo(historyEntry?.updatedAt, lang, 'exact')}
             </time>
           </div>
           <div className="progress-col">
