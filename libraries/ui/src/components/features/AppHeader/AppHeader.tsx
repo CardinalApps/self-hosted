@@ -50,7 +50,7 @@ const AppHeader = ({
   const kioskMode = useAppSelector(appSelectors.kioskMode)
   const { Link } = useContext(RouterContext)
   const { lang, open_apps_in_new_tab, enable_glass } = useAppSelector(settingsSelectors.current)
-  const [showBadgeModal, setShowBadgeModal] = useState<'kiosk' | 'planned' | 'wip'>()
+  const [showBadgeModal, setShowBadgeModal] = useState<'kiosk'>()
   const sidebarMode = useAppSelector(layoutSelectors.sidebarMode)
   const app = useAppSelector(appSelectors.app)
   const appName = useAppSelector(appSelectors.name)
@@ -75,11 +75,8 @@ const AppHeader = ({
     if (kioskMode) {
       badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><Icon fa="fas fa-store" />{i18n['major-badge.kiosk'][lang]}</span>)
     }
-    if (app === CardinalApp.CINEMA) {
-      badges.push(<span key="planned" onClick={() => setShowBadgeModal('planned')} style={{ background: '#007bd7' }}><Icon fa="fas fa-clock" />{i18n['major-badge.planned'][lang]}</span>)
-    }
-    if (app === CardinalApp.PHOTOS) {
-      badges.push(<span key="wip" onClick={() => setShowBadgeModal('wip')} style={{ background: '#700bd8' }}><Icon fa="fas fa-terminal" />{i18n['major-badge.wip'][lang]}</span>)
+    if (app === CardinalApp.CINEMA || app === CardinalApp.PHOTOS) {
+      badges.push(<span key="coming-soon" className="static" style={{ background: 'var(--accent-color)' }}><Icon fa="fas fa-clock" style={{ color: '#fff' }} />{i18n['major-badge.coming-soon'][lang]}</span>)
     }
 
     return badges
@@ -177,20 +174,6 @@ const AppHeader = ({
         <Modal onClose={() => setShowBadgeModal(null)}>
           <WrittenText>
             <div dangerouslySetInnerHTML={{ __html: i18n['major-badge.kiosk.desc'][lang] }} />
-          </WrittenText>
-        </Modal>
-      )}
-      {showBadgeModal === 'wip' && (
-        <Modal onClose={() => setShowBadgeModal(null)}>
-          <WrittenText>
-            <div dangerouslySetInnerHTML={{ __html: i18n['major-badge.wip.desc'][lang] }} />
-          </WrittenText>
-        </Modal>
-      )}
-      {showBadgeModal === 'planned' && (
-        <Modal onClose={() => setShowBadgeModal(null)}>
-          <WrittenText>
-            <div dangerouslySetInnerHTML={{ __html: i18n['major-badge.planned.desc'][lang] }} />
           </WrittenText>
         </Modal>
       )}
