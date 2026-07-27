@@ -1,11 +1,5 @@
 {
   "updates.tab.name": {
     "en": "Updates"
-  },
-  "reporting.tab.name": {
-    "en": "Telemetry"
-  },
-  "telemetry.history.title": {
-    "en": "History"
   }
 }
