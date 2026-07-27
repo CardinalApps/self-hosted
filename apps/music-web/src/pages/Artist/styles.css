@@ -253,13 +253,6 @@
     color: var(--text-color-4);
   }
 
-  @container artist-layout (max-width: 1020px) {
-
-    .artist-play-modes .button-text {
-      display: none;
-    }
-  }
-
   @container artist-layout (max-width: 860px) {
 
     .artist-hero-cols {
@@ -287,7 +280,13 @@
     }
   }
 
+  /* Above this the modes drop to a row of their own with their labels intact; below it there is
+     no width left to drop into, so the labels go instead. */
   @container artist-layout (max-width: 620px) {
+
+    .artist-play-modes .button-text {
+      display: none;
+    }
 
     .artist-timeline {
       --timeline-gutter: 60px;
