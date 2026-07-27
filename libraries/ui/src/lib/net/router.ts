@@ -17,7 +17,7 @@ export enum AdminRoutes {
   login                       = '/login',
   settings                    = '/settings',
   users                       = '/users',
-  roles                       = '/roles',
+  access_control              = '/access-control',
   indexing                    = '/indexing',
   jobs                        = '/jobs',
   libraries                   = '/libraries',
