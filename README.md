@@ -102,6 +102,6 @@ which variables are missing.
 
 ## License
 
-[Licensed under The Freehold License (freeholdlicense.com)](/LICENSE)
+[Licensed under the Freehold License (freeholdlicense.com)](/LICENSE)
 
 Copyright Cardinal Apps Inc. 2023 - 2026
