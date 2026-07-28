@@ -1,7 +1,7 @@
 {
   "name": "@cardinalapps/admin-web",
   "description": "Cardinal Media Server Admin web app.",
-  "license": "Licensed under The Freehold License (freeholdlicense.com)",
+  "license": "Licensed under the Freehold License (freeholdlicense.com)",
   "version": "0.4.0",
   "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
   "homepage": "/admin",
