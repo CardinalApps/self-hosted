@@ -44,12 +44,6 @@
   "music-artist.meta.formats": {
     "en": "Formats"
   },
-  "music-artist.meta.lossless": {
-    "en": "Lossless"
-  },
-  "music-artist.meta.bitrate": {
-    "en": "Bitrate"
-  },
   "music-artist.meta.sample-rate": {
     "en": "Quality"
   },
@@ -193,8 +187,5 @@
   },
   "music-artist.timeline.type.dj-mix": {
     "en": "DJ Mix"
-  },
-  "music-artist.timeline.type.inferred": {
-    "en": "Type inferred from the track count and runtime"
   }
 }
