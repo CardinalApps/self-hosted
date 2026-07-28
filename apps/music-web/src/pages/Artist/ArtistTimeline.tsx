@@ -1,6 +1,5 @@
 import { useContext, type CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
-import clsx from 'clsx'
 
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
@@ -21,7 +20,6 @@ const GAP_YEARS = 3
 type ArtistTimelineProps = {
   /** Newest release first. */
   discography: DiscographyEntry[],
-  onHoverRelease?: (musicReleaseId: string | null) => void,
 }
 
 /**
@@ -31,7 +29,6 @@ type ArtistTimelineProps = {
  */
 function ArtistTimeline({
   discography,
-  onHoverRelease,
 }: ArtistTimelineProps) {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
@@ -48,14 +45,6 @@ function ArtistTimeline({
     return hours
       ? template('music-artist.timeline.runtime.hours-minutes', { h: String(hours), m: String(minutes) })
       : template('music-artist.timeline.runtime.minutes', { m: String(minutes) })
-  }
-
-  /* A release whose type was never tagged still has a shape: enough tracks and enough
-     minutes make it an album, a handful of tracks an EP, anything less a single. */
-  const inferType = (entry: DiscographyEntry) => {
-    if (entry.numTracks >= 7 || entry.runtimeSeconds >= 25 * 60) return 'album'
-    if (entry.numTracks >= 4) return 'ep'
-    return 'single'
   }
 
   const typeLabel = (type: string) => t(`music-artist.timeline.type.${type}`) ?? type
@@ -76,12 +65,10 @@ function ArtistTimeline({
         {discography.map((entry, index) => {
           const previous = discography[index - 1]
           const gap = previous?.year && entry.year ? previous.year - entry.year : 0
-          const type = entry.releaseType || inferType(entry)
           const heard = entry.listening?.tracksHeard ?? 0
           const releaseLink = getAppUrl('release', { params: { ':id': entry.musicReleaseId } })
 
           const facts = [
-            typeLabel(type),
             template('music-artist.timeline.tracks', { count: String(entry.numTracks) }),
             entry.runtimeSeconds ? formatRuntime(entry.runtimeSeconds) : null,
             entry.bytes ? formatBytes(entry.bytes) : null,
@@ -92,8 +79,6 @@ function ArtistTimeline({
             <li
               key={entry.musicReleaseId || entry.id}
               className="artist-timeline-row"
-              onMouseEnter={() => onHoverRelease?.(entry.musicReleaseId)}
-              onMouseLeave={() => onHoverRelease?.(null)}
             >
               {gap >= GAP_YEARS && (
                 // The years drive how much air the gap gets, which the stylesheet caps
@@ -122,13 +107,10 @@ function ArtistTimeline({
                   </p>
 
                   <p className="artist-timeline-facts">
-                    <span
-                      className={clsx('artist-timeline-type', !entry.releaseType && 'is-inferred')}
-                      title={!entry.releaseType ? t('music-artist.timeline.type.inferred') : undefined}
-                    >
-                      {facts[0]}
-                    </span>
-                    {facts.slice(1).map((fact) => <span key={fact}>{fact}</span>)}
+                    {!!entry.releaseType && (
+                      <span className="artist-timeline-type">{typeLabel(entry.releaseType)}</span>
+                    )}
+                    {facts.map((fact) => <span key={fact}>{fact}</span>)}
                   </p>
 
                   {!!entry.numTracks && (

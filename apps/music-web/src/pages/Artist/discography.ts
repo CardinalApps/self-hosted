@@ -21,18 +21,10 @@ export type DiscographyEntry = {
   bytes: number,
   /** Every file extension on the release, most common first. */
   extensions: string[],
-  lossless: boolean,
   hasArtwork: boolean,
   tracks: MusicTrackType[],
   listening?: MusicArtistReleaseListeningType,
 }
-
-// Mirrors the Media Server's list, which is what decides the summary's lossless figures
-const LOSSLESS_EXTENSIONS = ['flac', 'alac', 'wav', 'aiff', 'aif', 'ape', 'wv']
-
-export const isLosslessExtension = (extension: string): boolean => (
-  LOSSLESS_EXTENSIONS.includes(extension.trim().toLowerCase())
-)
 
 // Album order: disc first, then track number
 const inAlbumOrder = (tracks: MusicTrackType[]): MusicTrackType[] => (
@@ -72,7 +64,6 @@ export const buildDiscography = (
         runtimeSeconds: figure?.runtimeSeconds ?? tracks.reduce((sum, track) => sum + (Number(track.duration) || 0), 0),
         bytes: figure?.bytes ?? 0,
         extensions: figure?.extensions ?? [],
-        lossless: figure?.lossless ?? false,
         hasArtwork: !!release.thumbnails?.length,
         tracks,
         listening: listening.get(musicReleaseId),

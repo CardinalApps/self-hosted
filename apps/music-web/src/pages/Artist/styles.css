@@ -219,7 +219,8 @@
 
   .artist-timeline-title {
     margin-bottom: 6px;
-    font-size: 17px;
+    font-size: 30px;
+    font-weight: 300;
 
     a {
       color: var(--text-color-1);
@@ -239,10 +240,6 @@
     span:not(:last-child)::after {
       content: ' · ';
       color: var(--text-color-4);
-    }
-
-    .artist-timeline-type.is-inferred {
-      border-bottom: 1px dotted var(--border-color-2);
     }
   }
 
@@ -299,17 +296,31 @@
     }
   }
 
-  /* Above this the modes drop to a row of their own with their labels intact; below it there is
-     no width left to drop into, so the labels go instead. */
   @container artist-layout (max-width: 620px) {
 
-    .artist-play-modes .button-text {
-      display: none;
+    .artist-play-modes {
+      width: 100%;
     }
 
     .artist-timeline {
       --timeline-gutter: 60px;
       --timeline-spine: 40px;
+    }
+  }
+
+  /* Three labelled modes across need about 560px, and two need about 370px. Under each of those
+     the grid loses a column rather than the buttons losing their labels. */
+  @container artist-layout (max-width: 570px) {
+
+    .artist-play-modes {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @container artist-layout (max-width: 380px) {
+
+    .artist-play-modes {
+      grid-template-columns: 1fr;
     }
   }
 }

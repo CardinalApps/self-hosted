@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import clsx from 'clsx'
 
 import AppPage from '@cardinalapps/ui/src/components/features/AppBase/AppPage'
@@ -39,7 +39,6 @@ function ArtistPage() {
   const { useParams } = useContext(RouterContext)
   const params = useParams()
   const artistId = params?.id as string
-  const [hoveredReleaseId, setHoveredReleaseId] = useState<string | null>(null)
 
   const {
     data,
@@ -114,7 +113,8 @@ function ArtistPage() {
     return groups.flatMap((group) => group.files.map((file) => {
       const track = tracksById.get(file.musicTrackId)
       const extension = file.extension.toUpperCase()
-      const kbps = !file.lossless && track?.bitrate
+      // The track's own bitrate, which the file reports; nothing here judges what it means
+      const kbps = track?.bitrate
         ? i18n['music-artist.meta.kbps'][lang].replace('{kbps}', String(Math.round(Number(track.bitrate) / 1000)))
         : null
 
@@ -124,7 +124,6 @@ function ArtistPage() {
         groupLabel: group.groupLabel,
         label: file.title ?? track?.title,
         bytes: file.bytes,
-        lossless: file.lossless,
         details: [
           track?.duration ? secondsToMMSS(Number(track.duration)) : null,
           kbps ? `${extension} ${kbps}` : extension,
@@ -183,7 +182,6 @@ function ArtistPage() {
               className="artist-disk-map"
               blocks={diskMapBlocks}
               palette={diskMapPalette}
-              activeGroupId={hoveredReleaseId ?? undefined}
               groupLinks={releaseLinks}
               groupImages={diskMapCovers}
             />
@@ -197,10 +195,7 @@ function ArtistPage() {
           discography={discography}
         />
 
-        <ArtistTimeline
-          discography={discography}
-          onHoverRelease={setHoveredReleaseId}
-        />
+        <ArtistTimeline discography={discography} />
       </div>
     </AppPage>
   )

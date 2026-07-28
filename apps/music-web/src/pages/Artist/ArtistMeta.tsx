@@ -10,7 +10,6 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import type { MusicArtistType } from '@cardinalapps/ui/src/store/apis/musicArtists'
 import type { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
-import { isLosslessExtension } from './discography'
 
 import i18n from './i18n.json'
 
@@ -106,33 +105,6 @@ function ArtistMeta({
       .join(' · ')
   }
 
-  const losslessShare = () => {
-    if (!summary?.numTracks) {
-      return null
-    }
-    return `${Math.round((summary.numLossless / summary.numTracks) * 100)}%`
-  }
-
-  /*
-    Averaging a FLAC rip's ~900 kbps in with the MP3s would report a bitrate that describes
-    nothing, so this is the lossy average. Artists that are lossless throughout fall back to
-    the whole set, where the figure means something again.
-  */
-  const bitrate = () => {
-    const rated = (summary?.formats ?? []).filter((format) => format.avgBitrate)
-    const lossy = rated.filter((format) => !isLosslessExtension(format.extension))
-    const counted = lossy.length ? lossy : rated
-
-    if (!counted.length) {
-      return null
-    }
-
-    const tracked = counted.reduce((sum, format) => sum + format.numTracks, 0)
-    const weighted = counted.reduce((sum, format) => sum + format.avgBitrate * format.numTracks, 0)
-
-    return template('music-artist.meta.kbps', { kbps: String(Math.round(weighted / tracked / 1000)) })
-  }
-
   const quality = () => {
     const rates = (summary?.sampleRates ?? [])
       .map((rate) => template('music-artist.meta.khz', { khz: String(Math.round(rate / 100) / 10) }))
@@ -223,8 +195,6 @@ function ArtistMeta({
       value: summary?.bytes && summary?.numTracks ? formatBytes(Math.round(summary.bytes / summary.numTracks)) : null,
     },
     { labelKey: 'music-artist.meta.formats', value: formats() },
-    { labelKey: 'music-artist.meta.lossless', value: losslessShare() },
-    { labelKey: 'music-artist.meta.bitrate', value: bitrate() },
     { labelKey: 'music-artist.meta.sample-rate', value: quality() },
     { labelKey: 'music-artist.meta.encoders', value: summarizeList(summary?.encoders ?? [], MAX_ENCODERS) },
     { labelKey: 'music-artist.meta.media', value: summarizeList(summary?.mediaTypes ?? [], MAX_ENCODERS) },
