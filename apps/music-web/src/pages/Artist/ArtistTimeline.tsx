@@ -130,9 +130,9 @@ function ArtistTimeline({ discography }: ArtistTimelineProps) {
 
                   {!!favoriteTracks.length && (
                     <div className="artist-timeline-favorites">
-                      {favoriteTracks.map((track) => {
-                        const trackIndex = entry.tracks.findIndex((t) => t.musicTrackId === track.musicTrackId)
-                        const musicTrackIds = entry.tracks.slice(Math.max(trackIndex, 0)).map((t) => t.musicTrackId)
+                      {favoriteTracks.map((track, favoriteIndex) => {
+                        // Queue only this favorite and the ones after it, not the rest of the release
+                        const musicTrackIds = favoriteTracks.slice(favoriteIndex).map((t) => t.musicTrackId)
 
                         return (
                           <MusicTrack
