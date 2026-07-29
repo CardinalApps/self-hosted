@@ -65,6 +65,7 @@ const Beads = ({
     <div className={clsx('beads', className)} style={{ gap: spacing }}>
       {beads.map((bead, index) => {
         const beadSize = sizeFor(bead)
+        const beadColor = bead.color ?? color
 
         return (
           <div
@@ -74,11 +75,11 @@ const Beads = ({
             onMouseLeave={() => renderTooltip && setHoveredIndex(null)}
           >
             <div
-              className="bead"
+              className={clsx('bead', beadColor === 'transparent' && 'hollow')}
               style={{
                 width: beadSize,
                 height: beadSize,
-                backgroundColor: bead.color ?? color,
+                backgroundColor: beadColor,
                 borderColor: bead.borderColor ?? borderColor,
                 color: bead.textColor,
               }}
