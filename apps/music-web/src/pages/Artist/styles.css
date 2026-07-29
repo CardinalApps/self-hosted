@@ -269,6 +269,13 @@
     }
   }
 
+  @media (max-width: 1100px) {
+
+    .artist-timeline-entry {
+      flex-direction: column;
+    }
+  }
+
   @container artist-timeline-entry (max-width: 760px) {
 
     .artist-timeline-favorites {
