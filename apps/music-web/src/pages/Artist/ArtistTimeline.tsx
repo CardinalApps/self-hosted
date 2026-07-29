@@ -2,10 +2,12 @@ import { useContext, type CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
+import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
 import Beads from '@cardinalapps/ui/src/components/layout/Beads'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
+import { secondsToMMSS } from '@cardinalapps/ui/src/lib/formatting/time'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import type { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
@@ -21,6 +23,8 @@ const GAP_YEARS = 3
 type ArtistTimelineProps = {
   /** Newest release first. */
   discography: DiscographyEntry[],
+  artistName?: string,
+  artistLink?: string,
 }
 
 /**
@@ -30,6 +34,8 @@ type ArtistTimelineProps = {
  */
 function ArtistTimeline({
   discography,
+  artistName,
+  artistLink,
 }: ArtistTimelineProps) {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
@@ -74,6 +80,9 @@ function ArtistTimeline({
             entry.bytes ? formatBytes(entry.bytes) : null,
             formatLabel(entry.extensions),
           ].filter(Boolean)
+
+          // Track order, same as the beads above it
+          const favoriteTracks = entry.tracks.filter((track) => Number(track.rating) > 0)
 
           return (
             <li
@@ -123,6 +132,34 @@ function ArtistTimeline({
                         ...(track.playCount > 0 ? {} : { color: 'transparent', borderColor: 'var(--accent-color)' }),
                       }))}
                     />
+                  )}
+
+                  {!!favoriteTracks.length && (
+                    <div className="artist-timeline-favorites">
+                      {favoriteTracks.map((track) => {
+                        const trackIndex = entry.tracks.findIndex((t) => t.musicTrackId === track.musicTrackId)
+                        const musicTrackIds = entry.tracks.slice(Math.max(trackIndex, 0)).map((t) => t.musicTrackId)
+
+                        return (
+                          <MusicTrack
+                            key={track.musicTrackId}
+                            musicTrackId={track.musicTrackId}
+                            trackNumber={track.trackNumber}
+                            trackTitle={track.title}
+                            releaseTitle={entry.title}
+                            releaseId={entry.id}
+                            releaseLink={releaseLink}
+                            artistName={artistName}
+                            artistLink={artistLink}
+                            duration={secondsToMMSS(Number(track.duration) || 0)}
+                            plays={track.playCount}
+                            rating={track.rating}
+                            hasArtwork={entry.hasArtwork}
+                            musicTrackIds={musicTrackIds}
+                          />
+                        )
+                      })}
+                    </div>
                   )}
                 </div>
               </div>

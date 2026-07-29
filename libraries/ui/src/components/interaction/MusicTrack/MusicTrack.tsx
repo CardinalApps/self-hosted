@@ -118,7 +118,7 @@ const MusicTrack = ({
             {!!releaseTitle &&
               <p className="music-release-title">
                 {Link && releaseLink
-                  ? <Link to={releaseLink}>{}</Link>
+                  ? <Link to={releaseLink}>{releaseTitle}</Link>
                   : releaseTitle
                 }
               </p>
