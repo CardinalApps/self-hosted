@@ -23,8 +23,6 @@ const GAP_YEARS = 3
 type ArtistTimelineProps = {
   /** Newest release first. */
   discography: DiscographyEntry[],
-  artistName?: string,
-  artistLink?: string,
 }
 
 /**
@@ -32,11 +30,7 @@ type ArtistTimelineProps = {
  * rather than bucketed — which is also the only way releases whose type never
  * got tagged still land in the right place.
  */
-function ArtistTimeline({
-  discography,
-  artistName,
-  artistLink,
-}: ArtistTimelineProps) {
+function ArtistTimeline({ discography }: ArtistTimelineProps) {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
 
@@ -144,17 +138,10 @@ function ArtistTimeline({
                           <MusicTrack
                             key={track.musicTrackId}
                             musicTrackId={track.musicTrackId}
-                            trackNumber={track.trackNumber}
                             trackTitle={track.title}
-                            releaseTitle={entry.title}
-                            releaseId={entry.id}
-                            releaseLink={releaseLink}
-                            artistName={artistName}
-                            artistLink={artistLink}
                             duration={secondsToMMSS(Number(track.duration) || 0)}
                             plays={track.playCount}
                             rating={track.rating}
-                            hasArtwork={entry.hasArtwork}
                             musicTrackIds={musicTrackIds}
                           />
                         )
