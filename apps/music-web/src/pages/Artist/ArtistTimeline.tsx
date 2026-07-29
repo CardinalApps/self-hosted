@@ -14,7 +14,7 @@ import type { DiscographyEntry } from './discography'
 
 import i18n from './i18n.json'
 
-const COVER_SIZE = 200
+const COVER_SIZE = 300
 // Below this many years apart, releases are just a normal gap between albums
 const GAP_YEARS = 3
 
@@ -122,11 +122,6 @@ function ArtistTimeline({
                         // Unplayed tracks read as an outline rather than the smallest filled bead
                         ...(track.playCount > 0 ? {} : { color: 'transparent', borderColor: 'var(--accent-color)' }),
                       }))}
-                      renderTooltip={(bead) => {
-                        const track = entry.tracks.find((t) => t.musicTrackId === bead.id)
-                        const times = template('music-artist.meta.times-played', { count: String(bead.value ?? 0) })
-                        return <span className="artist-timeline-beads-tooltip">{track?.title} {times}</span>
-                      }}
                     />
                   )}
                 </div>

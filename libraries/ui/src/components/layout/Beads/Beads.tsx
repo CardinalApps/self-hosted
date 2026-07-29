@@ -38,7 +38,7 @@ export type BeadsProps = {
  */
 const Beads = ({
   beads,
-  size = 7,
+  size = 14,
   spacing = 10,
   maxSizeRatio = 3,
   color = 'var(--accent-color)',
