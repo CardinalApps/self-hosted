@@ -66,7 +66,10 @@ const MusicRelease = ({
   }, [tracks])
 
   return (
-    <div className={clsx(`music-release`, className, !!showInner && 'show', !getArtwork() && 'no-artwork')}>
+    <div
+      className={clsx(`music-release`, className, !!showInner && 'show', !getArtwork() && 'no-artwork')}
+      style={{ width: coverSize?.width }}
+    >
       <div
         className="music-release-art"
         onFocus={() => hasControls ? setShowInner(true) : null}

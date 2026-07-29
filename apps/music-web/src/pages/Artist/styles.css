@@ -247,11 +247,6 @@
     padding: 4px 0;
   }
 
-  .artist-timeline-beads-tooltip {
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
   @container artist-layout (max-width: 860px) {
 
     .artist-hero-cols {

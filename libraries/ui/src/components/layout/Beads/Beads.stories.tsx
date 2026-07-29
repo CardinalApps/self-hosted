@@ -16,7 +16,7 @@ const meta = {
   ],
   argTypes: {
     size: {
-      control: { type: 'range', min: 2, max: 20, step: 1 },
+      control: { type: 'range', min: 2, max: 40, step: 1 },
       table: { category: 'Size' },
     },
     spacing: {
