@@ -195,7 +195,11 @@ function ArtistPage() {
           discography={discography}
         />
 
-        <ArtistTimeline discography={discography} />
+        <ArtistTimeline
+          discography={discography}
+          artistName={data?.name}
+          artistLink={getAppUrl('artist', { params: { ':id': artistId } })}
+        />
       </div>
     </AppPage>
   )

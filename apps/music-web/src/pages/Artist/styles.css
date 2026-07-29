@@ -184,6 +184,8 @@
     gap: var(--gutter);
     align-items: flex-start;
     padding: 12px 0;
+    /* Its own width, not the whole page's, is what the favorites grid below needs to collapse against */
+    container: artist-timeline-entry / inline-size;
 
     &::before {
       content: '';
@@ -245,6 +247,32 @@
 
   .artist-timeline-beads {
     padding: 4px 0;
+  }
+
+  .artist-timeline-favorites {
+    margin-top: var(--gutter);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gutter);
+
+    /* Grid items default to a content-based min-width, which fights the 1fr columns' shrinking */
+    > .music-track {
+      min-width: 0;
+    }
+  }
+
+  @container artist-timeline-entry (max-width: 1050px) {
+
+    .artist-timeline-favorites {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @container artist-timeline-entry (max-width: 760px) {
+
+    .artist-timeline-favorites {
+      grid-template-columns: 1fr;
+    }
   }
 
   @container artist-layout (max-width: 860px) {
