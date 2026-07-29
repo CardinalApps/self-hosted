@@ -253,15 +253,16 @@
     margin-top: var(--gutter);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--gutter);
+    gap: 8px;
 
     /* Grid items default to a content-based min-width, which fights the 1fr columns' shrinking */
     > .music-track {
       min-width: 0;
+      margin-bottom: 0;
     }
   }
 
-  @container artist-timeline-entry (max-width: 1050px) {
+  @media (max-width: 1600px) {
 
     .artist-timeline-favorites {
       grid-template-columns: repeat(2, 1fr);
