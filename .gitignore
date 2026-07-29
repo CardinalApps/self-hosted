@@ -24,9 +24,6 @@ storybook-static
 .playwright-cli
 .playwright-mcp
 
-# Draft product screenshots (see .claude/skills/product-screenshots) — destination TBD
-/product-screenshots
-
 servers/media/public/admin
 servers/media/public/cinema
 servers/media/public/music
