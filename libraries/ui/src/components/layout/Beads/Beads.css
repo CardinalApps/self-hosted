@@ -1,0 +1,51 @@
+.beads {
+  display: flex;
+  align-items: center;
+
+  .bead-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bead {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 100%;
+    color: white;
+    transition:
+      width var(--transition-speed-med),
+      height var(--transition-speed-med),
+      background-color var(--transition-speed-med),
+      border-color var(--transition-speed-med);
+  }
+
+  .bead-label {
+    font-size: 8px;
+    font-weight: 300;
+    line-height: 1;
+    color: inherit;
+    pointer-events: none;
+  }
+
+  .bead-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    z-index: 3;
+    width: max-content;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .bead {
+      transition: none;
+    }
+  }
+}

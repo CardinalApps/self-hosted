@@ -152,9 +152,6 @@
   "music-artist.timeline.gap": {
     "en": "{years} years"
   },
-  "music-artist.timeline.heard": {
-    "en": "heard {heard}/{total}"
-  },
   "music-artist.timeline.tracks": {
     "en": "{count} tracks"
   },

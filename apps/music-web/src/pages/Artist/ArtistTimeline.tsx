@@ -2,6 +2,7 @@ import { useContext, type CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
+import Beads from '@cardinalapps/ui/src/components/layout/Beads'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
@@ -65,7 +66,6 @@ function ArtistTimeline({
         {discography.map((entry, index) => {
           const previous = discography[index - 1]
           const gap = previous?.year && entry.year ? previous.year - entry.year : 0
-          const heard = entry.listening?.tracksHeard ?? 0
           const releaseLink = getAppUrl('release', { params: { ':id': entry.musicReleaseId } })
 
           const facts = [
@@ -113,18 +113,21 @@ function ArtistTimeline({
                     {facts.map((fact) => <span key={fact}>{fact}</span>)}
                   </p>
 
-                  {!!entry.numTracks && (
-                    <p className="artist-timeline-coverage">
-                      <span className="artist-timeline-coverage-bar">
-                        <span style={{ width: `${(heard / entry.numTracks) * 100}%` }} />
-                      </span>
-                      <span className="artist-timeline-coverage-label">
-                        {template('music-artist.timeline.heard', {
-                          heard: String(heard),
-                          total: String(entry.numTracks),
-                        })}
-                      </span>
-                    </p>
+                  {!!entry.tracks.length && (
+                    <Beads
+                      className="artist-timeline-beads"
+                      beads={entry.tracks.map((track) => ({
+                        id: track.musicTrackId,
+                        value: track.playCount,
+                        // Unplayed tracks read as an outline rather than the smallest filled bead
+                        ...(track.playCount > 0 ? {} : { color: 'transparent', borderColor: 'var(--accent-color)' }),
+                      }))}
+                      renderTooltip={(bead) => {
+                        const track = entry.tracks.find((t) => t.musicTrackId === bead.id)
+                        const times = template('music-artist.meta.times-played', { count: String(bead.value ?? 0) })
+                        return <span className="artist-timeline-beads-tooltip">{track?.title} {times}</span>
+                      }}
+                    />
                   )}
                 </div>
               </div>
