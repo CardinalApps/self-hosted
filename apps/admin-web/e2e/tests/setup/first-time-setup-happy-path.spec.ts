@@ -26,7 +26,7 @@ import {
 } from '@cardinalapps/e2e-helpers'
 
 /*
-  Full first-time-setup happy path. Defaults: light theme, telemetry on,
+  Full first-time-setup happy path. Light theme, telemetry opted in,
   SSO completes successfully. Asserts the post-Finish side effects on both
   the auth server (claim row) and the media server (options + redirect).
 
@@ -64,7 +64,7 @@ test(
       await setServerNameAndContinue(page, serverName)
       await completeSetupSSO(page, { email: testEmail, password: testPassword })
       await clickSetupNext(page, 'login')
-      // Telemetry defaults to true; leave it alone for the happy path.
+      // Telemetry defaults to false; the happy path opts in.
       await setTelemetryAgreement(page, true)
       await clickSetupNext(page, 'usage-data')
       await clickSetupNext(page, 'privacy')
