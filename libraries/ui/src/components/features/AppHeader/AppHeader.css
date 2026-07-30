@@ -43,10 +43,6 @@
     .toolbar {
       background-color: transparent;
     }
-
-    .toolbar-item .toolbar-button {
-      background-color: transparent;
-    }
   }
 
   > section {
