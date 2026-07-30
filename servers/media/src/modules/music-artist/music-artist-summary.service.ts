@@ -288,9 +288,27 @@ export class MusicArtistSummaryService {
   /**
    * Per-release figures for the timeline. The year is the consensus across the
    * release's own tracks, since release rows carry no metadata of their own.
+   * Every release of the artist's is listed, tracks or not, so the page can
+   * draw its timeline from the summary alone.
    */
   private async getReleaseSummaries(artistId: number): Promise<MusicArtistReleaseSummary[]> {
-    const [aggregateRows, yearRows] = await Promise.all([
+    const [identityRows, aggregateRows, yearRows] = await Promise.all([
+      this.musicReleaseRepository
+        .createQueryBuilder('release')
+        .innerJoin('release.artists', 'artist')
+        .leftJoin('release.thumbnails', 'thumbnail')
+        .where('artist.id = :artistId', { artistId })
+        .select('release.id', 'id')
+        .addSelect('release.musicReleaseId', 'musicReleaseId')
+        .addSelect('release.title', 'title')
+        .addSelect('release.releaseType', 'releaseType')
+        .addSelect('COUNT(thumbnail.id)', 'numThumbnails')
+        .groupBy('release.id')
+        .addGroupBy('release.musicReleaseId')
+        .addGroupBy('release.title')
+        .addGroupBy('release.releaseType')
+        .getRawMany(),
+
       this.musicReleaseRepository
         .createQueryBuilder('release')
         .innerJoin('release.artists', 'artist')
@@ -335,22 +353,29 @@ export class MusicArtistSummaryService {
 
     const byRelease = new Map<string, MusicArtistReleaseSummary & { extensionCounts: Map<string, number> }>()
 
-    for (const row of aggregateRows) {
+    for (const row of identityRows) {
       const musicReleaseId = String(row.musicReleaseId ?? '')
       if (!musicReleaseId) continue
 
-      if (!byRelease.has(musicReleaseId)) {
-        byRelease.set(musicReleaseId, {
-          musicReleaseId,
-          year: null,
-          numTracks: 0,
-          runtimeSeconds: 0,
-          bytes: 0,
-          extensions: [],
-          lossless: true,
-          extensionCounts: new Map(),
-        })
-      }
+      byRelease.set(musicReleaseId, {
+        id: toInt(row.id),
+        musicReleaseId,
+        title: row.title ? String(row.title) : null,
+        releaseType: row.releaseType ? String(row.releaseType) : null,
+        hasArtwork: toInt(row.numThumbnails) > 0,
+        year: null,
+        numTracks: 0,
+        runtimeSeconds: 0,
+        bytes: 0,
+        extensions: [],
+        lossless: true,
+        extensionCounts: new Map(),
+      })
+    }
+
+    for (const row of aggregateRows) {
+      const musicReleaseId = String(row.musicReleaseId ?? '')
+      if (!byRelease.has(musicReleaseId)) continue
 
       const release = byRelease.get(musicReleaseId)
       const extension = String(row.extension ?? '')

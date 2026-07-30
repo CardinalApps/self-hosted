@@ -40,13 +40,33 @@ function ArtistPage() {
   const params = useParams()
   const artistId = params?.id as string
 
+  /*
+    The artist's data is split across two queries of very different weight. The summary is
+    computed from a handful of aggregate queries and comes back in milliseconds, and it carries
+    everything the page's frame needs: the DiskMap's files, the meta column and the timeline's
+    releases. The release rows with their tracks are an order of magnitude slower to load, so
+    they stream in behind while the page is already up, filling in whatever is per-track:
+    beads, favorites, and the play modes.
+  */
   const {
     data,
     isLoading,
     error,
   } = useGetMusicArtistQuery({
     id: artistId,
+    releases: false,
+    tracks: false,
     summary: true,
+  })
+
+  const {
+    data: releasesData,
+    isLoading: isLoadingTracks,
+    error: releasesError,
+  } = useGetMusicArtistQuery({
+    id: artistId,
+    releases: true,
+    tracks: false,
     playCount: true,
     rating: true,
   })
@@ -54,8 +74,8 @@ function ArtistPage() {
   const { enable_glass, lang } = useAppSelector(settingsSelectors.current)
 
   const discography = useMemo(
-    () => buildDiscography((data?.releases ?? []) as MusicReleaseType[], data?.summary),
-    [data?.releases, data?.summary],
+    () => buildDiscography((releasesData?.releases ?? []) as MusicReleaseType[], data?.summary),
+    [releasesData?.releases, data?.summary],
   )
 
   // Only releases with artwork are worth sampling; the rest would return nothing anyway
@@ -65,8 +85,8 @@ function ArtistPage() {
       .map((entry) => entry.musicReleaseId)
   ), [discography])
 
-  const backgroundColors = useReleasesCoverColors(releaseIdsWithArt)
   const releaseCovers = useReleaseCovers(releaseIdsWithArt)
+  const backgroundColors = useReleasesCoverColors(releaseCovers)
 
   /*
     The map reads like a defragmenter: oldest release first, so the discography grows from the
@@ -155,8 +175,7 @@ function ArtistPage() {
       layout={PAGE_LAYOUT.standard}
       pageTitle={i18n['music-artist.title']['en']}
       showMobileTitle={false}
-      networkError={error as NetworkError}
-      loading={isLoading}
+      networkError={(error ?? releasesError) as NetworkError}
       capabilities={['MusicArtists.Read']}
       animatedGradientColors={backgroundColors}
       toolbar={(
@@ -182,11 +201,16 @@ function ArtistPage() {
               className="artist-disk-map"
               blocks={diskMapBlocks}
               palette={diskMapPalette}
+              loading={isLoading}
               groupLinks={releaseLinks}
               groupImages={diskMapCovers}
             />
 
-            <ArtistMeta artist={data} tracks={discographyTracks(discography) as MusicTrackType[]} />
+            <ArtistMeta
+              artist={data}
+              tracks={discographyTracks(discography) as MusicTrackType[]}
+              loading={isLoading}
+            />
           </div>
         </Card>
 
@@ -195,7 +219,11 @@ function ArtistPage() {
           discography={discography}
         />
 
-        <ArtistTimeline discography={discography} />
+        <ArtistTimeline
+          discography={discography}
+          loading={isLoading}
+          tracksPending={isLoadingTracks}
+        />
       </div>
     </AppPage>
   )

@@ -23,14 +23,20 @@ const GAP_YEARS = 3
 type ArtistTimelineProps = {
   /** Newest release first. */
   discography: DiscographyEntry[],
+  /** Draws skeleton rows in place of the timeline while the discography is on its way. */
+  loading?: boolean,
+  /** Reserves shimmer space where the per-track figures go while they are on their way. */
+  tracksPending?: boolean,
 }
+
+const SKELETON_ROWS = 4
 
 /**
  * The discography as a dated spine, newest first, with release types mixed
  * rather than bucketed — which is also the only way releases whose type never
  * got tagged still land in the right place.
  */
-function ArtistTimeline({ discography }: ArtistTimelineProps) {
+function ArtistTimeline({ discography, loading = false, tracksPending = false }: ArtistTimelineProps) {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
 
@@ -56,6 +62,29 @@ function ArtistTimeline({ discography }: ArtistTimelineProps) {
     return rest > 0
       ? `${extensions[0].toUpperCase()} ${template('music-artist.meta.plus-more', { count: String(rest) })}`
       : extensions[0].toUpperCase()
+  }
+
+  if (loading && !discography.length) {
+    return (
+      <section className="artist-timeline">
+        <H3>{t('music-artist.timeline.title')}</H3>
+
+        <ol className="artist-timeline-rows" aria-hidden="true">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <li key={index} className="artist-timeline-row is-skeleton">
+              <div className="artist-timeline-entry">
+                <p className="artist-timeline-year"><span className="timeline-skeleton-bar" /></p>
+                <div className="artist-timeline-cover timeline-skeleton-cover" />
+                <div className="artist-timeline-details">
+                  <p className="artist-timeline-title"><span className="timeline-skeleton-bar wide" /></p>
+                  <p className="artist-timeline-facts"><span className="timeline-skeleton-bar" /></p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
   }
 
   return (
@@ -115,6 +144,14 @@ function ArtistTimeline({ discography }: ArtistTimelineProps) {
                     )}
                     {facts.map((fact) => <span key={fact}>{fact}</span>)}
                   </p>
+
+                  {!entry.tracks.length && tracksPending && !!entry.numTracks && (
+                    <div className="artist-timeline-beads-skeleton" aria-hidden="true">
+                      {Array.from({ length: entry.numTracks }, (_, beadIndex) => (
+                        <span key={beadIndex} />
+                      ))}
+                    </div>
+                  )}
 
                   {!!entry.tracks.length && (
                     <Beads

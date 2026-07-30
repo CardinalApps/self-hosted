@@ -28,7 +28,11 @@ export type MusicArtistReleaseListeningType = {
 }
 
 export type MusicArtistReleaseSummaryType = {
+  id: number,
   musicReleaseId: string,
+  title: string | null,
+  releaseType: string | null,
+  hasArtwork: boolean,
   /** The consensus year across the release's tracks, from embedded tags. */
   year: number | null,
   numTracks: number,
@@ -180,6 +184,10 @@ export const musicArtistsApi = baseHomeServerApi
           rating?: boolean,
         }
       >({
+        /* Artist payloads are expensive to compute server-side, so revisits within a session
+           reuse the cached copy instead of refetching. A reload always refetches; the persisted
+           store drops the whole api slice on rehydration. */
+        keepUnusedDataFor: 600,
         query: ({ id, releases, tracks, metadata, summary, playCount, rating }) => {
           return queryParams(`/music/artist/${id}`, {
             ...(typeof releases === 'boolean' && { releases }),

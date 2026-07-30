@@ -24,6 +24,8 @@ const TAG_GENRES_COUNTED = 5
 type ArtistMetaProps = {
   artist: MusicArtistType,
   tracks: MusicTrackType[],
+  /** Draws shimmer bars in place of the values while the summary is on its way. */
+  loading?: boolean,
 }
 
 type MetaRow = {
@@ -38,6 +40,7 @@ type MetaRow = {
 function ArtistMeta({
   artist,
   tracks,
+  loading = false,
 }: ArtistMetaProps) {
   const { lang } = useSelector(settingsSelectors.current)
   const summary = artist?.summary
@@ -221,7 +224,14 @@ function ArtistMeta({
   ]
 
   const toListItems = (rows: MetaRow[]) => rows.map((row) => ({
-    name: <><strong>{t(row.labelKey)}</strong> <span>{row.value || UNKNOWN}</span></>,
+    name: (
+      <>
+        <strong>{t(row.labelKey)}</strong>
+        {loading
+          ? <span className="meta-value-skeleton" />
+          : <span>{row.value || UNKNOWN}</span>}
+      </>
+    ),
     title: t(row.labelKey),
   }))
 

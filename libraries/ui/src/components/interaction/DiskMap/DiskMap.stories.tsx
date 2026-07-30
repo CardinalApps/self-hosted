@@ -177,6 +177,13 @@ export const Empty = () => (
 )
 
 /**
+ * The caller's data is still on its way.
+ */
+export const Loading = () => (
+  <DiskMap blocks={[]} palette={PALETTE} loading />
+)
+
+/**
  * A kiosk server has no files behind its library, so whatever blocks are handed
  * over are ignored in favour of a dead grid.
  */

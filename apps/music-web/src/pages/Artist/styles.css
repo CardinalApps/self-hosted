@@ -89,6 +89,15 @@
     }
   }
 
+  .meta-value-skeleton {
+    align-self: center;
+    width: 90px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: var(--text-color-5);
+    animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+  }
+
   .artist-play-actions {
     display: flex;
     flex-wrap: wrap;
@@ -250,6 +259,49 @@
     padding: 4px 0;
   }
 
+  .artist-timeline-row.is-skeleton {
+
+    .timeline-skeleton-bar {
+      display: inline-block;
+      width: 120px;
+      height: 14px;
+      border-radius: 7px;
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+
+      &.wide {
+        width: 220px;
+        height: 24px;
+        border-radius: 12px;
+      }
+    }
+
+    .timeline-skeleton-cover {
+      width: 300px;
+      height: 300px;
+      max-width: 100%;
+      border-radius: var(--border-radius);
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  .artist-timeline-beads-skeleton {
+    padding: 4px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+
+    span {
+      width: 14px;
+      height: 14px;
+      border-radius: 100%;
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+    }
+  }
+
   .artist-timeline-favorites {
     margin-top: var(--gutter);
     display: grid;
@@ -337,5 +389,27 @@
     .artist-play-modes {
       grid-template-columns: 1fr;
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .meta-value-skeleton,
+    .timeline-skeleton-bar,
+    .timeline-skeleton-cover,
+    .artist-timeline-beads-skeleton span {
+      animation: none;
+    }
+  }
+}
+
+@keyframes artist-skeleton-pulse {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.7;
   }
 }
