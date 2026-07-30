@@ -39,10 +39,10 @@
     "en": "You can change it later."
   },
   "usage-data.title": {
-    "en": "Share Usage Data"
+    "en": "Share Usage Metrics"
   },
   "usage-data.message-p1": {
-    "en": "You can allow Cardinal Apps Inc. to collect anonymous data about how your apps are used. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more <i class=\"fas fa-external-link-alt\"></i></a>."
+    "en": "You can allow Cardinal Apps Inc. to collect anonymous metrics about how your apps are used. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/telemetry' target='_blank'>Read more <i class=\"fas fa-external-link-alt\"></i></a>."
   },
   "usage-data.message-p2": {
     "en": "Cardinal Apps Inc. adheres to a strict <a href=\"https://cardinalapps.io/privacy-policy\" target=\"_blank\">Privacy Policy <i class=\"fas fa-external-link-alt\"></i></a> that protects your data."
@@ -51,7 +51,7 @@
     "en": "More information"
   },
   "usage-data.agree": {
-    "en": "Share telemetry data with Cardinal Apps Inc."
+    "en": "Share anonymous metrics"
   },
   "usage-data.next": {
     "en": "Continue"
@@ -66,7 +66,7 @@
     "en": "I understand & agree"
   },
   "login.title": {
-    "en": "Claim this Server"
+    "en": "Claim Your Server"
   },
   "login.overview": {
     "en": "<p class='message'>Cardinal accounts are free to create, and using one will allow you to use Cardinal's cloud services in your apps. You can claim this Media Server at any time by logging in with your cloud account.</p><p class='message'>You can skip this and sign in later. <a href='https://help.cardinalapps.io/guides/cardinal-media-server/accounts' target='_blank'>Read more about how accounts work. <i class='fas fa-external-link-alt'></i></a></p>"
