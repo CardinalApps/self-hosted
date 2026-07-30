@@ -88,10 +88,29 @@ const getAxisCandidates = (originFraction: number, positionFraction: number) => 
   return [preferred, [1, 1] as [number, number], [0, 0] as [number, number]]
 }
 
-const getAxisPosition = (originFraction: number, positionFraction: number, offset: number) => {
-  const base = `${originFraction * 100}%`
-  const direction = getOffsetDirection(originFraction, positionFraction)
-  return direction === 0 ? base : `calc(${base} + ${direction * offset}px)`
+/*
+  Real insets rather than a translate on the panel: a transform only moves pixels, so a panel
+  hanging off the trigger's right edge still counts its untransformed box as scrollable overflow
+  in whichever ancestor scrolls. Overflow past a left or top edge isn't scrollable, so anchoring
+  the panel's trailing edge with `right`/`bottom` never grows a scrollbar.
+*/
+const getAxisInsets = (
+  startProp: 'left' | 'top',
+  endProp: 'right' | 'bottom',
+  originFraction: number,
+  positionFraction: number,
+  offset: number,
+  panelSize: number,
+): CSSProperties => {
+  const push = getOffsetDirection(originFraction, positionFraction) * offset
+
+  if (positionFraction === 1) {
+    return { [endProp]: `calc(${(1 - originFraction) * 100}% - ${push}px)` }
+  }
+  if (positionFraction === 0.5) {
+    return { [startProp]: `calc(${originFraction * 100}% + ${push - (panelSize / 2)}px)` }
+  }
+  return { [startProp]: `calc(${originFraction * 100}% + ${push}px)` }
 }
 
 type PopoutProps = {
@@ -134,6 +153,8 @@ const Popout = ({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [placement, setPlacement] = useState({ position, origin })
+  // Only read when an axis is centre-anchored, which is the one case percentages can't express
+  const [panelSize, setPanelSize] = useState({ width: 0, height: 0 })
   const { clickedOutside, resetClickOutside } = useClickOutside(wrapperRef)
 
   /*
@@ -153,6 +174,12 @@ const Popout = ({
       const trigger = wrapperRef.current?.getBoundingClientRect()
       const panel = panelRef.current?.getBoundingClientRect()
       if (!trigger || !panel) return
+
+      setPanelSize((current) => (
+        current.width === panel.width && current.height === panel.height
+          ? current
+          : { width: panel.width, height: panel.height }
+      ))
 
       const resolveAxis = (
         triggerStart: number,
@@ -229,14 +256,11 @@ const Popout = ({
   const [positionX, positionY] = ANCHOR_FRACTIONS[placement.position]
 
   const outerStyle: CSSProperties = {
-    left: getAxisPosition(originX, positionX, offset),
-    top: getAxisPosition(originY, positionY, offset),
+    ...getAxisInsets('left', 'right', originX, positionX, offset, panelSize.width),
+    ...getAxisInsets('top', 'bottom', originY, positionY, offset, panelSize.height),
   }
 
-  const innerStyle: CSSProperties = {
-    transform: `translate(${-positionX * 100}%, ${-positionY * 100}%)`,
-    ...(width ? { width } : {}),
-  }
+  const innerStyle: CSSProperties = width ? { width } : {}
 
   return (
     <div ref={wrapperRef} className={clsx('popout-anchor', className)}>
