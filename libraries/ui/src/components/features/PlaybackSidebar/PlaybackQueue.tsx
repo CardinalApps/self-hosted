@@ -10,6 +10,8 @@ import { QueueItem } from '../../../store/slices/music'
 import { settingsSelectors } from '../../../store/slices/settings'
 import { useGetQueueItemsQuery, useMoveQueueItemMutation } from '../../../store/apis/playbackQueues'
 
+import { usePlaybackSidebar } from './context'
+
 import i18n from './i18n'
 
 import './PlaybackQueue.css'
@@ -88,13 +90,18 @@ const PlaybackQueue = ({
     part of a row (a track lookup, the full MusicTrack) loads for those, and the rest render
     a same-height placeholder. Because the rows are a fixed height, the range comes straight
     off the scroll offset, so none of the virtualizer's own positioning is needed here.
+
+    The list doesn't scroll itself — the whole sidebar does — so the virtualizer watches
+    the sidebar's scroller, with the list's own offset (the player above it) as the margin.
   */
+  const { scrollRef } = usePlaybackSidebar()
   const listRef = useRef<HTMLOListElement>(null)
   const virtualizer = useVirtualizer({
     count: items.length,
-    getScrollElement: () => listRef.current,
+    getScrollElement: () => scrollRef.current,
     estimateSize: () => ROW_HEIGHT,
     overscan: ROW_OVERSCAN,
+    scrollMargin: listRef.current?.offsetTop ?? 0,
   })
   const visibleRows = virtualizer.getVirtualItems()
   const activeRows = new Set(visibleRows.map((row) => row.index))

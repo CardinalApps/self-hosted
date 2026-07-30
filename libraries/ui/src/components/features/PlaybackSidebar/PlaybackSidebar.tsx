@@ -46,6 +46,7 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
   const modalIsOpen = useAppSelector(modalSelectors.isOpen)
   const { enable_glass, floating_playback_sidebar, theme, accent_color } = useAppSelector(settingsSelectors.current)
   const [glassColors, setGlassColors] = useState<string[]>([])
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // If the sidebar is already open at first render (hydrated from the cached store), skip
   // the slide-in so a reload lands it in place. Cleared after the first commit so a user
@@ -107,7 +108,7 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
   }
 
   return (
-    <PlaybackSidebarContext.Provider value={{ setGlassColors: publishGlassColors }}>
+    <PlaybackSidebarContext.Provider value={{ setGlassColors: publishGlassColors, scrollRef }}>
       <AnimatePresence>
         {!!open && (
           <motion.aside
@@ -120,7 +121,7 @@ const PlaybackSidebar = ({ contents }: PropsWithChildren<PlaybackSidebarProps>) 
             transition={{ type: 'spring', stiffness: 320, damping: 34 }}
           >
             <div className="playback-sidebar-card">
-              <div className="playback-sidebar-content">
+              <div className="playback-sidebar-content" ref={scrollRef}>
                 {contents}
               </div>
               {/*

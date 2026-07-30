@@ -1,5 +1,4 @@
 .playback-queue {
-  min-height: 0;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -19,15 +18,8 @@
 
   .queue-list {
     margin: 0;
-    margin-right: -3px;
     padding: 0;
-    /* Bleeds the box 3px into the card's own padding so the scrollbar backs off the
-       track rows without shifting them — the extra width and the padding cancel out. */
-    padding-right: 3px;
     list-style: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex-grow: 1;
 
     /* A drag is a mousedown-and-move over the row's own text, which the browser also
        reads as a selection — the whole list opts out for as long as one is live, since
