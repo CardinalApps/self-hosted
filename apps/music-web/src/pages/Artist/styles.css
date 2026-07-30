@@ -235,9 +235,10 @@
   }
 
   .artist-timeline-facts {
-    margin-bottom: 10px;
-    font-size: 13px;
-    color: var(--text-color-3);
+    margin-top: 13px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: var(--text-color-2);
 
     span:not(:last-child)::after {
       content: ' · ';
