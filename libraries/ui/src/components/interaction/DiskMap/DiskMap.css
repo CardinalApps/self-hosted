@@ -152,6 +152,12 @@
     }
   }
 
+  &.is-loading .disk-map-block {
+    background-color: var(--text-color-4);
+    opacity: 0.15;
+    animation: disk-map-pulse 1.6s ease-in-out infinite;
+  }
+
   &.disk-map-empty {
     overflow: hidden;
     border-radius: var(--border-radius);
@@ -172,13 +178,26 @@
 
   @media (prefers-reduced-motion: reduce) {
 
-    &.animate .disk-map-block {
+    &.animate .disk-map-block,
+    &.is-loading .disk-map-block {
       animation: none;
     }
 
     .disk-map-block {
       transition: none;
     }
+  }
+}
+
+@keyframes disk-map-pulse {
+
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+
+  50% {
+    opacity: 0.25;
   }
 }
 

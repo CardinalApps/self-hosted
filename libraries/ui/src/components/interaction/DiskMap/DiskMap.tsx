@@ -23,6 +23,8 @@ type DiskMapProps = {
   blocks: DiskMapBlock[]
   /** One color per group, assigned in order of first appearance. Repeats when short. */
   palette?: string[]
+  /** Draws a pulsing placeholder grid while the caller's data is still on its way. */
+  loading?: boolean
   /** Sweeps the blocks in on mount, like a disk scan. Ignored under prefers-reduced-motion. */
   animate?: boolean
   /** Lights up a whole group, for hovering something outside the map. */
@@ -91,16 +93,17 @@ const randomNudge = () => {
 const SHADE_STEPS = [1, 0.91, 1.07, 0.96, 1.03]
 
 /*
-  A kiosk server indexes no files, so there is nothing to map. Rather than an empty frame, the
-  map is drawn as a dead grid of placeholder blocks: it still reads as the component it is,
-  while being obviously switched off. The sizes vary, since a grid of identical boxes doesn't
-  look like a disk map, but only enough to keep the rows full — a wide spread leaves the packer
-  a sliver at the bottom, which reads as a fault rather than as a placeholder. The sequence is
-  fixed rather than random so the grid never re-packs between renders.
+  Stands in when there is nothing to map: a kiosk server indexes no files, and a loading map
+  hasn't been told its files yet. Rather than an empty frame, the map is drawn as a dead grid
+  of placeholder blocks: it still reads as the component it is, while being obviously not the
+  real thing. The sizes vary, since a grid of identical boxes doesn't look like a disk map,
+  but only enough to keep the rows full — a wide spread leaves the packer a sliver at the
+  bottom, which reads as a fault rather than as a placeholder. The sequence is fixed rather
+  than random so the grid never re-packs between renders.
 */
-const KIOSK_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
-  id: `kiosk-${index}`,
-  groupId: 'kiosk',
+const PLACEHOLDER_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
+  id: `placeholder-${index}`,
+  groupId: 'placeholder',
   bytes: 10 + ((index * 3) % 7),
 }))
 
@@ -116,6 +119,7 @@ const KIOSK_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
 const DiskMap = ({
   blocks,
   palette = [],
+  loading = false,
   animate = true,
   activeGroupId,
   groupLinks,
@@ -188,18 +192,19 @@ const DiskMap = ({
     })
   }, [blocks])
 
-  const kioskRects = useMemo(
-    () => kioskMode
-      ? layoutDiskMap(KIOSK_BLOCKS, { width: frameWidth, height: frameHeight, minBlockPx: MIN_BLOCK_PX })
+  const placeholderRects = useMemo(
+    () => kioskMode || loading
+      ? layoutDiskMap(PLACEHOLDER_BLOCKS, { width: frameWidth, height: frameHeight, minBlockPx: MIN_BLOCK_PX })
       : [],
-    [kioskMode, frameWidth, frameHeight],
+    [kioskMode, loading, frameWidth, frameHeight],
   )
 
-  if (kioskMode) {
+  // Kiosk wins over loading: a switched-off map has nothing on its way
+  if (kioskMode || loading) {
     return (
-      <div ref={frameRef} className={clsx('disk-map', 'is-kiosk', className)}>
+      <div ref={frameRef} className={clsx('disk-map', kioskMode ? 'is-kiosk' : 'is-loading', className)}>
         <div className="disk-map-blocks" aria-hidden="true">
-          {kioskRects.map((rect) => (
+          {placeholderRects.map((rect) => (
             <div
               key={rect.blockIndex}
               className="disk-map-block"
@@ -208,19 +213,22 @@ const DiskMap = ({
                 top: `${rect.y * 100}%`,
                 width: `${rect.width * 100}%`,
                 height: `${rect.height * 100}%`,
+                ...(loading && !kioskMode ? { animationDelay: `${(rect.blockIndex / placeholderRects.length) * 1000}ms` } : {}),
               }}
             />
           ))}
         </div>
 
-        <Card
-          className={clsx('disk-map-kiosk-notice', enable_glass && 'glass')}
-          bg={1}
-          border={2}
-          padding="thin"
-        >
-          {i18n['disk-map.kiosk-disabled'][lang]}
-        </Card>
+        {kioskMode && (
+          <Card
+            className={clsx('disk-map-kiosk-notice', enable_glass && 'glass')}
+            bg={1}
+            border={2}
+            padding="thin"
+          >
+            {i18n['disk-map.kiosk-disabled'][lang]}
+          </Card>
+        )}
       </div>
     )
   }

@@ -20,11 +20,16 @@ export type MusicArtistGenre = {
 }
 
 /**
- * One of the artist's releases, with the figures the artist page's timeline
- * needs but that aren't columns on the release row.
+ * One of the artist's releases: enough of the row itself for the artist page
+ * to render its timeline without loading the release relations, plus the
+ * figures that aren't columns on the release row.
  */
 export type MusicArtistReleaseSummary = {
+  id: number
   musicReleaseId: string
+  title: string | null
+  releaseType: string | null
+  hasArtwork: boolean
   /** The consensus year across the release's tracks, from embedded tags. */
   year: number | null
   numTracks: number
