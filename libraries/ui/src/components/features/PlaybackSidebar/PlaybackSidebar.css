@@ -186,8 +186,7 @@
 /* A dark album turns the sidebar dark, and the theme's text colors stop reading on it */
 .playback-sidebar[data-contrast="light"] {
 
-  .playback-queue-title,
-  .playback-queue-empty {
+  .playback-queue-title {
     color: rgba(255, 255, 255, 0.8);
   }
 

@@ -132,13 +132,9 @@ const PlaybackQueue = ({
     moveQueueItem({ queueId, queueItemId: item.queueItemId, afterQueueItemId })
   }
 
+  // An empty queue shows nothing at all — the player above speaks for itself
   if (!items.length) {
-    return (
-      <div className={clsx(className, 'playback-queue', 'is-empty')}>
-        <h3 className="playback-queue-title">{i18n['playback-sidebar.queue-title'][lang]}</h3>
-        <p className="playback-queue-empty">{i18n['playback-sidebar.queue-empty'][lang]}</p>
-      </div>
-    )
+    return null
   }
 
   return (

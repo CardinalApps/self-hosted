@@ -7,9 +7,6 @@ const i18n: StringList = {
   "playback-sidebar.queue-title": {
     "en": "Queue",
   },
-  "playback-sidebar.queue-empty": {
-    "en": "Nothing else is in the queue.",
-  },
   "playback-sidebar.queue-reorder": {
     "en": "Drag to reorder",
   },
