@@ -28,9 +28,6 @@ const i18n: StringList = {
   "external-links.discogs.catalog-number": {
     "en": "Search by catalog no.",
   },
-  "external-links.amazon.asin": {
-    "en": "Go to ASIN",
-  },
 }
 
 export default i18n

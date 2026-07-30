@@ -23,7 +23,6 @@ const RELEASE_IDS = {
   musicbrainzReleaseGroupId: '51a74d4a-f21d-49de-8655-5335dafd82d2',
   barcode: '817424013734',
   catalogNumber: 'SUM473',
-  asin: 'B00HRVFOSO',
 }
 
 const TRACK_IDS = {
