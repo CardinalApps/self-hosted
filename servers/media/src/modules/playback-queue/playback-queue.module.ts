@@ -17,11 +17,12 @@ import { MusicTrackModule } from '../music-track/music-track.module'
 import { QueueItemService } from './playback-queue-item.service'
 import { MusicRelease } from '../music-release/music-release.entity'
 import { MusicArtist } from '../music-artist/music-artist.entity'
+import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating } from '../rating/rating.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PlaybackQueue, PlaybackQueueItem, MusicRelease, MusicArtist, Rating]),
+    TypeOrmModule.forFeature([PlaybackQueue, PlaybackQueueItem, MusicRelease, MusicArtist, MusicHistory, Rating]),
     EventModule,
     LibraryModule,
     MusicTrackModule,

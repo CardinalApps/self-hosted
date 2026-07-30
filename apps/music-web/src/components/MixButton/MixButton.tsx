@@ -11,17 +11,17 @@ import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { randomHexColor } from '@cardinalapps/ui/src/lib/color/randomHexColor'
 
 type MixButtonProps = {
-  seedMediaType: QueueSeedMediaType,
-  seedMediaId: string,
+  seedMediaType?: QueueSeedMediaType,
+  seedMediaId?: string,
   dynamicQueueType: DynamicQueueType,
   icon: string,
   label: string,
 }
 
 /**
- * An action button that starts a dynamic queue seeded by one release or artist.
- * Every press starts a brand new queue on the server; the server keeps it topped
- * up with fitting tracks from there on.
+ * An action button that starts a dynamic queue, optionally seeded by one
+ * release or artist. Every press starts a brand new queue on the server; the
+ * server keeps it topped up with fitting tracks from there on.
  */
 function MixButton({
   seedMediaType,
@@ -35,13 +35,14 @@ function MixButton({
   const { [dynamicQueueType]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
 
   /*
-    Party while a player of this queue type, seeded by this same media, is going.
-    The queue rides along in the player state, so this survives navigation and
-    stays scoped to the release or artist it was started from.
+    Party while a player of this queue type, with this same seed, is going. The
+    queue rides along in the player state, so this survives navigation and stays
+    scoped to the release or artist it was started from. A seedless button
+    parties only for seedless queues of its type.
   */
   const partyTime = !!Object.values(players).find((player: Player) => (
     player.queue?.dynamicType === dynamicQueueType
-    && player.queue?.seedMediaId === seedMediaId
+    && (player.queue?.seedMediaId ?? null) === (seedMediaId ?? null)
     && (player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING)
   ))
   const isPartyTime = partyTime && storedActionButton?.gradientAnimation
@@ -67,8 +68,7 @@ function MixButton({
     dispatch(play({
       queueType: 'dynamic',
       dynamicQueueType,
-      seedMediaType,
-      seedMediaId,
+      ...(seedMediaType && seedMediaId ? { seedMediaType, seedMediaId } : {}),
     }))
   }
 

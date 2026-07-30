@@ -3,3 +3,9 @@
   position: relative;
   overflow-x: hidden;
 }
+
+.listen-now .listen-now-actions {
+  height: 100%;
+  display: flex;
+  gap: 20px;
+}
