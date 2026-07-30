@@ -10,11 +10,10 @@ export type ExternalIds = {
   musicbrainzRecordingId?: string | null
   isrc?: string | null
   barcode?: string | null
-  asin?: string | null
   catalogNumber?: string | null
 }
 
-export type ExternalProviderId = 'musicbrainz' | 'discogs' | 'amazon'
+export type ExternalProviderId = 'musicbrainz' | 'discogs'
 
 export type ExternalLink = {
   /** Stable key, unique within one list. */
@@ -27,7 +26,6 @@ export type ExternalLink = {
 
 const MUSICBRAINZ = 'https://musicbrainz.org'
 const DISCOGS_SEARCH = 'https://www.discogs.com/search/'
-const AMAZON = 'https://www.amazon.com/dp'
 
 const discogsSearch = (query: string, type: 'release' | 'artist'): string => (
   `${DISCOGS_SEARCH}?q=${encodeURIComponent(query)}&type=${type}`
@@ -76,9 +74,6 @@ export function buildExternalLinks(ids: ExternalIds): ExternalLink[] {
 
   push('discogs-catno', 'discogs', 'external-links.discogs.catalog-number', ids.catalogNumber,
     (value) => discogsSearch(value, 'release'))
-
-  push('amazon-asin', 'amazon', 'external-links.amazon.asin', ids.asin,
-    (value) => `${AMAZON}/${encodeURIComponent(value)}`)
 
   return links
 }

@@ -62,25 +62,7 @@ const DiscogsLogo = () => (
   </svg>
 )
 
-const AmazonLogo = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    <text
-      x="12"
-      y="15.5"
-      textAnchor="middle"
-      fill="currentColor"
-      fontSize="10"
-      fontWeight="700"
-      fontFamily="inherit"
-    >
-      A
-    </text>
-  </svg>
-)
-
 export const providers: Record<ExternalProviderId, ExternalProvider> = {
   musicbrainz: { name: 'MusicBrainz', wordmark: true, logo: MusicBrainzLogo },
   discogs: { name: 'Discogs', logo: DiscogsLogo },
-  amazon: { name: 'Amazon', logo: AmazonLogo },
 }
