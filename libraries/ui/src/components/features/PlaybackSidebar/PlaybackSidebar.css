@@ -59,6 +59,7 @@
     z-index: 1;
   }
 
+  /* The one scroller in the sidebar: the player, the queue, everything moves as a single page */
   .playback-sidebar-content {
     width: 100%;
     height: 100%;
@@ -66,7 +67,8 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     z-index: 2;
   }
@@ -83,13 +85,11 @@
   itself back to the gutter to keep the content aligned with the rest of the sidebar.
 */
 .playback-sidebar-idle {
-  min-height: 0;
   flex-grow: 1;
   margin: 0 -15px;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  overflow-y: auto;
 }
 
 .playback-sidebar-no-media {
@@ -133,7 +133,10 @@
 }
 
 .playback-sidebar-player {
-  position: relative;
+  /* The content column scrolls rather than squeezes, so the player never gives up height */
+  flex-shrink: 0;
+  position: sticky;
+  top: -410px;
   z-index: 3;
 }
 
