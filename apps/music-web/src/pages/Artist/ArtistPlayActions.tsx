@@ -8,6 +8,7 @@ import { audioSelectors } from '@cardinalapps/ui/src/store/slices/music'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { useExtendQueueMutation } from '@cardinalapps/ui/src/store/apis/playbackQueues'
+import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 
 import MixButton from '../../components/MixButton'
 
@@ -52,7 +53,7 @@ function ArtistPlayActions({
   const oldestFirstIds = discographyTrackIds([...discography].reverse())
   const tracks = discographyTracks(discography)
 
-  const favoriteIds = tracks.filter((track) => Number(track?.rating) > 0).map((track) => track.musicTrackId)
+  const favoriteIds = tracks.filter((track) => isFavorite(track?.rating)).map((track) => track.musicTrackId)
   const unheardIds = tracks.filter((track) => !Number(track?.playCount)).map((track) => track.musicTrackId)
   const topTrackIds = [...tracks]
     .sort((a, b) => (

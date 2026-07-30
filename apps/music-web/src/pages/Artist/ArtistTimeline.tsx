@@ -8,6 +8,7 @@ import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
 import { secondsToMMSS } from '@cardinalapps/ui/src/lib/formatting/time'
+import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import type { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
@@ -105,7 +106,7 @@ function ArtistTimeline({ discography, loading = false, tracksPending = false }:
           ].filter(Boolean)
 
           // Track order, same as the beads above it
-          const favoriteTracks = entry.tracks.filter((track) => Number(track.rating) > 0)
+          const favoriteTracks = entry.tracks.filter((track) => isFavorite(track.rating))
 
           return (
             <li

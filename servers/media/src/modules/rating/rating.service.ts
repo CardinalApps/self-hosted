@@ -8,6 +8,7 @@ import { User } from '../user/user.entity'
 import { SetRatingDto } from './dtos/SetRating.dto'
 import { GetRatingsDto } from './dtos/GetRatings.dto'
 
+// Mirrored client-side by isFavorite() in @cardinalapps/ui (lib/media/ratings.ts); keep the two in sync
 const FAVORITE_THRESHOLD = 1
 
 @Injectable()
