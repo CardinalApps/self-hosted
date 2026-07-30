@@ -1,14 +1,18 @@
-import { CSSProperties, PropsWithChildren, useEffect, useRef } from 'react'
+import { CSSProperties, PropsWithChildren, useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 
 import useScrolledToBottom from '../../../../hooks/useScrolledToBottom'
 import H2 from '../../../typography/H2'
 import useScrollPointRestoration from '../../../../hooks/useScrollPointRestoration'
 import Card from '../../../layout/Card'
+import Shimmer from '../../../layout/Shimmer'
 import Icon from '../../../typography/Icon'
 
 import i18n from '../i18n'
 import H5 from '../../../typography/H5'
+
+// How far past the viewport a block can be and still initialize (one viewport of lookahead)
+const LAZY_INIT_MARGIN = '0px 0px 100% 0px'
 
 export type ProceduralProps = {
   name: string,
@@ -103,14 +107,38 @@ export type ProceduralBlockProps = {
   flush?: boolean,
 }
 
+/*
+  Blocks initialize lazily. A block renders a shimmer until it scrolls near the
+  viewport, then mounts its real contents and stays mounted, so a page can
+  declare any number of blocks without paying their query cost up front.
+*/
 ProceduralLayout.Block = (props: PropsWithChildren<ProceduralBlockProps>) => {
+  const blockRef = useRef<HTMLDivElement>(null)
+  const [initialized, setInitialized] = useState(typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    if (initialized || !blockRef.current) {
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setInitialized(true)
+      }
+    }, { rootMargin: LAZY_INIT_MARGIN })
+
+    observer.observe(blockRef.current)
+    return () => observer.disconnect()
+  }, [initialized])
+
   return (
     <div
+      ref={blockRef}
       className={clsx("procedural-layout-block", props.flush && 'flush')}
       data-size={props.size}
     >
       <div className="procedural-layout-block-inner" style={props.style}>
-        {props.children}
+        {initialized ? props.children : <Shimmer />}
       </div>
     </div>
   )
