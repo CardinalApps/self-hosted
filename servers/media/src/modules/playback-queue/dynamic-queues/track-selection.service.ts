@@ -6,9 +6,11 @@ import { PlaybackQueue } from '../playback-queue.entity'
 import { PlaybackQueueItem } from '../playback-queue-item.entity'
 
 import { LibraryService } from '../../library/library.service'
+import { MusicHistory } from '../../music-history/music-history.entity'
 import { MusicTrack } from '../../music-track/music-track.entity'
 import { MusicTrackService } from '../../music-track/music-track.service'
 import { Rating } from '../../rating/rating.entity'
+import { FAVORITE_THRESHOLD } from '../../rating/rating.service'
 
 // How many of the most recently queued tracks seed the next related batch
 const RELATED_TAIL_SIZE = 5
@@ -35,6 +37,9 @@ export class TrackSelection {
 
     @InjectRepository(Rating)
     private ratingRepository: Repository<Rating>,
+
+    @InjectRepository(MusicHistory)
+    private musicHistoryRepository: Repository<MusicHistory>,
 
     private readonly libraryService: LibraryService,
     private readonly musicTrackService: MusicTrackService,
@@ -168,6 +173,83 @@ export class TrackSelection {
       .sort((a, b) => a.plays - b.plays || a.jitter - b.jitter)
       .slice(0, count)
       .map((scored) => scored.track.musicTrackId)
+  }
+
+  /**
+   * The user's most played tracks since the cutoff, restricted to the queue's
+   * libraries. Only tracks with at least `minPlays` plays in the window qualify,
+   * so a lone accidental play cannot anchor a whole session.
+   */
+  async mostPlayedSince(queue: PlaybackQueue, cutoff: Date, minPlays: number, limit: number): Promise<MusicTrack[]> {
+    const playsQuery = this.musicHistoryRepository
+      .createQueryBuilder('history')
+      .select('history.track_id', 'trackId')
+      .addSelect('COUNT(history.id)', 'plays')
+      .where('history.created_at >= :cutoff', { cutoff })
+      .groupBy('history.track_id')
+      .having('COUNT(history.id) >= :minPlays', { minPlays })
+      .orderBy('plays', 'DESC')
+      .limit(limit)
+
+    if (queue.user) {
+      playsQuery.andWhere('history.user_id = :userId', { userId: queue.user.id })
+    }
+
+    const rows = await playsQuery.getRawMany()
+    const trackIds = rows.map((row) => parseInt(row.trackId, 10)).filter((id) => !isNaN(id))
+
+    if (!trackIds.length) {
+      return []
+    }
+
+    const tracksQuery = this.musicTrackRepository
+      .createQueryBuilder('music_track')
+      .where('music_track.id IN (:...trackIds)', { trackIds })
+
+    if (queue?.libraries?.length) {
+      tracksQuery.innerJoin('music_track.file', ...this.libraryService.createJoinArgs(queue.libraries))
+    }
+
+    return await tracksQuery.getMany()
+  }
+
+  /**
+   * One random track that the user has favorited, restricted to the queue's
+   * libraries. Returns null when the user has no reachable favorites.
+   */
+  async randomFavoriteTrack(queue: PlaybackQueue): Promise<MusicTrack | null> {
+    if (!queue.user) {
+      return null
+    }
+
+    const favorites = await this.ratingRepository.find({
+      select: {
+        mediaId: true,
+      },
+      where: {
+        mediaType: 'music_track',
+        rating: FAVORITE_THRESHOLD,
+        user: {
+          id: queue.user.id,
+        },
+      },
+    })
+
+    if (!favorites.length) {
+      return null
+    }
+
+    const favoriteQuery = this.musicTrackRepository
+      .createQueryBuilder('music_track')
+      .where('music_track.musicTrackId IN (:...favoriteIds)', { favoriteIds: favorites.map((favorite) => favorite.mediaId) })
+      .orderBy('RANDOM()')
+      .limit(1)
+
+    if (queue?.libraries?.length) {
+      favoriteQuery.innerJoin('music_track.file', ...this.libraryService.createJoinArgs(queue.libraries))
+    }
+
+    return await favoriteQuery.getOne()
   }
 
   /**

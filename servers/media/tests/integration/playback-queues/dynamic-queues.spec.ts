@@ -202,8 +202,11 @@ describe('house_mix queues', () => {
     }
   })
 
-  it('returns 400 when the seed is missing', async () => {
-    await createQueue({ type: 'dynamic', dynamicType: 'house_mix' }, 400)
+  it('accepts a missing seed by seeding itself', async () => {
+    const queue = await createQueue({ type: 'dynamic', dynamicType: 'house_mix' })
+    const items = await getItems(queue.queueId)
+
+    expect(items.length).toBeGreaterThan(1)
   })
 
   it('returns 404 when the seed release does not exist', async () => {
