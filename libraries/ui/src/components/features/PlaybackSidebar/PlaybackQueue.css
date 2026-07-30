@@ -11,11 +11,6 @@
     color: var(--text-color-3);
   }
 
-  .playback-queue-empty {
-    font-size: 14px;
-    color: var(--text-color-3);
-  }
-
   .queue-list {
     margin: 0;
     padding: 0;
