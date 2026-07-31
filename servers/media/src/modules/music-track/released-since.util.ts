@@ -8,6 +8,14 @@ import { ObjectLiteral, SelectQueryBuilder } from 'typeorm'
 const FULL_DATE_KEYS = ['originaldate', 'date']
 const YEAR_KEYS = ['originalyear', 'year', 'releaseYear']
 
+// How recently released in real life music must be to count as fresh
+export const FRESH_WINDOW_DAYS = 365
+
+// Today minus the fresh window, as YYYY-MM-DD
+export function freshCutoffIso(): string {
+  return new Date(Date.now() - FRESH_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+}
+
 /**
  * Filters a music_track query down to tracks whose file metadata says they were
  * released on or after the cutoff. Full YYYY-MM-DD values compare exactly.

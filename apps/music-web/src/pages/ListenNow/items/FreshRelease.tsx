@@ -6,21 +6,21 @@ import DynamicQueueActionButton from '../../../components/DynamicQueueActionButt
 import { useHasFreshMusic } from '../../../hooks/useHasFreshMusic'
 
 /**
- * Starts a queue of music released in real life within the fresh window,
- * according to the files' metadata. Disabled when the library has none.
+ * Plays one random release that came out in real life within the fresh window,
+ * front to back. Disabled when the library has no fresh music.
  */
-function FreshMusic() {
+function FreshRelease() {
   const { lang } = useAppSelector(settingsSelectors.current)
   const hasFreshMusic = useHasFreshMusic()
 
   return (
     <DynamicQueueActionButton
-      dynamicQueueType="fresh_music"
-      icon="fas fa-seedling"
+      dynamicQueueType="fresh_release"
+      icon="fas fa-leaf"
       disabled={!hasFreshMusic}
-      label={i18n['action-buttons.fresh-music'][lang]}
+      label={i18n['action-buttons.fresh-release'][lang]}
     />
   )
 }
 
-export default FreshMusic
+export default FreshRelease

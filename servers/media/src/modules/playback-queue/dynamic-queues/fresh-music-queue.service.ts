@@ -4,13 +4,12 @@ import { PlaybackQueue } from '../playback-queue.entity'
 import { PlaybackQueueItem } from '../playback-queue-item.entity'
 import { DynamicQueueType } from '../dtos/CreatePlaybackQueue'
 
+import { freshCutoffIso } from '../../music-track/released-since.util'
+
 import { DynamicQueue } from './types'
 import { TrackSelection } from './track-selection.service'
 
 const INIT_BATCH = 50
-
-// The oldest real-world release date that still counts as fresh
-const FRESH_WINDOW_DAYS = 365
 
 /**
  * Fresh plays music that was recently released in real life, according to the
@@ -29,7 +28,7 @@ export class FreshMusicQueue implements DynamicQueue {
    * A Fresh queue opens with a random spread of the library's fresh tracks.
    */
   async init(queue: PlaybackQueue): Promise<string[]> {
-    return await this.trackSelection.freshTracks(queue, this.cutoffIso(), INIT_BATCH, [])
+    return await this.trackSelection.freshTracks(queue, freshCutoffIso(), INIT_BATCH, [])
   }
 
   /**
@@ -38,11 +37,6 @@ export class FreshMusicQueue implements DynamicQueue {
    */
   async next(queue: PlaybackQueue, existingItems: PlaybackQueueItem[], batchSize: number): Promise<string[]> {
     const queuedTrackIds = existingItems.map((item) => item.mediaId)
-    return await this.trackSelection.freshTracks(queue, this.cutoffIso(), batchSize, queuedTrackIds)
-  }
-
-  // Today minus the fresh window, as YYYY-MM-DD
-  private cutoffIso(): string {
-    return new Date(Date.now() - FRESH_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    return await this.trackSelection.freshTracks(queue, freshCutoffIso(), batchSize, queuedTrackIds)
   }
 }
