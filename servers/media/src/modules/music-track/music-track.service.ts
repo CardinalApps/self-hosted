@@ -13,6 +13,7 @@ import { applyReleasedSince } from './released-since.util'
 import { LibraryService } from '../library/library.service'
 import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating, RatingMediaType } from '../rating/rating.entity'
+import { FAVORITE_THRESHOLD } from '../rating/rating.service'
 import { User } from '../user/user.entity'
 
 @Injectable()
@@ -80,12 +81,19 @@ export class MusicTrackService {
       playCount,
       rating,
       releasedSince,
+      favorites,
     } = getMusicTracksDto
 
     /* Ordering by a computed figure requires computing it, whatever the caller asked for -
        otherwise the sort silently falls back to an arbitrary order. */
     const withPlayCount = playCount || orderBy === 'playCount'
     const withRating = (rating || orderBy === 'rating') && !!user
+    const withFavorites = favorites || orderBy === 'favoritedAt'
+
+    // Favorites are per-user; without a user there is nothing to return
+    if (withFavorites && !user) {
+      return [[], 0]
+    }
 
     const qb = this.musicTrackRepository.createQueryBuilder('music_track')
 
@@ -102,6 +110,21 @@ export class MusicTrackService {
 
     if (releasedSince) {
       applyReleasedSince(qb, 'music_track', releasedSince)
+    }
+
+    // One rating row per user+track, so this join cannot duplicate tracks
+    if (withFavorites) {
+      qb.innerJoin(
+        Rating,
+        'favorite',
+        'favorite.media_type = :favoriteMediaType AND favorite.media_id = music_track.music_track_id AND favorite.user_id = :favoriteUserId AND favorite.rating = :favoriteThreshold',
+        {
+          favoriteMediaType: RatingMediaType.MUSIC_TRACK,
+          favoriteUserId: user.id,
+          favoriteThreshold: FAVORITE_THRESHOLD,
+        },
+      )
+      qb.addSelect('favorite.created_at', 'music_track_favorited_at')
     }
 
     // Join pre-aggregated play counts in a single pass rather than a
@@ -135,6 +158,8 @@ export class MusicTrackService {
       qb.orderBy('music_track_play_count', order)
     } else if (orderBy === 'rating' && withRating) {
       qb.orderBy('music_track_rating', order)
+    } else if (orderBy === 'favoritedAt') {
+      qb.orderBy('music_track_favorited_at', order)
     } else {
       qb.orderBy(`music_track.${orderBy}`, order)
     }

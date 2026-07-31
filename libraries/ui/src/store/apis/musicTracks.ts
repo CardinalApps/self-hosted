@@ -12,7 +12,7 @@ export type MusicTracksOrderBy = Extract<ToolbarOrderByType,
   | 'playCount'
   | 'trackNumber'
   | 'rating'
->
+> | 'favoritedAt'
 export type MusicTrackWaveformType = {
   version: number,
   binCount: number,
@@ -114,9 +114,10 @@ export const musicTracksApi = baseHomeServerApi
           metadata?: boolean,
           libraries?: string[],
           releasedSince?: string,
+          favorites?: boolean,
         }
       >({
-        query: ({ take, skip, release, metadata, orderBy, order, libraries, releasedSince }) => {
+        query: ({ take, skip, release, metadata, orderBy, order, libraries, releasedSince, favorites }) => {
           return queryParams('/music/tracks', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
@@ -126,6 +127,7 @@ export const musicTracksApi = baseHomeServerApi
             ...(metadata && { metadata }),
             ...(libraries && { libraries }),
             ...(releasedSince && { releasedSince }),
+            ...(favorites && { favorites }),
           })
         },
         providesTags: ['MusicTracks'],

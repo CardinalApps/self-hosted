@@ -13,6 +13,7 @@ enum AllowedMusicTracksOrderBy {
   'bitrate' = 'bitrate',
   'playCount' = 'playCount',
   'rating' = 'rating',
+  'favoritedAt' = 'favoritedAt',
 }
 
 class MusicTracksPagination extends Pagination {
@@ -67,4 +68,13 @@ export class GetMusicTracksDto extends MusicTracksPagination {
   @IsString()
   @Matches(/^\d{4}-\d{2}-\d{2}$/)
   releasedSince?: string
+
+  /**
+   * Only tracks the current user has favorited. Ordering by favoritedAt turns
+   * this on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  favorites?: boolean = false
 }
