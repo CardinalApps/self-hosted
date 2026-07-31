@@ -35,9 +35,18 @@ export type SSEIndexingUpdate = {
   },
 }
 
+export type IndexingRunOptions = {
+  runType: 'quick' | 'full',
+  indexMusic: boolean,
+  indexPhotos: boolean,
+  indexMovies: boolean,
+  indexTV: boolean,
+}
+
 type IndexingSliceState = {
   serverState: ServerStatus | null,
   startedAt: number | null,
+  runOptions: IndexingRunOptions,
   filesFound: number,
   filesIndexed: number,
   filesSkipped: number,
@@ -67,6 +76,13 @@ type IndexingSliceState = {
 export const initialState: IndexingSliceState = {
   serverState: null,
   startedAt: null,
+  runOptions: {
+    runType: 'quick',
+    indexMusic: true,
+    indexPhotos: true,
+    indexMovies: false,
+    indexTV: false,
+  },
   filesFound: 0,
   filesIndexed: 0,
   filesSkipped: 0,
@@ -97,6 +113,9 @@ const indexingSlice = createSlice({
   name: STORE_KEY,
   initialState,
   reducers: {
+    setRunOptions: (state, action: PayloadAction<Partial<IndexingRunOptions>>) => {
+      Object.assign(state.runOptions, action.payload)
+    },
     setServerState: (state, action: PayloadAction<SSEIndexingUpdate>) => {
       const { payload } = action
       state.serverState = payload?.state
@@ -308,6 +327,7 @@ const indexingSlice = createSlice({
     }),
   selectors: {
     serverState: (state) => state.serverState,
+    runOptions: (state) => state.runOptions,
     startedAt: (state) => state.startedAt,
     filesFound: (state) => state.filesFound,
     filesIndexed: (state) => state.filesIndexed,
