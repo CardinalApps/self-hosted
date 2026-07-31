@@ -6,6 +6,7 @@ import FreshRelease from './items/FreshRelease'
 import RecentlyAddedReleases from './items/RecentlyAddedReleases'
 import MostPlayedTracks from './items/MostPlayedTracks'
 import FavoriteTracks from './items/FavoriteTracks'
+import ReleasesWithFavorites from './items/ReleasesWithFavorites'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
 function ListenNowProcedural() {
@@ -63,6 +64,15 @@ function ListenNowProcedural() {
       }
       <ProceduralLayout.Block size='6x4'>
         <FavoriteTracks />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Releases with favorites carousel.
+       */
+      }
+      <ProceduralLayout.Block size='12x4' flush>
+        <ReleasesWithFavorites />
       </ProceduralLayout.Block>
 
       {

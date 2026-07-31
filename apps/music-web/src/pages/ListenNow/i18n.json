@@ -25,5 +25,11 @@
   },
   "recently-added-releases.title": {
     "en": "Recently Added Releases"
+  },
+  "releases-with-favorites.title": {
+    "en": "Releases with Favorites"
+  },
+  "releases-with-favorites.empty": {
+    "en": "Releases containing your favorite tracks will appear here."
   }
 }

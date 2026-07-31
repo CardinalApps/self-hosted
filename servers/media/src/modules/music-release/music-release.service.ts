@@ -10,9 +10,10 @@ import { MusicReleaseThumbnail } from './music-release-thumbnail.entity'
 import { ReleaseType } from './enums'
 
 import { EventService } from '../event/event.service'
+import { MusicTrack } from '../music-track/music-track.entity'
 import { MusicTrackService } from '../music-track/music-track.service'
-import { RatingService } from '../rating/rating.service'
-import { RatingMediaType } from '../rating/rating.entity'
+import { FAVORITE_THRESHOLD, RatingService } from '../rating/rating.service'
+import { Rating, RatingMediaType } from '../rating/rating.entity'
 import { User } from '../user/user.entity'
 
 import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
@@ -156,7 +157,7 @@ export class MusicReleaseService {
   /**
    * Returns music releases.
    */
-  async query(getMusicReleasesDto: GetMusicReleasesDto): Promise<[MusicRelease[], number]> {
+  async query(getMusicReleasesDto: GetMusicReleasesDto, user?: User): Promise<[MusicRelease[], number]> {
     const {
       take,
       skip,
@@ -168,7 +169,15 @@ export class MusicReleaseService {
       thumbnails,
       metadata,
       libraries,
+      favorites,
     } = getMusicReleasesDto
+
+    // Ordering by a computed figure requires computing it, and favorites are per-user
+    const withFavorites = favorites || orderBy === 'favoritedAt'
+    if (withFavorites && !user) {
+      return [[], 0]
+    }
+
     const qb = this.musicReleaseRepository.createQueryBuilder('musicRelease')
 
     if (artists) qb.leftJoinAndSelect('musicRelease.artist', 'artist')
@@ -185,8 +194,39 @@ export class MusicReleaseService {
       qb.innerJoin('tracks.file', ...this.libraryService.createJoinArgs(libraryEntities))
     }
 
+    /*
+      One aggregated row per release that contains favorites, so the join cannot
+      duplicate releases. favorited_at is the release's most recent favorite.
+    */
+    if (withFavorites) {
+      qb.innerJoin(
+        (subQuery) => subQuery
+          .select('favoritedTrack.release_id', 'release_id')
+          .addSelect('MAX(favorite.created_at)', 'favorited_at')
+          .from(Rating, 'favorite')
+          .innerJoin(MusicTrack, 'favoritedTrack', 'favoritedTrack.music_track_id = favorite.media_id')
+          .where('favorite.media_type = :favoriteMediaType')
+          .andWhere('favorite.user_id = :favoriteUserId')
+          .andWhere('favorite.rating = :favoriteThreshold')
+          .groupBy('favoritedTrack.release_id'),
+        'release_favorites',
+        'release_favorites.release_id = musicRelease.id',
+      )
+      qb.addSelect('release_favorites.favorited_at', 'music_release_favorited_at')
+      qb.setParameters({
+        favoriteMediaType: RatingMediaType.MUSIC_TRACK,
+        favoriteUserId: user.id,
+        favoriteThreshold: FAVORITE_THRESHOLD,
+      })
+    }
+
+    if (orderBy === 'favoritedAt') {
+      qb.orderBy('music_release_favorited_at', order)
+    } else {
+      qb.orderBy(`musicRelease.${orderBy}`, order)
+    }
+
     qb
-      .orderBy(`musicRelease.${orderBy}`, order)
       .take(take)
       .skip(skip)
 
