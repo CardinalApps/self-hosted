@@ -10,7 +10,7 @@ import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { useExtendQueueMutation } from '@cardinalapps/ui/src/store/apis/playbackQueues'
 import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 
-import MixButton from '../../components/MixButton'
+import DynamicQueueActionButton from '../../components/DynamicQueueActionButton'
 
 import { discographyTrackIds, discographyTracks, type DiscographyEntry } from './discography'
 
@@ -134,14 +134,14 @@ function ArtistPlayActions({
   return (
     <div className="artist-play-actions">
       <div className="artist-mix-row">
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_artist"
           seedMediaId={artistId}
           dynamicQueueType="house_mix"
           icon="fas fa-dna"
           label={t('music-artist.play-actions.house-mix')}
         />
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_artist"
           seedMediaId={artistId}
           dynamicQueueType="undertow"

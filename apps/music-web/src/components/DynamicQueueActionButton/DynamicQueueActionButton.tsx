@@ -10,7 +10,7 @@ import { DynamicQueueType, QueueSeedMediaType } from '@cardinalapps/ui/src/store
 import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { randomHexColor } from '@cardinalapps/ui/src/lib/color/randomHexColor'
 
-type MixButtonProps = {
+type DynamicQueueActionButtonProps = {
   seedMediaType?: QueueSeedMediaType,
   seedMediaId?: string,
   dynamicQueueType: DynamicQueueType,
@@ -23,13 +23,13 @@ type MixButtonProps = {
  * release or artist. Every press starts a brand new queue on the server; the
  * server keeps it topped up with fitting tracks from there on.
  */
-function MixButton({
+function DynamicQueueActionButton({
   seedMediaType,
   seedMediaId,
   dynamicQueueType,
   icon,
   label,
-}: MixButtonProps) {
+}: DynamicQueueActionButtonProps) {
   const dispatch = useAppDispatch()
   const players = useAppSelector(audioSelectors.players)
   const { [dynamicQueueType]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
@@ -95,4 +95,4 @@ function MixButton({
   )
 }
 
-export default MixButton
+export default DynamicQueueActionButton
