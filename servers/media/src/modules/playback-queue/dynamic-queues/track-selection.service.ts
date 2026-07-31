@@ -9,6 +9,7 @@ import { LibraryService } from '../../library/library.service'
 import { MusicHistory } from '../../music-history/music-history.entity'
 import { MusicTrack } from '../../music-track/music-track.entity'
 import { MusicTrackService } from '../../music-track/music-track.service'
+import { applyReleasedSince } from '../../music-track/released-since.util'
 import { Rating } from '../../rating/rating.entity'
 import { FAVORITE_THRESHOLD } from '../../rating/rating.service'
 
@@ -250,6 +251,39 @@ export class TrackSelection {
     }
 
     return await favoriteQuery.getOne()
+  }
+
+  /**
+   * Returns up to `count` random track ids whose metadata says they were
+   * released in real life on or after the cutoff, restricted to the queue's
+   * libraries. Play counts are irrelevant here.
+   */
+  async freshTracks(queue: PlaybackQueue, cutoffIso: string, count: number, excludeTrackIds: string[]): Promise<string[]> {
+    if (count <= 0) {
+      return []
+    }
+
+    const freshQuery = this.musicTrackRepository
+      .createQueryBuilder('music_track')
+      .select(['music_track.musicTrackId'])
+      .orderBy('RANDOM()')
+      .limit(count)
+
+    applyReleasedSince(freshQuery, 'music_track', cutoffIso)
+
+    if (excludeTrackIds.length) {
+      freshQuery.andWhere('music_track.musicTrackId NOT IN (:...excludeTrackIds)', { excludeTrackIds })
+    }
+
+    if (queue?.libraries?.length) {
+      freshQuery.innerJoin(
+        'music_track.file',
+        ...this.libraryService.createJoinArgs(queue.libraries),
+      )
+    }
+
+    const tracks = await freshQuery.getMany()
+    return tracks.map((track) => track.musicTrackId)
   }
 
   /**

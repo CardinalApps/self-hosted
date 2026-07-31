@@ -1,6 +1,7 @@
 import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Procedural'
 import TrueShuffle from './items/TrueShuffle'
 import HouseMix from './items/HouseMix'
+import FreshMusic from './items/FreshMusic'
 import RecentlyAddedReleases from './items/RecentlyAddedReleases'
 import MostPlayedTracks from './items/MostPlayedTracks'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
@@ -39,6 +40,7 @@ function ListenNowProcedural() {
         <div className="listen-now-actions">
           <HouseMix />
           <TrueShuffle />
+          <FreshMusic />
         </div>
       </ProceduralLayout.Block>
 

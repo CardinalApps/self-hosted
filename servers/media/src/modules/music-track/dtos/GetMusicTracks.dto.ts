@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsString, IsOptional, IsIn, IsArray } from 'class-validator'
+import { IsBoolean, IsString, IsOptional, IsIn, IsArray, Matches } from 'class-validator'
 
 import { Pagination } from '../../../dtos/pagination.dto'
 import { toArrayOfStrings } from '../../../utils/transformers'
@@ -58,4 +58,13 @@ export class GetMusicTracksDto extends MusicTracksPagination {
   @IsOptional()
   @IsBoolean()
   rating?: boolean = true
+
+  /**
+   * Only tracks whose metadata says they were released in real life on or after
+   * this date (YYYY-MM-DD). Year-only metadata counts as December 31 of its year.
+   */
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  releasedSince?: string
 }

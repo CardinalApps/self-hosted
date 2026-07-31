@@ -16,6 +16,7 @@ type DynamicQueueActionButtonProps = {
   dynamicQueueType: DynamicQueueType,
   icon: string,
   label: string,
+  disabled?: boolean,
 }
 
 /**
@@ -29,6 +30,7 @@ function DynamicQueueActionButton({
   dynamicQueueType,
   icon,
   label,
+  disabled = false,
 }: DynamicQueueActionButtonProps) {
   const dispatch = useAppDispatch()
   const players = useAppSelector(audioSelectors.players)
@@ -75,6 +77,7 @@ function DynamicQueueActionButton({
   return (
     <Button
       action
+      disabled={disabled}
       partyTime={!!isPartyTime}
       partyRoom={(
         <div
