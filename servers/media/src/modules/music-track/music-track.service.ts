@@ -9,6 +9,7 @@ import { File } from '../indexing/entities/file.entity'
 import { EventService } from '../event/event.service'
 
 import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
+import { applyReleasedSince } from './released-since.util'
 import { LibraryService } from '../library/library.service'
 import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating, RatingMediaType } from '../rating/rating.entity'
@@ -78,6 +79,7 @@ export class MusicTrackService {
       libraries,
       playCount,
       rating,
+      releasedSince,
     } = getMusicTracksDto
 
     /* Ordering by a computed figure requires computing it, whatever the caller asked for -
@@ -96,6 +98,10 @@ export class MusicTrackService {
     if (libraries && libraries.length) {
       const libraryEntities = await this.libraryService.getLibraries(libraries)
       qb.innerJoin('music_track.file', ...this.libraryService.createJoinArgs(libraryEntities))
+    }
+
+    if (releasedSince) {
+      applyReleasedSince(qb, 'music_track', releasedSince)
     }
 
     // Join pre-aggregated play counts in a single pass rather than a

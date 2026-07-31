@@ -113,9 +113,10 @@ export const musicTracksApi = baseHomeServerApi
           release?: boolean,
           metadata?: boolean,
           libraries?: string[],
+          releasedSince?: string,
         }
       >({
-        query: ({ take, skip, release, metadata, orderBy, order, libraries }) => {
+        query: ({ take, skip, release, metadata, orderBy, order, libraries, releasedSince }) => {
           return queryParams('/music/tracks', {
             ...(typeof skip !== 'undefined' && { skip }),
             ...(take && { take }),
@@ -124,6 +125,7 @@ export const musicTracksApi = baseHomeServerApi
             ...(release && { release }),
             ...(metadata && { metadata }),
             ...(libraries && { libraries }),
+            ...(releasedSince && { releasedSince }),
           })
         },
         providesTags: ['MusicTracks'],
