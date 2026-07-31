@@ -17,6 +17,12 @@
   "most-played-tracks.title": {
     "en": "Most Played Tracks"
   },
+  "favorite-tracks.title": {
+    "en": "Favorite Tracks"
+  },
+  "favorite-tracks.empty": {
+    "en": "Tracks that you favorite will appear here."
+  },
   "recently-added-releases.title": {
     "en": "Recently Added Releases"
   }
