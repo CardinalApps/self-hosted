@@ -287,6 +287,46 @@ export class TrackSelection {
   }
 
   /**
+   * The tracks of one random release that was released in real life on or after
+   * the cutoff, in album order, restricted to the queue's libraries. A release
+   * counts as fresh when any of its tracks does.
+   */
+  async freshRelease(queue: PlaybackQueue, cutoffIso: string): Promise<MusicTrack[]> {
+    const pickQuery = this.musicTrackRepository
+      .createQueryBuilder('music_track')
+      .innerJoinAndSelect('music_track.release', 'release')
+      .orderBy('RANDOM()')
+      .limit(1)
+
+    applyReleasedSince(pickQuery, 'music_track', cutoffIso)
+
+    if (queue?.libraries?.length) {
+      pickQuery.innerJoin(
+        'music_track.file',
+        ...this.libraryService.createJoinArgs(queue.libraries),
+      )
+    }
+
+    const pick = await pickQuery.getOne()
+
+    if (!pick?.release) {
+      return []
+    }
+
+    return await this.musicTrackRepository.find({
+      where: {
+        release: {
+          id: pick.release.id,
+        },
+      },
+      order: {
+        discNumber: 'asc',
+        trackNumber: 'asc',
+      },
+    })
+  }
+
+  /**
    * Returns up to `count` random track ids, restricted to the queue's libraries.
    */
   async randomTracks(queue: PlaybackQueue, count: number, excludeTrackIds: string[]): Promise<string[]> {

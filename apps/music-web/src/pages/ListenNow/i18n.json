@@ -11,6 +11,9 @@
   "action-buttons.fresh-music": {
     "en": "Fresh Music"
   },
+  "action-buttons.fresh-release": {
+    "en": "Fresh Release"
+  },
   "most-played-tracks.title": {
     "en": "Most Played Tracks"
   },
