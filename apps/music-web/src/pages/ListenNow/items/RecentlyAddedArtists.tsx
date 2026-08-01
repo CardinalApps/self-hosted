@@ -1,5 +1,5 @@
 import MusicArtist from '@cardinalapps/ui/src/components/interaction/MusicArtist'
-import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
@@ -36,7 +36,7 @@ function RecentlyAddedArtists() {
 
   return (
     <div className="recently-added-artists">
-      <H5 className="recently-added-artists-title">{i18n['recently-added-artists.title'][lang]}</H5>
+      <H3 className="recently-added-artists-title">{i18n['recently-added-artists.title'][lang]}</H3>
       {
         artists.length
           ? (

@@ -4,7 +4,7 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
-import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import H3 from '@cardinalapps/ui/src/components/typography/H3'
 
 import { MusicTrackType, useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
@@ -44,7 +44,7 @@ function FavoriteTracks() {
     <Card
       header={
         <>
-          <H5>{i18n['favorite-tracks.title'][lang]}</H5>
+          <H3>{i18n['favorite-tracks.title'][lang]}</H3>
           {!!pagination && pagination}
         </>
       }

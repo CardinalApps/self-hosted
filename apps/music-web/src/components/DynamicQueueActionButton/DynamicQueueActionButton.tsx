@@ -18,6 +18,8 @@ type DynamicQueueActionButtonProps = {
   buttonId?: string,
   icon: string,
   label: string,
+  /** Renders the label as a heading, for buttons that title a section of the page. */
+  labelAs?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
   disabled?: boolean,
 }
 
@@ -33,6 +35,7 @@ function DynamicQueueActionButton({
   buttonId,
   icon,
   label,
+  labelAs,
   disabled = false,
 }: DynamicQueueActionButtonProps) {
   const dispatch = useAppDispatch()
@@ -98,6 +101,7 @@ function DynamicQueueActionButton({
         />
       )}
       icon={icon}
+      textAs={labelAs}
       onClick={handleStart}
       onActionButtonClick={handleActionButtonClick}
     >

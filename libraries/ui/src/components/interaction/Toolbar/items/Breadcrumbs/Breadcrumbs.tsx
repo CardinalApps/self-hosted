@@ -14,12 +14,12 @@ const ToolbarBreadcrumbs = ({ item }: ToolbarItemProps) => {
 
   return (
     <div className="toolbar-breadcrumbs">
-      <h2 className="toolbar-page-title">
+      <h1 className="toolbar-page-title">
         {rootLink
           ? <Link to={rootLink} className="toolbar-breadcrumb">{pageTitle}</Link>
           : pageTitle
         }
-      </h2>
+      </h1>
       {crumbs?.map((crumb, i) => (
         <span key={i} className="toolbar-breadcrumb-item">
           <span className="toolbar-breadcrumb-separator">/</span>

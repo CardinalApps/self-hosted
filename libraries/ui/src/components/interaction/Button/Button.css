@@ -15,6 +15,12 @@
   transition: transform 125ms, background-color 100ms;
   -webkit-appearance: none;
 
+  .button-text {
+    margin: 0;
+    font: inherit;
+    color: inherit;
+  }
+
   &:not(:disabled):hover:not(.glass) {
     background: var(--button-bg-hover);
   }
