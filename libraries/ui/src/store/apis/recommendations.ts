@@ -1,3 +1,4 @@
+import queryParams from '../../lib/net/queryParams'
 import { baseHomeServerApi } from './baseHomeServerApi'
 import { DynamicQueueType } from './playbackQueues'
 
@@ -28,12 +29,16 @@ export const recommendationsApi = baseHomeServerApi
   .injectEndpoints({
     endpoints: (builder) => ({
       /**
-       * The artist spotlight for the current user. The server's pick is stable
-       * for the calendar day, so no invalidation tags; a fresh session fetches
-       * a fresh copy.
+       * The artist spotlight for the current user. The server's picks are
+       * stable for the calendar day, so no invalidation tags; a fresh session
+       * fetches a fresh copy. Each position in a page's sequence of spotlights
+       * gets a different artist and reason, until the server runs out and
+       * returns a null spotlight.
        */
-      getMusicArtistSpotlight: builder.query<{ spotlight: MusicArtistSpotlightType | null }, void>({
-        query: () => '/music/spotlight/artist',
+      getMusicArtistSpotlight: builder.query<{ spotlight: MusicArtistSpotlightType | null }, { position?: number } | void>({
+        query: (arg) => queryParams('/music/spotlight/artist', {
+          ...(arg && arg.position ? { position: arg.position } : {}),
+        }),
       }),
     }),
   })

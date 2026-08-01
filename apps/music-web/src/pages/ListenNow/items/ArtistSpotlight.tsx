@@ -26,17 +26,23 @@ const reasonSentence = (spotlight: MusicArtistSpotlightType, lang: string): stri
     return i18n['artist-spotlight.reason.favorited_track'][lang].replace('{track}', trackTitle)
   }
 
-  return i18n[`artist-spotlight.reason.${kind}`][lang]
+  // Kinds newer than this build fall back to the generic sentence instead of crashing the block
+  return (i18n[`artist-spotlight.reason.${kind}`] ?? i18n['artist-spotlight.reason.library_pick'])[lang]
+}
+
+type ArtistSpotlightProps = {
+  /** This block's position among the page's spotlights; each gets a different artist and reason. */
+  position?: number,
 }
 
 // The spotlighted artist of the day, with the reason it was picked
-function ArtistSpotlight() {
+function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
   const { lang } = useAppSelector(settingsSelectors.current)
 
   const {
     data,
     isLoading,
-  } = useGetMusicArtistSpotlightQuery()
+  } = useGetMusicArtistSpotlightQuery({ position })
 
   const spotlight = data?.spotlight
 

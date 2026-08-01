@@ -92,10 +92,11 @@ const recordPlays = async (track: MusicTrack, count: number, createdAt?: Date) =
   }
 }
 
-// Fetches the spotlight for the logged-in guest
-const getSpotlight = async () => {
+// Fetches the spotlight at a position of the sequence for the logged-in guest
+const getSpotlight = async (position?: number) => {
   const res = await request(testApp.app.getHttpServer())
     .get('/api/v1/music/spotlight/artist')
+    .query(position !== undefined ? { position } : {})
     .set('Authorization', `Bearer ${authToken}`)
     .expect(200)
 
@@ -212,5 +213,33 @@ describe('GET /music/spotlight/artist', () => {
     const second = await getSpotlight()
 
     expect(second).toEqual(first)
+  })
+
+  test('never repeats an artist or a reason across the sequence', async () => {
+    /* Three more eligible artists, one per remaining role: Second Wind is on heavy rotation,
+       Bystander has never been played, and Wallflower's single play keeps it out of every
+       signal pool so only the library_pick filler can surface it. */
+    const secondWindTracks = await seedRelease('Second Wind Album', 'Second Wind', true)
+    await seedRelease('Bystander Album', 'Bystander', true)
+    const wallflowerTracks = await seedRelease('Wallflower Album', 'Wallflower', true)
+    await recordPlays(secondWindTracks[0], 5)
+    await recordPlays(wallflowerTracks[0], 1)
+
+    const sequence = [await getSpotlight(0), await getSpotlight(1), await getSpotlight(2)]
+
+    expect(new Set(sequence.map((spotlight) => spotlight.reason.kind)))
+      .toEqual(new Set(['heavy_rotation', 'rediscover', 'unplayed']))
+    expect(new Set(sequence.map((spotlight) => spotlight.name)))
+      .toEqual(new Set(['Second Wind', 'Fresh Find', 'Bystander']))
+  })
+
+  test('serves library_pick once as the final filler, then runs dry', async () => {
+    const fourth = await getSpotlight(3)
+
+    expect(fourth.name).toBe('Wallflower')
+    expect(fourth.reason).toEqual({ kind: 'library_pick' })
+
+    expect(await getSpotlight(4)).toBeNull()
+    expect(await getSpotlight(10)).toBeNull()
   })
 })
