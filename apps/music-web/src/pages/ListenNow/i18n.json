@@ -66,7 +66,7 @@
     "en": "{num} plays"
   },
   "recently-added-releases.title": {
-    "en": "Most Recently Added"
+    "en": "Newest Releases"
   },
   "releases-with-favorites.title": {
     "en": "Releases with Favorites"
@@ -75,7 +75,7 @@
     "en": "Releases containing your favorite tracks will appear here."
   },
   "recently-added-artists.title": {
-    "en": "Recently Added Artists"
+    "en": "Newest Artists"
   },
   "recently-added-artists.empty": {
     "en": "Artists you've recently added to your library will appear here."
