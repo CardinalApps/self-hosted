@@ -71,6 +71,9 @@
   "release-spotlight.empty": {
     "en": "Add some music with cover art and a release will be spotlighted here."
   },
+  "release-spotlight.empty-sequence": {
+    "en": "Only one release stood out today. Check back tomorrow for another."
+  },
   "release-spotlight.reason.heavy_rotation": {
     "en": "Because you've had it on repeat lately"
   },
