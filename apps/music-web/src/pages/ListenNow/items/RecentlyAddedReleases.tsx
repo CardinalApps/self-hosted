@@ -31,8 +31,9 @@ function RecentlyAddedReleases() {
       title={i18n['recently-added-releases.title'][lang]}
       next={true}
       prev={true}
-      itemWidth={'220px'}
+      itemWidth={'240px'}
       itemsPerSlide={2}
+      gap="20px"
       items={releases.map((musicRelease: MusicReleaseType) => {
         return (
           <MusicRelease
@@ -42,6 +43,7 @@ function RecentlyAddedReleases() {
             releaseTitle={musicRelease?.title}
             artistName={musicRelease?.artist?.name}
             //releaseYear={musicRelease.year}
+            coverSize={{ width: 220, height: 220 }}
             releaseLink={getAppUrl('release', {
               params: {
                 ':id': musicRelease?.musicReleaseId?.toString() || '',

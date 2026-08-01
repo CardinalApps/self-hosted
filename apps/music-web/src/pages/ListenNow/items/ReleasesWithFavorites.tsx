@@ -54,8 +54,9 @@ function ReleasesWithFavorites() {
       title={i18n['releases-with-favorites.title'][lang]}
       next={true}
       prev={true}
-      itemWidth={'220px'}
+      itemWidth={'240px'}
       itemsPerSlide={2}
+      gap="20px"
       items={releases.map((musicRelease: MusicReleaseType) => {
         return (
           <MusicRelease
@@ -64,6 +65,7 @@ function ReleasesWithFavorites() {
             releaseId={musicRelease?.id}
             releaseTitle={musicRelease?.title}
             artistName={musicRelease?.artist?.name}
+            coverSize={{ width: 220, height: 220 }}
             releaseLink={getAppUrl('release', {
               params: {
                 ':id': musicRelease?.musicReleaseId?.toString() || '',
