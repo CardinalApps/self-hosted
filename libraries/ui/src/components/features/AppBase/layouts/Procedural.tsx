@@ -78,7 +78,10 @@ function ProceduralLayout({
 export type ProceduralBlockCols = 12 | 8 | 6 | 4
 export type ProceduralBlockRows = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
-export type ProceduralBlockSize = `${ProceduralBlockCols}x${ProceduralBlockRows}`
+/** 100% width, height determined by its own content instead of the row grid. */
+export type ProceduralBlockNaturalSize = 'natural'
+
+export type ProceduralBlockSize = `${ProceduralBlockCols}x${ProceduralBlockRows}` | ProceduralBlockNaturalSize
 
 export type ProceduralBlockProps = {
   size: ProceduralBlockSize,
@@ -110,14 +113,15 @@ ProceduralLayout.Block = (props: PropsWithChildren<ProceduralBlockProps>) => {
     return () => observer.disconnect()
   }, [initialized])
 
-  const [cols, rows] = props.size.split('x')
+  const isNatural = props.size === 'natural'
+  const [cols, rows] = isNatural ? [] : props.size.split('x')
 
   return (
     <div
       ref={blockRef}
       className={clsx("procedural-layout-block", props.flush && 'flush')}
-      data-cols={cols}
-      style={{ '--rows': rows } as CSSProperties}
+      data-cols={isNatural ? 'natural' : cols}
+      style={isNatural ? undefined : { '--rows': rows } as CSSProperties}
     >
       <div className="procedural-layout-block-inner" style={props.style}>
         {initialized ? props.children : <Shimmer />}

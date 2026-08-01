@@ -1,4 +1,6 @@
 import ProceduralLayout from '@cardinalapps/ui/src/components/features/AppBase/layouts/Procedural'
+import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
+import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import TrueShuffle from './items/TrueShuffle'
 import HouseMix from './items/HouseMix'
 import FreshMusic from './items/FreshMusic'
@@ -8,9 +10,13 @@ import MostPlayedTracks from './items/MostPlayedTracks'
 import FavoriteTracks from './items/FavoriteTracks'
 import ReleasesWithFavorites from './items/ReleasesWithFavorites'
 import ArtistSpotlight from './items/ArtistSpotlight'
+import RecentlyAddedArtists from './items/RecentlyAddedArtists'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
+import i18n from './i18n.json'
+
 function ListenNowProcedural() {
+  const { lang } = useAppSelector(settingsSelectors.current)
 
   /**
    * We need at least 1 track to show this page.
@@ -78,6 +84,15 @@ function ListenNowProcedural() {
 
       {
       /**
+       * Recently added releases carousel.
+       */
+      }
+      <ProceduralLayout.Block size='12x7' flush>
+        <RecentlyAddedReleases />
+      </ProceduralLayout.Block>
+
+      {
+      /**
        * Artist spotlight.
        */
       }
@@ -87,11 +102,20 @@ function ListenNowProcedural() {
 
       {
       /**
-       * Recently added releases carousel.
+       * Recently added artists grid.
        */
       }
-      <ProceduralLayout.Block size='12x7' flush>
-        <RecentlyAddedReleases />
+      <ProceduralLayout.Block size='natural'>
+        <RecentlyAddedArtists />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Fin.
+       */
+      }
+      <ProceduralLayout.Block size='12x2'>
+        <p className="listen-now-fin">{i18n['fin.message'][lang]}</p>
       </ProceduralLayout.Block>
     </ProceduralLayout>
   )
