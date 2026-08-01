@@ -33,6 +33,17 @@
   transition: box-shadow 400ms;
   background-color: var(--bg-1);
 
+  &:before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -30px;
+    right: -3px;
+    bottom: -20px;
+    background-color: var(--bg-2);
+    z-index: -1;
+  }
+
   &.glass {
     box-shadow: var(--box-shadow-2);
 
