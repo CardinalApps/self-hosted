@@ -75,31 +75,10 @@ function ProceduralLayout({
   )
 }
 
-export type ProceduralBlockSize =
-    "12x1"
-  | "12x2"
-  | "12x3"
-  | "12x4"
-  | "12x5"
-  | "12x6"
-  | "6x1"
-  | "6x2"
-  | "6x3"
-  | "6x4"
-  | "6x5"
-  | "6x6"
-  | "4x1"
-  | "4x2"
-  | "4x3"
-  | "4x4"
-  | "4x5"
-  | "4x6"
-  | "8x1"
-  | "8x2"
-  | "8x3"
-  | "8x4"
-  | "8x5"
-  | "8x6"
+export type ProceduralBlockCols = 12 | 8 | 6 | 4
+export type ProceduralBlockRows = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+
+export type ProceduralBlockSize = `${ProceduralBlockCols}x${ProceduralBlockRows}`
 
 export type ProceduralBlockProps = {
   size: ProceduralBlockSize,
@@ -131,11 +110,14 @@ ProceduralLayout.Block = (props: PropsWithChildren<ProceduralBlockProps>) => {
     return () => observer.disconnect()
   }, [initialized])
 
+  const [cols, rows] = props.size.split('x')
+
   return (
     <div
       ref={blockRef}
       className={clsx("procedural-layout-block", props.flush && 'flush')}
-      data-size={props.size}
+      data-cols={cols}
+      style={{ '--rows': rows } as CSSProperties}
     >
       <div className="procedural-layout-block-inner" style={props.style}>
         {initialized ? props.children : <Shimmer />}

@@ -667,7 +667,7 @@
 .procedural-layout {
   --numCols: 12;
   --gap: 10px;
-  --rowHeight: calc(80px + calc(var(--gap) * 2));
+  --rowHeight: calc(40px + var(--gap));
 
   height: 100%;
   padding: 85px 0 0 10px;
@@ -689,108 +689,21 @@
       margin-bottom: 0;
     }
 
-    /* 1 col wide */
-    &[data-size="12x1"] {
-      width: 100%;
-      height: calc(1 * var(--rowHeight));
-    }
-    &[data-size="12x2"] {
-      width: 100%;
-      height: calc(2 * var(--rowHeight));
-    }
-    &[data-size="12x3"] {
-      width: 100%;
-      height: calc(3 * var(--rowHeight));
-    }
-    &[data-size="12x4"] {
-      width: 100%;
-      height: calc(4 * var(--rowHeight));
-    }
-    &[data-size="12x5"] {
-      width: 100%;
-      height: calc(5 * var(--rowHeight));
-    }
-    &[data-size="12x6"] {
-      width: 100%;
-      height: calc(6 * var(--rowHeight));
+    &[data-cols] {
+      height: calc(var(--rows, 1) * var(--rowHeight));
     }
 
-    /* 2 cols wide */
-    &[data-size="6x1"] {
-      width: 50%;
-      height: calc(1 * var(--rowHeight));
+    &[data-cols="12"] {
+      width: 100%;
     }
-    &[data-size="6x2"] {
-      width: 50%;
-      height: calc(2 * var(--rowHeight));
-    }
-    &[data-size="6x3"] {
-      width: 50%;
-      height: calc(3 * var(--rowHeight));
-    }
-    &[data-size="6x4"] {
-      width: 50%;
-      height: calc(4 * var(--rowHeight));
-    }
-    &[data-size="6x5"] {
-      width: 50%;
-      height: calc(5 * var(--rowHeight));
-    }
-    &[data-size="6x6"] {
-      width: 50%;
-      height: calc(6 * var(--rowHeight));
-    }
-
-    /* 3 cols wide */
-    &[data-size="4x1"] {
-      width: 33.3333%;
-      height: calc(1 * var(--rowHeight));
-    }
-    &[data-size="4x2"] {
-      width: 33.3333%;
-      height: calc(2 * var(--rowHeight));
-    }
-    &[data-size="4x3"] {
-      width: 33.3333%;
-      height: calc(3 * var(--rowHeight));
-    }
-    &[data-size="4x4"] {
-      width: 33.3333%;
-      height: calc(4 * var(--rowHeight));
-    }
-    &[data-size="4x5"] {
-      width: 33.3333%;
-      height: calc(5 * var(--rowHeight));
-    }
-    &[data-size="4x6"] {
-      width: 33.3333%;
-      height: calc(6 * var(--rowHeight));
-    }
-
-    /* Three-quarters col */
-    &[data-size="8x1"] {
+    &[data-cols="8"] {
       width: 66.6666%;
-      height: calc(1 * var(--rowHeight));
     }
-    &[data-size="8x2"] {
-      width: 66.6666%;
-      height: calc(2 * var(--rowHeight));
+    &[data-cols="6"] {
+      width: 50%;
     }
-    &[data-size="8x3"] {
-      width: 66.6666%;
-      height: calc(3 * var(--rowHeight));
-    }
-    &[data-size="8x4"] {
-      width: 66.6666%;
-      height: calc(4 * var(--rowHeight));
-    }
-    &[data-size="8x5"] {
-      width: 66.6666%;
-      height: calc(5 * var(--rowHeight));
-    }
-    &[data-size="8x6"] {
-      width: 66.6666%;
-      height: calc(6 * var(--rowHeight));
+    &[data-cols="4"] {
+      width: 33.3333%;
     }
 
     &.flush {
