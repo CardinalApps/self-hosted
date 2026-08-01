@@ -5,8 +5,8 @@
 }
 
 .listen-now .listen-now-actions {
-  height: 100%;
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
