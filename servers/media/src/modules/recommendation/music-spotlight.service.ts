@@ -88,10 +88,10 @@ export class MusicSpotlightService {
   ) {}
 
   /**
-   * The spotlighted artist for this user today, or null for a library with no
-   * artist that could carry the hero block.
+   * The spotlighted artist at one position of this user's daily sequence, or
+   * null once the sequence has run dry.
    */
-  async getArtistSpotlight(user?: User): Promise<MusicArtistSpotlight | null> {
+  async getArtistSpotlight(user?: User, position = 0): Promise<MusicArtistSpotlight | null> {
     const eligible = await this.getEligibleArtists()
 
     if (!eligible.length) {
@@ -100,15 +100,50 @@ export class MusicSpotlightService {
 
     const daySeed = `${user?.userId ?? 'anonymous'}:${new Date().toISOString().slice(0, 10)}`
     const pools = user ? await this.buildReasonPools(eligible, user) : []
-    const nonEmpty = pools.filter((pool) => pool.candidates.length)
+    const signalPools = pools.filter((pool) => pool.candidates.length)
 
-    // No listening signals to reason from; fall back to a stable pick from the whole library
-    if (!nonEmpty.length) {
-      return this.toSpotlight('library_pick', this.pickCandidate(eligible, `${daySeed}:library_pick`))
+    const usedKinds = new Set<MusicSpotlightReasonKind>()
+    const usedArtists = new Set<string>()
+
+    /* Walk the day's deterministic sequence up to the requested position. Every step takes a
+       reason and an artist that no earlier step has used, so a page of spotlights never repeats
+       either; library_pick serves once as the final filler, then the sequence runs dry. */
+    for (let step = 0; ; step++) {
+      const available = signalPools
+        .filter((pool) => !usedKinds.has(pool.kind))
+        .map((pool) => ({
+          ...pool,
+          candidates: pool.candidates.filter((candidate) => !usedArtists.has(candidate.musicArtistId)),
+        }))
+        .filter((pool) => pool.candidates.length)
+
+      let kind: MusicSpotlightReasonKind
+      let candidate: SpotlightCandidate
+
+      if (available.length) {
+        const pool = available[fnv1a(`${daySeed}:${step}`) % available.length]
+        kind = pool.kind
+        candidate = this.pickCandidate(pool.candidates, `${daySeed}:${step}:${pool.kind}`)
+      } else if (!usedKinds.has('library_pick')) {
+        const remaining = eligible.filter((artist) => !usedArtists.has(artist.musicArtistId))
+
+        if (!remaining.length) {
+          return null
+        }
+
+        kind = 'library_pick'
+        candidate = this.pickCandidate(remaining, `${daySeed}:${step}:library_pick`)
+      } else {
+        return null
+      }
+
+      if (step === position) {
+        return this.toSpotlight(kind, candidate)
+      }
+
+      usedKinds.add(kind)
+      usedArtists.add(candidate.musicArtistId)
     }
-
-    const pool = nonEmpty[fnv1a(daySeed) % nonEmpty.length]
-    return this.toSpotlight(pool.kind, this.pickCandidate(pool.candidates, `${daySeed}:${pool.kind}`))
   }
 
   /**

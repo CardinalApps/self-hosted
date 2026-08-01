@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 
 import { MusicSpotlightService } from './music-spotlight.service'
+import { GetArtistSpotlightQueryDto } from './dtos/GetArtistSpotlightQuery.dto'
 import { GetMusicArtistSpotlightResponse } from './types'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
@@ -20,9 +21,12 @@ export class RecommendationController {
     summary: 'Get the artist spotlight for the current user: a personal artist pick with the reason it was picked.',
     capabilities: ['MusicArtists.Read'],
   })
-  async getArtistSpotlight(@CurrentUser() user): Promise<GetMusicArtistSpotlightResponse> {
+  async getArtistSpotlight(
+    @CurrentUser() user,
+    @Query() { position }: GetArtistSpotlightQueryDto,
+  ): Promise<GetMusicArtistSpotlightResponse> {
     return {
-      spotlight: await this.musicSpotlightService.getArtistSpotlight(user),
+      spotlight: await this.musicSpotlightService.getArtistSpotlight(user, position),
     }
   }
 }
