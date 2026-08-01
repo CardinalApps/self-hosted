@@ -57,11 +57,17 @@ const Spotlight = ({
         <div className="spotlight-tint" style={{ backgroundColor: imageColor }} />
       )}
       <div className="spotlight-content">
-        <p className="spotlight-kicker">{kicker}</p>
-        {heading}
-        {!!reason && <p className="spotlight-reason">{reason}</p>}
-        {!!stats && <div className="spotlight-stats">{stats}</div>}
-        {!!actions && <div className="spotlight-actions">{actions}</div>}
+        <div className="spotlight-top">
+          <p className="spotlight-kicker">{kicker}</p>
+          {!!reason && <p className="spotlight-reason">{reason}</p>}
+        </div>
+        <div className="spotlight-bottom">
+          {heading}
+          <div className="spotlight-bottom-row">
+            {!!stats && <div className="spotlight-stats">{stats}</div>}
+            {!!actions && <div className="spotlight-actions">{actions}</div>}
+          </div>
+        </div>
       </div>
     </div>
   )
