@@ -19,18 +19,23 @@ import i18n from '../i18n'
  */
 export default function handle410(res, endpoint, method, body, dispatch, lang) {
   if (res.status === 410) {
-    deleteAllJWTs()
-
-    dispatch({ type: globalActions.RESET })
-
-    dispatch(toastActions.addToQueue({
-      type: 'danger',
-      title: i18n['login.error.410.title'][lang],
-      body: i18n['login.error.410.body'][lang],
-    }))
-
-    // Perform a health check after resetting the app instead of waiting for the
-    // next one
-    dispatch(healthCheck())
+    resetForGoneUser(dispatch, lang)
   }
+}
+
+// Resets the app after the server reported that the token's user no longer exists
+export function resetForGoneUser(dispatch, lang) {
+  deleteAllJWTs()
+
+  dispatch({ type: globalActions.RESET })
+
+  dispatch(toastActions.addToQueue({
+    type: 'danger',
+    title: i18n['login.error.410.title'][lang],
+    body: i18n['login.error.410.body'][lang],
+  }))
+
+  // Perform a health check after resetting the app instead of waiting for the
+  // next one
+  dispatch(healthCheck())
 }

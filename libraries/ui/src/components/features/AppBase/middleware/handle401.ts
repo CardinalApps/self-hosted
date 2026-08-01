@@ -16,7 +16,7 @@ let isRefreshing = false
 // screen. The toast is announced only when there was a session to lose: a
 // logged-out visitor's bootstrap refresh 401s too, and telling them they are
 // "unauthorized" for never having logged in is noise, not information.
-function fullLogout(dispatch, lang, serverErrorMessage) {
+export function fullLogout(dispatch, lang, serverErrorMessage) {
   const hadSession = Boolean(getJWT(JWT_TYPE.HOME_SERVER_USER))
 
   deleteAllJWTs()

@@ -17,7 +17,7 @@ logHTTPErrorMiddleware.startListening({
   predicate: (action) => {
     if (!isRejectedWithValue(action)) return false
     const statusCode = (action.payload as ApiErrorPayload)?.data?.statusCode
-    // 401s are handled by the token refresh middleware; no toast needed
+    // 401s are handled by the reauth base query; no toast needed
     return statusCode !== 401
   },
   effect: async (action, store) => {
