@@ -40,7 +40,7 @@ function ListenNowProcedural() {
        * Action buttons.
        */
       }
-      <ProceduralLayout.Block size='12x1'>
+      <ProceduralLayout.Block size='12x2'>
         <div className="listen-now-actions">
           <HouseMix />
           <TrueShuffle />
@@ -54,7 +54,7 @@ function ListenNowProcedural() {
        * Most listened tracks.
        */
       }
-      <ProceduralLayout.Block size='6x4'>
+      <ProceduralLayout.Block size='6x8'>
         <MostPlayedTracks />
       </ProceduralLayout.Block>
 
@@ -63,7 +63,7 @@ function ListenNowProcedural() {
        * Favorite tracks.
        */
       }
-      <ProceduralLayout.Block size='6x4'>
+      <ProceduralLayout.Block size='6x8'>
         <FavoriteTracks />
       </ProceduralLayout.Block>
 
@@ -72,7 +72,7 @@ function ListenNowProcedural() {
        * Releases with favorites carousel.
        */
       }
-      <ProceduralLayout.Block size='12x4' flush>
+      <ProceduralLayout.Block size='12x7' flush>
         <ReleasesWithFavorites />
       </ProceduralLayout.Block>
 
@@ -81,7 +81,7 @@ function ListenNowProcedural() {
        * Artist spotlight.
        */
       }
-      <ProceduralLayout.Block size='12x4' flush>
+      <ProceduralLayout.Block size='12x8' flush>
         <ArtistSpotlight />
       </ProceduralLayout.Block>
 
@@ -90,7 +90,7 @@ function ListenNowProcedural() {
        * Recently added releases carousel.
        */
       }
-      <ProceduralLayout.Block size='12x4' flush>
+      <ProceduralLayout.Block size='12x7' flush>
         <RecentlyAddedReleases />
       </ProceduralLayout.Block>
     </ProceduralLayout>
