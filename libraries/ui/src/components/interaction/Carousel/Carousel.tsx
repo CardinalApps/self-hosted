@@ -1,6 +1,7 @@
 import { useEffect, type PropsWithChildren } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Button from '../Button'
+import H5 from '../../typography/H5'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 
 import './Carousel.css'
@@ -120,9 +121,9 @@ const Carousel = ({
       {(title || prev || next ) && (
           <header className="carousel-header">
             {title && (
-              <div className="carousel-title">
+              <H5 className="carousel-title">
                 {title}
-              </div>
+              </H5>
             )}
             <div className="carousel-controls">
               <div className="carousel-pagination">
