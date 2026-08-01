@@ -10,6 +10,7 @@ import MostPlayedTracks from './items/MostPlayedTracks'
 import FavoriteTracks from './items/FavoriteTracks'
 import ReleasesWithFavorites from './items/ReleasesWithFavorites'
 import ArtistSpotlight from './items/ArtistSpotlight'
+import ReleaseSpotlight from './items/ReleaseSpotlight'
 import RecentlyAddedArtists from './items/RecentlyAddedArtists'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
@@ -107,6 +108,15 @@ function ListenNowProcedural() {
       }
       <ProceduralLayout.Block size='natural'>
         <RecentlyAddedArtists />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Release spotlight.
+       */
+      }
+      <ProceduralLayout.Block size='6x8'>
+        <ReleaseSpotlight />
       </ProceduralLayout.Block>
 
       {

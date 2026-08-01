@@ -8,8 +8,8 @@ export type MusicSpotlightReasonKind =
   | 'library_pick'
 
 /**
- * Why the artist was picked. Clients render the sentence themselves from the
- * kind and its params, so the reason stays translatable.
+ * Why the artist or release was picked. Clients render the sentence themselves
+ * from the kind and its params, so the reason stays translatable.
  */
 export type MusicSpotlightReason = {
   kind: MusicSpotlightReasonKind
@@ -17,7 +17,7 @@ export type MusicSpotlightReason = {
   // The title of the recently favorited track, only for `favorited_track`
   trackTitle?: string
 
-  // When the artist was last played, only for `rediscover`
+  // When the artist or release was last played, only for `rediscover`
   lastPlayedAt?: string
 }
 
@@ -32,4 +32,21 @@ export type MusicArtistSpotlight = {
 
 export type GetMusicArtistSpotlightResponse = {
   spotlight: MusicArtistSpotlight | null
+}
+
+export type MusicReleaseSpotlight = {
+  musicReleaseId: string
+  title: string
+  reason: MusicSpotlightReason
+
+  // The release's primary artist, null when the release has none
+  artistName: string | null
+  musicArtistId: string | null
+
+  // The dynamic queue type that best fits the reason the release was picked
+  queueType: DynamicQueueType
+}
+
+export type GetMusicReleaseSpotlightResponse = {
+  spotlight: MusicReleaseSpotlight | null
 }
