@@ -668,9 +668,10 @@
   --numCols: 12;
   --gap: 10px;
   --rowHeight: calc(40px + var(--gap));
+  --right-gutter: 2px;
 
   height: 100%;
-  padding: 85px var(--gutter) 0 10px;
+  padding: 85px var(--right-gutter) 0 10px;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -706,6 +707,15 @@
       width: 33.3333%;
     }
 
+    &[data-cols="natural"] {
+      width: 100%;
+      height: auto;
+
+      .procedural-layout-block-inner {
+        height: auto;
+      }
+    }
+
     &.flush {
 
       .procedural-layout-block-inner {
@@ -719,8 +729,8 @@
 
           .embla__viewport {
             margin-left: -20px;
+            margin-right: calc(-1 * var(--right-gutter));
             padding-left: 20px;
-            margin-right: calc(-1 * var(--gutter));
             position: relative;
             
             &:before {
