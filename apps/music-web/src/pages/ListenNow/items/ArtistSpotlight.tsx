@@ -108,6 +108,7 @@ function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
         <>
           <DynamicQueueActionButton
             dynamicQueueType={spotlight.queueType}
+            buttonId="artist-spotlight"
             seedMediaType="music_artist"
             seedMediaId={spotlight.musicArtistId}
             icon="fas fa-star"
