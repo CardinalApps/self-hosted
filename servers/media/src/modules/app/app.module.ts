@@ -14,6 +14,7 @@ import { DevController } from './dev.controller'
 
 import { AuthModule } from '../auth/auth.module'
 import { DatabaseModule } from '../database/database.module'
+import { createDataSource } from '../database/data-source-factory'
 import { EventModule } from '../event/event.module'
 import { SettingsModule } from '../settings/settings.module'
 import { UserModule } from '../user/user.module'
@@ -94,35 +95,38 @@ const resolvePostgresHost = () => {
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // @ts-expect-error FIXME didn't feel like typing this when converting from vanilla JS
-    TypeOrmModule.forRoot(envVar('CARDINAL_POSTGRES', false)
-      ? {
-          type: 'postgres',
-          host: resolvePostgresHost(),
-          port: envVar('POSTGRES_PORT', 5432),
-          username: envVar('POSTGRES_USER', 'cardinal'),
-          password: envVar('POSTGRES_PASSWORD', 'cardinal'),
-          ...(envVar('POSTGRES_DATABASE', false) ? { database: envVar('POSTGRES_DATABASE', undefined) } : {}),
-          ssl: envVar('POSTGRES_SSL', false),
-          autoLoadEntities: true,
-          retryAttempts: 3,
-          logging: resolveDatabaseLogLevel(),
-          namingStrategy: new SnakeNamingStrategy(),
-          // this stays on until v1.0.0
-          synchronize: true,
-        }
-      // SQLite
-      : {
-          type: 'better-sqlite3',
-          database: getSQLiteDatabaseLocation(),
-          autoLoadEntities: true,
-          retryAttempts: 3,
-          logging: resolveDatabaseLogLevel(),
-          namingStrategy: new SnakeNamingStrategy(),
-          // this stays on until v1.0.0
-          synchronize: true,
-        },
-    ),
+    TypeOrmModule.forRootAsync({
+      // @ts-expect-error FIXME didn't feel like typing this when converting from vanilla JS
+      useFactory: () => (envVar('CARDINAL_POSTGRES', false)
+        ? {
+            type: 'postgres',
+            host: resolvePostgresHost(),
+            port: envVar('POSTGRES_PORT', 5432),
+            username: envVar('POSTGRES_USER', 'cardinal'),
+            password: envVar('POSTGRES_PASSWORD', 'cardinal'),
+            ...(envVar('POSTGRES_DATABASE', false) ? { database: envVar('POSTGRES_DATABASE', undefined) } : {}),
+            ssl: envVar('POSTGRES_SSL', false),
+            autoLoadEntities: true,
+            retryAttempts: 3,
+            logging: resolveDatabaseLogLevel(),
+            namingStrategy: new SnakeNamingStrategy(),
+            // this stays on until v1.0.0
+            synchronize: true,
+          }
+        // SQLite
+        : {
+            type: 'better-sqlite3',
+            database: getSQLiteDatabaseLocation(),
+            autoLoadEntities: true,
+            retryAttempts: 3,
+            logging: resolveDatabaseLogLevel(),
+            namingStrategy: new SnakeNamingStrategy(),
+            // this stays on until v1.0.0
+            synchronize: true,
+          }),
+      // runs the pre-synchronize schema fixups before TypeORM syncs the entities
+      dataSourceFactory: createDataSource,
+    }),
     ScheduleModule.forRoot(),
     // Initialize modules
     AuthModule,
