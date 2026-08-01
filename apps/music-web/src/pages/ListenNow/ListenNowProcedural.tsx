@@ -121,6 +121,15 @@ function ListenNowProcedural() {
 
       {
       /**
+       * Second release spotlight.
+       */
+      }
+      <ProceduralLayout.Block size='6x8'>
+        <ReleaseSpotlight position={1} />
+      </ProceduralLayout.Block>
+
+      {
+      /**
        * Fin.
        */
       }

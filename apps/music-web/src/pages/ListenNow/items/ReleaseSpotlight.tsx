@@ -58,10 +58,14 @@ function ReleaseSpotlight({ position = 0 }: ReleaseSpotlightProps) {
     return <Shimmer />
   }
 
+  /* Later positions run dry long before the library is empty, so they say the day ran out of
+     picks rather than blaming the library the way the first spotlight does. */
   if (!spotlight) {
+    const emptyKey = position ? 'release-spotlight.empty-sequence' : 'release-spotlight.empty'
+
     return (
       <Card header={<H3>{i18n['release-spotlight.title'][lang]}</H3>}>
-        <p>{i18n['release-spotlight.empty'][lang]}</p>
+        <p>{i18n[emptyKey][lang]}</p>
       </Card>
     )
   }
