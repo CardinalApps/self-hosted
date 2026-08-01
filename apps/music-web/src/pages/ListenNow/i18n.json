@@ -60,10 +60,10 @@
     "en": "{num} tracks"
   },
   "artist-spotlight.num-plays.singular": {
-    "en": "{num} play by you"
+    "en": "{num} play"
   },
   "artist-spotlight.num-plays.plural": {
-    "en": "{num} plays by you"
+    "en": "{num} plays"
   },
   "recently-added-releases.title": {
     "en": "Recently Added Releases"
