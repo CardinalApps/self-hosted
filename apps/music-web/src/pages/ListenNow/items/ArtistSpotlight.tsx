@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
 import Spotlight from '@cardinalapps/ui/src/components/interaction/Spotlight'
+import Tags from '@cardinalapps/ui/src/components/interaction/Tags'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { useReleaseCovers } from '@cardinalapps/ui/src/hooks/useReleaseCovers'
@@ -102,12 +103,7 @@ function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
       reason={reasonSentence(spotlight, lang)}
       image={cover?.src}
       imageColor={cover?.color}
-      stats={stats.map((stat, index) => (
-        <span key={stat}>
-          {index > 0 && <span className="stat-separator">·&nbsp;</span>}
-          {stat}
-        </span>
-      ))}
+      stats={!!stats.length && <Tags tags={stats} size="small" />}
       actions={
         <>
           <DynamicQueueActionButton
