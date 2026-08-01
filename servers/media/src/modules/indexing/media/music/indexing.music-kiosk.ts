@@ -27,8 +27,33 @@ export function parseKioskPath(absolutePath: string): { artistName: string, rele
   return { artistName, releaseName, trackName: baseName, trackNumber }
 }
 
+// Deterministic 32-bit hash (djb2) so fabricated values survive reindexing unchanged
+function hashKioskString(value: string): number {
+  let hash = 5381
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) >>> 0
+  }
+  return hash
+}
+
+/*
+ * Fabricates a stable release date for a kiosk release, spread up to 35 years into the
+ * past so artist timelines and release sorting look organic. Hashing the artist+release
+ * pair (never the track) keeps every track of an album on the same date, which the
+ * artist summary's per-release year consensus requires.
+ */
+export function buildKioskReleaseDate(artistName: string, releaseName: string): { year: number, date: string } {
+  const hash = hashKioskString(`${artistName}/${releaseName}`)
+  const year = new Date().getFullYear() - (hash % 35)
+  const month = ((hash >>> 8) % 12) + 1
+  const day = ((hash >>> 16) % 28) + 1
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return { year, date: `${year}-${pad(month)}-${pad(day)}` }
+}
+
 export function buildKioskEmbeddedMetadata(absolutePath: string): Record<string, unknown> {
   const { artistName, releaseName, trackName, trackNumber } = parseKioskPath(absolutePath)
+  const { year, date } = buildKioskReleaseDate(artistName, releaseName)
   return {
     title:       trackName,
     artist:      artistName,
@@ -36,6 +61,8 @@ export function buildKioskEmbeddedMetadata(absolutePath: string): Record<string,
     album:       releaseName,
     track:       { no: trackNumber, of: 10 },
     disk:        { no: 1, of: 1 },
+    year:        year,
+    date:        date,
     duration:    180 + (trackNumber * 7),
     bitrate:     320000,
     codec:       'MP3',
