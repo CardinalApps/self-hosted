@@ -46,7 +46,7 @@ function ListenNowProcedural() {
        * Action buttons.
        */
       }
-      <ProceduralLayout.Block size='12x2'>
+      <ProceduralLayout.Block size='natural'>
         <div className="listen-now-actions">
           <HouseMix />
           <TrueShuffle />
@@ -96,7 +96,7 @@ function ListenNowProcedural() {
        * Artist spotlight.
        */
       }
-      <ProceduralLayout.Block size='12x8' flush>
+      <ProceduralLayout.Block size='12x8'>
         <ArtistSpotlight />
       </ProceduralLayout.Block>
 
