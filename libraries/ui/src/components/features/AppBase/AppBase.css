@@ -670,7 +670,7 @@
   --rowHeight: calc(40px + var(--gap));
 
   height: 100%;
-  padding: 85px 0 0 10px;
+  padding: 85px var(--gutter) 0 10px;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -720,6 +720,7 @@
           .embla__viewport {
             margin-left: -20px;
             padding-left: 20px;
+            margin-right: calc(-1 * var(--gutter));
             position: relative;
             
             &:before {
