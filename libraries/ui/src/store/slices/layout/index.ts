@@ -6,6 +6,8 @@ import { STORE_KEY, SIDEBAR_MODE, PAGE_LAYOUT } from './constants'
 
 export type ActionButton = {
   gradientAnimation?: string,
+  /** Which button last claimed this queue's party animation, for when multiple buttons can resolve to the same queue. */
+  activeButtonId?: string,
 }
 
 export type VirtualView = {

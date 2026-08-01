@@ -14,6 +14,8 @@ type DynamicQueueActionButtonProps = {
   seedMediaType?: QueueSeedMediaType,
   seedMediaId?: string,
   dynamicQueueType: DynamicQueueType,
+  /** Distinguishes this button's party animation from others of the same dynamicQueueType, e.g. two buttons that can both resolve to "house_mix". Defaults to dynamicQueueType. */
+  buttonId?: string,
   icon: string,
   label: string,
   disabled?: boolean,
@@ -28,13 +30,18 @@ function DynamicQueueActionButton({
   seedMediaType,
   seedMediaId,
   dynamicQueueType,
+  buttonId,
   icon,
   label,
   disabled = false,
 }: DynamicQueueActionButtonProps) {
   const dispatch = useAppDispatch()
   const players = useAppSelector(audioSelectors.players)
-  const { [dynamicQueueType]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
+  const buttonName = buttonId ?? dynamicQueueType
+  // Two buttons can resolve to the identical queue (same type + seed), so the party animation
+  // is stored per queue, not per button; whichever button last started it owns the party.
+  const queueKey = `${dynamicQueueType}:${seedMediaId ?? ''}`
+  const { [queueKey]: storedActionButton } = useAppSelector(layoutSelectors.actionButtons)
 
   /*
     Party while a player of this queue type, with this same seed, is going. The
@@ -47,11 +54,12 @@ function DynamicQueueActionButton({
     && (player.queue?.seedMediaId ?? null) === (seedMediaId ?? null)
     && (player.state === PLAYBACK_STATE.PLAYING || player.state === PLAYBACK_STATE.LOADING)
   ))
-  const isPartyTime = partyTime && storedActionButton?.gradientAnimation
+  const isPartyTime = partyTime
+    && !!storedActionButton?.gradientAnimation
+    && storedActionButton?.activeButtonId === buttonName
 
   /**
-   * Create an action button animation on click. Store it in the store so that
-   * all action buttons with this name use the same animation.
+   * Create an action button animation on click, claiming this queue's party for this button.
    */
   const handleActionButtonClick = () => {
     const randomGradient = [
@@ -63,7 +71,7 @@ function DynamicQueueActionButton({
       randomHexColor(),
     ]
     const animation = `linear-gradient(-45deg, ${randomGradient.join(',')})`
-    dispatch(layoutActions.setActionButton({ buttonName: dynamicQueueType, button: { gradientAnimation: animation } }))
+    dispatch(layoutActions.setActionButton({ buttonName: queueKey, button: { gradientAnimation: animation, activeButtonId: buttonName } }))
   }
 
   const handleStart = () => {
@@ -81,10 +89,10 @@ function DynamicQueueActionButton({
       partyTime={!!isPartyTime}
       partyRoom={(
         <div
-          className={clsx('party-room', partyTime)}
+          className={clsx('party-room', isPartyTime)}
           style={
-            partyTime
-              ? { backgroundImage: storedActionButton.gradientAnimation }
+            isPartyTime
+              ? { backgroundImage: storedActionButton?.gradientAnimation }
               : undefined
           }
         />
