@@ -23,6 +23,48 @@
   "favorite-tracks.empty": {
     "en": "Tracks that you favorite will appear here."
   },
+  "action-buttons.spotlight": {
+    "en": "Spotlight"
+  },
+  "artist-spotlight.title": {
+    "en": "Artist Spotlight"
+  },
+  "artist-spotlight.empty": {
+    "en": "Add some music with cover art and an artist will be spotlighted here."
+  },
+  "artist-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had them on repeat lately"
+  },
+  "artist-spotlight.reason.favorited_track": {
+    "en": "Because you favorited {track}"
+  },
+  "artist-spotlight.reason.rediscover": {
+    "en": "Because it's been a while since you played them"
+  },
+  "artist-spotlight.reason.unplayed": {
+    "en": "Because you haven't played them yet"
+  },
+  "artist-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "artist-spotlight.num-releases.singular": {
+    "en": "{num} release"
+  },
+  "artist-spotlight.num-releases.plural": {
+    "en": "{num} releases"
+  },
+  "artist-spotlight.num-tracks.singular": {
+    "en": "{num} track"
+  },
+  "artist-spotlight.num-tracks.plural": {
+    "en": "{num} tracks"
+  },
+  "artist-spotlight.num-plays.singular": {
+    "en": "{num} play by you"
+  },
+  "artist-spotlight.num-plays.plural": {
+    "en": "{num} plays by you"
+  },
   "recently-added-releases.title": {
     "en": "Recently Added Releases"
   },

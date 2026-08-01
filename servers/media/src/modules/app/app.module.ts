@@ -34,6 +34,7 @@ import { RatingModule } from '../rating/rating.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
+import { RecommendationModule } from '../recommendation/recommendation.module'
 import { TranscodingModule } from '../transcoding/transcoding.module'
 import { WaveformModule } from '../waveform/waveform.module'
 
@@ -149,6 +150,7 @@ const resolvePostgresHost = () => {
     RatingModule,
     InvitationModule,
     PlaybackQueueModule,
+    RecommendationModule,
     ClaimModule,
     TranscodingModule,
     WaveformModule,
