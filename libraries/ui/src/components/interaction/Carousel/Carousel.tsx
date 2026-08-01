@@ -1,4 +1,4 @@
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Button from '../Button'
 import H5 from '../../typography/H5'
@@ -64,6 +64,22 @@ const Carousel = ({
     forceWheelAxis: 'x',
   })])
 
+  // Pagination only means something once there's more than one page to page through
+  const [hasMultiplePages, setHasMultiplePages] = useState(false)
+
+  useEffect(() => {
+    if (!emblaApi) return
+
+    const updatePageCount = () => setHasMultiplePages(emblaApi.scrollSnapList().length > 1)
+
+    updatePageCount()
+    emblaApi.on('reInit', updatePageCount)
+
+    return () => {
+      emblaApi.off('reInit', updatePageCount)
+    }
+  }, [emblaApi])
+
   const goToPrev = () => {
     emblaApi?.scrollPrev()
   }
@@ -71,27 +87,27 @@ const Carousel = ({
     emblaApi?.scrollNext()
   }
 
-  const prevBtn = () => (
+  const prevBtn = () => hasMultiplePages ? (
     <Button
       className={clsx('embla__prev', glass && 'glass')}
       onClick={goToPrev}
       icon="fas fa-angle-left"
       circleIcon
     />
-  )
+  ) : null
 
-  const nextBtn = () => (
+  const nextBtn = () => hasMultiplePages ? (
     <Button
       className={clsx('embla__next', glass && 'glass')}
       onClick={goToNext}
       icon="fas fa-angle-right"
       circleIcon
     />
-  )
+  ) : null
 
-  const pagination = () => (
+  const pagination = () => hasMultiplePages ? (
     <div className={clsx('carousel-pagination', glass && 'glass')}>{emblaApi?.selectedScrollSnap() + 1} / {maxPages}</div>
-  )
+  ) : null
 
   useEffect(() => {
     const update: CarouselState = {
@@ -105,7 +121,7 @@ const Carousel = ({
       })
     }
     onChange?.(update)
-  }, [emblaApi, maxPages, glass])
+  }, [emblaApi, maxPages, glass, hasMultiplePages])
 
   return (
     <div
@@ -125,16 +141,18 @@ const Carousel = ({
                 {title}
               </H5>
             )}
-            <div className="carousel-controls">
-              <div className="carousel-pagination">
-                {prev && (
-                  prevBtn()
-                )}
-                {next && (
-                  nextBtn()
-                )}
+            {hasMultiplePages && (prev || next) && (
+              <div className="carousel-controls">
+                <div className="carousel-pagination">
+                  {prev && (
+                    prevBtn()
+                  )}
+                  {next && (
+                    nextBtn()
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </header>
       )}
       <div
