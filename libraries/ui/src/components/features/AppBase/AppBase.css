@@ -681,6 +681,10 @@
   .procedural-layout-block {
     padding-bottom: calc(var(--gap) * 2);
 
+    &:not(:first-child) {
+      margin-bottom: 30px;
+    }
+
     .procedural-layout-block-inner {
       height: 100%;
       margin: 0 calc(var(--gap));
@@ -705,6 +709,13 @@
     }
     &[data-cols="4"] {
       width: 33.3333%;
+    }
+
+    @media (max-width: 1200px) {
+
+      &[data-cols="6"] {
+        width: 100%;
+      }
     }
 
     &[data-cols="natural"] {
