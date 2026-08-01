@@ -3,19 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
+import { MusicRelease } from '../music-release/music-release.entity'
 import { MusicTrack } from '../music-track/music-track.entity'
 import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating, RatingMediaType } from '../rating/rating.entity'
 import { User } from '../user/user.entity'
 import { DynamicQueueType } from '../playback-queue/dtos/CreatePlaybackQueue'
 
-import { MusicArtistSpotlight, MusicSpotlightReason, MusicSpotlightReasonKind } from './types'
+import { MusicArtistSpotlight, MusicReleaseSpotlight, MusicSpotlightReason, MusicSpotlightReasonKind } from './types'
 
 // How far back a play still counts as heavy rotation, and how many plays it takes
 const HEAVY_ROTATION_DAYS = 30
 const HEAVY_ROTATION_MIN_PLAYS = 5
 
-// How much history makes an artist worth rediscovering, and how long they must have sat idle
+// How much history makes a pick worth rediscovering, and how long it must have sat idle
 const REDISCOVER_MIN_PLAYS = 10
 const REDISCOVER_IDLE_DAYS = 90
 
@@ -24,12 +25,22 @@ const FAVORITED_DAYS = 60
 
 /* The queue the spotlight's play button should start. Reasons about neglect lead into Undertow
    (least-played first); reasons about affection lead into House Mix (most-played first). */
-const REASON_QUEUE_TYPES: Record<MusicSpotlightReasonKind, DynamicQueueType> = {
+const ARTIST_REASON_QUEUE_TYPES: Record<MusicSpotlightReasonKind, DynamicQueueType> = {
   heavy_rotation: 'house_mix',
   favorited_track: 'house_mix',
   rediscover: 'undertow',
   unplayed: 'undertow',
   library_pick: 'house_mix',
+}
+
+/* A release can't be Undertowed, so neglect leads into an Encore instead: the way to meet a
+   release you've never heard, or haven't heard in months, is to play it front to back. */
+const RELEASE_REASON_QUEUE_TYPES: Record<MusicSpotlightReasonKind, DynamicQueueType> = {
+  heavy_rotation: 'house_mix',
+  favorited_track: 'house_mix',
+  rediscover: 'encore',
+  unplayed: 'encore',
+  library_pick: 'encore',
 }
 
 // Aggregate counts come back as strings on Postgres and numbers on SQLite
@@ -57,11 +68,22 @@ const fnv1a = (input: string): number => {
 
 const daysAgo = (days: number): Date => new Date(Date.now() - days * 24 * 60 * 60 * 1000)
 
+/** Which media the spotlight is about. Both walk the same reasons over different rows. */
+type SpotlightScope = 'artist' | 'release'
+
 type SpotlightCandidate = {
-  musicArtistId: string
+  // The public ID of the artist or release
+  id: string
+
+  // The artist's name or the release's title
   name: string
+
   trackTitle?: string
   lastPlayedAt?: string
+
+  // The release's artist, only for release candidates
+  artistName?: string
+  musicArtistId?: string
 }
 
 type ReasonPool = {
@@ -69,16 +91,24 @@ type ReasonPool = {
   candidates: SpotlightCandidate[]
 }
 
+type SpotlightPick = {
+  kind: MusicSpotlightReasonKind
+  candidate: SpotlightCandidate
+}
+
 /**
- * Picks the artist for the Listen Now spotlight, along with the reason it was
- * picked. The pick is stable for a calendar day per user, and rolls over to a
- * fresh one the next day.
+ * Picks the artist and the release for the Listen Now spotlights, along with
+ * the reason each was picked. The picks are stable for a calendar day per
+ * user, and roll over to fresh ones the next day.
  */
 @Injectable()
 export class MusicSpotlightService {
   constructor(
     @InjectRepository(MusicArtist)
     private musicArtistRepository: Repository<MusicArtist>,
+
+    @InjectRepository(MusicRelease)
+    private musicReleaseRepository: Repository<MusicRelease>,
 
     @InjectRepository(MusicHistory)
     private musicHistoryRepository: Repository<MusicHistory>,
@@ -92,28 +122,71 @@ export class MusicSpotlightService {
    * null once the sequence has run dry.
    */
   async getArtistSpotlight(user?: User, position = 0): Promise<MusicArtistSpotlight | null> {
-    const eligible = await this.getEligibleArtists()
+    const pick = await this.getSpotlightPick('artist', user, position)
+
+    if (!pick) {
+      return null
+    }
+
+    return {
+      musicArtistId: pick.candidate.id,
+      name: pick.candidate.name,
+      reason: this.toReason(pick),
+      queueType: ARTIST_REASON_QUEUE_TYPES[pick.kind],
+    }
+  }
+
+  /**
+   * The spotlighted release at one position of this user's daily sequence, or
+   * null once the sequence has run dry. Runs its own sequence, so it can land
+   * on the same artist the artist spotlight did.
+   */
+  async getReleaseSpotlight(user?: User, position = 0): Promise<MusicReleaseSpotlight | null> {
+    const pick = await this.getSpotlightPick('release', user, position)
+
+    if (!pick) {
+      return null
+    }
+
+    return {
+      musicReleaseId: pick.candidate.id,
+      title: pick.candidate.name,
+      artistName: pick.candidate.artistName ?? null,
+      musicArtistId: pick.candidate.musicArtistId ?? null,
+      reason: this.toReason(pick),
+      queueType: RELEASE_REASON_QUEUE_TYPES[pick.kind],
+    }
+  }
+
+  /**
+   * Walks the day's deterministic sequence for one scope up to the requested
+   * position, or returns null once it runs dry.
+   */
+  private async getSpotlightPick(scope: SpotlightScope, user?: User, position = 0): Promise<SpotlightPick | null> {
+    const eligible = scope === 'artist'
+      ? await this.getEligibleArtists()
+      : await this.getEligibleReleases()
 
     if (!eligible.length) {
       return null
     }
 
-    const daySeed = `${user?.userId ?? 'anonymous'}:${new Date().toISOString().slice(0, 10)}`
-    const pools = user ? await this.buildReasonPools(eligible, user) : []
+    const daySeed = `${user?.userId ?? 'anonymous'}:${scope}:${new Date().toISOString().slice(0, 10)}`
+    const pools = user ? await this.buildReasonPools(scope, eligible, user) : []
     const signalPools = pools.filter((pool) => pool.candidates.length)
 
     const usedKinds = new Set<MusicSpotlightReasonKind>()
-    const usedArtists = new Set<string>()
+    const usedIds = new Set<string>()
 
-    /* Walk the day's deterministic sequence up to the requested position. Every step takes a
-       reason and an artist that no earlier step has used, so a page of spotlights never repeats
-       either; library_pick serves once as the final filler, then the sequence runs dry. */
+    /* Every step takes a reason and a pick that no earlier step has used, so a page of
+       spotlights never repeats either; library_pick serves once as the final filler, then
+       the sequence runs dry. */
     for (let step = 0; ; step++) {
       const available = signalPools
         .filter((pool) => !usedKinds.has(pool.kind))
         .map((pool) => ({
           ...pool,
-          candidates: pool.candidates.filter((candidate) => !usedArtists.has(candidate.musicArtistId)),
+          candidates: pool.candidates.filter((candidate) => !usedIds.has(candidate.id)),
         }))
         .filter((pool) => pool.candidates.length)
 
@@ -125,7 +198,7 @@ export class MusicSpotlightService {
         kind = pool.kind
         candidate = this.pickCandidate(pool.candidates, `${daySeed}:${step}:${pool.kind}`)
       } else if (!usedKinds.has('library_pick')) {
-        const remaining = eligible.filter((artist) => !usedArtists.has(artist.musicArtistId))
+        const remaining = eligible.filter((candidate) => !usedIds.has(candidate.id))
 
         if (!remaining.length) {
           return null
@@ -138,11 +211,11 @@ export class MusicSpotlightService {
       }
 
       if (step === position) {
-        return this.toSpotlight(kind, candidate)
+        return { kind, candidate }
       }
 
       usedKinds.add(kind)
-      usedArtists.add(candidate.musicArtistId)
+      usedIds.add(candidate.id)
     }
   }
 
@@ -157,26 +230,55 @@ export class MusicSpotlightService {
       .innerJoin('release.thumbnails', 'thumbnail')
       .innerJoin('release.tracks', 'track')
       .where('artist.name IS NOT NULL')
-      .select('artist.musicArtistId', 'musicArtistId')
+      .select('artist.musicArtistId', 'id')
       .addSelect('artist.name', 'name')
       .groupBy('artist.musicArtistId')
       .addGroupBy('artist.name')
       .getRawMany()
 
     return rows.map((row) => ({
-      musicArtistId: String(row.musicArtistId ?? ''),
+      id: String(row.id ?? ''),
       name: String(row.name ?? ''),
     }))
   }
 
   /**
-   * One pool of candidates per reason, all cut down to the eligible artists.
+   * Releases that can carry the block: titled, with cover art for the hero and
+   * playable tracks.
    */
-  private async buildReasonPools(eligible: SpotlightCandidate[], user: User): Promise<ReasonPool[]> {
+  private async getEligibleReleases(): Promise<SpotlightCandidate[]> {
+    const rows = await this.musicReleaseRepository
+      .createQueryBuilder('release')
+      .innerJoin('release.thumbnails', 'thumbnail')
+      .innerJoin('release.tracks', 'track')
+      .leftJoin('release.artist', 'artist')
+      .where('release.title IS NOT NULL')
+      .select('release.musicReleaseId', 'id')
+      .addSelect('release.title', 'name')
+      .addSelect('artist.name', 'artistName')
+      .addSelect('artist.musicArtistId', 'musicArtistId')
+      .groupBy('release.musicReleaseId')
+      .addGroupBy('release.title')
+      .addGroupBy('artist.name')
+      .addGroupBy('artist.musicArtistId')
+      .getRawMany()
+
+    return rows.map((row) => ({
+      id: String(row.id ?? ''),
+      name: String(row.name ?? ''),
+      ...(row.artistName ? { artistName: String(row.artistName) } : {}),
+      ...(row.musicArtistId ? { musicArtistId: String(row.musicArtistId) } : {}),
+    }))
+  }
+
+  /**
+   * One pool of candidates per reason, all cut down to the eligible picks.
+   */
+  private async buildReasonPools(scope: SpotlightScope, eligible: SpotlightCandidate[], user: User): Promise<ReasonPool[]> {
     const [allPlays, recentPlays, recentFavorites] = await Promise.all([
-      this.getPlaysByArtist(user),
-      this.getPlaysByArtist(user, daysAgo(HEAVY_ROTATION_DAYS)),
-      this.getRecentFavorites(user),
+      this.getPlays(scope, user),
+      this.getPlays(scope, user, daysAgo(HEAVY_ROTATION_DAYS)),
+      this.getRecentFavorites(scope, user),
     ])
 
     const rediscoverCutoff = daysAgo(REDISCOVER_IDLE_DAYS)
@@ -186,30 +288,30 @@ export class MusicSpotlightService {
     const unplayed: SpotlightCandidate[] = []
     const favorited: SpotlightCandidate[] = []
 
-    for (const artist of eligible) {
-      const played = allPlays.get(artist.musicArtistId)
-      const recent = recentPlays.get(artist.musicArtistId)
-      const favorite = recentFavorites.get(artist.musicArtistId)
+    for (const candidate of eligible) {
+      const played = allPlays.get(candidate.id)
+      const recent = recentPlays.get(candidate.id)
+      const favorite = recentFavorites.get(candidate.id)
 
       if (recent && recent.plays >= HEAVY_ROTATION_MIN_PLAYS) {
-        heavyRotation.push(artist)
+        heavyRotation.push(candidate)
       }
 
       if (favorite) {
-        favorited.push({ ...artist, trackTitle: favorite })
+        favorited.push({ ...candidate, trackTitle: favorite })
       }
 
       /* Unplayed is only a signal once the user has a listening record; with no plays at all,
-         every artist is unplayed and the library_pick fallback is the honest framing. */
+         everything is unplayed and the library_pick fallback is the honest framing. */
       if (!played && allPlays.size) {
-        unplayed.push(artist)
+        unplayed.push(candidate)
       } else if (
         played
         && played.plays >= REDISCOVER_MIN_PLAYS
         && played.lastPlayedAt
         && new Date(played.lastPlayedAt) < rediscoverCutoff
       ) {
-        rediscover.push({ ...artist, lastPlayedAt: played.lastPlayedAt })
+        rediscover.push({ ...candidate, lastPlayedAt: played.lastPlayedAt })
       }
     }
 
@@ -222,19 +324,30 @@ export class MusicSpotlightService {
   }
 
   /**
-   * The user's play count and most recent play per artist, optionally counting
-   * only plays after a cutoff.
+   * The user's play count and most recent play per artist or release,
+   * optionally counting only plays after a cutoff.
    */
-  private async getPlaysByArtist(user: User, since?: Date): Promise<Map<string, { plays: number, lastPlayedAt: string | null }>> {
+  private async getPlays(scope: SpotlightScope, user: User, since?: Date): Promise<Map<string, { plays: number, lastPlayedAt: string | null }>> {
     const query = this.musicHistoryRepository
       .createQueryBuilder('history')
       .innerJoin('history.track', 'track')
-      .innerJoin('track.artists', 'artist')
       .where('history.user_id = :userId', { userId: user.id })
-      .select('artist.musicArtistId', 'musicArtistId')
+
+    if (scope === 'artist') {
+      query
+        .innerJoin('track.artists', 'artist')
+        .select('artist.musicArtistId', 'id')
+        .groupBy('artist.musicArtistId')
+    } else {
+      query
+        .innerJoin('track.release', 'release')
+        .select('release.musicReleaseId', 'id')
+        .groupBy('release.musicReleaseId')
+    }
+
+    query
       .addSelect('COUNT(history.id)', 'plays')
       .addSelect('MAX(history.createdAt)', 'lastPlayedAt')
-      .groupBy('artist.musicArtistId')
 
     if (since) {
       query.andWhere('history.createdAt >= :since', { since })
@@ -243,37 +356,47 @@ export class MusicSpotlightService {
     const rows = await query.getRawMany()
 
     return new Map(rows.map((row) => [
-      String(row.musicArtistId ?? ''),
+      String(row.id ?? ''),
       { plays: toInt(row.plays), lastPlayedAt: toIsoOrNull(row.lastPlayedAt) },
     ]))
   }
 
   /**
-   * The title of the most recently favorited track per artist, within the
-   * recency window. Ratings key on the public track ID, so this joins on
-   * musicTrackId instead of a relation.
+   * The title of the most recently favorited track per artist or release,
+   * within the recency window. Ratings key on the public track ID, so this
+   * joins on musicTrackId instead of a relation.
    */
-  private async getRecentFavorites(user: User): Promise<Map<string, string>> {
-    const rows = await this.ratingRepository
+  private async getRecentFavorites(scope: SpotlightScope, user: User): Promise<Map<string, string>> {
+    const query = this.ratingRepository
       .createQueryBuilder('rating')
       .innerJoin(MusicTrack, 'track', 'track.music_track_id = rating.media_id')
-      .innerJoin('track.artists', 'artist')
       .where('rating.user_id = :userId', { userId: user.id })
       .andWhere('rating.media_type = :mediaType', { mediaType: RatingMediaType.MUSIC_TRACK })
       .andWhere('rating.created_at >= :since', { since: daysAgo(FAVORITED_DAYS) })
-      .select('artist.musicArtistId', 'musicArtistId')
+
+    if (scope === 'artist') {
+      query
+        .innerJoin('track.artists', 'artist')
+        .select('artist.musicArtistId', 'id')
+    } else {
+      query
+        .innerJoin('track.release', 'release')
+        .select('release.musicReleaseId', 'id')
+    }
+
+    const rows = await query
       .addSelect('track.title', 'trackTitle')
       .addSelect('rating.createdAt', 'favoritedAt')
       .orderBy('rating.createdAt', 'ASC')
       .getRawMany()
 
-    // Ascending order, so the newest favorite per artist wins the map slot
+    // Ascending order, so the newest favorite per pick wins the map slot
     const favorites = new Map<string, string>()
 
     for (const row of rows) {
-      const musicArtistId = String(row.musicArtistId ?? '')
-      if (musicArtistId && row.trackTitle) {
-        favorites.set(musicArtistId, String(row.trackTitle))
+      const id = String(row.id ?? '')
+      if (id && row.trackTitle) {
+        favorites.set(id, String(row.trackTitle))
       }
     }
 
@@ -284,14 +407,14 @@ export class MusicSpotlightService {
    * A deterministic pick from the pool: sorted for stability, indexed by hash.
    */
   private pickCandidate(candidates: SpotlightCandidate[], seed: string): SpotlightCandidate {
-    const sorted = [...candidates].sort((a, b) => a.musicArtistId.localeCompare(b.musicArtistId))
+    const sorted = [...candidates].sort((a, b) => a.id.localeCompare(b.id))
     return sorted[fnv1a(seed) % sorted.length]
   }
 
   /**
-   * Shapes the winning candidate into the API response.
+   * The reason, with only the params that belong to its kind.
    */
-  private toSpotlight(kind: MusicSpotlightReasonKind, candidate: SpotlightCandidate): MusicArtistSpotlight {
+  private toReason({ kind, candidate }: SpotlightPick): MusicSpotlightReason {
     const reason: MusicSpotlightReason = { kind }
 
     if (kind === 'favorited_track' && candidate.trackTitle) {
@@ -302,11 +425,6 @@ export class MusicSpotlightService {
       reason.lastPlayedAt = candidate.lastPlayedAt
     }
 
-    return {
-      musicArtistId: candidate.musicArtistId,
-      name: candidate.name,
-      reason,
-      queueType: REASON_QUEUE_TYPES[kind],
-    }
+    return reason
   }
 }

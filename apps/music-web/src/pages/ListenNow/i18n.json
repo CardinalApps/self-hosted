@@ -65,6 +65,39 @@
   "artist-spotlight.num-plays.plural": {
     "en": "{num} plays"
   },
+  "release-spotlight.title": {
+    "en": "Release Spotlight"
+  },
+  "release-spotlight.empty": {
+    "en": "Add some music with cover art and a release will be spotlighted here."
+  },
+  "release-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had it on repeat lately"
+  },
+  "release-spotlight.reason.favorited_track": {
+    "en": "Because you favorited {track}"
+  },
+  "release-spotlight.reason.rediscover": {
+    "en": "Because it's been a while since you played it"
+  },
+  "release-spotlight.reason.unplayed": {
+    "en": "Because you haven't played it yet"
+  },
+  "release-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "release-spotlight.num-tracks.singular": {
+    "en": "{num} track"
+  },
+  "release-spotlight.num-tracks.plural": {
+    "en": "{num} tracks"
+  },
+  "release-spotlight.num-plays.singular": {
+    "en": "{num} play"
+  },
+  "release-spotlight.num-plays.plural": {
+    "en": "{num} plays"
+  },
   "recently-added-releases.title": {
     "en": "Newest Releases"
   },
