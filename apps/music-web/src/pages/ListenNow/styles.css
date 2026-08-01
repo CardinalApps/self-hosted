@@ -7,7 +7,12 @@
 .listen-now .listen-now-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 20px;
+}
+
+.listen-now .h3 {
+  font-size: 24px;
 }
 
 .listen-now .recently-added-artists-title {

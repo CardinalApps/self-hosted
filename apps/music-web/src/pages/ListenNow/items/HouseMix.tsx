@@ -13,6 +13,7 @@ function HouseMix() {
       dynamicQueueType="house_mix"
       icon="fas fa-dna"
       label={i18n['action-buttons.house-mix'][lang]}
+      labelAs="h2"
     />
   )
 }

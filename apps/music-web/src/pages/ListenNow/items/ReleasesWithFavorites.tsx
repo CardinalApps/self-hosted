@@ -2,7 +2,7 @@ import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
-import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import H3 from '@cardinalapps/ui/src/components/typography/H3'
 
 import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { MusicReleaseType, useGetMusicReleasesQuery } from '@cardinalapps/ui/src/store/apis/musicReleases'
@@ -40,9 +40,9 @@ function ReleasesWithFavorites() {
     return (
       <div className="carousel">
         <header className="carousel-header">
-          <H5 className="carousel-title">
+          <H3 className="carousel-title">
             {i18n['releases-with-favorites.title'][lang]}
-          </H5>
+          </H3>
         </header>
         <p>{i18n['releases-with-favorites.empty'][lang]}</p>
       </div>

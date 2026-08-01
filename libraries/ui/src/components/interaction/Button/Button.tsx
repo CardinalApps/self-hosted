@@ -42,6 +42,9 @@ type ButtonProps = {
   disabled?: boolean,
   choices?: ButtonChoice[],
 
+  // Renders the label as a heading instead of a span, for buttons that act as a page section's title
+  textAs?: 'span' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6',
+
   // For the outer component to add conditional party-rendering logic
   partyTime?: boolean,
   partyRoom?: React.ReactNode,
@@ -73,6 +76,7 @@ const Button = ({
   className = undefined,
   disabled = false,
   choices = undefined,
+  textAs: ButtonText = 'span',
   partyTime = false,
   partyRoom,
   ...props
@@ -125,7 +129,7 @@ const Button = ({
         {...props}
       >
         {!!icon && <Icon fa={icon} />}
-        <span className="button-text">{children}</span>
+        <ButtonText className="button-text">{children}</ButtonText>
       </a>,
     )
   } else {
@@ -140,7 +144,7 @@ const Button = ({
       >
         {!!icon && <Icon fa={icon} />}
         {animation && getAnimationSVG(animation, animationColor)}
-        <span className="button-text">{children}</span>
+        <ButtonText className="button-text">{children}</ButtonText>
         {partyRoom}
       </button>
     )

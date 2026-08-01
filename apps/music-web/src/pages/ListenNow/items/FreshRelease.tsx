@@ -19,6 +19,7 @@ function FreshRelease() {
       icon="fas fa-leaf"
       disabled={!hasFreshMusic}
       label={i18n['action-buttons.fresh-release'][lang]}
+      labelAs="h2"
     />
   )
 }

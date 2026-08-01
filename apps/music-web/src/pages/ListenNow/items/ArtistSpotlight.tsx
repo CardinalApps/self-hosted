@@ -4,7 +4,7 @@ import Card from '@cardinalapps/ui/src/components/layout/Card'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
 import Spotlight from '@cardinalapps/ui/src/components/interaction/Spotlight'
 import Tags from '@cardinalapps/ui/src/components/interaction/Tags'
-import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { useReleaseCovers } from '@cardinalapps/ui/src/hooks/useReleaseCovers'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
@@ -69,7 +69,7 @@ function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
 
   if (!spotlight) {
     return (
-      <Card header={<H5>{i18n['artist-spotlight.title'][lang]}</H5>}>
+      <Card header={<H3>{i18n['artist-spotlight.title'][lang]}</H3>}>
         <p>{i18n['artist-spotlight.empty'][lang]}</p>
       </Card>
     )

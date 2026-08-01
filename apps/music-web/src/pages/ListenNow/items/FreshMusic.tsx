@@ -19,6 +19,7 @@ function FreshMusic() {
       icon="fas fa-seedling"
       disabled={!hasFreshMusic}
       label={i18n['action-buttons.fresh-music'][lang]}
+      labelAs="h2"
     />
   )
 }

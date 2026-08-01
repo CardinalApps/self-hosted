@@ -13,6 +13,7 @@ function TrueShuffle() {
       dynamicQueueType="true_shuffle"
       icon="fas fa-random"
       label={i18n['action-buttons.true-shuffle'][lang]}
+      labelAs="h2"
     />
   )
 }
