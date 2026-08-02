@@ -6,6 +6,7 @@ import { MusicSpotlightService } from './music-spotlight.service'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
 import { MusicRelease } from '../music-release/music-release.entity'
+import { MusicTrack } from '../music-track/music-track.entity'
 import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating } from '../rating/rating.entity'
 
@@ -14,6 +15,7 @@ import { Rating } from '../rating/rating.entity'
     TypeOrmModule.forFeature([
       MusicArtist,
       MusicRelease,
+      MusicTrack,
       MusicHistory,
       Rating,
     ]),

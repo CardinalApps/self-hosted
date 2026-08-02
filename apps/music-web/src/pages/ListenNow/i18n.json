@@ -107,6 +107,30 @@
   "release-spotlight.num-plays.plural": {
     "en": "{num} plays"
   },
+  "track-spotlight.title": {
+    "en": "Track Spotlight"
+  },
+  "track-spotlight.empty": {
+    "en": "Add some music with cover art and a track will be spotlighted here."
+  },
+  "track-spotlight.empty-sequence": {
+    "en": "Only one track stood out today. Check back tomorrow for another."
+  },
+  "track-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had it on repeat this week"
+  },
+  "track-spotlight.reason.favorited_track": {
+    "en": "Because you favorited it recently"
+  },
+  "track-spotlight.reason.unplayed": {
+    "en": "Because you've never heard it"
+  },
+  "track-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "action-buttons.play": {
+    "en": "Play"
+  },
   "recently-added-releases.title": {
     "en": "Newest Releases"
   },

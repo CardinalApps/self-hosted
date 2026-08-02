@@ -12,6 +12,7 @@ import HotTracks from './items/HotTracks'
 import ReleasesWithFavorites from './items/ReleasesWithFavorites'
 import ArtistSpotlight from './items/ArtistSpotlight'
 import ReleaseSpotlight from './items/ReleaseSpotlight'
+import TrackSpotlight from './items/TrackSpotlight'
 import RecentlyAddedArtists from './items/RecentlyAddedArtists'
 import { useGetMusicTracksQuery } from '@cardinalapps/ui/src/store/apis/musicTracks'
 
@@ -131,6 +132,19 @@ function ListenNowProcedural() {
       }
       <ProceduralLayout.Block size='12x8'>
         <HotTracks />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Track spotlights.
+       */
+      }
+      <ProceduralLayout.Block size='6x6'>
+        <TrackSpotlight />
+      </ProceduralLayout.Block>
+
+      <ProceduralLayout.Block size='6x6'>
+        <TrackSpotlight position={1} />
       </ProceduralLayout.Block>
 
       {

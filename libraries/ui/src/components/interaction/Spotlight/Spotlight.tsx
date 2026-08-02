@@ -6,6 +6,7 @@ import { RouterContext } from '../../../context/router'
 import './Spotlight.css'
 
 type SpotlightProps = {
+  className?: string,
   /** Small label above the title, e.g. "Artist Spotlight". */
   kicker: string,
   /** The day the pick was made, shown beside the kicker. */
@@ -32,6 +33,7 @@ type SpotlightProps = {
  * and what the actions do.
  */
 const Spotlight = ({
+  className,
   kicker,
   date,
   title,
@@ -49,7 +51,7 @@ const Spotlight = ({
     : <span className="spotlight-title">{title}</span>
 
   return (
-    <div className={clsx('spotlight', image && 'has-image')}>
+    <div className={clsx('spotlight', image && 'has-image', className)}>
       {!!image && (
         <div
           className="spotlight-image"

@@ -50,3 +50,23 @@ export type MusicReleaseSpotlight = {
 export type GetMusicReleaseSpotlightResponse = {
   spotlight: MusicReleaseSpotlight | null
 }
+
+/**
+ * A track spotlight carries no queue type: a track can't seed a dynamic queue,
+ * so the block plays the track itself and offers a mix of its release instead.
+ */
+export type MusicTrackSpotlight = {
+  musicTrackId: string
+  title: string
+  reason: MusicSpotlightReason
+
+  // The track's artist and release, null when the track has none
+  artistName: string | null
+  musicArtistId: string | null
+  musicReleaseId: string | null
+  releaseTitle: string | null
+}
+
+export type GetMusicTrackSpotlightResponse = {
+  spotlight: MusicTrackSpotlight | null
+}

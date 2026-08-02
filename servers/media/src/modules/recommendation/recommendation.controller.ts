@@ -3,7 +3,11 @@ import { ApiTags } from '@nestjs/swagger'
 
 import { MusicSpotlightService } from './music-spotlight.service'
 import { GetSpotlightQueryDto } from './dtos/GetSpotlightQuery.dto'
-import { GetMusicArtistSpotlightResponse, GetMusicReleaseSpotlightResponse } from './types'
+import {
+  GetMusicArtistSpotlightResponse,
+  GetMusicReleaseSpotlightResponse,
+  GetMusicTrackSpotlightResponse,
+} from './types'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
@@ -44,6 +48,23 @@ export class RecommendationController {
   ): Promise<GetMusicReleaseSpotlightResponse> {
     return {
       spotlight: await this.musicSpotlightService.getReleaseSpotlight(user, position),
+    }
+  }
+
+  /**
+   * Get the track spotlight for the current user.
+   */
+  @Get('/music/spotlight/track')
+  @StandardEndpoint({
+    summary: 'Get the track spotlight for the current user: a personal track pick with the reason it was picked.',
+    capabilities: ['MusicTracks.Read'],
+  })
+  async getTrackSpotlight(
+    @CurrentUser() user,
+    @Query() { position }: GetSpotlightQueryDto,
+  ): Promise<GetMusicTrackSpotlightResponse> {
+    return {
+      spotlight: await this.musicSpotlightService.getTrackSpotlight(user, position),
     }
   }
 }

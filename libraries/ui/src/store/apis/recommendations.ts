@@ -36,6 +36,20 @@ export type MusicReleaseSpotlightType = {
   queueType: DynamicQueueType,
 }
 
+/**
+ * A track spotlight carries no queue type: a track can't seed a dynamic queue,
+ * so the block plays the track itself and offers a mix of its release instead.
+ */
+export type MusicTrackSpotlightType = {
+  musicTrackId: string,
+  title: string,
+  reason: MusicSpotlightReasonType,
+  artistName: string | null,
+  musicArtistId: string | null,
+  musicReleaseId: string | null,
+  releaseTitle: string | null,
+}
+
 export const recommendationsApi = baseHomeServerApi
   .injectEndpoints({
     endpoints: (builder) => ({
@@ -62,10 +76,22 @@ export const recommendationsApi = baseHomeServerApi
           ...(arg && arg.position ? { position: arg.position } : {}),
         }),
       }),
+
+      /**
+       * The track spotlight for the current user, on its own daily sequence.
+       * A track's reasons are the sharper ones: on repeat this week, just
+       * favorited, or never heard.
+       */
+      getMusicTrackSpotlight: builder.query<{ spotlight: MusicTrackSpotlightType | null }, { position?: number } | void>({
+        query: (arg) => queryParams('/music/spotlight/track', {
+          ...(arg && arg.position ? { position: arg.position } : {}),
+        }),
+      }),
     }),
   })
 
 export const {
   useGetMusicArtistSpotlightQuery,
   useGetMusicReleaseSpotlightQuery,
+  useGetMusicTrackSpotlightQuery,
 } = recommendationsApi
