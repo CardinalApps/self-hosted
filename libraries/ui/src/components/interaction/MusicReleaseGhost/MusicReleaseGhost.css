@@ -1,0 +1,43 @@
+.music-release-ghost {
+  width: 200px;
+  pointer-events: none;
+  user-select: none;
+
+  .music-release-ghost-art {
+    padding: 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    border: 1px solid var(--border-color-1);
+    border-radius: var(--border-radius);
+  }
+
+  /* Where MusicRelease only reveals its play button on hover, the ghost always shows one */
+  .music-release-ghost-play-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color-1);
+    border-radius: 100%;
+
+    i {
+      font-size: 16px;
+      color: var(--text-color-5);
+    }
+  }
+
+  .music-release-ghost-meta {
+    padding: 8px 5px;
+  }
+
+  .music-release-ghost-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-color-4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

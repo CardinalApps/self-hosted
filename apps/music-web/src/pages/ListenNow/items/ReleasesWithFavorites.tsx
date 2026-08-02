@@ -1,6 +1,7 @@
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
+import MusicReleaseGhost from '@cardinalapps/ui/src/components/interaction/MusicReleaseGhost'
 import Shimmer from '@cardinalapps/ui/src/components/layout/Shimmer'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 
@@ -44,7 +45,7 @@ function ReleasesWithFavorites() {
             {i18n['releases-with-favorites.title'][lang]}
           </H3>
         </header>
-        <p>{i18n['releases-with-favorites.empty'][lang]}</p>
+        <MusicReleaseGhost coverSize={{ width: 220, height: 220 }} />
       </div>
     )
   }
