@@ -23,6 +23,12 @@
   width: 100%;
 }
 
+.listen-now .hot-tracks-note {
+  align-self: center;
+  font-size: 13px;
+  color: var(--text-color-3);
+}
+
 .listen-now .recently-added-artists-title {
   margin-bottom: 15px;
 }

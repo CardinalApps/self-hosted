@@ -73,20 +73,20 @@ function ListenNowProcedural() {
 
       {
       /**
-       * Releases with favorites carousel.
-       */
-      }
-      <ProceduralLayout.Block size='12x7' flush>
-        <ReleasesWithFavorites />
-      </ProceduralLayout.Block>
-
-      {
-      /**
        * Recently added releases carousel.
        */
       }
       <ProceduralLayout.Block size='12x7' flush>
         <RecentlyAddedReleases />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Releases with favorites carousel.
+       */
+      }
+      <ProceduralLayout.Block size='12x7' flush>
+        <ReleasesWithFavorites />
       </ProceduralLayout.Block>
 
       {

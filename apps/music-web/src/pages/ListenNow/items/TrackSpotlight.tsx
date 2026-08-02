@@ -71,7 +71,7 @@ function TrackSpotlight({ position = 0 }: TrackSpotlightProps) {
   return (
     <Spotlight
       className="track-spotlight"
-      kicker={`${i18n['track-spotlight.title'][lang]} ${position + 1}`}
+      kicker={`${i18n['track-spotlight.title'][lang]} #${position + 1}`}
       date={formatShortDate(new Date(), lang)}
       title={spotlight.title}
       titleLink={spotlight.musicReleaseId

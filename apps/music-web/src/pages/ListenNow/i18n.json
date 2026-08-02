@@ -20,6 +20,9 @@
   "hot-tracks.title": {
     "en": "Hot Tracks"
   },
+  "hot-tracks.note": {
+    "en": "Two plays in a week makes a track hot."
+  },
   "hot-tracks.empty": {
     "en": "Tracks you play through more than once will heat up here."
   },

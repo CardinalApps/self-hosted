@@ -5,6 +5,7 @@ import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
 import chunk from '@cardinalapps/ui/src/lib/array/chunk'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
+import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import { useAppSelector } from '@cardinalapps/ui/src/hooks/useAppSelector'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
@@ -37,6 +38,7 @@ function HotTracks() {
 
   return (
     <Card
+      icon={<Icon fa="fas fa-fire" />}
       header={
         <>
           <H3>{i18n['hot-tracks.title'][lang]}</H3>
@@ -45,6 +47,7 @@ function HotTracks() {
       }
       headerRight={
         <>
+          <p className="hot-tracks-note">{i18n['hot-tracks.note'][lang]}</p>
           {!!prevBtn && prevBtn}
           {!!nextBtn && nextBtn}
         </>

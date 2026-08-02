@@ -94,7 +94,7 @@ function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
 
   return (
     <Spotlight
-      kicker={`${i18n['artist-spotlight.title'][lang]} ${position + 1}`}
+      kicker={`${i18n['artist-spotlight.title'][lang]} #${position + 1}`}
       date={formatShortDate(new Date(), lang)}
       title={spotlight.name}
       titleLink={getAppUrl('artist', {

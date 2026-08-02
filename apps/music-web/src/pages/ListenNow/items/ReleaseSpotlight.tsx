@@ -87,7 +87,7 @@ function ReleaseSpotlight({ position = 0 }: ReleaseSpotlightProps) {
 
   return (
     <Spotlight
-      kicker={`${i18n['release-spotlight.title'][lang]} ${position + 1}`}
+      kicker={`${i18n['release-spotlight.title'][lang]} #${position + 1}`}
       date={formatShortDate(new Date(), lang)}
       title={spotlight.title}
       titleLink={getAppUrl('release', {
