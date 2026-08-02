@@ -181,6 +181,11 @@ describe('GET /music/spotlight/track', () => {
   })
 
   test('spotlights a recently favorited track', async () => {
+    /* One old play keeps the favorite out of the unplayed pool, without putting it anywhere near
+       the weekly heavy rotation floor. A track in both pools can be drawn as the unplayed pick,
+       which empties the favorited pool before it is ever reached. */
+    await recordPlays(freshFindTracks[1], 1, new Date(Date.now() - 10 * 24 * 60 * 60 * 1000))
+
     const ratings: Repository<Rating> = testApp.moduleRef.get(getRepositoryToken(Rating))
     await ratings.save({
       mediaType: 'music_track',
