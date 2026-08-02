@@ -644,7 +644,10 @@ export class IndexingService {
 
       this.scannerAbortController = null
       this.clearFilesFoundInterval()
-      this.importLoop()
+
+      this.recordScanVerification(scanResults).finally(() => {
+        this.importLoop()
+      })
     }
 
     this.scannerAbortController = new AbortController()
@@ -655,6 +658,49 @@ export class IndexingService {
       movies: this.currentRun.options.mediaTypes.movies,
       tv: this.currentRun.options.mediaTypes.tv,
     })
+  }
+
+  /**
+   * Records the outcome of the scan verification passes in the run log, so
+   * that recovered files and unverifiable directories are visible per-run
+   * instead of only in the application log.
+   */
+  private async recordScanVerification(scanResults: ScanResults): Promise<void> {
+    const verification = scanResults.musicVerification
+
+    if (!verification || !this.runEntity) {
+      return
+    }
+
+    try {
+      if (verification.recoveredFiles.length) {
+        await this.runLogRepository.save({
+          run: this.runEntity,
+          event: RunLogEvent.SCAN_RECOVERED,
+          mediaType: MediaType.MUSIC,
+          details: {
+            recovered: verification.recoveredFiles.length,
+            passes: verification.passes,
+          },
+        })
+      }
+
+      if (!verification.converged) {
+        await this.runLogRepository.save({
+          run: this.runEntity,
+          event: RunLogEvent.SCAN_INCOMPLETE,
+          mediaType: MediaType.MUSIC,
+          details: {
+            passes: verification.passes,
+            // Capped so a wide failure cannot balloon the row
+            unreadableDirs: verification.unreadableDirs.slice(0, 50),
+            unreadableDirCount: verification.unreadableDirs.length,
+          },
+        })
+      }
+    } catch (error) {
+      Logger.error(`Could not record scan verification in the run log. ${error?.message}`, 'Indexing')
+    }
   }
 
   /**

@@ -36,4 +36,6 @@ export enum RunLogEvent {
   FILE_DELETED = 'file_deleted',
   FILE_ERRORED = 'file_errored',
   RUN_NO_CHANGE = 'run_no_change',
+  SCAN_RECOVERED = 'scan_recovered',
+  SCAN_INCOMPLETE = 'scan_incomplete',
 }
