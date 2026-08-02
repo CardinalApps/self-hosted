@@ -14,6 +14,7 @@ enum AllowedMusicTracksOrderBy {
   'playCount' = 'playCount',
   'rating' = 'rating',
   'favoritedAt' = 'favoritedAt',
+  'hotPlays' = 'hotPlays',
 }
 
 class MusicTracksPagination extends Pagination {
@@ -77,4 +78,14 @@ export class GetMusicTracksDto extends MusicTracksPagination {
   @IsOptional()
   @IsBoolean()
   favorites?: boolean = false
+
+  /**
+   * Only tracks the current user is currently hooked on: played through to at
+   * least 90% at least twice in the past 14 days. Ordering by hotPlays turns
+   * this on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  hot?: boolean = false
 }

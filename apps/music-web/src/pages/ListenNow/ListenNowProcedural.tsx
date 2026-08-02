@@ -8,6 +8,7 @@ import FreshRelease from './items/FreshRelease'
 import RecentlyAddedReleases from './items/RecentlyAddedReleases'
 import MostPlayedTracks from './items/MostPlayedTracks'
 import FavoriteTracks from './items/FavoriteTracks'
+import HotTracks from './items/HotTracks'
 import ReleasesWithFavorites from './items/ReleasesWithFavorites'
 import ArtistSpotlight from './items/ArtistSpotlight'
 import ReleaseSpotlight from './items/ReleaseSpotlight'
@@ -31,14 +32,9 @@ function ListenNowProcedural() {
 
   const musicTracks = Array.isArray(data) ? data[0] : []
 
-  const listenNowLoadMore = () => {
-    console.log('load more')
-  }
-
   return (
     <ProceduralLayout
       name={'music-listen-now'}
-      onLoadMore={listenNowLoadMore}
       isReady={isSuccess}
       hasContent={!!musicTracks.length}
     >
@@ -126,6 +122,15 @@ function ListenNowProcedural() {
       }
       <ProceduralLayout.Block size='6x8'>
         <ReleaseSpotlight position={1} />
+      </ProceduralLayout.Block>
+
+      {
+      /**
+       * Hot tracks.
+       */
+      }
+      <ProceduralLayout.Block size='12x8'>
+        <HotTracks />
       </ProceduralLayout.Block>
 
       {

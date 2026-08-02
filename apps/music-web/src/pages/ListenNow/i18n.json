@@ -17,6 +17,12 @@
   "most-played-tracks.title": {
     "en": "Most Played Tracks"
   },
+  "hot-tracks.title": {
+    "en": "Hot Tracks"
+  },
+  "hot-tracks.empty": {
+    "en": "Tracks you play through more than once will heat up here."
+  },
   "favorite-tracks.title": {
     "en": "Favorite Tracks"
   },
@@ -117,6 +123,6 @@
     "en": "Artists you've recently added to your library will appear here."
   },
   "fin.message": {
-    "en": "That's it for today."
+    "en": "Fin."
   }
 }

@@ -16,6 +16,13 @@ import { Rating, RatingMediaType } from '../rating/rating.entity'
 import { FAVORITE_THRESHOLD } from '../rating/rating.service'
 import { User } from '../user/user.entity'
 
+/* What makes a track "hot": the user got through nearly all of it, more than once, recently.
+   A near-complete play is the strongest signal the library has that a track was wanted, since
+   anything less can be a skip. */
+const HOT_MIN_PROGRESS = 0.9
+const HOT_MIN_PLAYS = 2
+const HOT_WINDOW_DAYS = 14
+
 @Injectable()
 export class MusicTrackService {
   constructor(
@@ -82,6 +89,7 @@ export class MusicTrackService {
       rating,
       releasedSince,
       favorites,
+      hot,
     } = getMusicTracksDto
 
     /* Ordering by a computed figure requires computing it, whatever the caller asked for -
@@ -89,9 +97,10 @@ export class MusicTrackService {
     const withPlayCount = playCount || orderBy === 'playCount'
     const withRating = (rating || orderBy === 'rating') && !!user
     const withFavorites = favorites || orderBy === 'favoritedAt'
+    const withHot = hot || orderBy === 'hotPlays'
 
-    // Favorites are per-user; without a user there is nothing to return
-    if (withFavorites && !user) {
+    // Favorites and hot tracks are per-user; without a user there is nothing to return
+    if ((withFavorites || withHot) && !user) {
       return [[], 0]
     }
 
@@ -127,6 +136,31 @@ export class MusicTrackService {
       qb.addSelect('favorite.created_at', 'music_track_favorited_at')
     }
 
+    /* One row per track that clears the bar, so this join both filters the result down to hot
+       tracks and carries the count that orders them. */
+    if (withHot) {
+      qb.innerJoin(
+        (subQuery) => subQuery
+          .select('history.track_id', 'track_id')
+          .addSelect('COUNT(history.id)', 'hot_plays')
+          .from(MusicHistory, 'history')
+          .where('history.user_id = :hotUserId')
+          .andWhere('history.progress >= :hotMinProgress')
+          .andWhere('history.created_at >= :hotSince')
+          .groupBy('history.track_id')
+          .having('COUNT(history.id) >= :hotMinPlays'),
+        'hot_plays',
+        'hot_plays.track_id = music_track.id',
+      )
+      qb.addSelect('hot_plays.hot_plays', 'music_track_hot_plays')
+      qb.setParameters({
+        hotUserId: user.id,
+        hotMinProgress: HOT_MIN_PROGRESS,
+        hotSince: new Date(Date.now() - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000),
+        hotMinPlays: HOT_MIN_PLAYS,
+      })
+    }
+
     // Join pre-aggregated play counts in a single pass rather than a
     // correlated subquery per row.
     if (withPlayCount) {
@@ -160,6 +194,8 @@ export class MusicTrackService {
       qb.orderBy('music_track_rating', order)
     } else if (orderBy === 'favoritedAt') {
       qb.orderBy('music_track_favorited_at', order)
+    } else if (orderBy === 'hotPlays') {
+      qb.orderBy('music_track_hot_plays', order)
     } else {
       qb.orderBy(`music_track.${orderBy}`, order)
     }
