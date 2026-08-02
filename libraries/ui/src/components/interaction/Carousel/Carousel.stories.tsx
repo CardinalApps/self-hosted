@@ -67,4 +67,40 @@ export const StartingOnSlide3: Story = {
   },
 }
 
+const row = (label: string) => (
+  <div
+    key={label}
+    style={{
+      height: 44,
+      padding: '0 15px',
+      marginBottom: 10,
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: 8,
+      background: 'var(--bg-2)',
+    }}
+  >
+    {label}
+  </div>
+)
+
+// Each slide is a page of 8 rows, two columns of four, filled top to bottom
+export const TwoCols: Story = {
+  args: {
+    width: 900,
+    initialSlide: 0,
+    title: 'Two columns',
+    next: true,
+    prev: true,
+    gap: '10px',
+    dragFree: false,
+    columns: 2,
+    rows: 4,
+    maxPages: 3,
+    items: [0, 1, 2].map((page) => (
+      Array.from({ length: 8 }, (item, i) => row(`Track ${page * 8 + i + 1}`))
+    )),
+  },
+}
+
 export default meta

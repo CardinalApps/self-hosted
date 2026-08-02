@@ -1,4 +1,4 @@
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { useEffect, useState, type CSSProperties, type PropsWithChildren } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Button from '../Button'
 import H3 from '../../typography/H3'
@@ -27,6 +27,12 @@ type CarouselProps = {
   dragFree?: boolean,
   itemWidth?: string | number,
   itemsPerSlide?: number,
+  /**
+   * Lays each slide out as this many columns, filled top to bottom before
+   * moving right, so a slide can hold a whole page of a list.
+   */
+  columns?: number,
+  rows?: number,
   // Gives the pagination pill and the prev/next buttons the theme's glass treatment
   glass?: boolean,
   items: React.ReactNode[],
@@ -50,6 +56,8 @@ const Carousel = ({
   dragFree = true,
   itemWidth = '100%',
   itemsPerSlide = 1,
+  columns = 1,
+  rows = 4,
   glass = false,
   items = [],
   onChange = () => {},
@@ -162,7 +170,11 @@ const Carousel = ({
         <div className="embla__container">
           {items.map((item, i) => {
             return (
-              <div className="embla__slide" key={i}>
+              <div
+                className={clsx('embla__slide', columns > 1 && 'columns')}
+                key={i}
+                style={columns > 1 ? { '--slide-columns': columns, '--slide-rows': rows } as CSSProperties : undefined}
+              >
                 {item}
               </div>
             )
