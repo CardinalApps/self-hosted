@@ -27,6 +27,12 @@ let guestUser: User
 let artlessTracks: MusicTrack[] = []
 let freshFindTracks: MusicTrack[] = []
 
+const DAY = 24 * 60 * 60 * 1000
+const REAL_NOW = Date.now()
+
+let dayOffset = 0
+
+
 // Creates one release with 3 tracks, optionally with cover art
 const seedRelease = async (title: string, artistName: string, artwork: boolean): Promise<MusicTrack[]> => {
   const artists: Repository<MusicArtist> = testApp.moduleRef.get(getRepositoryToken(MusicArtist))
@@ -89,6 +95,26 @@ const recordPlays = async (track: MusicTrack, count: number, createdAt?: Date) =
   }
 }
 
+// Logs the guest in and keeps the bearer token for the requests that follow
+const login = async () => {
+  const res = await request(testApp.app.getHttpServer())
+    .post('/api/v1/auth/login')
+    .set('cardinal-app', 'admin')
+    .send({ userId: guestUser.userId })
+    .expect(201)
+
+  authToken = res.body.JWT
+}
+
+/* Each chapter of the story gets its own calendar day. The day's sequence is resolved once and
+   replayed from storage after that, so a signal added mid-day only reaches the picks once the
+   clock rolls over. The session goes with the old clock, hence the fresh login. */
+const advanceDay = async () => {
+  dayOffset++
+  jest.spyOn(Date, 'now').mockImplementation(() => REAL_NOW + dayOffset * DAY)
+  await login()
+}
+
 // Fetches the spotlight at a position of the sequence for the logged-in guest
 const getSpotlight = async (position?: number) => {
   const res = await request(testApp.app.getHttpServer())
@@ -110,16 +136,11 @@ beforeAll(async () => {
   const userService = testApp.moduleRef.get(UserService)
   guestUser = await userService.getGuestAccount()
 
-  const loginRes = await request(testApp.app.getHttpServer())
-    .post('/api/v1/auth/login')
-    .set('cardinal-app', 'admin')
-    .send({ userId: guestUser.userId })
-    .expect(201)
-
-  authToken = loginRes.body.JWT
+  await login()
 })
 
 afterAll(async () => {
+  jest.restoreAllMocks()
   await destroyTestApp(testApp)
 })
 
@@ -148,6 +169,8 @@ describe('GET /music/spotlight/track', () => {
   })
 
   test('spotlights an unheard track once the user has a listening record', async () => {
+    await advanceDay()
+
     // Plays on the ineligible release give the user a record without touching Fresh Find
     await recordPlays(artlessTracks[0], 3)
 
@@ -158,6 +181,8 @@ describe('GET /music/spotlight/track', () => {
   })
 
   test('spotlights the past week\'s heavy rotation', async () => {
+    await advanceDay()
+
     /* Three plays of one track this week clears the track floor; the other two tracks on the
        release stay unplayed, so both pools are populated and only the played one can carry
        heavy_rotation. */
@@ -171,6 +196,8 @@ describe('GET /music/spotlight/track', () => {
   })
 
   test('does not count plays from before the past week', async () => {
+    await advanceDay()
+
     const histories: Repository<MusicHistory> = testApp.moduleRef.get(getRepositoryToken(MusicHistory))
     await histories.remove(await histories.find({ where: { track: { id: freshFindTracks[0].id } } }))
     await recordPlays(freshFindTracks[0], 3, new Date(Date.now() - 10 * 24 * 60 * 60 * 1000))
@@ -181,6 +208,8 @@ describe('GET /music/spotlight/track', () => {
   })
 
   test('spotlights a recently favorited track', async () => {
+    await advanceDay()
+
     /* One old play keeps the favorite out of the unplayed pool, without putting it anywhere near
        the weekly heavy rotation floor. A track in both pools can be drawn as the unplayed pick,
        which empties the favorited pool before it is ever reached. */

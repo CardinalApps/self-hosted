@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { RecommendationController } from './recommendation.controller'
 import { MusicSpotlightService } from './music-spotlight.service'
+import { MusicSpotlightEntry } from './music-spotlight-entry.entity'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
 import { MusicRelease } from '../music-release/music-release.entity'
@@ -18,6 +19,7 @@ import { Rating } from '../rating/rating.entity'
       MusicTrack,
       MusicHistory,
       Rating,
+      MusicSpotlightEntry,
     ]),
   ],
   providers: [MusicSpotlightService],

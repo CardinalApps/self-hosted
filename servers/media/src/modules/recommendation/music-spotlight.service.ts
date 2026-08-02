@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { LessThan, Repository } from 'typeorm'
 
 import { MusicArtist } from '../music-artist/music-artist.entity'
 import { MusicRelease } from '../music-release/music-release.entity'
@@ -9,6 +9,8 @@ import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating, RatingMediaType } from '../rating/rating.entity'
 import { User } from '../user/user.entity'
 import { DynamicQueueType } from '../playback-queue/dtos/CreatePlaybackQueue'
+
+import { MusicSpotlightEntry } from './music-spotlight-entry.entity'
 
 import {
   MusicArtistSpotlight,
@@ -149,6 +151,9 @@ export class MusicSpotlightService {
 
     @InjectRepository(Rating)
     private ratingRepository: Repository<Rating>,
+
+    @InjectRepository(MusicSpotlightEntry)
+    private spotlightEntryRepository: Repository<MusicSpotlightEntry>,
   ) {}
 
   /**
@@ -216,8 +221,7 @@ export class MusicSpotlightService {
   }
 
   /**
-   * Walks the day's deterministic sequence for one scope up to the requested
-   * position, or returns null once it runs dry.
+   * The pick at one position of this user's sequence for the day.
    */
   private async getSpotlightPick(scope: SpotlightScope, user?: User, position = 0): Promise<SpotlightPick | null> {
     const eligible = await this.getEligible(scope)
@@ -226,51 +230,213 @@ export class MusicSpotlightService {
       return null
     }
 
-    const daySeed = `${user?.userId ?? 'anonymous'}:${scope}:${new Date().toISOString().slice(0, 10)}`
-    const pools = user ? await this.buildReasonPools(scope, eligible, user) : []
-    const signalPools = pools.filter((pool) => pool.candidates.length)
+    const day = new Date(Date.now()).toISOString().slice(0, 10)
+    const daySeed = `${user?.userId ?? 'anonymous'}:${scope}:${day}`
 
+    /* An anonymous caller has no listening record to draw reasons from and nothing to key a
+       stored sequence on, so its library picks are worked out fresh every time. */
+    if (!user) {
+      return this.resolveSequence(eligible, [], daySeed)[position] ?? null
+    }
+
+    const sequence = await this.getDaySequence(scope, user, day, daySeed, eligible)
+
+    return sequence[position] ?? null
+  }
+
+  /**
+   * This user's whole sequence for the day: the stored one if the day has
+   * already resolved it, otherwise a fresh one, resolved and stored.
+   */
+  private async getDaySequence(
+    scope: SpotlightScope,
+    user: User,
+    day: string,
+    daySeed: string,
+    eligible: SpotlightCandidate[],
+    afterRace = false,
+  ): Promise<(SpotlightPick | null)[]> {
+    const stored = await this.spotlightEntryRepository.find({
+      where: { user: { id: user.id }, scope, day },
+      order: { position: 'ASC' },
+    })
+
+    if (stored.length) {
+      return await this.replayStored(scope, user, daySeed, eligible, stored)
+    }
+
+    const pools = await this.buildReasonPools(scope, eligible, user)
+    const sequence = this.resolveSequence(eligible, pools, daySeed)
+
+    /* An empty sequence isn't worth a row: there was nothing to commit to, and the next
+       request should get another chance at a library that may have grown since. */
+    if (!sequence.length || afterRace) {
+      return sequence
+    }
+
+    await this.spotlightEntryRepository.delete({ day: LessThan(day) })
+
+    try {
+      await this.spotlightEntryRepository.insert(
+        sequence.map((pick, position) => this.toEntry(scope, user, day, position, pick)),
+      )
+    } catch {
+      /* Listen Now asks for several positions at once, so two requests can race to resolve the
+         same day. Whoever loses the unique index replays the winner's rows instead. */
+      return await this.getDaySequence(scope, user, day, daySeed, eligible, true)
+    }
+
+    return sequence
+  }
+
+  /**
+   * The stored sequence, read back against the library as it stands now. A pick
+   * whose media has been deleted or has stopped being eligible is replaced in
+   * place, so one missing artwork can't disturb the positions around it.
+   */
+  private async replayStored(
+    scope: SpotlightScope,
+    user: User,
+    daySeed: string,
+    eligible: SpotlightCandidate[],
+    stored: MusicSpotlightEntry[],
+  ): Promise<(SpotlightPick | null)[]> {
+    const byId = new Map(eligible.map((candidate) => [candidate.id, candidate]))
+    const sequence = stored.map((entry) => this.toPick(entry, byId.get(entry.mediaId)))
+
+    if (sequence.every((pick) => pick)) {
+      return sequence
+    }
+
+    const survivors = sequence.filter((pick): pick is SpotlightPick => !!pick)
+    const pools = await this.buildReasonPools(scope, eligible, user)
+    const usedKinds = new Set(survivors.map((pick) => pick.kind))
+    const usedIds = new Set(survivors.map((pick) => pick.candidate.id))
+
+    for (const [index, entry] of stored.entries()) {
+      if (sequence[index]) {
+        continue
+      }
+
+      const replacement = this.pickStep(eligible, pools, daySeed, entry.position, usedKinds, usedIds)
+
+      if (replacement) {
+        usedKinds.add(replacement.kind)
+        usedIds.add(replacement.candidate.id)
+        await this.spotlightEntryRepository.update(
+          { id: entry.id },
+          this.toEntry(scope, user, entry.day, entry.position, replacement),
+        )
+      } else {
+        // Nothing distinct left to stand in, so the position goes dark for the rest of the day
+        await this.spotlightEntryRepository.delete({ id: entry.id })
+      }
+
+      sequence[index] = replacement
+    }
+
+    return sequence
+  }
+
+  /**
+   * The day's sequence, walked from the reason pools as they stand right now.
+   */
+  private resolveSequence(eligible: SpotlightCandidate[], pools: ReasonPool[], daySeed: string): SpotlightPick[] {
+    const sequence: SpotlightPick[] = []
     const usedKinds = new Set<MusicSpotlightReasonKind>()
     const usedIds = new Set<string>()
 
-    /* Every step takes a reason and a pick that no earlier step has used, so a page of
-       spotlights never repeats either; library_pick serves once as the final filler, then
-       the sequence runs dry. */
     for (let step = 0; ; step++) {
-      const available = signalPools
-        .filter((pool) => !usedKinds.has(pool.kind))
-        .map((pool) => ({
-          ...pool,
-          candidates: pool.candidates.filter((candidate) => !usedIds.has(candidate.id)),
-        }))
-        .filter((pool) => pool.candidates.length)
+      const pick = this.pickStep(eligible, pools, daySeed, step, usedKinds, usedIds)
 
-      let kind: MusicSpotlightReasonKind
-      let candidate: SpotlightCandidate
-
-      if (available.length) {
-        const pool = available[fnv1a(`${daySeed}:${step}`) % available.length]
-        kind = pool.kind
-        candidate = this.pickCandidate(pool.candidates, `${daySeed}:${step}:${pool.kind}`)
-      } else if (!usedKinds.has('library_pick')) {
-        const remaining = eligible.filter((candidate) => !usedIds.has(candidate.id))
-
-        if (!remaining.length) {
-          return null
-        }
-
-        kind = 'library_pick'
-        candidate = this.pickCandidate(remaining, `${daySeed}:${step}:library_pick`)
-      } else {
-        return null
+      if (!pick) {
+        return sequence
       }
 
-      if (step === position) {
-        return { kind, candidate }
-      }
+      sequence.push(pick)
+      usedKinds.add(pick.kind)
+      usedIds.add(pick.candidate.id)
+    }
+  }
 
-      usedKinds.add(kind)
-      usedIds.add(candidate.id)
+  /**
+   * One step of the sequence, or null once nothing distinct is left. Every step
+   * takes a reason and a pick that no other step has used, so a page of
+   * spotlights never repeats either; library_pick serves once as the final
+   * filler, then the sequence runs dry.
+   */
+  private pickStep(
+    eligible: SpotlightCandidate[],
+    pools: ReasonPool[],
+    daySeed: string,
+    step: number,
+    usedKinds: Set<MusicSpotlightReasonKind>,
+    usedIds: Set<string>,
+  ): SpotlightPick | null {
+    const available = pools
+      .filter((pool) => pool.candidates.length && !usedKinds.has(pool.kind))
+      .map((pool) => ({
+        ...pool,
+        candidates: pool.candidates.filter((candidate) => !usedIds.has(candidate.id)),
+      }))
+      .filter((pool) => pool.candidates.length)
+
+    if (available.length) {
+      const pool = available[fnv1a(`${daySeed}:${step}`) % available.length]
+
+      return { kind: pool.kind, candidate: this.pickCandidate(pool.candidates, `${daySeed}:${step}:${pool.kind}`) }
+    }
+
+    if (usedKinds.has('library_pick')) {
+      return null
+    }
+
+    const remaining = eligible.filter((candidate) => !usedIds.has(candidate.id))
+
+    if (!remaining.length) {
+      return null
+    }
+
+    return { kind: 'library_pick', candidate: this.pickCandidate(remaining, `${daySeed}:${step}:library_pick`) }
+  }
+
+  /**
+   * A stored row as a pick, or null when its media is no longer eligible.
+   */
+  private toPick(entry: MusicSpotlightEntry, candidate?: SpotlightCandidate): SpotlightPick | null {
+    if (!candidate) {
+      return null
+    }
+
+    return {
+      kind: entry.reasonKind,
+      candidate: {
+        ...candidate,
+        ...(entry.reasonTrackTitle ? { trackTitle: entry.reasonTrackTitle } : {}),
+        ...(entry.reasonLastPlayedAt ? { lastPlayedAt: entry.reasonLastPlayedAt } : {}),
+      },
+    }
+  }
+
+  /**
+   * A pick as the row that stores it.
+   */
+  private toEntry(
+    scope: SpotlightScope,
+    user: User,
+    day: string,
+    position: number,
+    { kind, candidate }: SpotlightPick,
+  ): Partial<MusicSpotlightEntry> {
+    return {
+      user,
+      scope,
+      day,
+      position,
+      mediaId: candidate.id,
+      reasonKind: kind,
+      reasonTrackTitle: kind === 'favorited_track' ? candidate.trackTitle ?? null : null,
+      reasonLastPlayedAt: kind === 'rediscover' ? candidate.lastPlayedAt ?? null : null,
     }
   }
 
