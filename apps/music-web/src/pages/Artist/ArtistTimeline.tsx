@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+import MusicTrackGhost from '@cardinalapps/ui/src/components/interaction/MusicTrackGhost'
 import Beads from '@cardinalapps/ui/src/components/layout/Beads'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
@@ -164,6 +165,12 @@ function ArtistTimeline({ discography, loading = false, tracksPending = false }:
                         ...(track.playCount > 0 ? {} : { color: 'transparent', borderColor: 'var(--accent-color)' }),
                       }))}
                     />
+                  )}
+
+                  {!!entry.tracks.length && !favoriteTracks.length && (
+                    <div className="artist-timeline-favorites">
+                      <MusicTrackGhost />
+                    </div>
                   )}
 
                   {!!favoriteTracks.length && (

@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Card from '@cardinalapps/ui/src/components/layout/Card'
 import Carousel from '@cardinalapps/ui/src/components/interaction/Carousel'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+import MusicTrackGhost from '@cardinalapps/ui/src/components/interaction/MusicTrackGhost'
 import chunk from '@cardinalapps/ui/src/lib/array/chunk'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
@@ -82,7 +83,7 @@ function HotTracks() {
               )))}
             />
           )
-          : <p>{i18n['hot-tracks.empty'][lang]}</p>
+          : <MusicTrackGhost />
       }
     </Card>
   )

@@ -10,6 +10,7 @@ import { MusicTrackType, useGetMusicTracksQuery } from '@cardinalapps/ui/src/sto
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { librarySelectors } from '@cardinalapps/ui/src/store/slices/library'
 import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+import MusicTrackGhost from '@cardinalapps/ui/src/components/interaction/MusicTrackGhost'
 import chunk from '@cardinalapps/ui/src/lib/array/chunk'
 
 import i18n from '../i18n.json'
@@ -92,7 +93,7 @@ function FavoriteTracks() {
               })}
             />
           )
-          : <p>{i18n['favorite-tracks.empty'][lang]}</p>
+          : <MusicTrackGhost />
       }
     </Card>
   )

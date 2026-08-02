@@ -309,7 +309,8 @@
     gap: 8px;
 
     /* Grid items default to a content-based min-width, which fights the 1fr columns' shrinking */
-    > .music-track {
+    > .music-track,
+    > .music-track-ghost {
       min-width: 0;
       margin-bottom: 0;
     }
