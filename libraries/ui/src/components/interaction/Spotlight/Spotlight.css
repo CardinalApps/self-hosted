@@ -77,6 +77,10 @@
     color: var(--text-color-3);
   }
 
+  .spotlight-kicker-date {
+    color: var(--text-color-4);
+  }
+
   .spotlight-title {
     font-size: 40px;
     font-weight: 900;
