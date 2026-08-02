@@ -8,6 +8,8 @@ import './Spotlight.css'
 type SpotlightProps = {
   /** Small label above the title, e.g. "Artist Spotlight". */
   kicker: string,
+  /** The day the pick was made, shown beside the kicker. */
+  date?: string,
   /** The name of the spotlighted media. */
   title?: string,
   /** Route to the spotlighted media's own page. */
@@ -31,6 +33,7 @@ type SpotlightProps = {
  */
 const Spotlight = ({
   kicker,
+  date,
   title,
   titleLink,
   reason,
@@ -58,7 +61,10 @@ const Spotlight = ({
       )}
       <div className="spotlight-content">
         <div className="spotlight-top">
-          <p className="spotlight-kicker">{kicker}</p>
+          <p className="spotlight-kicker">
+            {kicker}
+            {!!date && <span className="spotlight-kicker-date"> - {date}</span>}
+          </p>
           {!!reason && <p className="spotlight-reason">{reason}</p>}
         </div>
         <div className="spotlight-bottom">

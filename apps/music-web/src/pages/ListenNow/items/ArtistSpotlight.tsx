@@ -16,6 +16,7 @@ import {
 } from '@cardinalapps/ui/src/store/apis/recommendations'
 
 import DynamicQueueActionButton from '../../../components/DynamicQueueActionButton'
+import { formatShortDate } from '../../../utils/date'
 
 import i18n from '../i18n.json'
 
@@ -93,7 +94,8 @@ function ArtistSpotlight({ position = 0 }: ArtistSpotlightProps) {
 
   return (
     <Spotlight
-      kicker={i18n['artist-spotlight.title'][lang]}
+      kicker={`${i18n['artist-spotlight.title'][lang]} ${position + 1}`}
+      date={formatShortDate(new Date(), lang)}
       title={spotlight.name}
       titleLink={getAppUrl('artist', {
         params: {
