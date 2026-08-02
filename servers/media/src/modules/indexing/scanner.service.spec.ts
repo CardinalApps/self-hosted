@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars -- tests drive the scanner through real env vars */
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals'
 import * as fs from 'fs'
 import * as os from 'os'
