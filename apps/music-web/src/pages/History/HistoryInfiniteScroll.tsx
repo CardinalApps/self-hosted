@@ -85,15 +85,15 @@ function MusicHistoryInfiniteScroll({
               releaseId={musicRelease?.id}
               hasControls={false}
               coverSize={{ width: 30, height: 30 }}
-              releaseLink={getAppUrl('release', {
-                params: {
-                  ':id': musicRelease?.musicReleaseId?.toString() || '',
-                },
-              })}
+              releaseLink={musicRelease?.musicReleaseId
+                ? getAppUrl('release', { params: { ':id': musicRelease.musicReleaseId.toString() } })
+                : undefined}
             />
           </div>
           <div className="track-col">
-            <Link to={getAppUrl('release', { params: { ':id': historyEntry.track.release?.musicReleaseId } })}>{historyEntry?.track?.title}</Link>
+            {musicRelease?.musicReleaseId
+              ? <Link to={getAppUrl('release', { params: { ':id': musicRelease.musicReleaseId } })}>{historyEntry.track?.title}</Link>
+              : historyEntry.track?.title}
           </div>
           <div className="date-col">
             <time title={formatDate(historyEntry?.updatedAt)}>
