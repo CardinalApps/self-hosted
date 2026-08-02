@@ -48,6 +48,7 @@ import { useGetInstanceQuery } from '../../../store/apis/instance'
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
 import useAppliedTheme from '../../../hooks/useAppliedTheme'
+import useCanLogIntoApp from '../../../hooks/useCanLogIntoApp'
 
 import { getJWT, isJwtExpired, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
@@ -129,6 +130,7 @@ function AppBase({
   const latestHealthResponse = useSelector(homeServerSelectors.latestHealthResponse)
   const firstTimeSetupComplete = useSelector(homeServerSelectors.firstTimeSetupComplete)
   const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
+  const canLoginToApp = useCanLogIntoApp(app)
   const {
     lang,
     enable_custom_context_menu,
@@ -299,7 +301,7 @@ function AppBase({
               <DrawerLayer />
               {!!developer_mode && <DevTools />}
               {health && tokenReady
-                ? homeServerUserLoggedIn
+                ? homeServerUserLoggedIn && canLoginToApp
                   ? <AppPrivate
                       header={header || defaultHeader}
                       sidebarOptions={sidebarOptions}
