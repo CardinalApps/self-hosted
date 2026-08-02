@@ -17,6 +17,7 @@
 
 .listen-now .track-spotlight .spotlight-title {
   font-size: 28px;
+  margin-bottom: 10px;
 }
 
 .listen-now .track-spotlight .spotlight-actions {
@@ -27,6 +28,11 @@
   align-self: center;
   font-size: 13px;
   color: var(--text-color-3);
+}
+
+/* Holds one of the carousel's two columns, gap included */
+.listen-now .hot-tracks-ghost {
+  width: calc(50% - var(--gutter));
 }
 
 .listen-now .recently-added-artists-title {

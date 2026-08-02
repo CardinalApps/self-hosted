@@ -83,7 +83,7 @@ function HotTracks() {
               )))}
             />
           )
-          : <MusicTrackGhost />
+          : <MusicTrackGhost className="hot-tracks-ghost" />
       }
     </Card>
   )
