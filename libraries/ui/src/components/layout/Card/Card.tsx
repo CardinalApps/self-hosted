@@ -4,7 +4,11 @@ import useWindowSize from '../../../hooks/useWindowSize'
 
 import './Card.css'
 
-export type CardPadding = 'regular' | 'thick' | 'thin' | 'none' | number
+export type CardPaddingKeyword = 'regular' | 'thick' | 'thin' | 'none'
+
+export type CardPadding = CardPaddingKeyword | number | string
+
+const PADDING_KEYWORDS: CardPaddingKeyword[] = ['regular', 'thick', 'thin', 'none']
 
 export type CardProps = {
   width?: number | string,
@@ -46,13 +50,14 @@ const Card = ({
   children,
 }: PropsWithChildren<CardProps>) => {
   const { width: windowWidth } = useWindowSize()
+  const paddingKeyword = typeof padding === 'string' && PADDING_KEYWORDS.includes(padding as CardPaddingKeyword) ? padding : null
 
   return (
     <div
       id={id || undefined}
       className={clsx(
         `card`,
-        typeof padding === 'string' && `padding-${padding}`,
+        paddingKeyword && `padding-${paddingKeyword}`,
         `bg-${(mobileBg && windowWidth <= 768) ? mobileBg : bg}`,
         className,
         shadow ? `shadow-${shadow}` : '',
@@ -79,7 +84,7 @@ const Card = ({
       <div
         className="card-content"
         style={{
-          ...(typeof padding === 'number' ? { padding } : {}),
+          ...(paddingKeyword ? {} : { padding }),
         }}
       >
         {children}
