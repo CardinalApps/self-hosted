@@ -56,21 +56,21 @@ describe('discriminated unions narrow on `type`', () => {
     const msg: ServerToMediaMessage = {
       type: 'registered',
       publicIp: '203.0.113.5',
-      hostname: 'abc.connect.cardinalcloud.io',
+      hostname: 'abc.connect.cardinalapps.host',
       signingKey: 'base64-key',
       cert,
       config: { foo: 'bar' },
     }
     if (msg.type === 'registered') {
       expect(msg.cert?.cert_pem).toMatch(/CERTIFICATE/)
-      expect(msg.hostname).toBe('abc.connect.cardinalcloud.io')
+      expect(msg.hostname).toBe('abc.connect.cardinalapps.host')
     }
   })
 
   test('ConnectionInfo offline server omits direct block', () => {
     const info: ConnectionInfo = {
       online: false,
-      relay: { url: 'https://relay.cardinalcloud.io/relay/abc', enabled: false },
+      relay: { url: 'https://relay.cardinalapps.host/relay/abc', enabled: false },
     }
     expect(info.direct).toBeUndefined()
     expect(info.relay.enabled).toBe(false)

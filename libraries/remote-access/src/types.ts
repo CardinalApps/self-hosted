@@ -4,7 +4,7 @@
 export type InstanceId = string
 export type AccountId = string
 
-// Negotiation API: GET https://api.cardinalcloud.io/connect/:instanceId
+// Negotiation API: GET https://api.cardinalapps.host/connect/:instanceId
 export interface ConnectionInfo {
   online: boolean
   direct?: {
