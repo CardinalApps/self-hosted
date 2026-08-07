@@ -2,7 +2,7 @@
  * FIXME this file is being replaced with the @cardinalapps/topology package
  */
 
-import { fetchAuthAPI, HTTPMethod, MixedAppEnv, Endpoint } from '@cardinalapps/topology/dist/cjs'
+import { CloudService, Endpoint, HTTPMethod, MixedAppEnv, fetchAuthAPI, fetchPopularityAPI, getCloudServiceURL } from '@cardinalapps/topology/dist/cjs'
 
 import { getCurrentMode, Mode } from './env'
 
@@ -36,6 +36,12 @@ type WebsiteFetchOptions = {
   returnRaw?: boolean,
 }
 
+type PopularityFetchOptions = {
+  headers?: Record<string, string>,
+  body?: Record<string, unknown>,
+  JWT?: string,
+}
+
 const websiteFetchDefaults: WebsiteFetchOptions = {
   headers: {},
   returnRaw: false,
@@ -65,6 +71,13 @@ export function getAuthServerUrl() {
   } else if (currentMode === Mode.PRODUCTION) {
     return AuthServerUrl.PRODUCTION
   }
+}
+
+/**
+ * Returns the Popularity Data Pool URL for this env.
+ */
+export function getPopularityUrl() {
+  return getCloudServiceURL(getCurrentMode() as MixedAppEnv, CloudService.POPULARITY)
 }
 
 /**
@@ -125,8 +138,54 @@ export function authAPI<T>(endpoint: Endpoint, method?: HTTPMethod, options?: Au
 }
 
 /**
+ * Fetches from the cloud Popularity Data Pool. Endpoint must start with a slash.
+ */
+export function popularityAPI<T>(endpoint: Endpoint, method?: HTTPMethod, options?: PopularityFetchOptions): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let headers = { ...options?.headers }
+
+    if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {
+      headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        ...headers,
+      }
+    }
+
+    if (options?.JWT) {
+      headers = {
+        ...headers,
+        Authorization: `Bearer ${options.JWT}`,
+      }
+    }
+
+    // Always add the server ID
+    headers = {
+      ...headers,
+      ...outboundHeaders(),
+    }
+
+    fetchPopularityAPI(
+      endpoint,
+      method ? method : 'GET',
+      getCurrentMode() as MixedAppEnv,
+      {
+        headers,
+        body: options?.body,
+      },
+    )
+      .then((res: T) => {
+        resolve(res)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+/**
  * A function for fetching from the website.
- * 
+ *
  * Since Cardinal Media Server is self-hosted by users, and therefore distributed
  * to many IPs, we send custom headers with all outbound requests so that our
  * traffic can be managed.

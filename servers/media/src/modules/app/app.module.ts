@@ -35,6 +35,7 @@ import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { ConnectSDKModule } from '../connect-sdk/connect-sdk.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
+import { PopularityModule } from '../popularity/popularity.module'
 import { RecommendationModule } from '../recommendation/recommendation.module'
 import { TranscodingModule } from '../transcoding/transcoding.module'
 import { WaveformModule } from '../waveform/waveform.module'
@@ -46,6 +47,7 @@ import { AttachLocalUserToRequest } from '../../middleware/AttachLocalUser.middl
 import { AttachCloudUserToRequest } from '../../middleware/AttachCloudUser.middleware'
 import { UserActivity } from '../../middleware/UserActivity.middleware'
 import { MaybeTriggerClaim } from '../../middleware/MaybeTriggerClaim'
+import { SendPopularityBatch } from '../../middleware/SendPopularityBatch.middleware'
 
 //import { ExampleInterceptor } from '../../interceptors/example.interceptor'
 
@@ -151,12 +153,13 @@ const resolvePostgresHost = () => {
     RatingModule,
     InvitationModule,
     PlaybackQueueModule,
+    PopularityModule,
     RecommendationModule,
     ClaimModule,
+    ConnectSDKModule,
     TranscodingModule,
     WaveformModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
-    ConnectSDKModule,
     ...(getCurrentMode() !== Mode.DEVELOPMENT ? [
       ServeStaticModule.forRoot({
         rootPath: join(__dirname, '..', '..', '..', 'public'),
@@ -200,5 +203,6 @@ export class AppModule implements NestModule {
     consumer.apply(RevokeDisabledUserSessions).forRoutes('*')
     consumer.apply(UserActivity).forRoutes('*')
     consumer.apply(MaybeTriggerClaim).forRoutes('*')
+    consumer.apply(SendPopularityBatch).forRoutes('*')
   }
 }
