@@ -6,9 +6,14 @@
   "globalPassThroughEnv": [
     "APP_ENCRYPTION_KEY",
     "CARDINAL_POSTGRES",
+    "DISABLE_RATE_LIMIT",
     "LOG_LEVEL",
+    "MONGODB_CONNECTION_STRING",
     "MONGODB_URI",
     "MONGODB_DB_NAME",
+    "POPULARITY_SERVER_HTTP_PORT",
+    "RATE_LIMIT_IP_WHITELIST",
+    "TRENDS_REFRESH_INTERVAL_MINUTES",
     "npm_package_version"
   ],
   "tasks": {

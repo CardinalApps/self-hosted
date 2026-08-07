@@ -18,6 +18,7 @@ export type SubscriptionTier = {
   slug: string,
   provides: {
     seats: number,
+    popularity_data_pool: boolean,
   },
   prices: {
     // Use the "Lookup Key" in Stripe for each price
@@ -39,6 +40,7 @@ export const SUBSCRIPTIONS = {
     slug: "free",
     provides: {
       seats: 2,
+      popularity_data_pool: false,
     },
     prices: {},
   },
@@ -52,6 +54,7 @@ export const SUBSCRIPTIONS = {
     slug: "early_adopter",
     provides: {
       seats: 10,
+      popularity_data_pool: true,
     },
     prices: {
       monthly: 'early_adopter',
@@ -64,6 +67,7 @@ export const SUBSCRIPTIONS = {
     slug: "starter",
     provides: {
       seats: 5,
+      popularity_data_pool: true,
     },
     prices: {
       monthly: 'starter_monthly',
@@ -77,6 +81,7 @@ export const SUBSCRIPTIONS = {
     slug: "pro",
     provides: {
       seats: 20,
+      popularity_data_pool: true,
     },
     prices: {
       monthly: 'pro_monthly',
@@ -90,6 +95,7 @@ export const SUBSCRIPTIONS = {
     slug: "ultimate",
     provides: {
       seats: 40,
+      popularity_data_pool: true,
     },
     prices: {
       monthly: 'ultimate_monthly',

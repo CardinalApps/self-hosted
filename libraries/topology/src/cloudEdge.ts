@@ -24,6 +24,7 @@ export enum CloudService {
   CMS = "cms",
   FEEDBACK = "feedback",
   HELP = "help",
+  POPULARITY = "popularity",
   STATUS = "status",
   WEBSITE = "website",
 }
@@ -57,6 +58,14 @@ export const CloudEdge = {
     entry: {
       dev: 'http://localhost:4024',
       prod: 'https://feedback.cardinalcloud.io',
+    },
+  },
+  popularity: {
+    provider: InfrastructureProvider.AZURE,
+    name: 'Popularity Data Pool',
+    entry: {
+      dev: 'http://localhost:4042',
+      prod: 'https://popularity.cardinalcloud.io',
     },
   },
 } as const
