@@ -38,4 +38,44 @@ export const OPTIONS = {
     name: 'claim_id',
     default: undefined,
   },
+  // Remote Access (the "Connect" feature). Opt-in via the Admin app.
+  CONNECT_ENABLED: <Option>{
+    name: 'connect_enabled',
+    default: false,
+  },
+  // Long-lived credential issued by the cloud IDP; exchanged for short-lived
+  // access tokens that authenticate the WSS control channel
+  CONNECT_SERVER_TOKEN: <Option>{
+    name: 'connect_server_token',
+    default: undefined,
+  },
+  // base64 of 32 bytes, assigned by the Remote Access Server on registration
+  CONNECT_SIGNING_KEY: <Option>{
+    name: 'connect_signing_key',
+    default: undefined,
+  },
+  // The Cardinal-assigned hostname (Path 2), e.g. <instanceId>.connect.cardinalapps.host
+  CONNECT_HOSTNAME: <Option>{
+    name: 'connect_hostname',
+    default: undefined,
+  },
+  CONNECT_TLS_CERT_PEM: <Option>{
+    name: 'connect_tls_cert_pem',
+    default: undefined,
+  },
+  CONNECT_TLS_KEY_PEM: <Option>{
+    name: 'connect_tls_key_pem',
+    default: undefined,
+  },
+  // User-provided FQDN (Path 1); null/unset for Path 2
+  CONNECT_BYO_HOSTNAME: <Option>{
+    name: 'connect_byo_hostname',
+    default: undefined,
+  },
+  // The externally reachable port reported in `register`. Falls back to the
+  // server's own listening port until the port mapper lands
+  CONNECT_PUBLIC_PORT: <Option>{
+    name: 'connect_public_port',
+    default: undefined,
+  },
 }

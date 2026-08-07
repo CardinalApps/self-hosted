@@ -33,6 +33,7 @@ import { MusicHistoryModule } from '../music-history/music-history.module'
 import { RatingModule } from '../rating/rating.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
+import { ConnectSDKModule } from '../connect-sdk/connect-sdk.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
 import { RecommendationModule } from '../recommendation/recommendation.module'
 import { TranscodingModule } from '../transcoding/transcoding.module'
@@ -155,6 +156,7 @@ const resolvePostgresHost = () => {
     TranscodingModule,
     WaveformModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
+    ConnectSDKModule,
     ...(getCurrentMode() !== Mode.DEVELOPMENT ? [
       ServeStaticModule.forRoot({
         rootPath: join(__dirname, '..', '..', '..', 'public'),
