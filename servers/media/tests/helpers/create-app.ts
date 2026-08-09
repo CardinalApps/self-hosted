@@ -35,7 +35,11 @@ export async function createTestApp(existingDbPath?: string): Promise<TestApp> {
 
   const app = moduleRef.createNestApplication({ logger: false })
 
+  const { CorsService } = await import('../../src/modules/cors/cors.service')
+  const { buildCorsOptions } = await import('../../src/modules/cors/cors.options')
+
   app.use(cookieParser())
+  app.enableCors(buildCorsOptions(moduleRef.get(CorsService)))
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.setGlobalPrefix('api')
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' })

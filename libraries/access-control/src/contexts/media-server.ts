@@ -48,6 +48,7 @@ export const MediaServerCapabilities = [
 
   'AdminApp.Login',
 
+  'ServerSettings.Read',
   'ServerSettings.Update',
 
   'Users.Create',

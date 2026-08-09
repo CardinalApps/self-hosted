@@ -10,6 +10,8 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import * as ip from 'ip'
 
 import { AppModule } from './modules/app/app.module'
+import { CorsService } from './modules/cors/cors.service'
+import { buildCorsOptions } from './modules/cors/cors.options'
 
 import {
   Env,
@@ -97,25 +99,11 @@ async function startup() {
   app.useWebSocketAdapter(new WsAdapter(app))
 
   /**
-   * Set CORS rules.
+   * Set CORS rules. The allowlist is dynamic: Cardinal hosted apps, this
+   * server's own hostnames, localhost development, and user-configured
+   * origins.
    */
-  app.enableCors({
-    origin: [
-      'http://localhost:3090',      // Media Server web app
-      'http://localhost:3092',      // Photos web app dev
-      'http://localhost:3094',      // Music web app dev
-      'http://localhost:3096',      // Cinema web app dev
-      'http://127.0.0.1:3090',      // Media Server web app
-      'http://192.168.2.97:3090',   // Media Server web app
-      'http://localhost:3099',      // Component Library development
-      'http://localhost:3000',      // Local prod web app tests
-    ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    exposedHeaders: [
-      'Cardinal-Extra-Message',
-    ],
-    credentials: true,
-  })
+  app.enableCors(buildCorsOptions(app.get(CorsService)))
 
   /**
    * Prefix all endpoints (except public static dirs) with /api/{version}.

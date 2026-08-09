@@ -16,7 +16,7 @@ export class PopularityController {
   @Get('stats')
   @StandardEndpoint({
     summary: "Get this server's Popularity Data Pool contribution stats.",
-    capabilities: ['ServerSettings.Update'],
+    capabilities: ['ServerSettings.Read'],
   })
   async getStats(): Promise<{ playsContributed: number }> {
     return await this.popularityService.getStats()

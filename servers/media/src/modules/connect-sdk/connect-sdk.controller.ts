@@ -70,7 +70,7 @@ export class ConnectSDKController {
   @Get('/connect/status')
   @StandardEndpoint({
     summary: 'Get the Remote Access status.',
-    capabilities: ['ServerSettings.Update'],
+    capabilities: ['ServerSettings.Read'],
   })
   @ApiOkResponse({ type: ConnectStatusResponse })
   async status(): Promise<ConnectStatusResponse> {

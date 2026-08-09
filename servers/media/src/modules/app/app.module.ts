@@ -34,6 +34,7 @@ import { RatingModule } from '../rating/rating.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { ConnectSDKModule } from '../connect-sdk/connect-sdk.module'
+import { CorsModule } from '../cors/cors.module'
 import { PingModule } from '../ping/ping.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
 import { PopularityModule } from '../popularity/popularity.module'
@@ -158,6 +159,7 @@ const resolvePostgresHost = () => {
     RecommendationModule,
     ClaimModule,
     ConnectSDKModule,
+    CorsModule,
     PingModule,
     TranscodingModule,
     WaveformModule,
