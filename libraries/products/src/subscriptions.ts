@@ -40,7 +40,7 @@ export const SUBSCRIPTIONS = {
     slug: "free",
     provides: {
       seats: 2,
-      popularity_data_pool: false,
+      popularity_data_pool: true,
     },
     prices: {},
   },

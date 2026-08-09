@@ -10,7 +10,6 @@ const RECORDING_ID = '3fc2f0bb-0f4a-4a5e-9a02-2f79e2b13e6b'
 const JWT = 'header.payload.signature'
 
 const paidUser = { subscription: 'pro' }
-const freeUser = { subscription: 'free' }
 
 function historyEntry(createdAt: Date, metaValue?: string) {
   return {
@@ -90,7 +89,6 @@ describe('PopularityService', () => {
     const { service, repository } = createService()
     elapseInterval(service)
 
-    service.maybeSend(JWT, freeUser)
     service.maybeSend(JWT, {})
     service.maybeSend(JWT, { subscription: 'not-a-tier' })
     await flush()
