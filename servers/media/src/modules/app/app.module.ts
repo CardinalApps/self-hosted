@@ -36,6 +36,7 @@ import { ClaimModule } from '../claim/claim.module'
 import { ConnectSDKModule } from '../connect-sdk/connect-sdk.module'
 import { CorsModule } from '../cors/cors.module'
 import { PingModule } from '../ping/ping.module'
+import { PortMapperModule } from '../port-mapper/port-mapper.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
 import { PopularityModule } from '../popularity/popularity.module'
 import { RecommendationModule } from '../recommendation/recommendation.module'
@@ -158,6 +159,7 @@ const resolvePostgresHost = () => {
     PopularityModule,
     RecommendationModule,
     ClaimModule,
+    PortMapperModule,
     ConnectSDKModule,
     CorsModule,
     PingModule,

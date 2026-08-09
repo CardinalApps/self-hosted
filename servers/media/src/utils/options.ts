@@ -72,10 +72,17 @@ export const OPTIONS = {
     name: 'connect_byo_hostname',
     default: undefined,
   },
-  // The externally reachable port reported in `register`. Falls back to the
-  // server's own listening port until the port mapper lands
+  // The externally reachable port reported in `register`. Written by the
+  // PortMapper on a successful mapping; falls back to the server's own
+  // listening port when unset
   CONNECT_PUBLIC_PORT: <Option>{
     name: 'connect_public_port',
     default: undefined,
+  },
+  // UPnP/NAT-PMP automatic port mapping. Opt-in via the Admin app; only works
+  // with host networking
+  PORT_MAPPING_ENABLED: <Option>{
+    name: 'port_mapping_enabled',
+    default: false,
   },
 }
