@@ -191,6 +191,12 @@ export default {
   "settings.enable-half-ratings.desc": {
     "en": "Allow ratings in half-star increments.",
   },
+  "settings.enable-popularity-data-pool.label": {
+    "en": "Enable the Popularity Data Pool",
+  },
+  "settings.enable-popularity-data-pool.desc": {
+    "en": "Contribute anonymized play counts to the Popularity Data Pool and let users access global trends.",
+  },
   "settings.inactive-session-timeout.label": {
     "en": "Session timeout",
   },

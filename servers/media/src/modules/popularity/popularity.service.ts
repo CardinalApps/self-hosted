@@ -6,8 +6,12 @@ import * as ms from 'ms'
 import { getSubscription, SubscriptionTierSlug } from '@cardinalapps/products/dist/cjs/subscriptions'
 
 import { popularityAPI } from '../../utils/cloud'
+import { CardinalApp } from '../../utils/apps'
+
+import { SettingsService } from '../settings/settings.service'
 
 import { MusicHistory } from '../music-history/music-history.entity'
+import { PopularityStats } from './popularity-stats.entity'
 
 // MusicBrainz recording IDs are UUIDs; a malformed tag would get the whole batch rejected
 const UUID_SHAPE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -25,6 +29,9 @@ export class PopularityService {
   constructor(
     @InjectRepository(MusicHistory)
     private musicHistoryRepository: Repository<MusicHistory>,
+    @InjectRepository(PopularityStats)
+    private popularityStatsRepository: Repository<PopularityStats>,
+    private settingsService: SettingsService,
   ) {}
 
   // The PDP rejects batches beyond this size
@@ -39,10 +46,16 @@ export class PopularityService {
 
   private inFlight = false
 
-  /* The end of the last attempted window, and the start of the next one.
-     Initialized to boot time — plays that happened while the process was down
-     are deliberately dropped rather than backfilled. */
-  private windowStart = new Date()
+  /* The end of the last attempted window, and the start of the next one. Null
+     means "not collecting": from boot until the first eligible cloud request,
+     and again whenever the service is observed disabled. Because a window can
+     only open at "now", no batch can ever span time when the service was off
+     or when no cloud-capable session was around. */
+  private windowStart: Date | null = null
+
+  /* Throttles settings reads while the window is null, since a null window
+     cannot throttle through the send interval. */
+  private lastNullWindowCheck = 0
 
   /**
    * Called with every cloud-authenticated request. Sends at most one batch per
@@ -53,7 +66,11 @@ export class PopularityService {
     if (this.inFlight) {
       return
     }
-    if (Date.now() - this.windowStart.getTime() < this.sendInterval) {
+    if (this.windowStart) {
+      if (Date.now() - this.windowStart.getTime() < this.sendInterval) {
+        return
+      }
+    } else if (Date.now() - this.lastNullWindowCheck < this.sendInterval) {
       return
     }
 
@@ -65,7 +82,7 @@ export class PopularityService {
     }
 
     this.inFlight = true
-    this.sendBatch(cloudJWT)
+    this.advanceWindow(cloudJWT)
       .catch((error) => {
         Logger.warn(`Could not send plays to the Popularity Data Pool: ${error?.message ?? error}`, 'Popularity')
       })
@@ -75,13 +92,35 @@ export class PopularityService {
   }
 
   /**
+   * Resolves the window state against the setting: resets to null while
+   * disabled, opens a fresh window on the first request after boot or
+   * re-enabling, and otherwise sends the batch.
+   */
+  private async advanceWindow(cloudJWT: string): Promise<void> {
+    const enabled = await this.settingsService.get(CardinalApp.ADMIN, 'enable_popularity_data_pool')
+
+    if (enabled !== true) {
+      this.windowStart = null
+      this.lastNullWindowCheck = Date.now()
+      return
+    }
+
+    if (this.windowStart === null) {
+      this.windowStart = new Date()
+      return
+    }
+
+    await this.sendBatch(cloudJWT, this.windowStart)
+  }
+
+  /**
    * Collects the window's plays, normalizes them down to
    * `{ recordingId, playedAt }`, and posts them. The window always advances,
    * even on failure — a missed batch is dropped, never retried.
    */
-  private async sendBatch(cloudJWT: string): Promise<void> {
+  private async sendBatch(cloudJWT: string, lastWindowEnd: Date): Promise<void> {
     const windowEnd = new Date()
-    const windowStart = new Date(Math.max(this.windowStart.getTime(), windowEnd.getTime() - this.maxPlayAge))
+    const windowStart = new Date(Math.max(lastWindowEnd.getTime(), windowEnd.getTime() - this.maxPlayAge))
     this.windowStart = windowEnd
 
     const entries = await this.musicHistoryRepository.find({
@@ -118,6 +157,25 @@ export class PopularityService {
       body: { plays },
     })
 
+    await this.recordContribution(plays.length)
+
     Logger.log(`Sent ${plays.length} plays to the Popularity Data Pool.`, 'Popularity')
+  }
+
+  // Adds successfully sent plays to the lifetime counter
+  private async recordContribution(count: number): Promise<void> {
+    const stats = (await this.popularityStatsRepository.find({ take: 1 }))[0]
+      ?? this.popularityStatsRepository.create({ playsContributed: 0 })
+
+    stats.playsContributed += count
+    await this.popularityStatsRepository.save(stats)
+  }
+
+  /**
+   * This server's lifetime contribution stats.
+   */
+  async getStats(): Promise<{ playsContributed: number }> {
+    const stats = (await this.popularityStatsRepository.find({ take: 1 }))[0]
+    return { playsContributed: stats?.playsContributed ?? 0 }
   }
 }

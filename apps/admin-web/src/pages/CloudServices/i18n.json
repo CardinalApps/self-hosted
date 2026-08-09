@@ -1,0 +1,26 @@
+{
+  "title": {
+    "en": "Cloud Services"
+  },
+  "cloud-service.criteria.free": {
+    "en": "Log in with any Cardinal account to enable this."
+  },
+  "cloud-service.criteria.subscribed": {
+    "en": "Log in with a subscribed Cardinal account to enable this."
+  },
+  "pdp.title": {
+    "en": "Popularity Data Pool"
+  },
+  "pdp.desc": {
+    "en": "Allow this Media Server to join the Popularity Data Pool to contribute anonymous play counts, and use the pool's trends in your Music and Cinema apps."
+  },
+  "pdp.plays-contributed": {
+    "en": "Plays contributed"
+  },
+  "pdp.confirm-disable.title": {
+    "en": "Disable the Popularity Data Pool?"
+  },
+  "pdp.confirm-disable.desc": {
+    "en": "Leaving the Popularity Data Pool will disable trend data in your Music and Cinema apps."
+  }
+}
