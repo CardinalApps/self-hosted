@@ -11,9 +11,11 @@
     "MONGODB_CONNECTION_STRING",
     "MONGODB_URI",
     "MONGODB_DB_NAME",
+    "NUM_PROXIES",
     "POPULARITY_SERVER_HTTP_PORT",
     "RATE_LIMIT_IP_WHITELIST",
     "TRENDS_REFRESH_INTERVAL_MINUTES",
+    "TRUST_PROXY",
     "npm_package_version"
   ],
   "tasks": {
