@@ -34,7 +34,7 @@ services:
     volumes:
       - cardinal-popularity-server:/data/db
     ports:
-      - "27018:27017"
+      - "27019:27017"
     networks:
       database-network:
         ipv4_address: 172.20.0.5
