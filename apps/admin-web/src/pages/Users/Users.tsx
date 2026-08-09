@@ -275,9 +275,10 @@ function Users() {
         {
         /*
          * User invitations card.
+         * TODO enable with remote access
          */
         }
-        <CardGrid.Card
+        {/* <CardGrid.Card
           size="s"
           icon={<Icon fa="fas fa-envelope" />}
           header={<H5>{i18n['users.invite-user'][lang]}</H5>}
@@ -301,7 +302,7 @@ function Users() {
               : i18n['users.invite.some-active-links.plural'][lang].replace('{num}', activeIntiations.length)
             : i18n['users.invite.no-active-links'][lang]
           }
-        </CardGrid.Card>
+        </CardGrid.Card> */}
         {/* <CardGrid.Card
           icon={<Icon fa="fas fa-info-circle" />}
           header={<H5>{i18n['users.new-users'][lang]}</H5>}
