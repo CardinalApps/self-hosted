@@ -1,5 +1,4 @@
 import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common'
-import { DEFAULT_MEDIA_SERVER_PORT } from '@cardinalapps/remote-access/dist/cjs'
 
 import {
   PortMapperFailureReason,
@@ -36,20 +35,35 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
   ) {}
 
   /**
-   * Attempts the mapping on boot when the user has port mapping enabled.
+   * Reflects the option in the status on boot. The mapping itself is
+   * triggered by the HTTPS module once its listener is bound, because the
+   * internal port is not known before then.
    */
   async onApplicationBootstrap(): Promise<void> {
     const enabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
 
     if (!(enabled === 'true' || enabled === true)) {
       this.status = { state: 'disabled' }
-      return
+    }
+  }
+
+  /**
+   * Creates the mapping when the user has port mapping enabled; no-op
+   * otherwise. Never throws — a failed mapping is a status, not an error.
+   */
+  async mapIfEnabled(internalPort: number, desiredExternalPort: number): Promise<PortMapperStatus> {
+    const enabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
+
+    if (!(enabled === 'true' || enabled === true)) {
+      return this.status
     }
 
-    // Boot must never wait on (or crash from) router probing
-    void this.enable(DEFAULT_MEDIA_SERVER_PORT, DEFAULT_MEDIA_SERVER_PORT).catch((error) => {
-      Logger.warn(`Port mapping failed unexpectedly at boot: ${error}`, 'PortMapper')
-    })
+    try {
+      return await this.enable(internalPort, desiredExternalPort)
+    } catch (error) {
+      Logger.warn(`Port mapping failed unexpectedly: ${error}`, 'PortMapper')
+      return this.status
+    }
   }
 
   /**

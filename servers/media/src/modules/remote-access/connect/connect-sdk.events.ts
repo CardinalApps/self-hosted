@@ -23,6 +23,8 @@ export type ConnectSDKEventPayloads = {
   'relay:abort': RelayAbort,
   'connection:state': ConnectionState,
   'binary:frame': BinaryFramePayload,
+  // Fires only on persisted enable/disable, never on transient disconnects
+  'enabled:changed': boolean,
 }
 
 /**

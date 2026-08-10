@@ -12,6 +12,7 @@ import * as ip from 'ip'
 import { AppModule } from './modules/app/app.module'
 import { CorsService } from './modules/cors/cors.service'
 import { buildCorsOptions } from './modules/cors/cors.options'
+import { HttpsService } from './modules/remote-access/https/https.service'
 
 import {
   Env,
@@ -134,6 +135,12 @@ async function startup() {
    * Start listening on the network.
    */
   await app.listen(PORT)
+
+  /**
+   * Start the Remote Access HTTPS listener, if enabled and configured. This
+   * never affects the HTTP listener above.
+   */
+  app.get(HttpsService).attach(app.getHttpAdapter().getInstance())
 
   /**
    * Welcome message box.

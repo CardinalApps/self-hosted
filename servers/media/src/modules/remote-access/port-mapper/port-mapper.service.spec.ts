@@ -206,14 +206,33 @@ describe('lifecycle hooks', () => {
     expect(factory).not.toHaveBeenCalled()
   })
 
-  it('maps on boot when port mapping is enabled', async () => {
-    const { service, client } = makeService({ [OPTIONS.PORT_MAPPING_ENABLED.name]: 'true' })
+  it('waits for the HTTPS listener when port mapping is enabled', async () => {
+    const { service, factory } = makeService({ [OPTIONS.PORT_MAPPING_ENABLED.name]: 'true' })
 
     await service.onApplicationBootstrap()
     await flush()
 
-    expect(service.getStatus().state).toBe('active')
-    expect(client.mappingCalls).toHaveLength(1)
+    expect(service.getStatus()).toEqual({ state: 'not_attempted' })
+    expect(factory).not.toHaveBeenCalled()
+  })
+
+  it('maps via mapIfEnabled when port mapping is enabled', async () => {
+    const { service, client } = makeService({ [OPTIONS.PORT_MAPPING_ENABLED.name]: 'true' })
+
+    const status = await service.mapIfEnabled(45678, 24900)
+
+    expect(status).toMatchObject({ state: 'active', internalPort: 45678, externalPort: 24900 })
+    expect(client.mappingCalls[0]).toMatchObject({ public: 24900, private: 45678 })
+  })
+
+  it('does not map via mapIfEnabled when port mapping is disabled', async () => {
+    const { service, factory } = makeService()
+
+    await service.onApplicationBootstrap()
+    const status = await service.mapIfEnabled(45678, 24900)
+
+    expect(status).toEqual({ state: 'disabled' })
+    expect(factory).not.toHaveBeenCalled()
   })
 
   it('unmaps an active mapping on graceful shutdown', async () => {

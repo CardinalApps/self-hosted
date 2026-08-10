@@ -16,15 +16,22 @@ mock the `nat-upnp` library entirely; this runbook covers the real thing.
 
 ## Steps
 
-1. Enable the option (there is no Admin UI surface yet):
+1. Enable the option (there is no Admin UI surface yet). The mapping is
+   triggered by the Remote Access HTTPS listener, so Remote Access must also
+   be enabled with stored cert material (`connect_enabled`,
+   `connect_tls_cert_pem`, `connect_tls_key_pem`):
 
    ```sql
    INSERT INTO option (name, value) VALUES ('port_mapping_enabled', 'true')
    ON CONFLICT (name) DO UPDATE SET value = 'true';
    ```
 
-2. Start the Media Server and watch the logs for one of:
-   - `[PortMapper] Port mapping active: <externalIp>:24900` — success.
+2. Start the Media Server and watch the logs for
+   `[HTTPS] Remote Access HTTPS listening on port <port>` followed by one of:
+   - `[PortMapper] Port mapping active: <externalIp>:<externalPort>` — success.
+     Unless `connect_https_port` is set, both the internal and external ports
+     are randomized (internal is OS-assigned, external is drawn from
+     20000–60000).
    - `[PortMapper] Port mapping failed: <reason>` — see the reason table below.
 
 3. Verify the status endpoint (admin JWT required):
@@ -42,9 +49,9 @@ mock the `nat-upnp` library entirely; this runbook covers the real thing.
 5. Verify renewal: wait 20 minutes and check that `leaseExpiresAt` in the
    status response has moved forward.
 
-6. Verify port conflicts: create a manual port forward for 24900 on the
-   router (or run a second mapped service), restart the Media Server, and
-   expect the mapping to land on 24901 instead.
+6. Verify port conflicts: set `connect_https_port` to a port that already has
+   a manual forward on the router (or a second mapped service), restart the
+   Media Server, and expect the external mapping to land one port above.
 
 7. Verify clean shutdown: stop the Media Server with SIGTERM and confirm the
    mapping disappears from the router's UPnP lease table.

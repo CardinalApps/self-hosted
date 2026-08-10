@@ -35,6 +35,7 @@ import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
 import { ConnectSDKModule } from '../remote-access/connect/connect-sdk.module'
 import { CorsModule } from '../cors/cors.module'
+import { HttpsModule } from '../remote-access/https/https.module'
 import { PingModule } from '../remote-access/ping/ping.module'
 import { PortMapperModule } from '../remote-access/port-mapper/port-mapper.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
@@ -162,6 +163,7 @@ const resolvePostgresHost = () => {
     PortMapperModule,
     ConnectSDKModule,
     CorsModule,
+    HttpsModule,
     PingModule,
     TranscodingModule,
     WaveformModule,

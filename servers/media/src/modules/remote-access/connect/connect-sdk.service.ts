@@ -111,6 +111,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     await this.databaseService.saveOption(OPTIONS.CONNECT_SERVER_TOKEN.name, body.serverToken)
     await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'true')
     this.tokenRefresher.clear()
+    this.events.emit('enabled:changed', true)
 
     Logger.log('Remote Access enabled', 'ConnectSDK')
     void this.connect()
@@ -162,6 +163,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     } catch (err) {
       if (err instanceof ConnectAuthError) {
         await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'false')
+        this.events.emit('enabled:changed', false)
         this.setState('auth_failed')
         Logger.error(`Remote Access disabled: ${err.message}`, 'ConnectSDK')
         return
@@ -202,6 +204,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
   async disconnect(): Promise<void> {
     this.manualStop = true
     await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'false')
+    this.events.emit('enabled:changed', false)
     this.cancelReconnect()
     this.stopHeartbeat()
     this.ws?.close(1000)

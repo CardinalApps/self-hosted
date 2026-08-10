@@ -85,4 +85,10 @@ export const OPTIONS = {
     name: 'port_mapping_enabled',
     default: false,
   },
+  // The port for the Remote Access HTTPS listener (also the port the
+  // PortMapper maps). Unset means DEFAULT_MEDIA_SERVER_PORT
+  CONNECT_HTTPS_PORT: <Option>{
+    name: 'connect_https_port',
+    default: undefined,
+  },
 }
