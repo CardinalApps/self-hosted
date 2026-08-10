@@ -2,9 +2,9 @@ import * as request from 'supertest'
 
 import { signProbeHeader } from '@cardinalapps/remote-access'
 
-import { createTestApp, destroyTestApp, TestApp } from '../../helpers/create-app'
-import { DatabaseService } from '../../../src/modules/database/database.service'
-import { OPTIONS } from '../../../src/utils/options'
+import { createTestApp, destroyTestApp, TestApp } from '../../../helpers/create-app'
+import { DatabaseService } from '../../../../src/modules/database/database.service'
+import { OPTIONS } from '../../../../src/utils/options'
 
 const SIGNING_KEY = new Uint8Array(32).fill(7)
 

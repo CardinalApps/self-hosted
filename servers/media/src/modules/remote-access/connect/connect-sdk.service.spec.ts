@@ -4,8 +4,8 @@ import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } fro
 import { ConnectSDKService, ConnectWebSocket } from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
-import { DatabaseService } from '../database/database.service'
-import { OPTIONS } from '../../utils/options'
+import { DatabaseService } from '../../database/database.service'
+import { OPTIONS } from '../../../utils/options'
 
 class FakeWebSocket extends EventEmitter {
   url: string

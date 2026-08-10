@@ -6,7 +6,7 @@ import { ConnectSDKEvents } from './connect-sdk.events'
 import { ConnectSDKService, CONNECT_WS_FACTORY, ConnectWsFactory } from './connect-sdk.service'
 import { TokenRefresher } from './token-refresher'
 
-import { DatabaseModule } from '../database/database.module'
+import { DatabaseModule } from '../../database/database.module'
 
 const defaultWsFactory: ConnectWsFactory = (url: string) => new WebSocket(url)
 

@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
 import { PortMapperService } from './port-mapper.service'
 import { PortMapperStatusResponse } from './dtos/PortMapperStatusResponse.dto'
-import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+import { StandardEndpoint } from '../../../decorators/StandardEndpoint.decorator'
 
 @Controller('/port-mapper')
 @ApiTags('Remote Access')

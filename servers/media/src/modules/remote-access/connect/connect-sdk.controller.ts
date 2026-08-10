@@ -3,8 +3,8 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
 import { ConnectSDKService } from './connect-sdk.service'
 import { ConnectStatusResponse } from './dtos/ConnectStatusResponse.dto'
-import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
-import { getCardinalTolkienFromHeaders } from '../../utils/jwt'
+import { StandardEndpoint } from '../../../decorators/StandardEndpoint.decorator'
+import { getCardinalTolkienFromHeaders } from '../../../utils/jwt'
 
 @Controller()
 @ApiTags('Remote Access')

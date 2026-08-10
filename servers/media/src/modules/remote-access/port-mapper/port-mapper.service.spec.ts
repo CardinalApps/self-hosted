@@ -1,7 +1,7 @@
 import { PortMapperService, classifyMappingError } from './port-mapper.service'
 import { UpnpClient } from './port-mapper.types'
-import { DatabaseService } from '../database/database.service'
-import { OPTIONS } from '../../utils/options'
+import { DatabaseService } from '../../database/database.service'
+import { OPTIONS } from '../../../utils/options'
 
 type MappingResult = { error?: Error }
 

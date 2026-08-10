@@ -2,9 +2,9 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
 import { PingController } from './ping.controller'
 
-import { DatabaseModule } from '../database/database.module'
+import { DatabaseModule } from '../../database/database.module'
 
-import { VerifyProbe } from '../../middleware/VerifyProbe.middleware'
+import { VerifyProbe } from '../../../middleware/VerifyProbe.middleware'
 
 @Module({
   imports: [

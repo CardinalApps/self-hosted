@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common'
 import jwtDecode from 'jwt-decode'
 import { fetchAuthAPI, MixedAppEnv } from '@cardinalapps/topology/dist/cjs'
 
-import { DatabaseService } from '../database/database.service'
-import { OPTIONS } from '../../utils/options'
-import { getCurrentMode } from '../../utils/env'
-import { outboundHeaders } from '../../utils/cloud'
+import { DatabaseService } from '../../database/database.service'
+import { OPTIONS } from '../../../utils/options'
+import { getCurrentMode } from '../../../utils/env'
+import { outboundHeaders } from '../../../utils/cloud'
 
 // How much lifetime an access token must have left to be reused
 const REFRESH_THRESHOLD_MS = 10 * 60 * 1000

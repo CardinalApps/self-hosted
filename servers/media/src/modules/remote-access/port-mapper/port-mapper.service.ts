@@ -8,8 +8,8 @@ import {
   UpnpClient,
   UpnpClientFactory,
 } from './port-mapper.types'
-import { DatabaseService } from '../database/database.service'
-import { OPTIONS } from '../../utils/options'
+import { DatabaseService } from '../../database/database.service'
+import { OPTIONS } from '../../../utils/options'
 
 const LEASE_TTL_S = 30 * 60
 const RENEW_INTERVAL_MS = 20 * 60 * 1000

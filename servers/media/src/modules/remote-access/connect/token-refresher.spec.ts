@@ -1,6 +1,6 @@
 import { TokenRefresher, ConnectAuthError } from './token-refresher'
-import { DatabaseService } from '../database/database.service'
-import { OPTIONS } from '../../utils/options'
+import { DatabaseService } from '../../database/database.service'
+import { OPTIONS } from '../../../utils/options'
 
 jest.mock('@cardinalapps/topology/dist/cjs', () => ({
   ...jest.requireActual('@cardinalapps/topology/dist/cjs'),

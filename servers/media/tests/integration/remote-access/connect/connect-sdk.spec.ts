@@ -2,11 +2,11 @@ import * as http from 'http'
 import { AddressInfo } from 'net'
 import { WebSocket, WebSocketServer } from 'ws'
 
-import { createTestApp, TestApp } from '../../helpers/create-app'
-import { ConnectSDKService } from '../../../src/modules/connect-sdk/connect-sdk.service'
-import { TokenRefresher } from '../../../src/modules/connect-sdk/token-refresher'
-import { DatabaseService } from '../../../src/modules/database/database.service'
-import { OPTIONS } from '../../../src/utils/options'
+import { createTestApp, TestApp } from '../../../helpers/create-app'
+import { ConnectSDKService } from '../../../../src/modules/remote-access/connect/connect-sdk.service'
+import { TokenRefresher } from '../../../../src/modules/remote-access/connect/token-refresher'
+import { DatabaseService } from '../../../../src/modules/database/database.service'
+import { OPTIONS } from '../../../../src/utils/options'
 
 // Builds an unsigned-but-decodable JWT with the given time until expiry
 function makeJwt(expiresInMs: number): string {

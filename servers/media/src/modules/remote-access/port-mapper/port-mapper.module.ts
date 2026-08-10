@@ -5,7 +5,7 @@ import { PortMapperController } from './port-mapper.controller'
 import { PortMapperService } from './port-mapper.service'
 import { UPNP_CLIENT_FACTORY, UpnpClientFactory } from './port-mapper.types'
 
-import { DatabaseModule } from '../database/database.module'
+import { DatabaseModule } from '../../database/database.module'
 
 const defaultUpnpClientFactory: UpnpClientFactory = () => createClient()
 

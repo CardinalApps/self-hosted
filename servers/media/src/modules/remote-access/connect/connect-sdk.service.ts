@@ -14,12 +14,12 @@ import {
 } from '@cardinalapps/remote-access/dist/cjs'
 import { fetchAuthAPI, MixedAppEnv } from '@cardinalapps/topology/dist/cjs'
 
-import { DatabaseService } from '../database/database.service'
+import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
-import { OPTIONS } from '../../utils/options'
-import { envVar, getCurrentMode, Mode } from '../../utils/env'
-import { outboundHeaders } from '../../utils/cloud'
+import { OPTIONS } from '../../../utils/options'
+import { envVar, getCurrentMode, Mode } from '../../../utils/env'
+import { outboundHeaders } from '../../../utils/cloud'
 
 // The subset of the `ws` client the service uses; injectable so tests can
 // supply a fake socket
