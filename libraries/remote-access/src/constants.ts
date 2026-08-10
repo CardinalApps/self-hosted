@@ -45,4 +45,7 @@ export const WSS_CLOSE_PING_TIMEOUT = 4002
 // Max clock skew accepted on probe-header timestamps (design §9 step 2).
 export const PROBE_TIMESTAMP_SKEW_SECONDS = 5 * 60
 
+// Max body size for the probe-signed diagnostic echo endpoint.
+export const ECHO_MAX_BYTES = 1024 * 1024
+
 export const PROTOCOL_VERSION = 1
