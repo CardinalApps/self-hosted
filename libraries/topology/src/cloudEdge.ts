@@ -25,6 +25,7 @@ export enum CloudService {
   FEEDBACK = "feedback",
   HELP = "help",
   POPULARITY = "popularity",
+  REMOTE_ACCESS = "remote-access",
   STATUS = "status",
   WEBSITE = "website",
 }
@@ -66,6 +67,14 @@ export const CloudEdge = {
     entry: {
       dev: 'http://localhost:4042',
       prod: 'https://popularity.cardinalcloud.io',
+    },
+  },
+  'remote-access': {
+    provider: InfrastructureProvider.AZURE,
+    name: 'Remote Access',
+    entry: {
+      dev: 'http://localhost:4037',
+      prod: 'https://api.cardinalapps.host',
     },
   },
 } as const
