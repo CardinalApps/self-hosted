@@ -6,6 +6,7 @@ import type {
   RegisteredPayload,
   RelayAbort,
   RelayHttpRequest,
+  RelayHttpRequestEnd,
 } from '@cardinalapps/remote-access/dist/cjs'
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'auth_failed'
@@ -20,6 +21,7 @@ export type ConnectSDKEventPayloads = {
   'config:update': ConfigUpdatePayload,
   'cert:update': CertUpdatePayload,
   'relay:http:request': RelayHttpRequest,
+  'relay:http:request:end': RelayHttpRequestEnd,
   'relay:abort': RelayAbort,
   'connection:state': ConnectionState,
   'binary:frame': BinaryFramePayload,

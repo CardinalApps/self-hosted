@@ -7,6 +7,9 @@ export const HEADERS = {
   PROBE_SIGNATURE: 'X-Cardinal-Probe-Signature',
   PROBE_PONG: 'X-Cardinal-Probe-Pong',
   CONNECTION: 'X-Cardinal-Connection',
+  // Set by the relay on forwarded requests to carry the original client IP.
+  // The relay overwrites any client-supplied value, so it cannot be spoofed.
+  CLIENT_IP: 'X-Cardinal-Client-IP',
 } as const
 
 export const MESSAGE_TYPES = {

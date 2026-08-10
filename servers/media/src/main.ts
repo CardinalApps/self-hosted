@@ -13,6 +13,7 @@ import { AppModule } from './modules/app/app.module'
 import { CorsService } from './modules/cors/cors.service'
 import { buildCorsOptions } from './modules/cors/cors.options'
 import { HttpsService } from './modules/remote-access/https/https.service'
+import { RelayRequestHandler } from './modules/remote-access/relay/relay-request-handler'
 
 import {
   Env,
@@ -138,9 +139,11 @@ async function startup() {
 
   /**
    * Start the Remote Access HTTPS listener, if enabled and configured. This
-   * never affects the HTTP listener above.
+   * never affects the HTTP listener above. Relayed Remote Access requests
+   * dispatch through the same Express stack.
    */
   app.get(HttpsService).attach(app.getHttpAdapter().getInstance())
+  app.get(RelayRequestHandler).attach(app.getHttpAdapter().getInstance())
 
   /**
    * Welcome message box.

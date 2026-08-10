@@ -11,6 +11,7 @@ import {
   WSS_CLOSE_SUPERSEDED,
   WSS_PATH,
   decodeRelayBinaryFrame,
+  encodeRelayBinaryFrame,
 } from '@cardinalapps/remote-access/dist/cjs'
 import { fetchAuthAPI, MixedAppEnv } from '@cardinalapps/topology/dist/cjs'
 
@@ -232,6 +233,24 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     }
   }
 
+  /**
+   * Sends a relay control message on behalf of the RelayRequestHandler.
+   */
+  sendRelayMessage(message: MediaToServerMessage): void {
+    this.sendMessage(message)
+  }
+
+  /**
+   * Sends a relay response body chunk as a binary frame.
+   */
+  sendRelayBinary(requestId: string, chunk: Uint8Array): void {
+    try {
+      this.ws?.send(encodeRelayBinaryFrame(requestId, chunk))
+    } catch (err) {
+      Logger.warn(`Could not send a relay binary frame: ${err}`, 'ConnectSDK')
+    }
+  }
+
   // Sends register and starts the heartbeat once the socket is up
   private async handleOpen(): Promise<void> {
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
@@ -314,6 +333,11 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
 
       case 'relay:http:request': {
         this.events.emit('relay:http:request', message)
+        break
+      }
+
+      case 'relay:http:request:end': {
+        this.events.emit('relay:http:request:end', message)
         break
       }
 

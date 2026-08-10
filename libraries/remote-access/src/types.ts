@@ -52,10 +52,18 @@ export interface RelayHttpRequest {
   headers: Record<string, string>
 }
 
+// Signals end-of-request-body so the Media Server can close its synthesized
+// IncomingMessage.
+export interface RelayHttpRequestEnd {
+  requestId: string
+}
+
 export interface RelayHttpResponseStart {
   requestId: string
   status: number
-  headers: Record<string, string>
+  // Numbers and string arrays (set-cookie) survive the trip; the relay
+  // sanitizes before writing them to the client response
+  headers: Record<string, string | number | string[]>
 }
 
 export interface RelayHttpResponseEnd {
@@ -90,4 +98,5 @@ export type ServerToMediaMessage =
   | ({ type: 'config:update' } & ConfigUpdatePayload)
   | ({ type: 'cert:update' } & CertUpdatePayload)
   | ({ type: 'relay:http:request' } & RelayHttpRequest)
+  | ({ type: 'relay:http:request:end' } & RelayHttpRequestEnd)
   | ({ type: 'relay:abort' } & RelayAbort)
