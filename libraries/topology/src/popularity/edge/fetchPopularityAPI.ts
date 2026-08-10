@@ -1,9 +1,13 @@
 import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../../cloudEdge'
 
+const CLOUD_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/cloud_user_tolkien'
+
 type FetchPopularityAPIOptions = {
   headers?: HeadersInit,
   body?: Record<string, unknown>,
   returnRawResponse?: boolean,
+  // Browser-only: attaches the logged-in cloud user's token from localStorage
+  accessToken?: boolean,
 }
 
 const defaultOptions: FetchPopularityAPIOptions = {
@@ -20,6 +24,17 @@ export function fetchPopularityAPI<T>(
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     options = { ...defaultOptions, ...options }
+
+    if (options.accessToken) {
+      const token = localStorage.getItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY)
+
+      if (token) {
+        options.headers = {
+          'Authorization': `Bearer ${token}`,
+          ...options.headers,
+        }
+      }
+    }
 
     if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {
       options.headers = {
