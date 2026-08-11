@@ -4,13 +4,26 @@
 export type InstanceId = string
 export type AccountId = string
 
+/*
+ * One direct-dial attempt: an IP-encoded hostname (`192-168-1-40.<instanceId>.<suffix>`, dashed-v6
+ * for AAAA) that TLS-validates against the server's own certificate. Clients walk candidates in
+ * order — LAN entries come first — and fall back to the relay.
+ */
+export interface ConnectionCandidate {
+  kind: 'lan' | 'wan'
+  hostname: string
+  port: number
+}
+
 // Negotiation API: GET https://api.cardinalapps.host/connect/:instanceId
 export interface ConnectionInfo {
   online: boolean
+  // Legacy single direct target; stays populated until clients consume `candidates`.
   direct?: {
     hostname: string
     port: number
   }
+  candidates: ConnectionCandidate[]
   relay: {
     url: string
     enabled: boolean

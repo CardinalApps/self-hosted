@@ -67,13 +67,27 @@ describe('discriminated unions narrow on `type`', () => {
     }
   })
 
-  test('ConnectionInfo offline server omits direct block', () => {
+  test('ConnectionInfo offline server omits direct block and has no candidates', () => {
     const info: ConnectionInfo = {
       online: false,
+      candidates: [],
       relay: { url: 'https://relay.cardinalapps.host/relay/abc', enabled: false },
     }
     expect(info.direct).toBeUndefined()
     expect(info.relay.enabled).toBe(false)
+  })
+
+  test('ConnectionInfo candidates order LAN before WAN', () => {
+    const info: ConnectionInfo = {
+      online: true,
+      candidates: [
+        { kind: 'lan', hostname: '192-168-1-40.abc.connect.cardinalapps.host', port: 32400 },
+        { kind: 'wan', hostname: '203-0-113-4.abc.connect.cardinalapps.host', port: 32400 },
+      ],
+      relay: { url: 'https://relay.cardinalapps.host/relay/abc', enabled: true },
+    }
+    expect(info.candidates[0].kind).toBe('lan')
+    expect(info.candidates.map((c) => c.kind)).toEqual(['lan', 'wan'])
   })
 
   test('relay:http:request narrows on path/method/headers', () => {

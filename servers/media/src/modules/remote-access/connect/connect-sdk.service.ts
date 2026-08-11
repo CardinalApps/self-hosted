@@ -439,21 +439,29 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
 }
 
 /**
- * Returns the LAN/public IPv4 addresses of this machine, excluding loopback
- * and link-local ranges.
+ * Returns the LAN/public IP addresses of this machine — IPv4 plus global/ULA IPv6 — excluding
+ * loopback and link-local ranges. The v6 entries are what let the cloud offer direct-connect
+ * candidates to households with no inbound IPv4 (CGNAT).
  */
-export function getLocalIps(): string[] {
+export function getLocalIps(interfaces = os.networkInterfaces()): string[] {
   const ips: string[] = []
 
-  for (const addresses of Object.values(os.networkInterfaces())) {
+  for (const addresses of Object.values(interfaces)) {
     for (const address of addresses ?? []) {
-      if (address.family !== 'IPv4' || address.internal) {
+      if (address.internal) {
         continue
       }
-      if (address.address.startsWith('169.254.')) {
-        continue
+      if (address.family === 'IPv4') {
+        if (address.address.startsWith('169.254.')) {
+          continue
+        }
+        ips.push(address.address)
+      } else if (address.family === 'IPv6') {
+        if (address.scopeid !== 0 || address.address.toLowerCase().startsWith('fe80')) {
+          continue
+        }
+        ips.push(address.address)
       }
-      ips.push(address.address)
     }
   }
 

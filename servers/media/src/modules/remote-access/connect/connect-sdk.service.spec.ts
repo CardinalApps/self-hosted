@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } from '@cardinalapps/remote-access/dist/cjs'
 
-import { ConnectSDKService, ConnectWebSocket } from './connect-sdk.service'
+import { ConnectSDKService, ConnectWebSocket, getLocalIps } from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
 import { DatabaseService } from '../../database/database.service'
@@ -390,5 +390,40 @@ describe('ConnectSDKService', () => {
     expect(frames).toHaveLength(1)
     expect(frames[0].requestId).toBe('req-1')
     expect(Array.from(frames[0].chunk)).toEqual([1, 2, 3])
+  })
+})
+
+describe('getLocalIps', () => {
+  const v4 = (address: string, internal = false) => ({
+    address,
+    netmask: '255.255.255.0',
+    family: 'IPv4' as const,
+    mac: '00:00:00:00:00:00',
+    internal,
+    cidr: `${address}/24`,
+  })
+  const v6 = (address: string, scopeid = 0, internal = false) => ({
+    address,
+    netmask: 'ffff:ffff:ffff:ffff::',
+    family: 'IPv6' as const,
+    mac: '00:00:00:00:00:00',
+    internal,
+    scopeid,
+    cidr: `${address}/64`,
+  })
+
+  it('collects external IPv4 plus global and ULA IPv6', () => {
+    const ips = getLocalIps({
+      eth0: [v4('192.168.1.40'), v6('2001:db8::5'), v6('fd00::5')],
+    })
+    expect(ips).toEqual(['192.168.1.40', '2001:db8::5', 'fd00::5'])
+  })
+
+  it('excludes internal, v4 link-local, and v6 link-local addresses', () => {
+    const ips = getLocalIps({
+      lo: [v4('127.0.0.1', true), v6('::1', 0, true)],
+      eth0: [v4('169.254.10.4'), v6('fe80::1', 2), v6('fe80::2', 3)],
+    })
+    expect(ips).toEqual([])
   })
 })
