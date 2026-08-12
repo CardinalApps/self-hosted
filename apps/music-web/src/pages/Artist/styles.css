@@ -12,7 +12,7 @@
   }
 
   .artist-hero-cols {
-    --artist-hero-height: 600px;
+    --artist-hero-height: 460px;
 
     display: flex;
     gap: calc(var(--gutter) * 2);
@@ -309,11 +309,16 @@
     gap: 8px;
 
     /* Grid items default to a content-based min-width, which fights the 1fr columns' shrinking */
-    > .music-track,
-    > .music-track-ghost {
+    > .music-track {
       min-width: 0;
       margin-bottom: 0;
     }
+  }
+
+  /* Measured against the entry because the details column is shrink-to-fit, so a percentage here feeds itself */
+  .artist-timeline-ghost {
+    margin-top: var(--gutter);
+    width: min(400px, 100cqi);
   }
 
   @media (max-width: 1600px) {

@@ -20,7 +20,10 @@
     background-color: var(--bg-4);
     background-clip: padding-box;
     filter: brightness(var(--disk-map-shade, 1));
-    transition: opacity var(--transition-speed-fast), filter var(--transition-speed-fast);
+    transition:
+      opacity var(--transition-speed-fast),
+      filter var(--transition-speed-fast),
+      transform var(--transition-speed-fast);
   }
 
   .disk-map-block.is-lossless {
@@ -38,6 +41,7 @@
 
   .disk-map-block.is-hovered {
     z-index: 2;
+    transform: scale(1.05);
   }
 
   /* Lighting one box isn't enough to pick a whole release out of a full map, so an outside

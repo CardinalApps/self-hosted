@@ -168,7 +168,7 @@ function ArtistTimeline({ discography, loading = false, tracksPending = false }:
                   )}
 
                   {!!entry.tracks.length && !favoriteTracks.length && (
-                    <div className="artist-timeline-favorites">
+                    <div className="artist-timeline-ghost">
                       <MusicTrackGhost />
                     </div>
                   )}
