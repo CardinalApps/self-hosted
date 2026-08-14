@@ -27,7 +27,7 @@
     "en": "Remote Access"
   },
   "ra.desc": {
-    "en": "Enable remote access for this media server so that you reach your self-hosted apps from anywhere."
+    "en": "Enable remote access for this media server to reach your self-hosted apps from anywhere."
   },
   "ra.direct.label": {
     "en": "Enable direct remote connections"
