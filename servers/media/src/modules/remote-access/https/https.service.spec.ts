@@ -5,6 +5,7 @@ import { EventEmitter } from 'node:events'
 import { HttpsService } from './https.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
 import { HttpsStatusStore } from '../connect/https-status.store'
+import { ConnectSDKService } from '../connect/connect-sdk.service'
 import { DatabaseService } from '../../database/database.service'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
 import { OPTIONS } from '../../../utils/options'
@@ -59,8 +60,9 @@ const ENABLED_WITH_CERT = {
   [OPTIONS.CONNECT_TLS_KEY_PEM.name]: KEY_A,
 }
 
-function makeService(initialOptions: Record<string, string> = {}) {
+function makeService(initialOptions: Record<string, string> = {}, directEnabled = true) {
   const db = makeDb(initialOptions)
+  const connectSDKService = { isPathEnabled: jest.fn(async () => directEnabled) }
   const events = new ConnectSDKEvents()
   const portMapper = { mapIfEnabled: jest.fn(async () => ({ state: 'disabled' })) }
   const servers: FakeHttpsServer[] = []
@@ -75,13 +77,14 @@ function makeService(initialOptions: Record<string, string> = {}) {
     db as unknown as DatabaseService,
     events,
     statusStore,
+    connectSDKService as unknown as ConnectSDKService,
     portMapper as unknown as PortMapperService,
     factory,
   )
   service.onApplicationBootstrap()
 
   const listener = jest.fn()
-  return { service, db, events, portMapper, factory, servers, listener }
+  return { service, db, events, portMapper, factory, servers, listener, statusStore, connectSDKService }
 }
 
 // Lets the void promise chains kicked off by event handlers settle
@@ -277,5 +280,91 @@ describe('runtime enable and disable', () => {
     await service.onApplicationShutdown()
 
     expect(servers[0].closed).toBe(true)
+  })
+})
+
+describe('the direct path toggle', () => {
+  it('starts when the direct path has never been written', async () => {
+    const { service, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(service.getStatus().state).toBe('running')
+  })
+
+  it('does not start while the direct path is off', async () => {
+    const { service, factory, listener } = makeService(ENABLED_WITH_CERT, false)
+
+    service.attach(listener)
+    await flush()
+
+    expect(factory).not.toHaveBeenCalled()
+    expect(service.getStatus().state).toBe('stopped')
+  })
+
+  it('closes the listener when the direct path is turned off at runtime', async () => {
+    const { service, events, servers, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+    expect(service.getStatus().state).toBe('running')
+
+    events.emit('direct:changed', false)
+    await flush()
+
+    expect(servers[0].closed).toBe(true)
+    expect(service.getStatus().state).toBe('stopped')
+  })
+
+  it('starts the listener when the direct path is turned back on', async () => {
+    const { service, events, listener, connectSDKService } = makeService(ENABLED_WITH_CERT, false)
+
+    service.attach(listener)
+    await flush()
+    expect(service.getStatus().state).toBe('stopped')
+
+    connectSDKService.isPathEnabled.mockResolvedValue(true)
+    events.emit('direct:changed', true)
+    await flush()
+
+    expect(service.getStatus().state).toBe('running')
+  })
+})
+
+describe('status publishing', () => {
+  it('publishes the running listener so the status endpoint can report it', async () => {
+    const { service, listener, statusStore } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(statusStore.get()).toMatchObject({ state: 'running' })
+    expect(statusStore.get().port).toBe(service.getStatus().port)
+    expect(statusStore.get().certExpiresAt).not.toBeNull()
+  })
+
+  it('publishes the stopped state after a shutdown', async () => {
+    const { service, listener, statusStore } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+    await service.stop()
+
+    expect(statusStore.get()).toMatchObject({ state: 'stopped', port: null })
+  })
+
+  it('publishes the error when stored cert material is unusable', async () => {
+    const { service, listener, statusStore } = makeService({
+      [OPTIONS.CONNECT_ENABLED.name]: 'true',
+      [OPTIONS.CONNECT_TLS_CERT_PEM.name]: 'not-a-cert',
+      [OPTIONS.CONNECT_TLS_KEY_PEM.name]: 'not-a-key',
+    })
+
+    service.attach(listener)
+    await flush()
+
+    expect(statusStore.get().state).toBe('error')
+    expect(statusStore.get().lastError).toContain('Rejected invalid TLS certificate material')
   })
 })

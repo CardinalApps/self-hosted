@@ -10,15 +10,22 @@ import List from '@cardinalapps/ui/src/components/interaction/List'
 import type { ListItem } from '@cardinalapps/ui/src/components/interaction/List/List'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+import set from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
+import sync from '@cardinalapps/ui/src/store/slices/settings/thunks/sync'
 import { cloudUserSelectors } from '@cardinalapps/ui/src/store/slices/cloudUser'
+import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
+import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
 
 import {
   useGetConnectStatusQuery,
   useEnableRemoteAccessMutation,
   useDisableRemoteAccessMutation,
-  useUpdateConnectSettingsMutation,
 } from '@cardinalapps/ui/src/store/apis/remoteAccess'
+
+import { ENABLE_REMOTE_ACCESS_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access'
+import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_direct'
+import { ENABLE_REMOTE_ACCESS_RELAY_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_relay'
 
 import i18n from '../i18n.json'
 
@@ -41,10 +48,14 @@ function urlItem(value: string, url: string | null | undefined): ListItem[] {
 
 // Card for the Remote Access cloud service
 function RemoteAccess() {
-  const { lang } = useSelector(settingsSelectors.current)
+  const dispatch = useAppDispatch()
+  const settings = useSelector(settingsSelectors.current)
+  const { lang } = settings
   const cloudLoggedIn = useSelector(cloudUserSelectors.loggedIn)
   const canUpdate = useHasCapability('ServerSettings.Update')
 
+  /* Only the hostname and URLs come from here. The switches read the settings slice, which is
+     seeded and persisted client-side, so they paint in the right position instead of flipping. */
   const { data: status } = useGetConnectStatusQuery(undefined, {
     skip: !canUpdate,
     pollingInterval: STATUS_POLL_MS,
@@ -52,28 +63,31 @@ function RemoteAccess() {
 
   const [enableRemoteAccess] = useEnableRemoteAccessMutation()
   const [disableRemoteAccess] = useDisableRemoteAccessMutation()
-  const [updateConnectSettings] = useUpdateConnectSettingsMutation()
 
   const [showRequestAccess, setShowRequestAccess] = useState(false)
   const [showConfirmDisable, setShowConfirmDisable] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const enabled = status?.enabled === true
-  const directEnabled = enabled && status?.directEnabled === true
-  const relayEnabled = enabled && status?.relayEnabled === true
+  const enabled = settings[ENABLE_REMOTE_ACCESS_SLUG] === true
+  const directEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_DIRECT_SLUG] === true
+  const relayEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_RELAY_SLUG] === true
 
-  const enable = async () => {
+  /* Enabling mints a cloud credential, so it goes through the connect endpoint rather than a
+     settings write. The Media Server owns the setting; pull it back once the call lands. */
+  const setRemoteAccess = async (value: boolean) => {
     setSaving(true)
-    await enableRemoteAccess()
+    await (value ? enableRemoteAccess() : disableRemoteAccess())
+    await dispatch(sync(CardinalApp.ADMIN))
     setSaving(false)
     setShowRequestAccess(false)
+    setShowConfirmDisable(false)
   }
 
-  const disable = async () => {
-    setSaving(true)
-    await disableRemoteAccess()
-    setSaving(false)
-    setShowConfirmDisable(false)
+  const setPath = (slug: string, value: boolean) => {
+    dispatch(set({
+      settings: { [slug]: value },
+      app: CardinalApp.ADMIN,
+    }))
   }
 
   const handleChange = (value: boolean) => {
@@ -118,7 +132,7 @@ function RemoteAccess() {
                 name="enable-direct-connections"
                 value={directEnabled}
                 disabled={!enabled || !canUpdate}
-                onChange={(value) => updateConnectSettings({ directEnabled: value })}
+                onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_DIRECT_SLUG, value)}
               />
             ),
           },
@@ -131,7 +145,7 @@ function RemoteAccess() {
                 name="enable-relay-connections"
                 value={relayEnabled}
                 disabled={!enabled || !canUpdate}
-                onChange={(value) => updateConnectSettings({ relayEnabled: value })}
+                onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_RELAY_SLUG, value)}
               />
             ),
           },
@@ -151,7 +165,7 @@ function RemoteAccess() {
           loading={saving}
           onClose={(confirmed) => {
             if (confirmed) {
-              enable()
+              setRemoteAccess(true)
             } else {
               setShowRequestAccess(false)
             }
@@ -167,7 +181,7 @@ function RemoteAccess() {
           confirmButtonIsDangerous={true}
           onClose={(confirmed) => {
             if (confirmed) {
-              disable()
+              setRemoteAccess(false)
             } else {
               setShowConfirmDisable(false)
             }

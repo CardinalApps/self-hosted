@@ -19,6 +19,11 @@ import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
 import { HttpsStatus, HttpsStatusStore } from './https-status.store'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
+import { SettingsService } from '../../settings/settings.service'
+import { SettingsEvents, SettingsChangedEventPayload } from '../../settings/events'
+import { SettingName } from '../../settings/types'
+import { EventService } from '../../event/event.service'
+import { CardinalApp } from '../../../utils/apps'
 import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 import { envVar, getCurrentMode, Mode } from '../../../utils/env'
 import { outboundHeaders } from '../../../utils/cloud'
@@ -28,6 +33,10 @@ import { outboundHeaders } from '../../../utils/cloud'
 export type ConnectWebSocket = Pick<WebSocket, 'send' | 'close' | 'terminate' | 'on'>
 export type ConnectWsFactory = (url: string) => ConnectWebSocket
 export const CONNECT_WS_FACTORY = 'CONNECT_WS_FACTORY'
+
+export const ENABLE_REMOTE_ACCESS = 'enable_remote_access'
+export const ENABLE_REMOTE_ACCESS_DIRECT = 'enable_remote_access_direct'
+export const ENABLE_REMOTE_ACCESS_RELAY = 'enable_remote_access_relay'
 
 const PING_INTERVAL_MS = 30_000
 const PONG_TIMEOUT_MS = 90_000
@@ -40,17 +49,10 @@ export type ConnectStatus = {
   hostname: string | null,
   signingKeyFingerprint: string | null,
   tokenExpiresAt: string | null,
-  directEnabled: boolean,
-  relayEnabled: boolean,
   publicPort: number | null,
   directUrl: string | null,
   relayUrl: string | null,
   https: HttpsStatus,
-}
-
-export type ConnectPathSettings = {
-  directEnabled?: boolean,
-  relayEnabled?: boolean,
 }
 
 /**
@@ -74,17 +76,50 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     private readonly tokenRefresher: TokenRefresher,
     private readonly events: ConnectSDKEvents,
     private readonly httpsStatusStore: HttpsStatusStore,
+    private readonly settingsService: SettingsService,
+    private readonly eventService: EventService,
     @Inject(CONNECT_WS_FACTORY) private readonly wsFactory: ConnectWsFactory,
   ) {}
 
   /**
-   * Connects on boot when the user has Remote Access enabled.
+   * Connects on boot when the user has Remote Access enabled, and starts
+   * watching for path changes made through the settings API.
    */
   async onApplicationBootstrap(): Promise<void> {
+    this.eventService.subscribePrivate(this, SettingsEvents.CHANGED, (payload: SettingsChangedEventPayload) => {
+      void this.handleSettingsChanged(payload?.names ?? [])
+    })
+
     const enabled = await this.databaseService.getOption(OPTIONS.CONNECT_ENABLED.name)
 
     if (isOptionEnabled(enabled)) {
       void this.connect()
+    }
+  }
+
+  /*
+   * The paths are ordinary settings, so they change without going through this module. Translate
+   * that into the internal events the listener and the relay handler already follow, and tell the
+   * Remote Access Server so it stops offering a path the owner turned off.
+   */
+  private async handleSettingsChanged(names: string[]): Promise<void> {
+    const directChanged = names.includes(ENABLE_REMOTE_ACCESS_DIRECT)
+    const relayChanged = names.includes(ENABLE_REMOTE_ACCESS_RELAY)
+
+    if (!directChanged && !relayChanged) {
+      return
+    }
+
+    if (directChanged) {
+      this.events.emit('direct:changed', await this.isPathEnabled(ENABLE_REMOTE_ACCESS_DIRECT))
+    }
+
+    if (relayChanged) {
+      this.events.emit('relay:changed', await this.isPathEnabled(ENABLE_REMOTE_ACCESS_RELAY))
+    }
+
+    if (this.state === 'connected') {
+      await this.sendRegister()
     }
   }
 
@@ -123,9 +158,8 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const body = await response.json()
 
     await this.databaseService.saveOption(OPTIONS.CONNECT_SERVER_TOKEN.name, body.serverToken)
-    await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'true')
+    await this.setEnabled(true)
     this.tokenRefresher.clear()
-    this.events.emit('enabled:changed', true)
 
     Logger.log('Remote Access enabled', 'ConnectSDK')
     void this.connect()
@@ -176,8 +210,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       token = await this.tokenRefresher.getCurrentToken()
     } catch (err) {
       if (err instanceof ConnectAuthError) {
-        await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'false')
-        this.events.emit('enabled:changed', false)
+        await this.setEnabled(false)
         this.setState('auth_failed')
         Logger.error(`Remote Access disabled: ${err.message}`, 'ConnectSDK')
         return
@@ -217,8 +250,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
    */
   async disconnect(): Promise<void> {
     this.manualStop = true
-    await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'false')
-    this.events.emit('enabled:changed', false)
+    await this.setEnabled(false)
     this.cancelReconnect()
     this.stopHeartbeat()
     this.ws?.close(1000)
@@ -246,8 +278,6 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
         ? crypto.createHash('sha256').update(Buffer.from(signingKey as string, 'base64')).digest('hex').slice(0, 16)
         : null,
       tokenExpiresAt: tokenExpiresAt?.toISOString() ?? null,
-      directEnabled: await this.isPathEnabled(OPTIONS.CONNECT_DIRECT_ENABLED.name),
-      relayEnabled: await this.isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name),
       publicPort,
       directUrl: buildDirectUrl(hostname as string, publicPort),
       relayUrl: instanceId ? `https://${envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}` : null,
@@ -255,35 +285,25 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     }
   }
 
-  /**
-   * Persists the per-path opt-outs. The HTTPS listener reacts to the direct
-   * flag through the event bus, and the flags are re-registered so the Remote
-   * Access Server stops advertising a path the owner turned off.
+  /*
+   * Persists the enabled state and mirrors it into the setting the Admin app reads. The option
+   * stays authoritative for the server's own boot decisions; the setting exists so the toggle
+   * renders in the right position on first paint instead of flipping once a request comes back.
    */
-  async updateSettings(settings: ConnectPathSettings): Promise<ConnectStatus> {
-    if (settings.directEnabled !== undefined) {
-      await this.databaseService.saveOption(OPTIONS.CONNECT_DIRECT_ENABLED.name, String(settings.directEnabled))
-      this.events.emit('direct:changed', settings.directEnabled)
-    }
-
-    if (settings.relayEnabled !== undefined) {
-      await this.databaseService.saveOption(OPTIONS.CONNECT_RELAY_ENABLED.name, String(settings.relayEnabled))
-      this.events.emit('relay:changed', settings.relayEnabled)
-    }
-
-    if (this.state === 'connected') {
-      await this.sendRegister()
-    }
-
-    return await this.getStatus()
+  private async setEnabled(enabled: boolean): Promise<void> {
+    await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, String(enabled))
+    await this.settingsService.set(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS]: enabled })
+    this.events.emit('enabled:changed', enabled)
   }
 
   /**
-   * Whether a connection path is on. An unset option means on, so enabling
-   * Remote Access lights up both paths without writing them first.
+   * Whether a connection path is on. Both default to on, so enabling Remote
+   * Access lights up direct and relay without writing either first.
    */
-  async isPathEnabled(optionName: string): Promise<boolean> {
-    return isOptionEnabled(await this.databaseService.getOption(optionName), true)
+  async isPathEnabled(slug: SettingName): Promise<boolean> {
+    const value = await this.settingsService.get(CardinalApp.ADMIN, slug)
+
+    return value === null || value === undefined ? true : value === true || value === 'true'
   }
 
   /**
@@ -326,8 +346,8 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       localIps: getLocalIps(),
       version: getServerVersion(),
       ...(byoHostname ? { byoHostname: byoHostname as string } : {}),
-      directEnabled: await this.isPathEnabled(OPTIONS.CONNECT_DIRECT_ENABLED.name),
-      relayEnabled: await this.isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name),
+      directEnabled: await this.isPathEnabled(ENABLE_REMOTE_ACCESS_DIRECT),
+      relayEnabled: await this.isPathEnabled(ENABLE_REMOTE_ACCESS_RELAY),
     })
   }
 

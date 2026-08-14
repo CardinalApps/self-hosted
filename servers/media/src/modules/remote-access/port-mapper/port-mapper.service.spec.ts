@@ -1,4 +1,12 @@
-import { PortMapperService, classifyMappingError } from './port-mapper.service'
+import * as fs from 'fs'
+import * as os from 'os'
+
+import {
+  PortMapperService,
+  classifyMappingError,
+  isDockerBridgeAddress,
+  looksLikeDockerBridge,
+} from './port-mapper.service'
 import { UpnpClient } from './port-mapper.types'
 import { DatabaseService } from '../../database/database.service'
 import { OPTIONS } from '../../../utils/options'
@@ -243,6 +251,111 @@ describe('lifecycle hooks', () => {
 
     expect(client.unmappingCalls).toEqual([{ public: 24900 }])
     expect(client.closed).toBe(true)
+  })
+})
+
+describe('setEnabled', () => {
+  it('maps immediately using the ports the listener already reported', async () => {
+    const { service, client } = makeService()
+    await service.mapIfEnabled(24900, 24900)
+
+    const status = await service.setEnabled(true)
+
+    expect(status).toMatchObject({ state: 'active', internalPort: 24900 })
+    expect(client.mappingCalls).toHaveLength(1)
+  })
+
+  // Enabling before the HTTPS listener has bound cannot know which port to map
+  it('waits for the listener when no ports are known yet', async () => {
+    const { service, client, db } = makeService()
+
+    const status = await service.setEnabled(true)
+
+    expect(status).toMatchObject({ state: 'not_attempted' })
+    expect(client.mappingCalls).toHaveLength(0)
+    expect(db.options[OPTIONS.PORT_MAPPING_ENABLED.name]).toBe('true')
+  })
+
+  it('removes an active mapping when turned off', async () => {
+    const { service, client, db } = makeService({ [OPTIONS.PORT_MAPPING_ENABLED.name]: 'true' })
+    await service.enable(24900, 24900)
+
+    const status = await service.setEnabled(false)
+
+    expect(status).toMatchObject({ state: 'disabled' })
+    expect(client.unmappingCalls).toEqual([{ public: 24900 }])
+    expect(db.options[OPTIONS.PORT_MAPPING_ENABLED.name]).toBe('false')
+  })
+})
+
+describe('docker bridge detection', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  const iface = (address: string, internal = false) => ({
+    address,
+    netmask: '255.255.0.0',
+    family: 'IPv4' as const,
+    mac: '00:00:00:00:00:00',
+    internal,
+    cidr: `${address}/16`,
+  })
+
+  it('recognizes addresses inside Docker default bridge pool', () => {
+    expect(isDockerBridgeAddress('172.17.0.2')).toBe(true)
+    expect(isDockerBridgeAddress('172.31.255.254')).toBe(true)
+    expect(isDockerBridgeAddress('172.15.0.2')).toBe(false)
+    expect(isDockerBridgeAddress('172.32.0.2')).toBe(false)
+    expect(isDockerBridgeAddress('192.168.1.40')).toBe(false)
+    expect(isDockerBridgeAddress('not-an-ip')).toBe(false)
+  })
+
+  it('needs both a container and bridge-only addressing', () => {
+    const bridge = { eth0: [iface('172.17.0.2')] }
+    const lan = { eth0: [iface('192.168.1.40')] }
+
+    expect(looksLikeDockerBridge(true, bridge)).toBe(true)
+    // Host networking also reports /.dockerenv, so the address is what separates them
+    expect(looksLikeDockerBridge(true, lan)).toBe(false)
+    expect(looksLikeDockerBridge(false, bridge)).toBe(false)
+  })
+
+  it('is not fooled by a host that happens to use 172.16/12', () => {
+    expect(looksLikeDockerBridge(false, { eth0: [iface('172.20.5.5')] })).toBe(false)
+  })
+
+  it('ignores loopback when judging the addressing', () => {
+    const withLoopback = { lo: [iface('127.0.0.1', true)], eth0: [iface('172.17.0.2')] }
+
+    expect(looksLikeDockerBridge(true, withLoopback)).toBe(true)
+  })
+
+  it('reports docker_bridge instead of no_gateway inside a bridged container', async () => {
+    jest.spyOn(fs, 'existsSync').mockReturnValue(true)
+    jest.spyOn(os, 'networkInterfaces').mockReturnValue({ eth0: [iface('172.17.0.2')] })
+
+    const { service, client } = makeService()
+    const timeout = new Error('connect ETIMEDOUT') as NodeJS.ErrnoException
+    timeout.code = 'ETIMEDOUT'
+    client.mappingResults = [{ error: timeout }]
+
+    const status = await service.enable(24900, 24900)
+
+    expect(status).toMatchObject({ state: 'failed', reason: 'docker_bridge' })
+  })
+
+  it('still reports no_gateway on a normal host', async () => {
+    jest.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+    const { service, client } = makeService()
+    const timeout = new Error('connect ETIMEDOUT') as NodeJS.ErrnoException
+    timeout.code = 'ETIMEDOUT'
+    client.mappingResults = [{ error: timeout }]
+
+    const status = await service.enable(24900, 24900)
+
+    expect(status).toMatchObject({ state: 'failed', reason: 'no_gateway' })
   })
 })
 

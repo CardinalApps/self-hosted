@@ -30,12 +30,6 @@ export class ConnectStatusResponse {
   @ApiProperty({ nullable: true, description: 'Expiry of the stored cloud credential, ISO 8601.' })
   tokenExpiresAt: string | null
 
-  @ApiProperty({ description: 'Whether clients may connect straight to this server.' })
-  directEnabled: boolean
-
-  @ApiProperty({ description: "Whether clients may reach this server through Cardinal's metered relay." })
-  relayEnabled: boolean
-
   @ApiProperty({ nullable: true, description: 'The externally reachable port advertised to the Remote Access Server.' })
   publicPort: number | null
 

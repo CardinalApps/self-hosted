@@ -8,6 +8,7 @@ import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdo
 import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
 import { HttpsStatus, HttpsStatusStore } from '../connect/https-status.store'
+import { ConnectSDKService, ENABLE_REMOTE_ACCESS_DIRECT } from '../connect/connect-sdk.service'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
 import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 
@@ -43,6 +44,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     private readonly databaseService: DatabaseService,
     private readonly events: ConnectSDKEvents,
     private readonly statusStore: HttpsStatusStore,
+    private readonly connectSDKService: ConnectSDKService,
     private readonly portMapperService: PortMapperService,
     @Inject(HTTPS_SERVER_FACTORY) private readonly serverFactory: HttpsServerFactory,
   ) {}
@@ -104,8 +106,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
 
     /* Turning the direct path off leaves the listener down, so nothing answers on the server's own
        hostname. Relayed traffic is unaffected — it arrives over the control channel. */
-    const directEnabled = await this.databaseService.getOption(OPTIONS.CONNECT_DIRECT_ENABLED.name)
-    if (!isOptionEnabled(directEnabled, true)) {
+    if (!await this.connectSDKService.isPathEnabled(ENABLE_REMOTE_ACCESS_DIRECT)) {
       return
     }
 

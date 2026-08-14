@@ -193,6 +193,33 @@ describe('RelayRequestHandler', () => {
     expect(handler.getInFlightCount()).toBe(MEDIA_MAX_INFLIGHT_RELAY)
   })
 
+  /* The Remote Access Server is told to stop advertising the relay on register, but a client
+     holding a stale plan can still arrive, so the refusal has to happen here too. */
+  it('refuses relayed requests with a 403 once the relay path is turned off', async () => {
+    const app = express()
+    app.get('/ping', (_req, res) => res.send('pong'))
+    const { handler, sdk } = makeHandler(app)
+
+    handler.setRelayEnabled(false)
+    handler.handle('req-off', { method: 'GET', path: '/ping', headers: {} })
+
+    expect(startOf(sdk, 'req-off')).toMatchObject({ status: 403 })
+    expect(handler.getInFlightCount()).toBe(0)
+  })
+
+  it('dispatches again once the relay path is turned back on', async () => {
+    const app = express()
+    app.get('/ping', (_req, res) => res.send('pong'))
+    const { handler, sdk, events } = makeHandler(app)
+
+    handler.setRelayEnabled(false)
+    events.emit('relay:changed', true)
+    handler.handle('req-on', { method: 'GET', path: '/ping', headers: {} })
+    await waitFor(() => !!endOf(sdk, 'req-on'))
+
+    expect(startOf(sdk, 'req-on')).toMatchObject({ status: 200 })
+  })
+
   it('returns a 500 through the Express error handler when a controller throws', async () => {
     const app = express()
     app.get('/boom', () => {

@@ -197,6 +197,24 @@ export default {
   "settings.enable-popularity-data-pool.desc": {
     "en": "Contribute anonymized play counts to the Popularity Data Pool and let users access global trends.",
   },
+  "settings.enable-remote-access.label": {
+    "en": "Enable Remote Access",
+  },
+  "settings.enable-remote-access.desc": {
+    "en": "Reach this Media Server from outside your network.",
+  },
+  "settings.enable-remote-access-direct.label": {
+    "en": "Enable direct remote connections",
+  },
+  "settings.enable-remote-access-direct.desc": {
+    "en": "Let apps connect straight to this Media Server instead of going through Cardinal.",
+  },
+  "settings.enable-remote-access-relay.label": {
+    "en": "Enable metered relay connections",
+  },
+  "settings.enable-remote-access-relay.desc": {
+    "en": "Let apps reach this Media Server through Cardinal's relay when a direct connection is not possible.",
+  },
   "settings.inactive-session-timeout.label": {
     "en": "Session timeout",
   },

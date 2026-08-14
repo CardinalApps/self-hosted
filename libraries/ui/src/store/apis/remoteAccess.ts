@@ -17,8 +17,6 @@ export type ConnectStatus = {
   hostname: string | null,
   signingKeyFingerprint: string | null,
   tokenExpiresAt: string | null,
-  directEnabled: boolean,
-  relayEnabled: boolean,
   publicPort: number | null,
   directUrl: string | null,
   relayUrl: string | null,
@@ -73,18 +71,6 @@ export const remoteAccessApi = baseHomeServerApi
         invalidatesTags: ['RemoteAccess.Status', 'RemoteAccess.PortMapper'],
       }),
 
-      updateConnectSettings: builder.mutation<
-        ConnectStatus,
-        { directEnabled?: boolean, relayEnabled?: boolean }
-      >({
-        query: (body) => ({
-          url: '/connect/settings',
-          method: 'PUT',
-          body,
-        }),
-        invalidatesTags: ['RemoteAccess.Status'],
-      }),
-
       getPortMapperStatus: builder.query<PortMapperStatus, void>({
         query: () => queryParams('/port-mapper/status'),
         providesTags: ['RemoteAccess.PortMapper'],
@@ -127,7 +113,6 @@ export const {
   useGetConnectStatusQuery,
   useEnableRemoteAccessMutation,
   useDisableRemoteAccessMutation,
-  useUpdateConnectSettingsMutation,
   useGetPortMapperStatusQuery,
   useUpdatePortMapperSettingsMutation,
   useGetCorsOriginsQuery,

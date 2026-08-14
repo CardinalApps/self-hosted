@@ -92,17 +92,6 @@ export const OPTIONS = {
     name: 'connect_public_port',
     default: undefined,
   },
-  // Direct connections, straight to this server's own HTTPS listener. Unset
-  // means enabled, so turning Remote Access on lights up both paths
-  CONNECT_DIRECT_ENABLED: <Option>{
-    name: 'connect_direct_enabled',
-    default: true,
-  },
-  // Metered connections proxied through Cardinal's relay. Unset means enabled
-  CONNECT_RELAY_ENABLED: <Option>{
-    name: 'connect_relay_enabled',
-    default: true,
-  },
   // UPnP/NAT-PMP automatic port mapping. Opt-in via the Admin app; only works
   // with host networking
   PORT_MAPPING_ENABLED: <Option>{

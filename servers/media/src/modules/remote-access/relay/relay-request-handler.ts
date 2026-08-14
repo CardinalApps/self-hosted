@@ -3,9 +3,8 @@ import { Readable } from 'stream'
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common'
 import { HEADERS } from '@cardinalapps/remote-access/dist/cjs'
 
-import { ConnectSDKService } from '../connect/connect-sdk.service'
+import { ConnectSDKService, ENABLE_REMOTE_ACCESS_RELAY } from '../connect/connect-sdk.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
-import { OPTIONS } from '../../../utils/options'
 
 /* Defensive per-Media-Server ceiling. The Remote Access Server already
    enforces per-account limits; this protects the Media Server itself from a
@@ -49,7 +48,7 @@ export class RelayRequestHandler implements OnApplicationBootstrap {
     this.events.on('relay:changed', (enabled) => { this.relayEnabled = enabled })
 
     void this.connectSDKService
-      .isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name)
+      .isPathEnabled(ENABLE_REMOTE_ACCESS_RELAY)
       .then((enabled) => { this.relayEnabled = enabled })
   }
 

@@ -4,6 +4,9 @@ import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } fro
 import { ConnectSDKService, ConnectWebSocket, getLocalIps } from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
 import { HttpsStatusStore } from './https-status.store'
+import { SettingsService } from '../../settings/settings.service'
+import { SettingsEvents } from '../../settings/events'
+import { EventService } from '../../event/event.service'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
 import { DatabaseService } from '../../database/database.service'
 import { OPTIONS } from '../../../utils/options'
@@ -62,6 +65,31 @@ function makeDb(initial: Record<string, string> = {}) {
   }
 }
 
+function makeSettings(initial: Record<string, unknown> = {}) {
+  const values: Record<string, unknown> = { ...initial }
+  return {
+    values,
+    get: jest.fn(async (app: unknown, name: string) => (name in values ? values[name] : null)),
+    set: jest.fn(async (app: unknown, settings: Record<string, unknown>) => {
+      Object.assign(values, settings)
+      return []
+    }),
+  }
+}
+
+// Stands in for the private event channel the settings module publishes on
+function makeEventService() {
+  const subscribers: Record<string, ((payload: unknown) => void)[]> = {}
+  return {
+    subscribePrivate: jest.fn((instance: unknown, type: string, subscriber: (payload: unknown) => void) => {
+      subscribers[type] = [...(subscribers[type] ?? []), subscriber]
+    }),
+    emitPrivate: jest.fn((type: string, payload?: unknown) => {
+      (subscribers[type] ?? []).forEach((subscriber) => subscriber(payload))
+    }),
+  }
+}
+
 function makeRefresher() {
   return {
     getCurrentToken: jest.fn(async () => 'access-jwt'),
@@ -93,8 +121,10 @@ const ENABLED_OPTIONS = {
   [OPTIONS.CONNECT_SERVER_TOKEN.name]: 'server-token',
 }
 
-function makeService(dbOptions: Record<string, string> = ENABLED_OPTIONS) {
+function makeService(dbOptions: Record<string, string> = ENABLED_OPTIONS, initialSettings: Record<string, unknown> = {}) {
   const db = makeDb(dbOptions)
+  const settings = makeSettings(initialSettings)
+  const eventService = makeEventService()
   const refresher = makeRefresher()
   const events = new ConnectSDKEvents()
   const sockets: FakeWebSocket[] = []
@@ -109,9 +139,11 @@ function makeService(dbOptions: Record<string, string> = ENABLED_OPTIONS) {
     refresher as unknown as TokenRefresher,
     events,
     httpsStatusStore,
+    settings as unknown as SettingsService,
+    eventService as unknown as EventService,
     factory,
   )
-  return { service, db, refresher, events, factory, sockets, httpsStatusStore }
+  return { service, db, refresher, events, factory, sockets, httpsStatusStore, settings, eventService }
 }
 
 beforeEach(() => {
@@ -393,6 +425,184 @@ describe('ConnectSDKService', () => {
     expect(frames).toHaveLength(1)
     expect(frames[0].requestId).toBe('req-1')
     expect(Array.from(frames[0].chunk)).toEqual([1, 2, 3])
+  })
+})
+
+describe('ConnectSDKService connection paths', () => {
+  const DIRECT = 'enable_remote_access_direct'
+  const RELAY = 'enable_remote_access_relay'
+
+  // Both settings default to on, so a fresh server offers both paths
+  it('treats an unwritten path setting as enabled', async () => {
+    const { service } = makeService()
+
+    expect(await service.isPathEnabled(DIRECT)).toBe(true)
+    expect(await service.isPathEnabled(RELAY)).toBe(true)
+  })
+
+  it('reports a path as disabled once its setting is off', async () => {
+    const { service } = makeService(ENABLED_OPTIONS, { [RELAY]: false })
+
+    expect(await service.isPathEnabled(DIRECT)).toBe(true)
+    expect(await service.isPathEnabled(RELAY)).toBe(false)
+  })
+
+  it('announces a direct change so the listener can react', async () => {
+    const { service, events, settings, eventService } = makeService()
+    const directEvents: boolean[] = []
+    events.on('direct:changed', (enabled) => directEvents.push(enabled))
+
+    await service.onApplicationBootstrap()
+    settings.values[DIRECT] = false
+    eventService.emitPrivate(SettingsEvents.CHANGED, { names: [DIRECT] })
+    await flush()
+
+    expect(directEvents).toEqual([false])
+  })
+
+  it('announces a relay change so the relay handler can react', async () => {
+    const { service, events, settings, eventService } = makeService()
+    const relayEvents: boolean[] = []
+    events.on('relay:changed', (enabled) => relayEvents.push(enabled))
+
+    await service.onApplicationBootstrap()
+    settings.values[RELAY] = false
+    eventService.emitPrivate(SettingsEvents.CHANGED, { names: [RELAY] })
+    await flush()
+
+    expect(relayEvents).toEqual([false])
+  })
+
+  it('ignores settings changes that have nothing to do with the paths', async () => {
+    const { service, events, eventService } = makeService()
+    const seen: boolean[] = []
+    events.on('direct:changed', (enabled) => seen.push(enabled))
+    events.on('relay:changed', (enabled) => seen.push(enabled))
+
+    await service.onApplicationBootstrap()
+    eventService.emitPrivate(SettingsEvents.CHANGED, { names: ['server_name'] })
+    await flush()
+
+    expect(seen).toEqual([])
+  })
+
+  it('carries the path flags in the register message', async () => {
+    const { service, sockets } = makeService(ENABLED_OPTIONS, { [RELAY]: false })
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    const register = sockets[0].sentMessages().find((m) => m.type === 'register')
+    expect(register!.directEnabled).toBe(true)
+    expect(register!.relayEnabled).toBe(false)
+  })
+
+  // The server only learns about a path being turned off if it is told again
+  it('re-registers after a path changes while the channel is up', async () => {
+    const { service, sockets, settings, eventService } = makeService()
+
+    await service.onApplicationBootstrap()
+    await flush()
+    sockets[0].open()
+    await flush()
+    sockets[0].receive({ type: 'registered', publicIp: '203.0.113.7', hostname: 'h', signingKey: 'a2V5', config: {} })
+    await flush()
+
+    settings.values[RELAY] = false
+    eventService.emitPrivate(SettingsEvents.CHANGED, { names: [RELAY] })
+    await flush()
+
+    const registers = sockets[0].sentMessages().filter((m) => m.type === 'register')
+    expect(registers).toHaveLength(2)
+    expect(registers[1].relayEnabled).toBe(false)
+  })
+
+  it('does not re-register while the channel is down', async () => {
+    const { service, sockets, settings, eventService } = makeService({ [OPTIONS.CONNECT_ENABLED.name]: 'false' })
+
+    await service.onApplicationBootstrap()
+    settings.values[RELAY] = false
+    eventService.emitPrivate(SettingsEvents.CHANGED, { names: [RELAY] })
+    await flush()
+
+    expect(sockets).toHaveLength(0)
+  })
+})
+
+describe('ConnectSDKService enabled setting', () => {
+  const ENABLE = 'enable_remote_access'
+
+  /* The Admin app reads this setting rather than the status endpoint, so it has to track the
+     option everywhere the option changes - including when the cloud rejects the credential. */
+  it('mirrors the enabled state into the setting when connect is disabled', async () => {
+    const { service, db, settings } = makeService()
+
+    await service.disconnect()
+
+    expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBe('false')
+    expect(settings.values[ENABLE]).toBe(false)
+  })
+
+  it('mirrors the enabled state into the setting when the token is revoked', async () => {
+    const { service, db, refresher, settings } = makeService()
+    refresher.getCurrentToken.mockRejectedValueOnce(new ConnectAuthError('revoked'))
+
+    await service.connect()
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBe('false')
+    expect(settings.values[ENABLE]).toBe(false)
+  })
+})
+
+describe('ConnectSDKService connection URLs', () => {
+  it('has no URLs before a hostname is assigned', async () => {
+    const { service } = makeService({ [OPTIONS.CONNECT_ENABLED.name]: 'true' })
+
+    const status = await service.getStatus()
+
+    expect(status.directUrl).toBeNull()
+    expect(status.relayUrl).toBeNull()
+  })
+
+  it('builds the direct URL from the assigned hostname and the advertised port', async () => {
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'instance-1234.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '31000',
+    })
+
+    const status = await service.getStatus()
+
+    expect(status.directUrl).toBe('https://instance-1234.connect.cardinalapps.host:31000')
+    expect(status.publicPort).toBe(31000)
+  })
+
+  it('omits the port from the direct URL when it is 443', async () => {
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'media.example.com',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '443',
+    })
+
+    expect((await service.getStatus()).directUrl).toBe('https://media.example.com')
+  })
+
+  // The relay is reached on a shared host with the instance in the path, unlike direct
+  it('builds the relay URL from the instance ID', async () => {
+    const { service } = makeService()
+
+    expect((await service.getStatus()).relayUrl).toBe('https://relay.cardinalapps.host/relay/instance-1234')
+  })
+
+  it('surfaces the HTTPS listener state that the listener published', async () => {
+    const { service, httpsStatusStore } = makeService()
+    httpsStatusStore.set({ state: 'running', port: 31000, certExpiresAt: null, lastError: null })
+
+    expect((await service.getStatus()).https.state).toBe('running')
+    expect((await service.getStatus()).https.port).toBe(31000)
   })
 })
 

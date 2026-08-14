@@ -8,12 +8,16 @@ import { HttpsStatusStore } from './https-status.store'
 import { TokenRefresher } from './token-refresher'
 
 import { DatabaseModule } from '../../database/database.module'
+import { SettingsModule } from '../../settings/settings.module'
+import { EventModule } from '../../event/event.module'
 
 const defaultWsFactory: ConnectWsFactory = (url: string) => new WebSocket(url)
 
 @Module({
   imports: [
     DatabaseModule,
+    SettingsModule,
+    EventModule,
   ],
   exports: [ConnectSDKService, ConnectSDKEvents, HttpsStatusStore],
   providers: [
