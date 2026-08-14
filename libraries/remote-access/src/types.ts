@@ -89,7 +89,11 @@ export interface RelayAbort {
   reason: string
 }
 
-// Messages the Media Server sends to the Remote Access Server. `byoHostname` is set only when the user supplies their own domain.
+/*
+ * Messages the Media Server sends to the Remote Access Server. `byoHostname` is set only when the
+ * user supplies their own domain. `directEnabled`/`relayEnabled` carry the server owner's per-path
+ * opt-out; both are absent on Media Servers predating the setting, which means enabled.
+ */
 export type MediaToServerMessage =
   | {
       type: 'register'
@@ -98,6 +102,8 @@ export type MediaToServerMessage =
       localIps: string[]
       version: string
       byoHostname?: string
+      directEnabled?: boolean
+      relayEnabled?: boolean
     }
   | { type: 'ping' }
   | ({ type: 'relay:http:response:start' } & RelayHttpResponseStart)

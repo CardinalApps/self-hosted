@@ -3,6 +3,19 @@ type Option = {
   default: string | boolean | null | undefined,
 }
 
+/**
+ * Reads a boolean option, where the row not existing yet counts as the given
+ * default. Options are stored as strings and `getOption` returns null for a
+ * missing row, so every caller would otherwise repeat this coercion.
+ */
+export function isOptionEnabled(value: unknown, whenUnset = false): boolean {
+  if (value === null || value === undefined || value === '') {
+    return whenUnset
+  }
+
+  return value === true || value === 'true'
+}
+
 // FIXME move this to the db service
 export const OPTIONS = {
   DATABASE_VERSION: <Option>{
@@ -78,6 +91,17 @@ export const OPTIONS = {
   CONNECT_PUBLIC_PORT: <Option>{
     name: 'connect_public_port',
     default: undefined,
+  },
+  // Direct connections, straight to this server's own HTTPS listener. Unset
+  // means enabled, so turning Remote Access on lights up both paths
+  CONNECT_DIRECT_ENABLED: <Option>{
+    name: 'connect_direct_enabled',
+    default: true,
+  },
+  // Metered connections proxied through Cardinal's relay. Unset means enabled
+  CONNECT_RELAY_ENABLED: <Option>{
+    name: 'connect_relay_enabled',
+    default: true,
   },
   // UPnP/NAT-PMP automatic port mapping. Opt-in via the Admin app; only works
   // with host networking

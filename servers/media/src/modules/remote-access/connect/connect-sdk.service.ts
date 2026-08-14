@@ -17,8 +17,9 @@ import { fetchAuthAPI, MixedAppEnv } from '@cardinalapps/topology/dist/cjs'
 
 import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
+import { HttpsStatus, HttpsStatusStore } from './https-status.store'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
-import { OPTIONS } from '../../../utils/options'
+import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 import { envVar, getCurrentMode, Mode } from '../../../utils/env'
 import { outboundHeaders } from '../../../utils/cloud'
 
@@ -39,6 +40,17 @@ export type ConnectStatus = {
   hostname: string | null,
   signingKeyFingerprint: string | null,
   tokenExpiresAt: string | null,
+  directEnabled: boolean,
+  relayEnabled: boolean,
+  publicPort: number | null,
+  directUrl: string | null,
+  relayUrl: string | null,
+  https: HttpsStatus,
+}
+
+export type ConnectPathSettings = {
+  directEnabled?: boolean,
+  relayEnabled?: boolean,
 }
 
 /**
@@ -61,6 +73,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     private readonly databaseService: DatabaseService,
     private readonly tokenRefresher: TokenRefresher,
     private readonly events: ConnectSDKEvents,
+    private readonly httpsStatusStore: HttpsStatusStore,
     @Inject(CONNECT_WS_FACTORY) private readonly wsFactory: ConnectWsFactory,
   ) {}
 
@@ -70,7 +83,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
   async onApplicationBootstrap(): Promise<void> {
     const enabled = await this.databaseService.getOption(OPTIONS.CONNECT_ENABLED.name)
 
-    if (enabled === 'true' || enabled === true) {
+    if (isOptionEnabled(enabled)) {
       void this.connect()
     }
   }
@@ -221,16 +234,56 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const hostname = await this.databaseService.getOption(OPTIONS.CONNECT_HOSTNAME.name)
     const signingKey = await this.databaseService.getOption(OPTIONS.CONNECT_SIGNING_KEY.name)
     const tokenExpiresAt = await this.tokenRefresher.getServerTokenExpiry()
+    const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
+    const publicPortOption = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
+    const publicPort = publicPortOption ? Number(publicPortOption) : null
 
     return {
-      enabled: enabled === 'true' || enabled === true,
+      enabled: isOptionEnabled(enabled),
       state: this.state,
       hostname: (hostname as string) || null,
       signingKeyFingerprint: signingKey
         ? crypto.createHash('sha256').update(Buffer.from(signingKey as string, 'base64')).digest('hex').slice(0, 16)
         : null,
       tokenExpiresAt: tokenExpiresAt?.toISOString() ?? null,
+      directEnabled: await this.isPathEnabled(OPTIONS.CONNECT_DIRECT_ENABLED.name),
+      relayEnabled: await this.isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name),
+      publicPort,
+      directUrl: buildDirectUrl(hostname as string, publicPort),
+      relayUrl: instanceId ? `https://${envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}` : null,
+      https: this.httpsStatusStore.get(),
     }
+  }
+
+  /**
+   * Persists the per-path opt-outs. The HTTPS listener reacts to the direct
+   * flag through the event bus, and the flags are re-registered so the Remote
+   * Access Server stops advertising a path the owner turned off.
+   */
+  async updateSettings(settings: ConnectPathSettings): Promise<ConnectStatus> {
+    if (settings.directEnabled !== undefined) {
+      await this.databaseService.saveOption(OPTIONS.CONNECT_DIRECT_ENABLED.name, String(settings.directEnabled))
+      this.events.emit('direct:changed', settings.directEnabled)
+    }
+
+    if (settings.relayEnabled !== undefined) {
+      await this.databaseService.saveOption(OPTIONS.CONNECT_RELAY_ENABLED.name, String(settings.relayEnabled))
+      this.events.emit('relay:changed', settings.relayEnabled)
+    }
+
+    if (this.state === 'connected') {
+      await this.sendRegister()
+    }
+
+    return await this.getStatus()
+  }
+
+  /**
+   * Whether a connection path is on. An unset option means on, so enabling
+   * Remote Access lights up both paths without writing them first.
+   */
+  async isPathEnabled(optionName: string): Promise<boolean> {
+    return isOptionEnabled(await this.databaseService.getOption(optionName), true)
   }
 
   /**
@@ -253,6 +306,12 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
 
   // Sends register and starts the heartbeat once the socket is up
   private async handleOpen(): Promise<void> {
+    await this.sendRegister()
+    this.startHeartbeat()
+  }
+
+  // Tells the Remote Access Server how to reach this server and which paths are on
+  private async sendRegister(): Promise<void> {
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
     const byoHostname = await this.databaseService.getOption(OPTIONS.CONNECT_BYO_HOSTNAME.name)
     const publicPortOption = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
@@ -267,9 +326,9 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       localIps: getLocalIps(),
       version: getServerVersion(),
       ...(byoHostname ? { byoHostname: byoHostname as string } : {}),
+      directEnabled: await this.isPathEnabled(OPTIONS.CONNECT_DIRECT_ENABLED.name),
+      relayEnabled: await this.isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name),
     })
-
-    this.startHeartbeat()
   }
 
   // Routes JSON control messages and binary relay frames
@@ -466,6 +525,21 @@ export function getLocalIps(interfaces = os.networkInterfaces()): string[] {
   }
 
   return ips
+}
+
+/*
+ * The address clients dial directly. Null until the Remote Access Server has assigned a hostname,
+ * because the certificate only validates against that name. The port is omitted when it is 443,
+ * which is what a Path 1 reverse proxy in front of this server would use.
+ */
+function buildDirectUrl(hostname: string | null, publicPort: number | null): string | null {
+  if (!hostname) {
+    return null
+  }
+
+  return publicPort && publicPort !== 443
+    ? `https://${hostname}:${publicPort}`
+    : `https://${hostname}`
 }
 
 // Same resolution order as AppService.getHomeServerVersion, without the module dependency

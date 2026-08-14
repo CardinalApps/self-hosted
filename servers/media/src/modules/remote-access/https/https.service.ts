@@ -7,8 +7,9 @@ import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdo
 
 import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
+import { HttpsStatus, HttpsStatusStore } from '../connect/https-status.store'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
-import { OPTIONS } from '../../../utils/options'
+import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 
 // The subset of the https server the service uses; injectable so tests can
 // supply a fake
@@ -21,12 +22,7 @@ export const HTTPS_SERVER_FACTORY = 'HTTPS_SERVER_FACTORY'
 const EXTERNAL_PORT_MIN = 20000
 const EXTERNAL_PORT_MAX = 60000
 
-export type HttpsStatus = {
-  state: 'stopped' | 'running' | 'error',
-  port: number | null,
-  certExpiresAt: string | null,
-  lastError: string | null,
-}
+export type { HttpsStatus }
 
 /**
  * Owns the Remote Access HTTPS listener. The listener is a second front door
@@ -46,17 +42,19 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly events: ConnectSDKEvents,
+    private readonly statusStore: HttpsStatusStore,
     private readonly portMapperService: PortMapperService,
     @Inject(HTTPS_SERVER_FACTORY) private readonly serverFactory: HttpsServerFactory,
   ) {}
 
   /**
-   * Reacts to cert pushes and to Remote Access being enabled or disabled at
-   * runtime. Startup itself waits for attach().
+   * Reacts to cert pushes and to Remote Access — or the direct path on its own
+   * — being enabled or disabled at runtime. Startup itself waits for attach().
    */
   onApplicationBootstrap(): void {
     this.events.on('cert:update', (cert) => void this.handleCertUpdate(cert.cert_pem, cert.key_pem))
     this.events.on('enabled:changed', (enabled) => void (enabled ? this.maybeStart() : this.stop()))
+    this.events.on('direct:changed', (enabled) => void (enabled ? this.maybeStart() : this.stop()))
   }
 
   /**
@@ -88,10 +86,11 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
   }
 
   /**
-   * Starts the listener when Remote Access is enabled and full cert material
-   * is stored; no-op otherwise. A user-pinned `connect_https_port` is bound
-   * exactly (manual port-forwarding needs a stable target); otherwise the OS
-   * assigns a random free port and UPnP advertises it transparently.
+   * Starts the listener when Remote Access and the direct path are both
+   * enabled and full cert material is stored; no-op otherwise. A user-pinned
+   * `connect_https_port` is bound exactly (manual port-forwarding needs a
+   * stable target); otherwise the OS assigns a random free port and UPnP
+   * advertises it transparently.
    */
   async maybeStart(): Promise<void> {
     if (this.server || !this.requestListener) {
@@ -99,7 +98,14 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     }
 
     const enabled = await this.databaseService.getOption(OPTIONS.CONNECT_ENABLED.name)
-    if (!(enabled === 'true' || enabled === true)) {
+    if (!isOptionEnabled(enabled)) {
+      return
+    }
+
+    /* Turning the direct path off leaves the listener down, so nothing answers on the server's own
+       hostname. Relayed traffic is unaffected — it arrives over the control channel. */
+    const directEnabled = await this.databaseService.getOption(OPTIONS.CONNECT_DIRECT_ENABLED.name)
+    if (!isOptionEnabled(directEnabled, true)) {
       return
     }
 
@@ -124,6 +130,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     } catch (error) {
       this.lastError = `Could not bind the Remote Access HTTPS listener: ${error}`
       Logger.error(this.lastError, 'HTTPS')
+      this.publish()
       return
     }
 
@@ -133,6 +140,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     this.port = (server.address() as AddressInfo).port
     this.certExpiresAt = readCertExpiry(certPem)
     this.lastError = null
+    this.publish()
     Logger.log(`Remote Access HTTPS listening on port ${this.port}`, 'HTTPS')
 
     const desiredExternalPort = configuredPort ?? crypto.randomInt(EXTERNAL_PORT_MIN, EXTERNAL_PORT_MAX)
@@ -158,6 +166,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
       ;(server as https.Server & { closeIdleConnections?: () => void }).closeIdleConnections?.()
     })
 
+    this.publish()
     Logger.log('Remote Access HTTPS listener stopped', 'HTTPS')
   }
 
@@ -176,6 +185,7 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     this.server.setSecureContext({ cert: certPem, key: keyPem })
     this.certExpiresAt = readCertExpiry(certPem)
     this.lastError = null
+    this.publish()
     Logger.log('Remote Access TLS certificate hot-reloaded', 'HTTPS')
   }
 
@@ -186,8 +196,14 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     } catch (error) {
       this.lastError = `Rejected invalid TLS certificate material: ${error}`
       Logger.error(this.lastError, 'HTTPS')
+      this.publish()
       return false
     }
+  }
+
+  // Mirrors the listener state into the store the status endpoint reads
+  private publish(): void {
+    this.statusStore.set(this.getStatus())
   }
 
   private async getConfiguredPort(): Promise<number | null> {

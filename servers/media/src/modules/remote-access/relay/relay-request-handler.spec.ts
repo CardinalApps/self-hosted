@@ -15,6 +15,7 @@ function makeSdk() {
     frames,
     sendRelayMessage: jest.fn((message: SentMessage) => { messages.push(message) }),
     sendRelayBinary: jest.fn((requestId: string, chunk: Uint8Array) => { frames.push({ requestId, chunk }) }),
+    isPathEnabled: jest.fn(async () => true),
   }
 }
 

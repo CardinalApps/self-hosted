@@ -36,6 +36,7 @@ export type ENV_VAR =
   'CARDINAL_ENABLE_DEV_ENDPOINTS' |
   'KIOSK_MODE' |
   'CONNECT_HOST' |
+  'CONNECT_RELAY_HOST' |
 
   // Publicly documented
   'CARDINAL_POSTGRES' |

@@ -3,6 +3,7 @@ import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } fro
 
 import { ConnectSDKService, ConnectWebSocket, getLocalIps } from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
+import { HttpsStatusStore } from './https-status.store'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
 import { DatabaseService } from '../../database/database.service'
 import { OPTIONS } from '../../../utils/options'
@@ -102,13 +103,15 @@ function makeService(dbOptions: Record<string, string> = ENABLED_OPTIONS) {
     sockets.push(ws)
     return ws as unknown as ConnectWebSocket
   })
+  const httpsStatusStore = new HttpsStatusStore()
   const service = new ConnectSDKService(
     db as unknown as DatabaseService,
     refresher as unknown as TokenRefresher,
     events,
+    httpsStatusStore,
     factory,
   )
-  return { service, db, refresher, events, factory, sockets }
+  return { service, db, refresher, events, factory, sockets, httpsStatusStore }
 }
 
 beforeEach(() => {

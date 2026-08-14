@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events'
 
 import { HttpsService } from './https.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
+import { HttpsStatusStore } from '../connect/https-status.store'
 import { DatabaseService } from '../../database/database.service'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
 import { OPTIONS } from '../../../utils/options'
@@ -69,9 +70,11 @@ function makeService(initialOptions: Record<string, string> = {}) {
     return server as never
   })
 
+  const statusStore = new HttpsStatusStore()
   const service = new HttpsService(
     db as unknown as DatabaseService,
     events,
+    statusStore,
     portMapper as unknown as PortMapperService,
     factory,
   )

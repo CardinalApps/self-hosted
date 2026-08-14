@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import * as os from 'os'
 import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common'
 
 import {
@@ -8,7 +10,7 @@ import {
   UpnpClientFactory,
 } from './port-mapper.types'
 import { DatabaseService } from '../../database/database.service'
-import { OPTIONS } from '../../../utils/options'
+import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 
 const LEASE_TTL_S = 30 * 60
 const RENEW_INTERVAL_MS = 20 * 60 * 1000
@@ -28,6 +30,7 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
   private renewTimer: NodeJS.Timeout | null = null
   private internalPort: number | null = null
   private externalPort: number | null = null
+  private desiredExternalPort: number | null = null
 
   constructor(
     private readonly databaseService: DatabaseService,
@@ -42,7 +45,7 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
   async onApplicationBootstrap(): Promise<void> {
     const enabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
 
-    if (!(enabled === 'true' || enabled === true)) {
+    if (!isOptionEnabled(enabled)) {
       this.status = { state: 'disabled' }
     }
   }
@@ -52,9 +55,14 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
    * otherwise. Never throws — a failed mapping is a status, not an error.
    */
   async mapIfEnabled(internalPort: number, desiredExternalPort: number): Promise<PortMapperStatus> {
+    /* Remembered before the enabled check so that turning port mapping on later can map
+       immediately, instead of waiting for the next listener restart to learn the ports. */
+    this.internalPort = internalPort
+    this.desiredExternalPort = desiredExternalPort
+
     const enabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
 
-    if (!(enabled === 'true' || enabled === true)) {
+    if (!isOptionEnabled(enabled)) {
       return this.status
     }
 
@@ -64,6 +72,27 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
       Logger.warn(`Port mapping failed unexpectedly: ${error}`, 'PortMapper')
       return this.status
     }
+  }
+
+  /**
+   * Persists the port mapping preference and acts on it now. Turning it on
+   * maps straight away when the HTTPS listener has already reported its port;
+   * otherwise the mapping waits for the listener to start.
+   */
+  async setEnabled(enabled: boolean): Promise<PortMapperStatus> {
+    if (!enabled) {
+      await this.disable()
+      return this.status
+    }
+
+    await this.databaseService.saveOption(OPTIONS.PORT_MAPPING_ENABLED.name, 'true')
+
+    if (this.internalPort === null || this.desiredExternalPort === null) {
+      this.setStatus({ state: 'not_attempted' })
+      return this.status
+    }
+
+    return await this.mapIfEnabled(this.internalPort, this.desiredExternalPort)
   }
 
   /**
@@ -92,7 +121,7 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
       try {
         await this.createMapping(candidatePort, internalPort)
       } catch (error) {
-        const reason = classifyMappingError(error)
+        const reason = this.refineFailureReason(classifyMappingError(error))
 
         if (reason === 'port_conflict') {
           continue
@@ -176,7 +205,8 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
     try {
       await this.createMapping(this.externalPort, this.internalPort)
     } catch (error) {
-      this.setStatus({ state: 'failed', reason: classifyMappingError(error), lastAttemptAt: new Date() })
+      const reason = this.refineFailureReason(classifyMappingError(error))
+      this.setStatus({ state: 'failed', reason, lastAttemptAt: new Date() })
       return
     }
 
@@ -217,6 +247,17 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
     })
   }
 
+  /* A container on a Docker bridge network cannot see the router: the UPnP discovery multicast never
+     leaves the bridge, so the gateway simply appears absent. Naming that case separately is what
+     lets the Admin app say "switch to host networking" instead of "no gateway found". */
+  private refineFailureReason(reason: PortMapperFailureReason): PortMapperFailureReason {
+    if (reason !== 'no_gateway') {
+      return reason
+    }
+
+    return looksLikeDockerBridge() ? 'docker_bridge' : reason
+  }
+
   private getClient(): UpnpClient {
     if (!this.client) {
       this.client = this.clientFactory()
@@ -241,6 +282,38 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
       Logger.log('Port mapping disabled', 'PortMapper')
     }
   }
+}
+
+/**
+ * Whether this process looks like it is running on a Docker bridge network,
+ * where UPnP can never work. Both signals are needed: host networking also
+ * reports `/.dockerenv`, and a plain host can legitimately use 172.16/12.
+ */
+export function looksLikeDockerBridge(
+  inContainer = fs.existsSync('/.dockerenv'),
+  interfaces = os.networkInterfaces(),
+): boolean {
+  if (!inContainer) {
+    return false
+  }
+
+  const addresses = Object.values(interfaces)
+    .flatMap((entries) => entries ?? [])
+    .filter((entry) => !entry.internal && entry.family === 'IPv4')
+    .map((entry) => entry.address)
+
+  return addresses.length > 0 && addresses.every(isDockerBridgeAddress)
+}
+
+// Whether an IPv4 address is inside 172.16.0.0/12, Docker's default bridge pool
+export function isDockerBridgeAddress(address: string): boolean {
+  const octets = address.split('.').map(Number)
+
+  if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet))) {
+    return false
+  }
+
+  return octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31
 }
 
 /**

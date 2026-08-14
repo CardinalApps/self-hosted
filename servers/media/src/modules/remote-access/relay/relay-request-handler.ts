@@ -5,6 +5,7 @@ import { HEADERS } from '@cardinalapps/remote-access/dist/cjs'
 
 import { ConnectSDKService } from '../connect/connect-sdk.service'
 import { ConnectSDKEvents } from '../connect/connect-sdk.events'
+import { OPTIONS } from '../../../utils/options'
 
 /* Defensive per-Media-Server ceiling. The Remote Access Server already
    enforces per-account limits; this protects the Media Server itself from a
@@ -29,6 +30,7 @@ type RelayEntry = {
 export class RelayRequestHandler implements OnApplicationBootstrap {
   private expressApp: ((req: http.IncomingMessage, res: http.ServerResponse) => void) | null = null
   private readonly inFlight = new Map<string, RelayEntry>()
+  private relayEnabled = true
 
   constructor(
     private readonly connectSDKService: ConnectSDKService,
@@ -36,13 +38,27 @@ export class RelayRequestHandler implements OnApplicationBootstrap {
   ) {}
 
   /**
-   * Subscribes to the relay events fanned out by the ConnectSDK.
+   * Subscribes to the relay events fanned out by the ConnectSDK, and tracks
+   * the owner's relay opt-out so dispatch can stay synchronous.
    */
   onApplicationBootstrap(): void {
     this.events.on('relay:http:request', (message) => this.handle(message.requestId, message))
     this.events.on('binary:frame', ({ requestId, chunk }) => this.feedBinary(requestId, chunk))
     this.events.on('relay:http:request:end', ({ requestId }) => this.feedEnd(requestId))
     this.events.on('relay:abort', ({ requestId, reason }) => this.abort(requestId, reason))
+    this.events.on('relay:changed', (enabled) => { this.relayEnabled = enabled })
+
+    void this.connectSDKService
+      .isPathEnabled(OPTIONS.CONNECT_RELAY_ENABLED.name)
+      .then((enabled) => { this.relayEnabled = enabled })
+  }
+
+  /**
+   * Sets whether relayed requests are accepted, for tests and for callers
+   * that change the setting without going through the event bus.
+   */
+  setRelayEnabled(enabled: boolean): void {
+    this.relayEnabled = enabled
   }
 
   /**
@@ -66,6 +82,13 @@ export class RelayRequestHandler implements OnApplicationBootstrap {
   handle(requestId: string, params: { method: string, path: string, headers: Record<string, string | string[]> }): void {
     if (!this.expressApp || this.inFlight.size >= MEDIA_MAX_INFLIGHT_RELAY) {
       this.reject(requestId, 503)
+      return
+    }
+
+    /* The owner turned the relay off. The Remote Access Server is told on register and stops
+       advertising the relay, but requests already in flight against a stale plan land here. */
+    if (!this.relayEnabled) {
+      this.reject(requestId, 403)
       return
     }
 

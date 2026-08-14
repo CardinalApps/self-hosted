@@ -12,7 +12,7 @@
     "en": "Popularity Data Pool"
   },
   "pdp.desc": {
-    "en": "Allow this Media Server to join the Popularity Data Pool to contribute anonymous play counts, and use the pool's trends in your Music and Cinema apps."
+    "en": "Allow this media server to join the Popularity Data Pool and contribute anonymous play counts. Your media apps will also use the pool's data with your own media to display trends."
   },
   "pdp.plays-contributed": {
     "en": "Plays contributed"
@@ -22,5 +22,32 @@
   },
   "pdp.confirm-disable.desc": {
     "en": "Leaving the Popularity Data Pool will disable trend data in your Music and Cinema apps."
+  },
+  "ra.title": {
+    "en": "Remote Access"
+  },
+  "ra.desc": {
+    "en": "Enable remote access for this media server so that you reach your self-hosted apps from anywhere."
+  },
+  "ra.direct.label": {
+    "en": "Enable direct remote connections"
+  },
+  "ra.relay.label": {
+    "en": "Enable metered relay connections"
+  },
+  "ra.request-access.title": {
+    "en": "Request beta access"
+  },
+  "ra.request-access.desc-p1": {
+    "en": "Remote Access is currently a beta feature that is available to a limited number of users. Once enabled, you will remain in a queue until there is room for your media server. There is a maximum of one (1) media server per user during the beta."
+  },
+  "ra.request-access.desc-p2": {
+    "en": "Inactive servers may be pruned from the beta. If that happens to you, feel free to queue up again."
+  },
+  "ra.confirm-disable.title": {
+    "en": "Disable Remote Access?"
+  },
+  "ra.confirm-disable.desc": {
+    "en": "This media server will stop being reachable from outside your network, and its remote URLs will stop working."
   }
 }

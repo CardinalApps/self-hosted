@@ -1,6 +1,6 @@
 import type { Client } from 'nat-upnp'
 
-export type PortMapperFailureReason = 'port_conflict' | 'no_gateway' | 'unknown'
+export type PortMapperFailureReason = 'port_conflict' | 'no_gateway' | 'docker_bridge' | 'unknown'
 
 export type PortMapperState = 'disabled' | 'not_attempted' | 'active' | 'failed'
 

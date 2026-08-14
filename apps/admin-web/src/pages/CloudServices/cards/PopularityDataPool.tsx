@@ -76,7 +76,7 @@ function PopularityDataPool() {
           disabled={!cloudLoggedIn || !canUpdate}
         />
       }
-      footer={criteriaNotice}
+      footer={enabled ? undefined : criteriaNotice}
     >
       <div className="description">
         <p>{i18n['pdp.desc'][lang]}</p>

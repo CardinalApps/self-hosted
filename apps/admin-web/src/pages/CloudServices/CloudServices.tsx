@@ -10,6 +10,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
 
 import PopularityDataPool from './cards/PopularityDataPool'
+import RemoteAccess from './cards/RemoteAccess'
 
 import i18n from './i18n.json'
 import './styles.css'
@@ -38,6 +39,7 @@ function CloudServices() {
     >
       <CardGrid rowHeight='l'>
         <PopularityDataPool />
+        <RemoteAccess />
       </CardGrid>
     </AppPage>
   )

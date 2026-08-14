@@ -2,4 +2,10 @@
   .description {
     margin-bottom: 10px;
   }
+
+  .remote-access-paths {
+    .item-list-item-name {
+      word-break: break-all;
+    }
+  }
 }

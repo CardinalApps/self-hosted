@@ -27,6 +27,9 @@ export type ConnectSDKEventPayloads = {
   'binary:frame': BinaryFramePayload,
   // Fires only on persisted enable/disable, never on transient disconnects
   'enabled:changed': boolean,
+  // Fire when the owner turns one connection path on or off on its own
+  'direct:changed': boolean,
+  'relay:changed': boolean,
 }
 
 /**
