@@ -166,13 +166,9 @@
       background-color: var(--border-color-3);
     }
 
+    /* Starts at the first dot rather than above it, and runs to the foot of the last release */
     &:first-of-type::before {
       top: 22px;
-    }
-
-    &:last-of-type::before {
-      bottom: auto;
-      height: 22px;
     }
   }
 
