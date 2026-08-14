@@ -1,0 +1,37 @@
+.remote-access-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-color-2);
+  white-space: nowrap;
+
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-color-2);
+  }
+
+  &[data-status="negotiating"] .indicator-dot {
+    animation: remote-access-indicator-pulse 1.2s ease-in-out infinite;
+  }
+
+  &[data-status="direct"] .indicator-dot {
+    background-color: var(--success);
+  }
+
+  &[data-status="relay"] .indicator-dot {
+    background-color: var(--warning);
+  }
+
+  &[data-status="error"] .indicator-dot {
+    background-color: var(--danger);
+  }
+}
+
+@keyframes remote-access-indicator-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}

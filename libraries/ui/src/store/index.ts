@@ -19,6 +19,7 @@ import jobsSlice from './slices/jobs'
 import layoutSlice from './slices/layout'
 import audioSlice from './slices/music'
 import librarySlice from './slices/library'
+import remoteAccessSlice from './slices/remoteAccess'
 
 /**
  * APIs
@@ -39,6 +40,7 @@ import logHTTPError from './middleware/logHTTPError'
  * Lifecycle
  */
 import musicBeforeStoreInit from './slices/music/lifecycle/beforeStoreInit'
+import remoteAccessBeforeStoreInit from './slices/remoteAccess/lifecycle/beforeStoreInit'
 
 /**
  * Utils
@@ -72,6 +74,7 @@ const slices = {
   [jobsSlice.reducerPath]: jobsSlice,
   [layoutSlice.reducerPath]: layoutSlice,
   [audioSlice.reducerPath]: audioSlice,
+  [remoteAccessSlice.reducerPath]: remoteAccessSlice,
   [baseHomeServerApi.reducerPath]: baseHomeServerApi,
 }
 
@@ -110,6 +113,7 @@ const createStore = () => {
   // Before store init lifecycle
   triggerLifecycle(preloadedState, [
     musicBeforeStoreInit,
+    remoteAccessBeforeStoreInit,
   ])
 
   const store = configureStore({
