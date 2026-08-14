@@ -12,26 +12,26 @@
   }
 
   .artist-hero-cols {
-    --artist-hero-height: 460px;
-
     display: flex;
     gap: calc(var(--gutter) * 2);
-    align-items: flex-start;
+    align-items: stretch;
   }
 
+  /* The lists set the card's height, and the map takes whatever that turns out to be */
   .artist-disk-map {
     flex: 1 1 0;
     min-width: 0;
     width: auto;
-    height: var(--artist-hero-height);
+    height: auto;
   }
 
   .artist-meta-pane {
-    flex: 1 1 0;
+    flex: 2 1 0;
     min-width: 0;
-    height: var(--artist-hero-height);
     display: flex;
     flex-direction: column;
+    /* The two meta columns collapse against the pane's own width, not the page's */
+    container: artist-meta-pane / inline-size;
   }
 
   .artist-meta-row {
@@ -49,12 +49,6 @@
   }
 
   .artist-meta {
-    min-height: 0;
-    flex-grow: 1;
-    overflow-y: auto;
-    /* Reserved up front, so a classic scrollbar doesn't reflow every right-aligned value the
-       moment the sections finish loading and the list outgrows the map. */
-    scrollbar-gutter: stable;
 
     .meta-section-title {
       margin-bottom: 8px;
@@ -67,6 +61,17 @@
         margin-top: var(--gutter);
       }
     }
+  }
+
+  .artist-meta-cols {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--gutter) * 2);
+  }
+
+  .artist-meta-col {
+    flex: 1;
+    min-width: 0;
   }
 
   .artist-meta-list {
@@ -348,24 +353,30 @@
       flex-direction: column;
     }
 
-    /* Stacked, the flex basis measures height instead of width, which would flatten the map */
+    /* Stacked, there is no neighbour to take a height from, so the map states its own again */
     .artist-disk-map {
       order: 2;
       flex: 0 0 auto;
       width: 100%;
+      height: 460px;
     }
 
-    /* Nothing left to match heights with once the map is out from beside it, so the list runs
-       its full length rather than scrolling inside the card. */
     .artist-meta-pane {
       flex: 0 0 auto;
       width: 100%;
-      height: auto;
+    }
+  }
+
+  /* Two lists of label/value pairs stop being readable side by side under about this width */
+  @container artist-meta-pane (max-width: 560px) {
+
+    .artist-meta-cols {
+      flex-direction: column;
+      gap: 0;
     }
 
-    .artist-meta {
-      overflow-y: visible;
-      scrollbar-gutter: auto;
+    .artist-meta-col:not(:first-child) .meta-section-title {
+      margin-top: var(--gutter);
     }
   }
 
