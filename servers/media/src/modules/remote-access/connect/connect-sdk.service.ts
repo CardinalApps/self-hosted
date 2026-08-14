@@ -34,6 +34,15 @@ export type ConnectWebSocket = Pick<WebSocket, 'send' | 'close' | 'terminate' | 
 export type ConnectWsFactory = (url: string) => ConnectWebSocket
 export const CONNECT_WS_FACTORY = 'CONNECT_WS_FACTORY'
 
+// A refusal from the cloud IDP while enabling, kept with its HTTP status so
+// the controller can pass meaningful refusals (like a full slot allowance)
+// through to the Admin app instead of flattening them into a 500
+export class CloudEnableError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message)
+  }
+}
+
 export const ENABLE_REMOTE_ACCESS = 'enable_remote_access'
 export const ENABLE_REMOTE_ACCESS_DIRECT = 'enable_remote_access_direct'
 export const ENABLE_REMOTE_ACCESS_RELAY = 'enable_remote_access_relay'
@@ -152,7 +161,10 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
 
     if (response.status !== 201) {
       const body = await response.json().catch(() => null)
-      throw new Error(body?.message || `Cloud IDP returned ${response.status} while issuing a server token`)
+      throw new CloudEnableError(
+        body?.message || `Cloud IDP returned ${response.status} while issuing a server token`,
+        response.status,
+      )
     }
 
     const body = await response.json()

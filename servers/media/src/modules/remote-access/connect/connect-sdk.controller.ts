@@ -1,7 +1,7 @@
-import { BadRequestException, Controller, Get, InternalServerErrorException, Post, Req } from '@nestjs/common'
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { BadRequestException, ConflictException, Controller, Get, InternalServerErrorException, Post, Req } from '@nestjs/common'
+import { ApiConflictResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
-import { ConnectSDKService } from './connect-sdk.service'
+import { CloudEnableError, ConnectSDKService } from './connect-sdk.service'
 import { ConnectStatusResponse } from './dtos/ConnectStatusResponse.dto'
 import { StandardEndpoint } from '../../../decorators/StandardEndpoint.decorator'
 import { getCardinalTolkienFromHeaders } from '../../../utils/jwt'
@@ -27,6 +27,7 @@ export class ConnectSDKController {
       400: ['The cloud account JWT header is missing'],
     },
   })
+  @ApiConflictResponse({ description: 'The cloud IDP refused: every server slot on the cloud account is occupied.' })
   @ApiOkResponse({ type: ConnectStatusResponse })
   async enable(@Req() req): Promise<ConnectStatusResponse> {
     const cloudJwt = getCardinalTolkienFromHeaders(req.headers)
@@ -38,6 +39,10 @@ export class ConnectSDKController {
     try {
       await this.connectSDKService.enable(cloudJwt)
     } catch (error) {
+      // The cloud's own refusals carry user-facing messages; pass them through
+      if (error instanceof CloudEnableError && error.status === 409) {
+        throw new ConflictException(error.message)
+      }
       throw new InternalServerErrorException(`Could not enable Remote Access: ${error.message}`)
     }
 

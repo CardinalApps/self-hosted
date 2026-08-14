@@ -19,6 +19,9 @@ export type SubscriptionTier = {
   provides: {
     seats: number,
     popularity_data_pool: boolean,
+    // How many Media Servers may hold an active Remote Access credential.
+    // Flat 1 on every tier while the relay cost model is unproven.
+    remote_access_slots: number,
   },
   prices: {
     // Use the "Lookup Key" in Stripe for each price
@@ -41,6 +44,7 @@ export const SUBSCRIPTIONS = {
     provides: {
       seats: 2,
       popularity_data_pool: true,
+      remote_access_slots: 1,
     },
     prices: {},
   },
@@ -55,6 +59,7 @@ export const SUBSCRIPTIONS = {
     provides: {
       seats: 10,
       popularity_data_pool: true,
+      remote_access_slots: 1,
     },
     prices: {
       monthly: 'early_adopter',
@@ -68,6 +73,7 @@ export const SUBSCRIPTIONS = {
     provides: {
       seats: 5,
       popularity_data_pool: true,
+      remote_access_slots: 1,
     },
     prices: {
       monthly: 'starter_monthly',
@@ -82,6 +88,7 @@ export const SUBSCRIPTIONS = {
     provides: {
       seats: 20,
       popularity_data_pool: true,
+      remote_access_slots: 1,
     },
     prices: {
       monthly: 'pro_monthly',
@@ -96,6 +103,7 @@ export const SUBSCRIPTIONS = {
     provides: {
       seats: 40,
       popularity_data_pool: true,
+      remote_access_slots: 1,
     },
     prices: {
       monthly: 'ultimate_monthly',
