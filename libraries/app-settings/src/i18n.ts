@@ -215,6 +215,12 @@ export default {
   "settings.enable-remote-access-relay.desc": {
     "en": "Let apps reach this Media Server through Cardinal's relay when a direct connection is not possible.",
   },
+  "settings.enable-remote-access-upnp.label": {
+    "en": "Automatic port forwarding (UPnP)",
+  },
+  "settings.enable-remote-access-upnp.desc": {
+    "en": "Ask your router to forward a port to this Media Server so direct connections can reach it.",
+  },
   "settings.inactive-session-timeout.label": {
     "en": "Session timeout",
   },

@@ -49,5 +49,95 @@
   },
   "ra.confirm-disable.desc": {
     "en": "This media server will stop being reachable from outside your network, and its remote URLs will stop working."
+  },
+  "ra.configure": {
+    "en": "Configure"
+  },
+  "ra.drawer.title": {
+    "en": "Configure Remote Access"
+  },
+  "ra.drawer.direct.title": {
+    "en": "Direct Connection"
+  },
+  "ra.drawer.relay.title": {
+    "en": "Relay Connection"
+  },
+  "ra.upnp.label": {
+    "en": "Automatic port forwarding (UPnP)"
+  },
+  "ra.upnp.status.active": {
+    "en": "Active"
+  },
+  "ra.upnp.status.failed": {
+    "en": "Failed"
+  },
+  "ra.upnp.status.waiting": {
+    "en": "Waiting for the HTTPS listener"
+  },
+  "ra.upnp.reason.port_conflict": {
+    "en": "No free external port on the router"
+  },
+  "ra.upnp.reason.no_gateway": {
+    "en": "No UPnP gateway found on this network"
+  },
+  "ra.upnp.reason.docker_bridge": {
+    "en": "Unavailable on this container network"
+  },
+  "ra.upnp.reason.unknown": {
+    "en": "Port mapping failed"
+  },
+  "ra.upnp.docker-bridge-banner": {
+    "en": "UPnP requires host networking. Switch your compose template to enable automatic port forwarding."
+  },
+  "ra.status.label": {
+    "en": "Connection"
+  },
+  "ra.status.connected": {
+    "en": "Active"
+  },
+  "ra.status.reconnecting": {
+    "en": "Reconnecting…"
+  },
+  "ra.status.auth-failed": {
+    "en": "Authorization failed"
+  },
+  "ra.auth-failed.desc": {
+    "en": "Cardinal Cloud rejected this media server's credentials. Sign in again to re-enable Remote Access."
+  },
+  "ra.auth-failed.cta": {
+    "en": "Sign in again"
+  },
+  "ra.https.label": {
+    "en": "HTTPS listener"
+  },
+  "ra.https.running": {
+    "en": "Running"
+  },
+  "ra.https.stopped": {
+    "en": "Stopped"
+  },
+  "ra.https.error": {
+    "en": "Error"
+  },
+  "ra.cors.title": {
+    "en": "Custom CORS origins"
+  },
+  "ra.cors.desc": {
+    "en": "Let your own web apps at these origins call this media server remotely."
+  },
+  "ra.cors.placeholder": {
+    "en": "https://example.com"
+  },
+  "ra.cors.invalid": {
+    "en": "Enter a valid http:// or https:// origin without a path"
+  },
+  "ra.cors.duplicate": {
+    "en": "That origin is already on the list"
+  },
+  "ra.cors.confirm-delete.title": {
+    "en": "Remove this origin?"
+  },
+  "ra.cors.confirm-delete.desc": {
+    "en": "Apps served from this origin will lose remote access to this media server."
   }
 }

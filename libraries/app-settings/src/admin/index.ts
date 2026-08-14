@@ -6,6 +6,7 @@ import { INACTIVE_SESSION_TIMEOUT_SLUG, inactiveSessionTimeoutFactory } from './
 import { ENABLE_REMOTE_ACCESS_SLUG, enableRemoteAccessFactory } from './enable_remote_access'
 import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG, enableRemoteAccessDirectFactory } from './enable_remote_access_direct'
 import { ENABLE_REMOTE_ACCESS_RELAY_SLUG, enableRemoteAccessRelayFactory } from './enable_remote_access_relay'
+import { ENABLE_REMOTE_ACCESS_UPNP_SLUG, enableRemoteAccessUpnpFactory } from './enable_remote_access_upnp'
 
 export const adminFields = {
   [SERVER_NAME_SLUG]: serverNameFactory,
@@ -16,4 +17,5 @@ export const adminFields = {
   [ENABLE_REMOTE_ACCESS_SLUG]: enableRemoteAccessFactory,
   [ENABLE_REMOTE_ACCESS_DIRECT_SLUG]: enableRemoteAccessDirectFactory,
   [ENABLE_REMOTE_ACCESS_RELAY_SLUG]: enableRemoteAccessRelayFactory,
+  [ENABLE_REMOTE_ACCESS_UPNP_SLUG]: enableRemoteAccessUpnpFactory,
 }

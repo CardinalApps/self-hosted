@@ -10,7 +10,11 @@ import {
   UpnpClientFactory,
 } from './port-mapper.types'
 import { DatabaseService } from '../../database/database.service'
+import { SettingsService } from '../../settings/settings.service'
+import { CardinalApp } from '../../../utils/apps'
 import { OPTIONS, isOptionEnabled } from '../../../utils/options'
+
+export const ENABLE_REMOTE_ACCESS_UPNP = 'enable_remote_access_upnp'
 
 const LEASE_TTL_S = 30 * 60
 const RENEW_INTERVAL_MS = 20 * 60 * 1000
@@ -34,6 +38,7 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
 
   constructor(
     private readonly databaseService: DatabaseService,
+    private readonly settingsService: SettingsService,
     @Inject(UPNP_CLIENT_FACTORY) private readonly clientFactory: UpnpClientFactory,
   ) {}
 
@@ -85,7 +90,7 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
       return this.status
     }
 
-    await this.databaseService.saveOption(OPTIONS.PORT_MAPPING_ENABLED.name, 'true')
+    await this.setEnabledState(true)
 
     if (this.internalPort === null || this.desiredExternalPort === null) {
       this.setStatus({ state: 'not_attempted' })
@@ -157,9 +162,19 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
    */
   async disable(): Promise<void> {
     await this.unmap()
-    await this.databaseService.saveOption(OPTIONS.PORT_MAPPING_ENABLED.name, 'false')
+    await this.setEnabledState(false)
     await this.databaseService.saveOption(OPTIONS.CONNECT_PUBLIC_PORT.name, '')
     this.setStatus({ state: 'disabled' })
+  }
+
+  /*
+   * Persists the enabled state and mirrors it into the setting the Admin app reads. The option
+   * stays authoritative for the server's own boot decisions; the setting exists so the toggle
+   * renders in the right position on first paint instead of flipping once a request comes back.
+   */
+  private async setEnabledState(enabled: boolean): Promise<void> {
+    await this.databaseService.saveOption(OPTIONS.PORT_MAPPING_ENABLED.name, String(enabled))
+    await this.settingsService.set(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS_UPNP]: enabled })
   }
 
   /**

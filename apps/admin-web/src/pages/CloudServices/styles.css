@@ -9,3 +9,37 @@
     }
   }
 }
+
+.configure-remote-access-drawer {
+  .item-list-item-name {
+    word-break: break-all;
+  }
+
+  .alert {
+    margin-top: 10px;
+  }
+
+  .cors-origins {
+    margin-top: 14px;
+
+    .cors-empty {
+      color: var(--text-color-2);
+    }
+
+    .cors-add {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .text-input {
+        flex: 1;
+      }
+
+      .app-icon {
+        cursor: pointer;
+      }
+    }
+
+  }
+}

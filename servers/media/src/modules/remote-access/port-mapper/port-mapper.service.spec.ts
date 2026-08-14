@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as os from 'os'
 
 import {
+  ENABLE_REMOTE_ACCESS_UPNP,
   PortMapperService,
   classifyMappingError,
   isDockerBridgeAddress,
@@ -9,6 +10,8 @@ import {
 } from './port-mapper.service'
 import { UpnpClient } from './port-mapper.types'
 import { DatabaseService } from '../../database/database.service'
+import { SettingsService } from '../../settings/settings.service'
+import { CardinalApp } from '../../../utils/apps'
 import { OPTIONS } from '../../../utils/options'
 
 type MappingResult = { error?: Error }
@@ -60,9 +63,14 @@ function makeService(initialOptions: Record<string, string> = {}) {
   const db = makeDb(initialOptions)
   const client = new FakeUpnpClient()
   const factory = jest.fn(() => client as unknown as UpnpClient)
-  const service = new PortMapperService(db as unknown as DatabaseService, factory)
+  const settings = { set: jest.fn(async () => []) }
+  const service = new PortMapperService(
+    db as unknown as DatabaseService,
+    settings as unknown as SettingsService,
+    factory,
+  )
 
-  return { service, client, factory, db }
+  return { service, client, factory, db, settings }
 }
 
 function conflictError() {
@@ -274,6 +282,16 @@ describe('setEnabled', () => {
     expect(status).toMatchObject({ state: 'not_attempted' })
     expect(client.mappingCalls).toHaveLength(0)
     expect(db.options[OPTIONS.PORT_MAPPING_ENABLED.name]).toBe('true')
+  })
+
+  it('mirrors the enabled state into the Admin setting', async () => {
+    const { service, settings } = makeService()
+
+    await service.setEnabled(true)
+    expect(settings.set).toHaveBeenLastCalledWith(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS_UPNP]: true })
+
+    await service.setEnabled(false)
+    expect(settings.set).toHaveBeenLastCalledWith(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS_UPNP]: false })
   })
 
   it('removes an active mapping when turned off', async () => {

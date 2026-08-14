@@ -6,12 +6,14 @@ import { PortMapperService } from './port-mapper.service'
 import { UPNP_CLIENT_FACTORY, UpnpClientFactory } from './port-mapper.types'
 
 import { DatabaseModule } from '../../database/database.module'
+import { SettingsModule } from '../../settings/settings.module'
 
 const defaultUpnpClientFactory: UpnpClientFactory = () => createClient()
 
 @Module({
   imports: [
     DatabaseModule,
+    SettingsModule,
   ],
   exports: [PortMapperService],
   providers: [

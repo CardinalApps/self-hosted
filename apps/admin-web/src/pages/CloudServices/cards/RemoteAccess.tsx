@@ -5,9 +5,9 @@ import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
+import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
 import List from '@cardinalapps/ui/src/components/interaction/List'
-import type { ListItem } from '@cardinalapps/ui/src/components/interaction/List/List'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import set from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
@@ -18,7 +18,6 @@ import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
 
 import {
-  useGetConnectStatusQuery,
   useEnableRemoteAccessMutation,
   useDisableRemoteAccessMutation,
 } from '@cardinalapps/ui/src/store/apis/remoteAccess'
@@ -27,24 +26,9 @@ import { ENABLE_REMOTE_ACCESS_SLUG } from '@cardinalapps/app-settings/src/admin/
 import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_direct'
 import { ENABLE_REMOTE_ACCESS_RELAY_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_relay'
 
+import ConfigureRemoteAccessDrawer from '../ConfigureRemoteAccessDrawer'
+
 import i18n from '../i18n.json'
-
-const STATUS_POLL_MS = 5000
-
-// A copyable row for a connection URL, or nothing when that path is off or unassigned
-function urlItem(value: string, url: string | null | undefined): ListItem[] {
-  if (!url) {
-    return []
-  }
-
-  return [{
-    value,
-    name: url,
-    title: url,
-    copyable: url,
-    controls: ['copy'],
-  }]
-}
 
 // Card for the Remote Access cloud service
 function RemoteAccess() {
@@ -54,18 +38,12 @@ function RemoteAccess() {
   const cloudLoggedIn = useSelector(cloudUserSelectors.loggedIn)
   const canUpdate = useHasCapability('ServerSettings.Update')
 
-  /* Only the hostname and URLs come from here. The switches read the settings slice, which is
-     seeded and persisted client-side, so they paint in the right position instead of flipping. */
-  const { data: status } = useGetConnectStatusQuery(undefined, {
-    skip: !canUpdate,
-    pollingInterval: STATUS_POLL_MS,
-  })
-
   const [enableRemoteAccess] = useEnableRemoteAccessMutation()
   const [disableRemoteAccess] = useDisableRemoteAccessMutation()
 
   const [showRequestAccess, setShowRequestAccess] = useState(false)
   const [showConfirmDisable, setShowConfirmDisable] = useState(false)
+  const [showConfigure, setShowConfigure] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const enabled = settings[ENABLE_REMOTE_ACCESS_SLUG] === true
@@ -114,7 +92,14 @@ function RemoteAccess() {
           disabled={!cloudLoggedIn || !canUpdate}
         />
       }
-      footer={enabled ? undefined : i18n['cloud-service.criteria.free'][lang]}
+      footer={enabled
+        ? (
+          <Button type="button" onClick={() => setShowConfigure(true)}>
+            {i18n['ra.configure'][lang]}
+          </Button>
+        )
+        : i18n['cloud-service.criteria.free'][lang]
+      }
     >
       <div className="description">
         <p>{i18n['ra.desc'][lang]}</p>
@@ -136,7 +121,6 @@ function RemoteAccess() {
               />
             ),
           },
-          ...urlItem('direct-url', directEnabled ? status?.directUrl : null),
           {
             value: 'relay',
             name: i18n['ra.relay.label'][lang],
@@ -149,7 +133,6 @@ function RemoteAccess() {
               />
             ),
           },
-          ...urlItem('relay-url', relayEnabled ? status?.relayUrl : null),
         ]}
       />
 
@@ -187,6 +170,10 @@ function RemoteAccess() {
             }
           }}
         />
+      )}
+
+      {showConfigure && (
+        <ConfigureRemoteAccessDrawer onClose={() => setShowConfigure(false)} />
       )}
     </CardGrid.Card>
   )
