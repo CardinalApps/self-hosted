@@ -135,6 +135,7 @@ describe('relay streaming against a minimal Express app', () => {
     const sdk = {
       sendRelayMessage: (message: SentMessage) => { capture.messages.push(message) },
       sendRelayBinary: (requestId: string, chunk: Uint8Array) => { capture.frames.push({ requestId, chunk }) },
+      isPathEnabled: async () => true,
     }
     const events = new ConnectSDKEvents()
     handler = new RelayRequestHandler(sdk as unknown as ConnectSDKService, events)
