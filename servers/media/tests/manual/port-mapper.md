@@ -29,8 +29,9 @@ mock the `nat-upnp` library entirely; this runbook covers the real thing.
 2. Start the Media Server and watch the logs for
    `[HTTPS] Remote Access HTTPS listening on port <port>` followed by one of:
    - `[PortMapper] Port mapping active: <externalIp>:<externalPort>` — success.
-     Unless `connect_https_port` is set, both the internal and external ports
-     are randomized (internal is OS-assigned, external is drawn from
+     Unless a port is pinned (`CONNECT_HTTPS_PORT`, or the stored
+     `connect_https_port`), both the internal and external ports are
+     randomized (internal is OS-assigned, external is drawn from
      20000–60000).
    - `[PortMapper] Port mapping failed: <reason>` — see the reason table below.
 
@@ -49,7 +50,7 @@ mock the `nat-upnp` library entirely; this runbook covers the real thing.
 5. Verify renewal: wait 20 minutes and check that `leaseExpiresAt` in the
    status response has moved forward.
 
-6. Verify port conflicts: set `connect_https_port` to a port that already has
+6. Verify port conflicts: set `CONNECT_HTTPS_PORT` to a port that already has
    a manual forward on the router (or a second mapped service), restart the
    Media Server, and expect the external mapping to land one port above.
 

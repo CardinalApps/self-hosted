@@ -19,6 +19,7 @@ import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
 import { HttpsStatus, HttpsStatusStore } from './https-status.store'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
+import { getPinnedHttpsPort, resolvePublicPort, toPort } from '../ports'
 import { SettingsService } from '../../settings/settings.service'
 import { SettingsEvents, SettingsChangedEventPayload } from '../../settings/events'
 import { SettingName } from '../../settings/types'
@@ -279,8 +280,8 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const signingKey = await this.databaseService.getOption(OPTIONS.CONNECT_SIGNING_KEY.name)
     const tokenExpiresAt = await this.tokenRefresher.getServerTokenExpiry()
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
-    const publicPortOption = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
-    const publicPort = publicPortOption ? Number(publicPortOption) : null
+    // No fallback here: the UI should say nothing rather than name a port nobody can be reached on
+    const publicPort = await this.getPublicPort(null)
 
     return {
       enabled: isOptionEnabled(enabled),
@@ -295,6 +296,19 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       relayUrl: instanceId ? `https://${envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}` : null,
       https: this.httpsStatusStore.get(),
     }
+  }
+
+  // The externally reachable port; see resolvePublicPort for how the sources rank
+  private async getPublicPort(fallbackPort: number | null): Promise<number | null> {
+    const mappedPort = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
+    const upnpEnabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
+
+    return resolvePublicPort({
+      mappedPort: toPort(mappedPort),
+      upnpEnabled: isOptionEnabled(upnpEnabled),
+      pinnedPort: getPinnedHttpsPort(),
+      fallbackPort,
+    })
   }
 
   /*
@@ -346,10 +360,8 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
   private async sendRegister(): Promise<void> {
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
     const byoHostname = await this.databaseService.getOption(OPTIONS.CONNECT_BYO_HOSTNAME.name)
-    const publicPortOption = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
-    const publicPort = publicPortOption
-      ? Number(publicPortOption)
-      : Number(envVar('CARDINAL_HOME_SERVER_PORT', 3080))
+    const fallbackPort = Number(envVar('CARDINAL_HOME_SERVER_PORT', 3080))
+    const publicPort = (await this.getPublicPort(fallbackPort)) ?? fallbackPort
 
     this.sendMessage({
       type: 'register',

@@ -65,7 +65,8 @@ export type ENV_VAR =
   'RESET_LOCAL_USER_PW' |
   'SQLITE_WAL' |
   'SQLITE_PATH' |
-  'SECURE_COOKIES'
+  'SECURE_COOKIES' |
+  'CONNECT_HTTPS_PORT'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.

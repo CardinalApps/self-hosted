@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars -- tests drive the advertised port through the real env vars */
 import { EventEmitter } from 'node:events'
 import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } from '@cardinalapps/remote-access/dist/cjs'
 
@@ -557,6 +558,71 @@ describe('ConnectSDKService enabled setting', () => {
   })
 })
 
+describe('the advertised public port', () => {
+  afterEach(() => {
+    delete process.env.CONNECT_HTTPS_PORT
+    delete process.env.CARDINAL_HOME_SERVER_PORT
+  })
+
+  // Registers and returns the register message the server would have received
+  async function register(dbOptions: Record<string, string>) {
+    const { service, sockets } = makeService({ ...ENABLED_OPTIONS, ...dbOptions })
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    return sockets[0].sentMessages().find((m) => m.type === 'register')
+  }
+
+  it('is the pinned port when UPnP is off', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+
+    expect((await register({}))!.publicPort).toBe(8443)
+  })
+
+  // The stale value describes a router mapping that no longer exists
+  it('ignores a public port left behind by an earlier UPnP run', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+
+    const message = await register({ [OPTIONS.CONNECT_PUBLIC_PORT.name]: '24901' })
+
+    expect(message!.publicPort).toBe(8443)
+  })
+
+  it('is the mapped port while UPnP is on', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+
+    const message = await register({
+      [OPTIONS.PORT_MAPPING_ENABLED.name]: 'true',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '24901',
+    })
+
+    expect(message!.publicPort).toBe(24901)
+  })
+
+  it('is the mapped port when nothing is pinned', async () => {
+    const message = await register({ [OPTIONS.CONNECT_PUBLIC_PORT.name]: '24901' })
+
+    expect(message!.publicPort).toBe(24901)
+  })
+
+  it('falls back to the server port when nothing is pinned or mapped', async () => {
+    process.env.CARDINAL_HOME_SERVER_PORT = '3080'
+
+    expect((await register({}))!.publicPort).toBe(3080)
+  })
+
+  it('is ignored when the pinned value is unusable', async () => {
+    process.env.CONNECT_HTTPS_PORT = 'not-a-port'
+
+    const message = await register({ [OPTIONS.CONNECT_PUBLIC_PORT.name]: '24901' })
+
+    expect(message!.publicPort).toBe(24901)
+  })
+})
+
 describe('ConnectSDKService connection URLs', () => {
   it('has no URLs before a hostname is assigned', async () => {
     const { service } = makeService({ [OPTIONS.CONNECT_ENABLED.name]: 'true' })
@@ -578,6 +644,20 @@ describe('ConnectSDKService connection URLs', () => {
 
     expect(status.directUrl).toBe('https://instance-1234.connect.cardinalapps.host:31000')
     expect(status.publicPort).toBe(31000)
+  })
+
+  it('builds the direct URL from the pinned port', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'instance-1234.connect.cardinalapps.host',
+    })
+
+    const status = await service.getStatus()
+    delete process.env.CONNECT_HTTPS_PORT
+
+    expect(status.publicPort).toBe(8443)
+    expect(status.directUrl).toBe('https://instance-1234.connect.cardinalapps.host:8443')
   })
 
   it('omits the port from the direct URL when it is 443', async () => {

@@ -1,3 +1,4 @@
+/* eslint-disable turbo/no-undeclared-env-vars -- tests pin the listener port through the real env var */
 import * as fs from 'fs'
 import * as path from 'path'
 import { EventEmitter } from 'node:events'
@@ -159,6 +160,57 @@ describe('startup', () => {
     expect(factory).not.toHaveBeenCalled()
     expect(service.getStatus().state).toBe('error')
     expect(service.getStatus().lastError).toContain('Rejected invalid TLS certificate material')
+  })
+})
+
+describe('the pinned port env var', () => {
+  afterEach(() => {
+    delete process.env.CONNECT_HTTPS_PORT
+  })
+
+  it('binds the port the deployment pinned', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+    const { service, servers, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(servers[0].listenedPort).toBe(8443)
+    expect(service.getStatus()).toMatchObject({ state: 'running', port: 8443 })
+  })
+
+  it('outranks the stored option', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+    const { service, servers, listener } = makeService({
+      ...ENABLED_WITH_CERT,
+      [OPTIONS.CONNECT_HTTPS_PORT.name]: '31234',
+    })
+
+    service.attach(listener)
+    await flush()
+
+    expect(servers[0].listenedPort).toBe(8443)
+  })
+
+  it('is the desired external port for the port mapper', async () => {
+    process.env.CONNECT_HTTPS_PORT = '8443'
+    const { service, portMapper, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(portMapper.mapIfEnabled).toHaveBeenCalledWith(8443, 8443)
+  })
+
+  it('falls back to an OS-assigned port when the value is unusable', async () => {
+    process.env.CONNECT_HTTPS_PORT = 'not-a-port'
+    const { service, servers, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(servers[0].listenedPort).toBe(0)
+    expect(service.getStatus()).toMatchObject({ state: 'running', port: 45678 })
   })
 })
 

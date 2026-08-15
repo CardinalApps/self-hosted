@@ -36,6 +36,9 @@ type ReceivedConnection = {
   messages: Record<string, unknown>[],
 }
 
+// Nothing binds it here; the listener is only started by the specs that attach it
+const PINNED_HTTPS_PORT = 8443
+
 describe('ConnectSDK (integration)', () => {
   let testApp: TestApp
   let service: ConnectSDKService
@@ -62,6 +65,8 @@ describe('ConnectSDK (integration)', () => {
 
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.CONNECT_HOST = `127.0.0.1:${wssPort}`
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    process.env.CONNECT_HTTPS_PORT = String(PINNED_HTTPS_PORT)
 
     testApp = await createTestApp()
     service = testApp.moduleRef.get(ConnectSDKService)
@@ -81,6 +86,7 @@ describe('ConnectSDK (integration)', () => {
   })
 
   afterAll(async () => {
+    delete process.env.CONNECT_HTTPS_PORT
     await service?.disconnect()
     await testApp?.app.close()
     await new Promise((resolve) => wss.close(resolve))
@@ -95,7 +101,7 @@ describe('ConnectSDK (integration)', () => {
 
     const register = await waitFor(() => connection.messages.find((m) => m.type === 'register'))
     expect(register.instanceId).toBe('itest-instance-1')
-    expect(typeof register.publicPort).toBe('number')
+    expect(register.publicPort).toBe(PINNED_HTTPS_PORT)
     expect(register.version).toBeTruthy()
 
     connection.socket.send(JSON.stringify({

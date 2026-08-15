@@ -10,6 +10,7 @@ import { ConnectSDKEvents } from '../connect/connect-sdk.events'
 import { HttpsStatus, HttpsStatusStore } from '../connect/https-status.store'
 import { ConnectSDKService, ENABLE_REMOTE_ACCESS_DIRECT } from '../connect/connect-sdk.service'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
+import { getPinnedHttpsPort, toPort } from '../ports'
 import { OPTIONS, isOptionEnabled } from '../../../utils/options'
 
 // The subset of the https server the service uses; injectable so tests can
@@ -89,10 +90,10 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
 
   /**
    * Starts the listener when Remote Access and the direct path are both
-   * enabled and full cert material is stored; no-op otherwise. A user-pinned
-   * `connect_https_port` is bound exactly (manual port-forwarding needs a
-   * stable target); otherwise the OS assigns a random free port and UPnP
-   * advertises it transparently.
+   * enabled and full cert material is stored; no-op otherwise. A port pinned
+   * with `CONNECT_HTTPS_PORT` (or the stored `connect_https_port`) is bound
+   * exactly, because manual port-forwarding needs a stable target; otherwise
+   * the OS assigns a random free port and UPnP advertises it transparently.
    */
   async maybeStart(): Promise<void> {
     if (this.server || !this.requestListener) {
@@ -207,11 +208,9 @@ export class HttpsService implements OnApplicationBootstrap, OnApplicationShutdo
     this.statusStore.set(this.getStatus())
   }
 
+  // The env var is deployment truth, so it outranks anything stored on the host
   private async getConfiguredPort(): Promise<number | null> {
-    const value = await this.databaseService.getOption(OPTIONS.CONNECT_HTTPS_PORT.name)
-    const port = Number(value)
-
-    return value && Number.isInteger(port) && port > 0 && port <= 65535 ? port : null
+    return getPinnedHttpsPort() ?? toPort(await this.databaseService.getOption(OPTIONS.CONNECT_HTTPS_PORT.name))
   }
 }
 
