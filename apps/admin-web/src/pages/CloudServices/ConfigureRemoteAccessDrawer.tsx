@@ -41,6 +41,10 @@ import i18n from './i18n.json'
 const STATUS_POLL_MS = 5000
 const PORT_MAPPER_POLL_MS = 30000
 
+/* The port mapper works but has never been validated against real routers, so the surface stays
+   hidden while the whole server-side implementation keeps shipping. Flip this to reveal it. */
+const SHOW_UPNP = false
+
 // A copyable row for a connection URL, or nothing when that path is off or unassigned
 function urlItem(value: string, url: string | null | undefined): ListItem[] {
   if (!url) {
@@ -97,7 +101,7 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
     pollingInterval: STATUS_POLL_MS,
   })
   const { data: portMapper } = useGetPortMapperStatusQuery(undefined, {
-    skip: !canUpdate,
+    skip: !canUpdate || !SHOW_UPNP,
     pollingInterval: PORT_MAPPER_POLL_MS,
   })
   const { data: corsOrigins } = useGetCorsOriginsQuery(undefined, { skip: !canUpdate })
@@ -215,7 +219,7 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
             items={[
               ...urlItem('direct-url', directEnabled ? status?.directUrl : null),
               ...(status ? httpsItem(status.https) : []),
-              {
+              ...(SHOW_UPNP ? [{
                 value: 'upnp',
                 name: i18n['ra.upnp.label'][lang],
                 label: (
@@ -226,12 +230,12 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
                     onChange={(value) => setUpnp(value)}
                   />
                 ),
-              },
-              ...(upnpEnabled && portMapper ? upnpStatusItem(portMapper) : []),
+              }] : []),
+              ...(SHOW_UPNP && upnpEnabled && portMapper ? upnpStatusItem(portMapper) : []),
             ]}
           />
 
-          {portMapper?.state === 'failed' && portMapper.reason === 'docker_bridge' && (
+          {SHOW_UPNP && portMapper?.state === 'failed' && portMapper.reason === 'docker_bridge' && (
             <Alert
               type="info"
               message={i18n['ra.upnp.docker-bridge-banner'][lang]}
