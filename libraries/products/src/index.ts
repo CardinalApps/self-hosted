@@ -1,3 +1,9 @@
 import Subscriptions from './subscriptions'
+import serviceAccessFeatures from './serviceAccess'
 
-export { Subscriptions }
+export { Subscriptions, serviceAccessFeatures }
+export type {
+  ServiceAccessStatus,
+  ServiceAccessMode,
+  ServiceAccessFeatureDefinition,
+} from './serviceAccess'
