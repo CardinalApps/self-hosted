@@ -53,6 +53,14 @@ export const ENABLE_REMOTE_ACCESS_RELAY = 'enable_remote_access_relay'
 // The cloud IDP's code for "this account has no approved access to a Remote Access feature yet"
 export const SERVICE_ACCESS_REQUIRED = 'service_access_required'
 
+// Refused mints that are the cloud having a bad minute rather than an answer about the account
+const TRANSIENT_MINT_STATUSES = [408, 425, 429]
+
+// Whether a refused mint is the cloud's last word on this account, which is what ends a held-open wait
+function isFinalMintRefusal(status: number): boolean {
+  return status < 500 && !TRANSIENT_MINT_STATUSES.includes(status)
+}
+
 const PING_INTERVAL_MS = 30_000
 const PONG_TIMEOUT_MS = 90_000
 const RECONNECT_BASE_MS = 1_000
@@ -191,6 +199,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       this.manualStop = false
       this.pendingEnableJwt = cloudJwt
       this.setState('not_approved')
+      await this.recordEnableIntent(true)
       this.scheduleSlowRetry()
       Logger.log('Remote Access is waiting on cloud service access approval', 'ConnectSDK')
     }
@@ -259,7 +268,18 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       return
     }
 
+    /* An approval can be days away, so only the cloud actually answering about this account ends the
+     * wait. A 5xx or a rate limit is the cloud having a bad minute, and giving up on one of those
+     * would leave the eventual approval with nobody waiting for it.
+     */
+    if (!isFinalMintRefusal(response.status)) {
+      Logger.warn(`The cloud IDP returned ${response.status} while waiting on Remote Access approval; still waiting`, 'ConnectSDK')
+      this.scheduleSlowRetry()
+      return
+    }
+
     this.pendingEnableJwt = null
+    await this.recordEnableIntent(false)
     Logger.warn(`Stopped waiting on Remote Access approval: the cloud IDP returned ${response.status}`, 'ConnectSDK')
   }
 
@@ -407,6 +427,15 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     await this.databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, String(enabled))
     await this.settingsService.set(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS]: enabled })
     this.events.emit('enabled:changed', enabled)
+  }
+
+  /*
+   * Records that the owner asked for Remote Access, in the one place the Admin app looks. Only the
+   * setting moves: the option stays where it is because there is no channel to bring up on boot
+   * until a server token exists, and the toggle would otherwise be the only way out of the queue.
+   */
+  private async recordEnableIntent(enabled: boolean): Promise<void> {
+    await this.settingsService.set(CardinalApp.ADMIN, { [ENABLE_REMOTE_ACCESS]: enabled })
   }
 
   /**

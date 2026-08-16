@@ -128,6 +128,10 @@ const cloudResponses = {
   minted: (serverToken = 'server-token') => ({ status: 201, json: async () => ({ serverToken }) }),
   gated: () => ({ status: 403, json: async () => ({ message: 'Access has not been approved.', code: SERVICE_ACCESS_REQUIRED }) }),
   slotsExhausted: () => ({ status: 409, json: async () => ({ message: 'Every server slot is in use.', code: 'server_slots_exhausted' }) }),
+  suspended: () => ({ status: 403, json: async () => ({ message: 'This account is suspended.', code: 'account_suspended' }) }),
+  expiredJwt: () => ({ status: 401, json: async () => ({ message: 'Invalid or expired token.' }) }),
+  serverError: () => ({ status: 500, json: async () => ({ message: 'Something went wrong.' }) }),
+  rateLimited: () => ({ status: 429, json: async () => ({ message: 'Slow down.' }) }),
 }
 
 // Flushes pending microtasks without advancing fake timers
@@ -677,8 +681,8 @@ describe('ConnectSDKService enable', () => {
 
   /* The refusal is the queue entry, so the server waits it out instead of making the owner
      come back and try again. */
-  it('reports the gate refusal with its code and leaves the enabled state alone', async () => {
-    const { service, db, settings } = makeService(DISABLED_OPTIONS)
+  it('reports the gate refusal with its code', async () => {
+    const { service } = makeService(DISABLED_OPTIONS)
     mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
 
     await expect(service.enable('admin-jwt')).rejects.toMatchObject({
@@ -687,8 +691,42 @@ describe('ConnectSDKService enable', () => {
     })
 
     expect((await service.getStatus()).state).toBe('not_approved')
-    expect(settings.set).not.toHaveBeenCalled()
+  })
+
+  /* Asking is the whole of the owner's part, so the toggle they flipped stays where they left it.
+     The option behind it does not move: there is no channel to bring up until the mint succeeds. */
+  it('records the ask in the setting the Admin app reads while the wait runs', async () => {
+    const { service, db, settings } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+
+    await expect(service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(true)
     expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBeUndefined()
+  })
+
+  // Turning the toggle back off is the only way out of the queue, so it has to end the wait
+  it('clears the setting and stops waiting when the owner turns it off again', async () => {
+    const { service, settings } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+
+    await expect(service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(true)
+
+    await service.disable()
+    await advance(SLOW_RETRY_MS * 2)
+
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(false)
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves the setting off when the refusal is not something waiting can fix', async () => {
+    const { service, settings } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.slotsExhausted())
+
+    await expect(service.enable('admin-jwt')).rejects.toMatchObject({ status: 409 })
+
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBeUndefined()
   })
 
   it('finishes enabling when a later retry finds the account approved', async () => {
@@ -737,6 +775,92 @@ describe('ConnectSDKService enable', () => {
     await advance(SLOW_RETRY_MS)
 
     expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(1)
+  })
+})
+
+/*
+ * What survives a held-open wait. Approval can be days away, and a cloud that hiccups in the middle
+ * of it is not an answer — only the cloud actually deciding something ends the wait.
+ */
+describe('ConnectSDKService held-open enable', () => {
+  const DISABLED_OPTIONS = { [OPTIONS.INSTANCE_ID.name]: 'instance-1234' }
+
+  beforeEach(() => {
+    mockedFetchAuthAPI.mockReset()
+  })
+
+  // Starts a wait and returns the harness with the gate refusal already delivered
+  async function waiting() {
+    const harness = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+    await expect(harness.service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+    return harness
+  }
+
+  it.each([
+    ['a server error', () => cloudResponses.serverError()],
+    ['a rate limit', () => cloudResponses.rateLimited()],
+  ])('keeps waiting through %s', async (_label, response) => {
+    const { service, settings } = await waiting()
+
+    mockedFetchAuthAPI.mockResolvedValue(response())
+    await advance(SLOW_RETRY_MS)
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(2)
+
+    // The wait is still live: an approval that lands next time still takes effect
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.minted('approved-token'))
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(3)
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(true)
+    expect((await service.getStatus()).state).not.toBe('not_approved')
+  })
+
+  it('keeps waiting when the cloud cannot be reached at all', async () => {
+    await waiting()
+
+    mockedFetchAuthAPI.mockRejectedValue(new Error('fetch failed'))
+    await advance(SLOW_RETRY_MS)
+
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(3)
+  })
+
+  /* The admin's cloud JWT is what the wait is spending, and it does not last forever. Once it is no
+     longer accepted there is nothing left to retry with, so the wait ends and the owner decides. */
+  it('stops waiting once the admin cloud token is no longer accepted', async () => {
+    const { service, settings } = await waiting()
+
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.expiredJwt())
+    await advance(SLOW_RETRY_MS)
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(2)
+    expect((await service.getStatus()).state).toBe('not_approved')
+    // Nothing is waiting any more, so the toggle must not go on claiming otherwise
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(false)
+  })
+
+  it('stops waiting on a refusal that is not the access gate', async () => {
+    await waiting()
+
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.suspended())
+    await advance(SLOW_RETRY_MS)
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(2)
+  })
+
+  it('stops waiting when every server slot is taken', async () => {
+    await waiting()
+
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.slotsExhausted())
+    await advance(SLOW_RETRY_MS)
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(2)
   })
 })
 
