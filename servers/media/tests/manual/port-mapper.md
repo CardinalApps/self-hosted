@@ -27,12 +27,12 @@ mock the `nat-upnp` library entirely; this runbook covers the real thing.
    ```
 
 2. Start the Media Server and watch the logs for
-   `[HTTPS] Remote Access HTTPS listening on port <port>` followed by one of:
+   `[HTTPS] Remote Access is answering TLS on port <port>` followed by one of:
    - `[PortMapper] Port mapping active: <externalIp>:<externalPort>` — success.
      Unless a port is pinned (`CONNECT_HTTPS_PORT`, or the stored
-     `connect_https_port`), both the internal and external ports are
-     randomized (internal is OS-assigned, external is drawn from
-     20000–60000).
+     `connect_https_port`), the internal port is the main server port
+     (`CARDINAL_HOME_SERVER_PORT`) and the external port is drawn from
+     20000–60000.
    - `[PortMapper] Port mapping failed: <reason>` — see the reason table below.
 
 3. Verify the status endpoint (admin JWT required):

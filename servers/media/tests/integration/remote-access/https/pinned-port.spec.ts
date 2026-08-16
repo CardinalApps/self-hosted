@@ -5,6 +5,7 @@ import * as tls from 'tls'
 
 import { createTestApp, destroyTestApp, TestApp } from '../../../helpers/create-app'
 import { HttpsService } from '../../../../src/modules/remote-access/https/https.service'
+import { MuxService } from '../../../../src/modules/remote-access/mux/mux.service'
 import { DatabaseService } from '../../../../src/modules/database/database.service'
 import { OPTIONS } from '../../../../src/utils/options'
 
@@ -14,7 +15,9 @@ const KEY_A = fs.readFileSync(path.join(FIXTURES, 'key-a.pem'), 'utf8')
 
 let testApp: TestApp
 let httpsService: HttpsService
+let muxService: MuxService
 let pinnedPort: number
+let mainPort: number
 
 // Borrows a free port from the OS, then hands it back for the listener to claim
 async function findFreePort(): Promise<number> {
@@ -24,6 +27,30 @@ async function findFreePort(): Promise<number> {
   await new Promise<void>((resolve) => probe.close(() => resolve()))
 
   return port
+}
+
+// Sends a request over an established TLS socket and returns the response head
+function requestOverSocket(socket: tls.TLSSocket, urlPath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let response = ''
+    const onData = (chunk: Buffer) => {
+      response += chunk.toString()
+      if (response.includes('\r\n\r\n')) {
+        socket.off('data', onData)
+        resolve(response)
+      }
+    }
+    socket.on('data', onData)
+    socket.once('error', reject)
+    socket.write(`GET ${urlPath} HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: keep-alive\r\n\r\n`)
+  })
+}
+
+function connectTls(port: number): Promise<tls.TLSSocket> {
+  return new Promise((resolve, reject) => {
+    const socket = tls.connect({ host: '127.0.0.1', port, rejectUnauthorized: false }, () => resolve(socket))
+    socket.once('error', reject)
+  })
 }
 
 async function startListener(): Promise<void> {
@@ -46,6 +73,8 @@ beforeAll(async () => {
   process.env.CONNECT_HTTPS_PORT = String(pinnedPort)
 
   testApp = await createTestApp()
+  muxService = testApp.moduleRef.get(MuxService)
+  mainPort = await muxService.listen(0, testApp.app.getHttpServer(), '127.0.0.1')
   await startListener()
 }, 90000)
 
@@ -54,32 +83,27 @@ afterAll(async () => {
   await destroyTestApp(testApp)
 })
 
-describe('Remote Access HTTPS listener with a pinned port', () => {
-  it('binds the pinned port instead of an OS-assigned one', () => {
+/* Pinning is legacy: the main port answers TLS on its own now. It keeps working for deployments
+   whose external TLS port has to differ from the main one. */
+describe('Remote Access HTTPS with a pinned port', () => {
+  it('binds the pinned port as well as the main one', () => {
     expect(httpsService.getStatus()).toMatchObject({ state: 'running', port: pinnedPort })
+    expect(pinnedPort).not.toBe(mainPort)
   })
 
   it('serves the API on the pinned port', async () => {
-    const socket = await new Promise<tls.TLSSocket>((resolve, reject) => {
-      const attempt = tls.connect({ host: '127.0.0.1', port: pinnedPort, rejectUnauthorized: false }, () => resolve(attempt))
-      attempt.once('error', reject)
-    })
+    const socket = await connectTls(pinnedPort)
 
-    const response = await new Promise<string>((resolve, reject) => {
-      let received = ''
-      const onData = (chunk: Buffer) => {
-        received += chunk.toString()
-        if (received.includes('\r\n\r\n')) {
-          socket.off('data', onData)
-          resolve(received)
-        }
-      }
-      socket.on('data', onData)
-      socket.once('error', reject)
-      socket.write('GET /api/v1/health HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: keep-alive\r\n\r\n')
-    })
+    expect(await requestOverSocket(socket, '/api/v1/health')).toContain('HTTP/1.1 200')
 
-    expect(response).toContain('HTTP/1.1 200')
+    socket.destroy()
+  })
+
+  it('serves the API on the main port too, with the same certificate', async () => {
+    const socket = await connectTls(mainPort)
+
+    expect(socket.getPeerCertificate().subject.CN).toBe('cert-a.test.cardinalapps.host')
+    expect(await requestOverSocket(socket, '/api/v1/health')).toContain('HTTP/1.1 200')
 
     socket.destroy()
   })
@@ -91,5 +115,14 @@ describe('Remote Access HTTPS listener with a pinned port', () => {
     await httpsService.maybeStart()
 
     expect(httpsService.getStatus()).toMatchObject({ state: 'running', port: pinnedPort })
+  })
+
+  it('stops answering on both ports when it stops', async () => {
+    await httpsService.stop()
+
+    await expect(connectTls(pinnedPort)).rejects.toBeDefined()
+    await expect(connectTls(mainPort)).rejects.toBeDefined()
+
+    await httpsService.maybeStart()
   })
 })

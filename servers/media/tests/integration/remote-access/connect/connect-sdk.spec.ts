@@ -134,6 +134,7 @@ describe('ConnectSDK (integration)', () => {
     const register = await waitFor(() => reconnection.messages.find((m) => m.type === 'register'))
 
     expect(register.instanceId).toBe('itest-instance-1')
+    expect(register.publicPort).toBe(PINNED_HTTPS_PORT)
   })
 
   it('applies a rotated signing key pushed via config:update', async () => {
@@ -143,6 +144,26 @@ describe('ConnectSDK (integration)', () => {
     connection.socket.send(JSON.stringify({ type: 'config:update', signingKey: rotatedKey }))
 
     await waitFor(async () => (await databaseService.getOption(OPTIONS.CONNECT_SIGNING_KEY.name)) === rotatedKey)
+  })
+
+  /* Nothing is pinned in the published quick start, and the main port is the one serving TLS, so
+     that is the port the Remote Access Server has to be told about. */
+  it('advertises the main server port when nothing is pinned', async () => {
+    delete process.env.CONNECT_HTTPS_PORT
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    process.env.CARDINAL_HOME_SERVER_PORT = '24900'
+    const registeredFrom = connections.length
+
+    connections[connections.length - 1].socket.terminate()
+
+    const reconnection = await waitFor(() => connections[registeredFrom])
+    const register = await waitFor(() => reconnection.messages.find((m) => m.type === 'register'))
+
+    expect(register.publicPort).toBe(24900)
+
+    delete process.env.CARDINAL_HOME_SERVER_PORT
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    process.env.CONNECT_HTTPS_PORT = String(PINNED_HTTPS_PORT)
   })
 
   /* A suspension is lifted by staff, not by the server owner, so the server has to find its own

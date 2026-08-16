@@ -36,6 +36,7 @@ import { ClaimModule } from '../claim/claim.module'
 import { ConnectSDKModule } from '../remote-access/connect/connect-sdk.module'
 import { CorsModule } from '../cors/cors.module'
 import { HttpsModule } from '../remote-access/https/https.module'
+import { MuxModule } from '../remote-access/mux/mux.module'
 import { PingModule } from '../remote-access/ping/ping.module'
 import { RelayModule } from '../remote-access/relay/relay.module'
 import { PortMapperModule } from '../remote-access/port-mapper/port-mapper.module'
@@ -164,6 +165,7 @@ const resolvePostgresHost = () => {
     PortMapperModule,
     ConnectSDKModule,
     CorsModule,
+    MuxModule,
     HttpsModule,
     RelayModule,
     PingModule,

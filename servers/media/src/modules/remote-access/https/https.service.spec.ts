@@ -8,8 +8,12 @@ import { ConnectSDKEvents } from '../connect/connect-sdk.events'
 import { HttpsStatusStore } from '../connect/https-status.store'
 import { ConnectSDKService } from '../connect/connect-sdk.service'
 import { DatabaseService } from '../../database/database.service'
+import { MuxService } from '../mux/mux.service'
 import { PortMapperService } from '../port-mapper/port-mapper.service'
 import { OPTIONS } from '../../../utils/options'
+
+// The port the mux bound, which is the server's main port
+const MAIN_PORT = 24900
 
 const FIXTURES = path.join(__dirname, '..', '..', '..', '..', 'tests', 'fixtures', 'certs')
 const CERT_A = fs.readFileSync(path.join(FIXTURES, 'cert-a.pem'), 'utf8')
@@ -66,6 +70,7 @@ function makeService(initialOptions: Record<string, string> = {}, directEnabled 
   const connectSDKService = { isPathEnabled: jest.fn(async () => directEnabled) }
   const events = new ConnectSDKEvents()
   const portMapper = { mapIfEnabled: jest.fn(async () => ({ state: 'disabled' })) }
+  const mux = { setTlsServer: jest.fn(), getPort: jest.fn(() => MAIN_PORT as number | null) }
   const servers: FakeHttpsServer[] = []
   const factory = jest.fn(() => {
     const server = new FakeHttpsServer()
@@ -80,12 +85,13 @@ function makeService(initialOptions: Record<string, string> = {}, directEnabled 
     statusStore,
     connectSDKService as unknown as ConnectSDKService,
     portMapper as unknown as PortMapperService,
+    mux as unknown as MuxService,
     factory,
   )
   service.onApplicationBootstrap()
 
   const listener = jest.fn()
-  return { service, db, events, portMapper, factory, servers, listener, statusStore, connectSDKService }
+  return { service, db, events, portMapper, mux, factory, servers, listener, statusStore, connectSDKService }
 }
 
 // Lets the void promise chains kicked off by event handlers settle
@@ -96,16 +102,26 @@ async function flush(passes = 10) {
 }
 
 describe('startup', () => {
-  it('starts on attach with enabled + stored cert material', async () => {
-    const { service, factory, servers, listener } = makeService(ENABLED_WITH_CERT)
+  it('serves TLS on the main port with enabled + stored cert material', async () => {
+    const { service, factory, servers, mux, listener } = makeService(ENABLED_WITH_CERT)
 
     service.attach(listener)
     await flush()
 
     expect(factory).toHaveBeenCalledWith(expect.objectContaining({ cert: CERT_A, key: KEY_A }), listener)
-    expect(servers[0].listenedPort).toBe(0)
-    expect(service.getStatus()).toMatchObject({ state: 'running', port: 45678 })
+    expect(mux.setTlsServer).toHaveBeenCalledWith(servers[0])
+    expect(service.getStatus()).toMatchObject({ state: 'running', port: MAIN_PORT })
     expect(service.getStatus().certExpiresAt).not.toBeNull()
+  })
+
+  // A port of its own is what the legacy pin buys, and nothing else asks for one
+  it('binds no port of its own', async () => {
+    const { service, servers, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+
+    expect(servers[0].listenedPort).toBeNull()
   })
 
   it('binds the pinned port when connect_https_port is set', async () => {
@@ -121,8 +137,21 @@ describe('startup', () => {
     expect(service.getStatus()).toMatchObject({ state: 'running', port: 31234 })
   })
 
+  // The main port answers TLS either way, so a pinned listener is an addition, not a replacement
+  it('also serves TLS on the main port when a port is pinned', async () => {
+    const { service, servers, mux, listener } = makeService({
+      ...ENABLED_WITH_CERT,
+      [OPTIONS.CONNECT_HTTPS_PORT.name]: '31234',
+    })
+
+    service.attach(listener)
+    await flush()
+
+    expect(mux.setTlsServer).toHaveBeenCalledWith(servers[0])
+  })
+
   it('does not start when Remote Access is disabled', async () => {
-    const { service, factory, listener } = makeService({
+    const { service, factory, mux, listener } = makeService({
       [OPTIONS.CONNECT_TLS_CERT_PEM.name]: CERT_A,
       [OPTIONS.CONNECT_TLS_KEY_PEM.name]: KEY_A,
     })
@@ -131,6 +160,7 @@ describe('startup', () => {
     await flush()
 
     expect(factory).not.toHaveBeenCalled()
+    expect(mux.setTlsServer).not.toHaveBeenCalled()
     expect(service.getStatus().state).toBe('stopped')
   })
 
@@ -163,7 +193,9 @@ describe('startup', () => {
   })
 })
 
-describe('the pinned port env var', () => {
+/* Pinning is what a deployment does when its external TLS port has to differ from the main port.
+   The main port serves TLS regardless, so the pinned listener is a second front door. */
+describe('the legacy pinned port env var', () => {
   afterEach(() => {
     delete process.env.CONNECT_HTTPS_PORT
   })
@@ -202,20 +234,22 @@ describe('the pinned port env var', () => {
     expect(portMapper.mapIfEnabled).toHaveBeenCalledWith(8443, 8443)
   })
 
-  it('falls back to an OS-assigned port when the value is unusable', async () => {
+  it('leaves TLS on the main port alone when the value is unusable', async () => {
     process.env.CONNECT_HTTPS_PORT = 'not-a-port'
     const { service, servers, listener } = makeService(ENABLED_WITH_CERT)
 
     service.attach(listener)
     await flush()
 
-    expect(servers[0].listenedPort).toBe(0)
-    expect(service.getStatus()).toMatchObject({ state: 'running', port: 45678 })
+    expect(servers[0].listenedPort).toBeNull()
+    expect(service.getStatus()).toMatchObject({ state: 'running', port: MAIN_PORT })
   })
 })
 
 describe('port mapping trigger', () => {
-  it('maps the bound port with a random desired external port when no port is pinned', async () => {
+  /* The mapping points at the main port now that it is the one serving TLS. The external port
+     stays random, so a Cardinal server is not sitting on a well-known port on the public internet. */
+  it('maps the main port with a random desired external port when no port is pinned', async () => {
     const { service, portMapper, listener } = makeService(ENABLED_WITH_CERT)
 
     service.attach(listener)
@@ -223,7 +257,7 @@ describe('port mapping trigger', () => {
 
     expect(portMapper.mapIfEnabled).toHaveBeenCalledTimes(1)
     const [internalPort, desiredExternalPort] = portMapper.mapIfEnabled.mock.calls[0] as unknown as [number, number]
-    expect(internalPort).toBe(45678)
+    expect(internalPort).toBe(MAIN_PORT)
     expect(desiredExternalPort).toBeGreaterThanOrEqual(20000)
     expect(desiredExternalPort).toBeLessThan(60000)
   })
@@ -238,6 +272,16 @@ describe('port mapping trigger', () => {
     await flush()
 
     expect(portMapper.mapIfEnabled).toHaveBeenCalledWith(31234, 31234)
+  })
+
+  it('does not map anything before the main port is bound', async () => {
+    const { service, portMapper, mux, listener } = makeService(ENABLED_WITH_CERT)
+    mux.getPort.mockReturnValue(null)
+
+    service.attach(listener)
+    await flush()
+
+    expect(portMapper.mapIfEnabled).not.toHaveBeenCalled()
   })
 })
 
@@ -309,7 +353,7 @@ describe('runtime enable and disable', () => {
   })
 
   it('closes gracefully when Remote Access is disabled', async () => {
-    const { service, events, servers, listener } = makeService(ENABLED_WITH_CERT)
+    const { service, events, servers, mux, listener } = makeService(ENABLED_WITH_CERT)
 
     service.attach(listener)
     await flush()
@@ -320,7 +364,19 @@ describe('runtime enable and disable', () => {
 
     expect(servers[0].closed).toBe(true)
     expect(servers[0].closeIdleConnections).toHaveBeenCalled()
+    expect(mux.setTlsServer).toHaveBeenLastCalledWith(null)
     expect(service.getStatus().state).toBe('stopped')
+  })
+
+  // The main port keeps serving HTTP either way; only its TLS half goes away
+  it('takes TLS off the main port when it stops', async () => {
+    const { service, mux, listener } = makeService(ENABLED_WITH_CERT)
+
+    service.attach(listener)
+    await flush()
+    await service.stop()
+
+    expect(mux.setTlsServer).toHaveBeenLastCalledWith(null)
   })
 
   it('closes on application shutdown', async () => {
@@ -356,7 +412,7 @@ describe('the direct path toggle', () => {
   })
 
   it('closes the listener when the direct path is turned off at runtime', async () => {
-    const { service, events, servers, listener } = makeService(ENABLED_WITH_CERT)
+    const { service, events, servers, mux, listener } = makeService(ENABLED_WITH_CERT)
 
     service.attach(listener)
     await flush()
@@ -366,6 +422,7 @@ describe('the direct path toggle', () => {
     await flush()
 
     expect(servers[0].closed).toBe(true)
+    expect(mux.setTlsServer).toHaveBeenLastCalledWith(null)
     expect(service.getStatus().state).toBe('stopped')
   })
 

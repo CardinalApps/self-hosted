@@ -10,16 +10,15 @@ let warnedAbout: string | null = null
 
 export type PublicPortInputs = {
   mappedPort: number | null,
-  upnpEnabled: boolean,
   pinnedPort: number | null,
   fallbackPort: number | null,
 }
 
 /**
- * The port the deployment pinned the Remote Access HTTPS listener to, or null
- * when it was left unset. Pinning is what makes the direct path usable behind
- * a published container port or a hand-written port forward, where the
- * anti-scan random port cannot be reached.
+ * The port the deployment pinned a dedicated Remote Access HTTPS listener to,
+ * or null when it was left unset. Legacy: the main port answers TLS on its
+ * own, so this is only for deployments whose external TLS port has to differ
+ * from the main one.
  */
 export function getPinnedHttpsPort(): number | null {
   const value = envVar('CONNECT_HTTPS_PORT', null)
@@ -62,14 +61,12 @@ export function toPort(value: unknown): number | null {
 
 /**
  * The port the Remote Access Server is told to reach this server on.
+ *
+ * A port mapping outranks everything, because only the router knows which
+ * external port it opened. A pinned port comes next, being the one thing the
+ * deployment said out loud. Failing both, the main port is the answer: it
+ * serves TLS itself, and the published quick start forwards it 1:1.
  */
-export function resolvePublicPort({ mappedPort, upnpEnabled, pinnedPort, fallbackPort }: PublicPortInputs): number | null {
-  /* Only a live UPnP mapping knows which external port the router actually opened, so it outranks the
-     pin. With UPnP off, a stored public port is a leftover from an earlier run pointing at a mapping
-     the router no longer has, while the pin is the port the deployment really forwards. */
-  if (upnpEnabled && mappedPort) {
-    return mappedPort
-  }
-
-  return pinnedPort ?? mappedPort ?? fallbackPort
+export function resolvePublicPort({ mappedPort, pinnedPort, fallbackPort }: PublicPortInputs): number | null {
+  return mappedPort ?? pinnedPort ?? fallbackPort
 }

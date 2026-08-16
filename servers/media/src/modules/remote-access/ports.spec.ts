@@ -67,13 +67,14 @@ describe('toPort', () => {
 describe('resolvePublicPort', () => {
   const inputs = {
     mappedPort: null as number | null,
-    upnpEnabled: false,
     pinnedPort: null as number | null,
-    fallbackPort: 3080 as number | null,
+    fallbackPort: 24900 as number | null,
   }
 
-  it('falls back when nothing is known', () => {
-    expect(resolvePublicPort({ ...inputs })).toBe(3080)
+  /* The main port serves TLS, and the quick start publishes it 1:1, so a server that was told
+     nothing is reachable on exactly the port it already listens on. */
+  it('falls back to the main port when nothing is known', () => {
+    expect(resolvePublicPort({ ...inputs })).toBe(24900)
   })
 
   it('uses a mapped port when no port is pinned', () => {
@@ -84,18 +85,13 @@ describe('resolvePublicPort', () => {
     expect(resolvePublicPort({ ...inputs, pinnedPort: 8443 })).toBe(8443)
   })
 
-  /* A port left behind by an earlier UPnP run points at a mapping the router no longer has, so it must
-     not outrank a port the deployment forwards itself. */
-  it('prefers the pinned port over a stale mapped port while UPnP is off', () => {
-    expect(resolvePublicPort({ ...inputs, mappedPort: 24901, pinnedPort: 8443 })).toBe(8443)
+  // Only the mapping knows which external port the router actually opened
+  it('prefers the mapped port over the pinned port', () => {
+    expect(resolvePublicPort({ ...inputs, mappedPort: 24901, pinnedPort: 8443 })).toBe(24901)
   })
 
-  it('prefers the live mapped port over the pinned port while UPnP is on', () => {
-    expect(resolvePublicPort({ ...inputs, mappedPort: 24901, pinnedPort: 8443, upnpEnabled: true })).toBe(24901)
-  })
-
-  it('uses the pinned port while UPnP is on but has mapped nothing yet', () => {
-    expect(resolvePublicPort({ ...inputs, pinnedPort: 8443, upnpEnabled: true })).toBe(8443)
+  it('prefers the pinned port over the main port', () => {
+    expect(resolvePublicPort({ ...inputs, pinnedPort: 8443 })).toBe(8443)
   })
 
   it('can report nothing at all when the caller has no fallback', () => {

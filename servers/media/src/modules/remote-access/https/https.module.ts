@@ -5,6 +5,7 @@ import { HTTPS_SERVER_FACTORY, HttpsServerFactory, HttpsService } from './https.
 
 import { ConnectSDKModule } from '../connect/connect-sdk.module'
 import { DatabaseModule } from '../../database/database.module'
+import { MuxModule } from '../mux/mux.module'
 import { PortMapperModule } from '../port-mapper/port-mapper.module'
 
 const defaultHttpsServerFactory: HttpsServerFactory = (options, listener) => https.createServer(options, listener)
@@ -13,6 +14,7 @@ const defaultHttpsServerFactory: HttpsServerFactory = (options, listener) => htt
   imports: [
     DatabaseModule,
     ConnectSDKModule,
+    MuxModule,
     PortMapperModule,
   ],
   exports: [HttpsService],

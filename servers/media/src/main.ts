@@ -13,6 +13,7 @@ import { AppModule } from './modules/app/app.module'
 import { CorsService } from './modules/cors/cors.service'
 import { buildCorsOptions } from './modules/cors/cors.options'
 import { HttpsService } from './modules/remote-access/https/https.service'
+import { MuxService } from './modules/remote-access/mux/mux.service'
 import { RelayRequestHandler } from './modules/remote-access/relay/relay-request-handler'
 
 import {
@@ -133,14 +134,18 @@ async function startup() {
   }
 
   /**
-   * Start listening on the network.
+   * Start listening on the network. The port is bound by the mux rather than
+   * by Nest, so that TLS connections can be handed to Remote Access and
+   * everything else to the HTTP stack Nest built. Nest's own server never
+   * binds a port; it is fed the connections the mux accepts for it.
    */
-  await app.listen(PORT)
+  await app.init()
+  await app.get(MuxService).listen(PORT, app.getHttpServer())
 
   /**
-   * Start the Remote Access HTTPS listener, if enabled and configured. This
-   * never affects the HTTP listener above. Relayed Remote Access requests
-   * dispatch through the same Express stack.
+   * Let Remote Access answer TLS on the port above, if enabled and
+   * configured. Relayed Remote Access requests dispatch through the same
+   * Express stack.
    */
   app.get(HttpsService).attach(app.getHttpAdapter().getInstance())
   app.get(RelayRequestHandler).attach(app.getHttpAdapter().getInstance())

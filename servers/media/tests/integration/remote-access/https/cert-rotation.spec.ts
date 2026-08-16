@@ -4,6 +4,7 @@ import * as tls from 'tls'
 
 import { createTestApp, destroyTestApp, TestApp } from '../../../helpers/create-app'
 import { HttpsService } from '../../../../src/modules/remote-access/https/https.service'
+import { MuxService } from '../../../../src/modules/remote-access/mux/mux.service'
 import { ConnectSDKEvents } from '../../../../src/modules/remote-access/connect/connect-sdk.events'
 import { DatabaseService } from '../../../../src/modules/database/database.service'
 import { OPTIONS } from '../../../../src/utils/options'
@@ -45,6 +46,7 @@ function requestOverSocket(socket: tls.TLSSocket, urlPath: string): Promise<stri
 
 beforeAll(async () => {
   testApp = await createTestApp()
+  port = await testApp.moduleRef.get(MuxService).listen(0, testApp.app.getHttpServer(), '127.0.0.1')
 
   const databaseService = testApp.moduleRef.get(DatabaseService)
   await databaseService.saveOption(OPTIONS.CONNECT_ENABLED.name, 'true')
@@ -59,16 +61,15 @@ beforeAll(async () => {
     await new Promise((resolve) => setTimeout(resolve, 25))
   }
 
-  expect(httpsService.getStatus().state).toBe('running')
-  port = httpsService.getStatus().port
+  expect(httpsService.getStatus()).toMatchObject({ state: 'running', port })
 }, 90000)
 
 afterAll(async () => {
   await destroyTestApp(testApp)
 })
 
-describe('Remote Access HTTPS listener', () => {
-  it('serves the API with the stored cert on an OS-assigned port', async () => {
+describe('Remote Access TLS on the main port', () => {
+  it('serves the API with the stored cert', async () => {
     const socket = await connectTls()
 
     expect(socket.getPeerCertificate().subject.CN).toBe('cert-a.test.cardinalapps.host')

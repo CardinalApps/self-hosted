@@ -758,19 +758,19 @@ describe('the advertised public port', () => {
     return sockets[0].sentMessages().find((m) => m.type === 'register')
   }
 
-  it('is the pinned port when UPnP is off', async () => {
+  it('is the pinned port when nothing is mapped', async () => {
     process.env.CONNECT_HTTPS_PORT = '8443'
 
     expect((await register({}))!.publicPort).toBe(8443)
   })
 
-  // The stale value describes a router mapping that no longer exists
-  it('ignores a public port left behind by an earlier UPnP run', async () => {
+  // The router's mapping is the only source that knows the port the outside world can reach
+  it('prefers a mapped port over the pinned port', async () => {
     process.env.CONNECT_HTTPS_PORT = '8443'
 
     const message = await register({ [OPTIONS.CONNECT_PUBLIC_PORT.name]: '24901' })
 
-    expect(message!.publicPort).toBe(8443)
+    expect(message!.publicPort).toBe(24901)
   })
 
   it('is the mapped port while UPnP is on', async () => {
@@ -790,10 +790,12 @@ describe('the advertised public port', () => {
     expect(message!.publicPort).toBe(24901)
   })
 
-  it('falls back to the server port when nothing is pinned or mapped', async () => {
-    process.env.CARDINAL_HOME_SERVER_PORT = '3080'
+  /* The quick start publishes the main port 1:1 and the main port answers TLS, so a server nobody
+     configured is reachable on exactly the port it already listens on. */
+  it('is the main server port when nothing is pinned or mapped', async () => {
+    process.env.CARDINAL_HOME_SERVER_PORT = '24900'
 
-    expect((await register({}))!.publicPort).toBe(3080)
+    expect((await register({}))!.publicPort).toBe(24900)
   })
 
   it('is ignored when the pinned value is unusable', async () => {

@@ -390,11 +390,9 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
   // The externally reachable port; see resolvePublicPort for how the sources rank
   private async getPublicPort(fallbackPort: number | null): Promise<number | null> {
     const mappedPort = await this.databaseService.getOption(OPTIONS.CONNECT_PUBLIC_PORT.name)
-    const upnpEnabled = await this.databaseService.getOption(OPTIONS.PORT_MAPPING_ENABLED.name)
 
     return resolvePublicPort({
       mappedPort: toPort(mappedPort),
-      upnpEnabled: isOptionEnabled(upnpEnabled),
       pinnedPort: getPinnedHttpsPort(),
       fallbackPort,
     })
