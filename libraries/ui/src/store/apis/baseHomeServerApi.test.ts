@@ -141,6 +141,32 @@ describe('baseQueryWithReauth', () => {
     expect(dispatch).toHaveBeenCalledWith({ type: globalActions.RESET })
   })
 
+  /* A cloud-linked account is its Cardinal account, so a refresh refused for want of a cloud
+     tolkien ends the whole session, local half included. */
+  it('ends both sessions when the refresh failed for want of a cloud token', async () => {
+    const { baseQueryWithReauth, registerTokenRefreshProvider, setJWT, JWT_TYPE } = await loadModules()
+    setJWT(makeJwt(900), JWT_TYPE.HOME_SERVER_USER)
+    setJWT('cloud-token', JWT_TYPE.CLOUD_USER)
+
+    const provider = vi.fn(async () => {
+      // RTK serializes a thunk's rejection down to these fields, so the code is what survives
+      throw { message: 'Cloud token required.', code: 'cloud_token_required' }
+    })
+    registerTokenRefreshProvider(provider)
+
+    const fetchMock = vi.fn(async () => jsonResponse(401, { message: 'Unauthorized', statusCode: 401 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const dispatch = vi.fn()
+    const result = await baseQueryWithReauth('/music/tracks', makeApi(dispatch), {})
+
+    expect(result.error).toMatchObject({ status: 401 })
+    expect(dispatch).toHaveBeenCalledWith({ type: globalActions.RESET })
+    expect(dispatch).toHaveBeenCalledWith({ type: 'cloudUser/logout/fulfilled' })
+    expect(localStorage.getItem('@cardinal/home_server_user_tolkien')).toBeNull()
+    expect(localStorage.getItem('@cardinal/cloud_user_tolkien')).toBeNull()
+  })
+
   it('returns the 401 untouched when no refresh provider is registered', async () => {
     const { baseQueryWithReauth, setJWT, JWT_TYPE } = await loadModules()
     setJWT(makeJwt(900), JWT_TYPE.HOME_SERVER_USER)

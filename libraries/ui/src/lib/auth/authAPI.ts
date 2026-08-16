@@ -30,6 +30,28 @@ export const registerCloudTokenRefreshProvider = (fn: () => Promise<string>) => 
   tokenRefreshProvider = fn
 }
 
+let tokenRefreshInFlight: Promise<string> | null = null
+
+/**
+ * Invokes the registered cloud token refresh provider. Concurrent callers share
+ * the same in-flight refresh instead of each triggering their own request, so a
+ * batch of parallel calls spends one refresh token rather than racing several
+ * against the same cookie. Returns null when no provider has been registered.
+ */
+export const runCloudTokenRefresh = (): Promise<string> | null => {
+  if (!tokenRefreshProvider) {
+    return null
+  }
+
+  if (!tokenRefreshInFlight) {
+    tokenRefreshInFlight = tokenRefreshProvider().finally(() => {
+      tokenRefreshInFlight = null
+    })
+  }
+
+  return tokenRefreshInFlight
+}
+
 export type AuthAPIProps = {
   body?: Record<string, unknown>,
   headers?: Record<string, unknown>,
@@ -62,7 +84,7 @@ const authAPI = async <T>(
     const token = getJWT(JWT_TYPE.CLOUD_USER)
     if (token && isJwtExpiringSoon(token, 60)) {
       try {
-        await tokenRefreshProvider()
+        await runCloudTokenRefresh()
       } catch {
         // If proactive refresh fails, let the request proceed; the reactive
         // 401 handler will deal with it

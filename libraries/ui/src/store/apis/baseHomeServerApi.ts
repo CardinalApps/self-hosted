@@ -7,6 +7,7 @@ import { getJWT, isJwtExpiringSoon, JWT_TYPE } from "../../lib/auth/jwt"
 import { settingsSelectors } from "../slices/settings"
 import { fullLogout } from "../../components/features/AppBase/middleware/handle401"
 import { resetForGoneUser } from "../../components/features/AppBase/middleware/handle410"
+import { cloudLogout, isCloudTokenRequired } from "../../lib/auth/cloudSession"
 import type { RootState } from "../index"
 
 const rawBaseQuery = fetchBaseQuery({
@@ -41,7 +42,14 @@ export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, Fetch
       try {
         await refresh
         result = await rawBaseQuery(args, api, extraOptions)
-      } catch {
+      } catch (error) {
+        /* A refresh the Media Server turned down for want of a cloud tolkien takes the Cardinal
+           sign-in with it: for a cloud-linked account that credential is the identity, so the
+           session is over. A local-only failure leaves the Cardinal account signed in. */
+        if (isCloudTokenRequired(error)) {
+          cloudLogout(api.dispatch)
+        }
+
         const { lang } = settingsSelectors.current(api.getState() as RootState) as { lang?: string }
         fullLogout(api.dispatch, lang, serverErrorMessage)
       }
