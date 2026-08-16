@@ -21,6 +21,7 @@ import
   removeHomeServerAPIMiddleware,
   registerTokenRefreshProvider,
 } from '../../../lib/homeserver/homeServerAPI'
+import { registerCloudBearerTokenProvider } from '../../../lib/auth/cloudBearerToken'
 import refreshToken from '../../../store/slices/homeServerUser/thunks/refreshToken'
 import handle401 from './middleware/handle401'
 import handle410 from './middleware/handle410'
@@ -156,6 +157,7 @@ function AppBase({
     registerHomeServerAPIMiddleware('handle_401', (...args) => handle401(args[0], args[1], args[2], args[3], dispatch, lang))
     registerHomeServerAPIMiddleware('handle_410', (...args) => handle410(args[0], args[1], args[2], args[3], dispatch, lang))
     registerTokenRefreshProvider(() => dispatch(refreshToken()).unwrap())
+    registerCloudBearerTokenProvider()
     return () => {
       removeHomeServerAPIMiddleware('handle_401')
       removeHomeServerAPIMiddleware('handle_410')

@@ -1,12 +1,11 @@
 import { HTTPMethod, MixedAppEnv, getCloudServiceURL, CloudService, Endpoint } from '../../cloudEdge'
-
-const CLOUD_USER_JWT_LOCALSTORAGE_KEY = '@cardinal/cloud_user_tolkien'
+import { getBearerToken } from '../../bearerToken'
 
 type FetchPopularityAPIOptions = {
   headers?: HeadersInit,
   body?: Record<string, unknown>,
   returnRawResponse?: boolean,
-  // Browser-only: attaches the logged-in cloud user's token from localStorage
+  // Attaches the logged-in cloud user's token, as supplied by the registered bearer token provider
   accessToken?: boolean,
 }
 
@@ -16,36 +15,36 @@ const defaultOptions: FetchPopularityAPIOptions = {
   returnRawResponse: false,
 }
 
-export function fetchPopularityAPI<T>(
+export async function fetchPopularityAPI<T>(
   endpoint: Endpoint,
   method: HTTPMethod = 'GET',
   env: MixedAppEnv,
   options?: FetchPopularityAPIOptions,
 ): Promise<T> {
-  return new Promise((resolve, reject) => {
-    options = { ...defaultOptions, ...options }
+  options = { ...defaultOptions, ...options }
 
-    if (options.accessToken) {
-      const token = localStorage.getItem(CLOUD_USER_JWT_LOCALSTORAGE_KEY)
+  if (options.accessToken) {
+    const token = await getBearerToken()
 
-      if (token) {
-        options.headers = {
-          'Authorization': `Bearer ${token}`,
-          ...options.headers,
-        }
-      }
-    }
-
-    if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {
+    if (token) {
       options.headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
         ...options.headers,
       }
     }
+  }
 
-    const url = getCloudServiceURL(env, CloudService.POPULARITY)
+  if (method === 'POST' || method === 'DELETE' || method === 'PUT' || method === 'PATCH') {
+    options.headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
+  }
 
+  const url = getCloudServiceURL(env, CloudService.POPULARITY)
+
+  return new Promise((resolve, reject) => {
     fetch(`${url}${endpoint}`, {
       method: method,
       headers: options.headers,
