@@ -1,4 +1,4 @@
-import { JWT_TYPE, getJWT, authorizedFetchHeaders, isJwtExpiringSoon } from './jwt'
+import { JWT_TYPE, getJWT, authorizedFetchHeaders, shouldRenewJwt } from './jwt'
 
 import { CLOUD_AUTH_HOST } from '../../../env'
 
@@ -52,6 +52,13 @@ export const runCloudTokenRefresh = (): Promise<string> | null => {
   return tokenRefreshInFlight
 }
 
+/*
+ * A refusal and an outage read the same from a message alone, so failures carry the status. It also
+ * travels as `code` because a rejection thrown through a createAsyncThunk is serialized on the way
+ * out, and RTK's serializer forwards only name, message, stack and code.
+ */
+const httpError = (message: string, status: number) => Object.assign(new Error(message), { status, code: status })
+
 export type AuthAPIProps = {
   body?: Record<string, unknown>,
   headers?: Record<string, unknown>,
@@ -82,7 +89,7 @@ const authAPI = async <T>(
   // Proactively refresh the access token if it expires within 60 seconds
   if (options.sendJWT && tokenRefreshProvider) {
     const token = getJWT(JWT_TYPE.CLOUD_USER)
-    if (token && isJwtExpiringSoon(token, 60)) {
+    if (token && shouldRenewJwt(token, 60)) {
       try {
         await runCloudTokenRefresh()
       } catch {
@@ -144,15 +151,15 @@ const authAPI = async <T>(
     try {
       parsed = JSON.parse(text)
     } catch {
-      throw new Error(text)
+      throw httpError(text, res.status)
     }
     // Normalize server JSON errors of the form { message: "..." } to a real
     // Error instance so callers can rely on `err instanceof Error` and
     // `err.message` regardless of whether the server returned text or JSON.
     if (parsed && typeof parsed === 'object' && typeof (parsed as { message?: unknown }).message === 'string') {
-      throw new Error((parsed as { message: string }).message)
+      throw httpError((parsed as { message: string }).message, res.status)
     }
-    throw new Error(text)
+    throw httpError(text, res.status)
   }
 }
 

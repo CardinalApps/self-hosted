@@ -1,16 +1,7 @@
 import { registerBearerTokenProvider } from '@cardinalapps/topology/src/bearerToken'
 
 import { runCloudTokenRefresh } from './authAPI'
-import { getJWT, isJwtExpiringSoon, JWT_TYPE } from './jwt'
-
-// An unreadable token can't be judged, so leave it alone and let the server refuse it
-const expiringSoon = (token: string) => {
-  try {
-    return isJwtExpiringSoon(token, 60)
-  } catch {
-    return false
-  }
-}
+import { getJWT, shouldRenewJwt, JWT_TYPE } from './jwt'
 
 /*
  * Cloud access tokens last 15 minutes, so any page left open outlives one. Renewing the token on
@@ -19,7 +10,7 @@ const expiringSoon = (token: string) => {
 export const cloudBearerTokenProvider = async (): Promise<string | null> => {
   const token = getJWT(JWT_TYPE.CLOUD_USER)
 
-  if (!token || !expiringSoon(token)) {
+  if (!token || !shouldRenewJwt(token, 60)) {
     return token ?? null
   }
 
