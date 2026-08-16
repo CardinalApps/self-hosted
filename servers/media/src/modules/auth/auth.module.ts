@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 
+import { DatabaseModule } from '../database/database.module'
 import { SettingsModule } from '../settings/settings.module'
 import { UserModule } from '../user/user.module'
 
@@ -17,6 +18,7 @@ import { LocalAuthStrategy } from './strategies/local.service'
     JwtModule.register({
       secret: getSigningSecret(),
     }),
+    DatabaseModule,
     SettingsModule,
     UserModule,
   ],

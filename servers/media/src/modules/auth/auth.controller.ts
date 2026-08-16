@@ -30,8 +30,7 @@ import { OriginApp } from '../../decorators/OriginApp'
 import { CardinalApp } from '../../utils/apps'
 import { envVar } from '../../utils/env'
 import { getCardinalTolkienFromHeaders } from '../../utils/jwt'
-
-const REFRESH_TOLKIEN_COOKIE = 'cardinal_refresh_tolkien'
+import { REFRESH_COOKIE_PATH } from './refresh-cookie'
 
 const secureCookies = envVar('SECURE_COOKIES', false) as boolean
 
@@ -39,7 +38,7 @@ const REFRESH_COOKIE_BASE = {
   httpOnly: true,
   secure: secureCookies,
   sameSite: (secureCookies ? 'strict' : 'lax') as 'strict' | 'lax',
-  path: '/api/v1/auth',
+  path: REFRESH_COOKIE_PATH,
 }
 
 const loginEndpointDescription =
@@ -68,7 +67,7 @@ export class LoginController {
   ) {}
 
   /**
-   * Logs a user into this server. Sets the cardinal_refresh_tolkien httpOnly
+   * Logs a user into this server. Sets the instance's refresh tolkien httpOnly
    * cookie and returns a short-lived access token in the response body.
    */
   @Post('/auth/login')
@@ -100,9 +99,10 @@ export class LoginController {
       }
 
       const sessionTimeout = await this.tokenService.getSessionTimeout()
+      const cookieName = await this.tokenService.getRefreshCookieName()
       const maxAge = await this.tokenService.getRefreshCookieMaxAge()
       const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-      res.cookie(REFRESH_TOLKIEN_COOKIE, loginResult.refreshToken, cookieOptions)
+      res.cookie(cookieName, loginResult.refreshToken, cookieOptions)
 
       delete loginResult.refreshToken
       loginResult.scope = (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local'
@@ -131,19 +131,28 @@ export class LoginController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ JWT: string, scope: 'local' | 'session' | 'memory' }> {
-    const refreshToken = req.cookies?.[REFRESH_TOLKIEN_COOKIE]
+    const cookieName = await this.tokenService.getRefreshCookieName()
+    const refreshToken = req.cookies?.[cookieName]
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token')
     }
 
-    const payload = this.tokenService.verifyRefreshToken(refreshToken)
+    const verification = this.tokenService.verifyRefreshToken(refreshToken)
 
-    if (!payload) {
-      res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })
+    if (verification.outcome !== 'valid') {
+      /*
+       * Only a tolkien this server signed proves the cookie is this server's to clear. Clearing on a
+       * foreign signature is what let two servers on one host destroy each other's sessions.
+       */
+      if (verification.outcome !== 'foreign') {
+        res.clearCookie(cookieName, { path: REFRESH_COOKIE_PATH })
+      }
+
       throw new UnauthorizedException('Invalid or expired refresh token')
     }
 
+    const payload = verification.payload
     const user = await this.userService.get(payload.uid)
 
     if (!user) {
@@ -165,7 +174,7 @@ export class LoginController {
     const newRefreshToken = await this.tokenService.createRefreshToken(payload.uid)
     const maxAge = await this.tokenService.getRefreshCookieMaxAge()
     const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-    res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshToken, cookieOptions)
+    res.cookie(cookieName, newRefreshToken, cookieOptions)
 
     return { JWT: newAccessToken, scope: (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local' }
   }
@@ -212,8 +221,10 @@ export class LoginController {
     auth: false,
     summary: 'Clear the refresh token cookie.',
   })
-  logout(@Res({ passthrough: true }) res: Response): { success: true } {
-    res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })
+  async logout(@Res({ passthrough: true }) res: Response): Promise<{ success: true }> {
+    const cookieName = await this.tokenService.getRefreshCookieName()
+    res.clearCookie(cookieName, { path: REFRESH_COOKIE_PATH })
+
     return { success: true }
   }
 }
