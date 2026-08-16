@@ -28,6 +28,15 @@
   &[data-status="error"] .indicator-dot {
     background-color: var(--danger);
   }
+
+  &[data-status="not_approved"] .indicator-dot {
+    background-color: var(--warning);
+    animation: remote-access-indicator-pulse 1.2s ease-in-out infinite;
+  }
+
+  &[data-status="suspended"] .indicator-dot {
+    background-color: var(--danger);
+  }
 }
 
 @keyframes remote-access-indicator-pulse {

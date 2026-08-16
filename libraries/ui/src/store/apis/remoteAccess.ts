@@ -2,7 +2,15 @@ import queryParams from '../../lib/net/queryParams'
 
 import { baseHomeServerApi } from './baseHomeServerApi'
 
-export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'auth_failed'
+/* Mirrors the Media Server's connect SDK. `not_approved` and `suspended` are the cloud's access
+   gates: the server keeps retrying on its own, so neither is a dead end the user has to clear. */
+export type ConnectionState =
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'auth_failed'
+  | 'not_approved'
+  | 'suspended'
 
 export type HttpsListenerStatus = {
   state: 'stopped' | 'running' | 'error',

@@ -44,6 +44,18 @@
   "ra.request-access.desc-p2": {
     "en": "Inactive servers may be pruned from the beta. If that happens to you, feel free to queue up again."
   },
+  "ra.access.checking": {
+    "en": "Checking your access"
+  },
+  "ra.access.granted": {
+    "en": "Your account is approved for this"
+  },
+  "ra.access.queued": {
+    "en": "Your account is queued for this"
+  },
+  "ra.queued.desc": {
+    "en": "Your account is in the queue for Remote Access. Cardinal will approve it when there is room for another media server; turn Remote Access on again once that happens."
+  },
   "ra.confirm-disable.title": {
     "en": "Disable Remote Access?"
   },
@@ -101,11 +113,23 @@
   "ra.status.auth-failed": {
     "en": "Authorization failed"
   },
+  "ra.status.not-approved": {
+    "en": "Queued for access"
+  },
+  "ra.status.suspended": {
+    "en": "Suspended"
+  },
   "ra.auth-failed.desc": {
     "en": "Cardinal Cloud rejected this media server's credentials. Sign in again to re-enable Remote Access."
   },
   "ra.auth-failed.cta": {
     "en": "Sign in again"
+  },
+  "ra.not-approved.desc": {
+    "en": "This media server is queued for Remote Access. It keeps asking on its own and connects as soon as Cardinal approves your account."
+  },
+  "ra.suspended.desc": {
+    "en": "Cardinal staff suspended Remote Access for this account. Signing in again will not lift it. The media server keeps retrying on its own and reconnects if the suspension is lifted."
   },
   "ra.https.label": {
     "en": "HTTPS listener"

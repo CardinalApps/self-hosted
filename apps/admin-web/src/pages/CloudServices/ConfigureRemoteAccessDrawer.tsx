@@ -159,6 +159,8 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
       connecting: i18n['ra.status.reconnecting'][lang],
       disconnected: i18n['ra.status.reconnecting'][lang],
       auth_failed: i18n['ra.status.auth-failed'][lang],
+      not_approved: i18n['ra.status.not-approved'][lang],
+      suspended: i18n['ra.status.suspended'][lang],
     }
 
     return [{
@@ -298,6 +300,21 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
                 label: i18n['ra.auth-failed.cta'][lang],
                 onClick: () => navigate(routes.LOGIN),
               }]}
+            />
+          )}
+
+          {/* Both gates clear on Cardinal's side, so neither offers a remedy to click */}
+          {status?.state === 'not_approved' && (
+            <Alert
+              type="info"
+              message={i18n['ra.not-approved.desc'][lang]}
+            />
+          )}
+
+          {status?.state === 'suspended' && (
+            <Alert
+              type="warning"
+              message={i18n['ra.suspended.desc'][lang]}
             />
           )}
         </Card>

@@ -7,6 +7,28 @@
     .item-list-item-name {
       word-break: break-all;
     }
+
+    .path-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .path-access {
+      display: inline-flex;
+
+      i {
+        font-size: 14px;
+      }
+
+      &[data-access="granted"] i {
+        color: var(--success);
+      }
+    }
+  }
+
+  .alert {
+    margin-top: 10px;
   }
 }
 

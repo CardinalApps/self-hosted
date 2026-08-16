@@ -16,6 +16,12 @@ const i18n: StringList = {
   "ra-status.error": {
     "en": "Error",
   },
+  "ra-status.not_approved": {
+    "en": "Queued for access",
+  },
+  "ra-status.suspended": {
+    "en": "Access suspended",
+  },
 }
 
 export default i18n

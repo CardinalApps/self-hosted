@@ -34,6 +34,10 @@ store.dispatch(remoteAccessActions.connectionFailed({
   instanceId: 'story-error',
   error: 'Could not reach the matchmaker',
 }))
+store.dispatch(remoteAccessActions.connectionResolved({
+  instanceId: 'story-gated',
+  plan: { kind: 'offline' },
+}))
 
 const meta = {
   title: 'Features/RemoteAccessStatusIndicator',
@@ -61,4 +65,12 @@ export const Offline: Story = {
 
 export const Error: Story = {
   args: { instanceId: 'story-error' },
+}
+
+export const NotApproved: Story = {
+  args: { instanceId: 'story-gated', state: 'not_approved' },
+}
+
+export const Suspended: Story = {
+  args: { instanceId: 'story-gated', state: 'suspended' },
 }
