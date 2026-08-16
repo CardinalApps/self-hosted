@@ -54,6 +54,8 @@ const ACCESS_TITLES = {
   queued: 'ra.access.queued',
 } as const
 
+const ENABLE_REQUIRES_SUBSCRIPTION = true
+
 // Card for the Remote Access cloud service
 function RemoteAccess() {
   const dispatch = useAppDispatch()
@@ -77,7 +79,13 @@ function RemoteAccess() {
   const directEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_DIRECT_SLUG] === true
   const relayEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_RELAY_SLUG] === true
 
-  const queued = !enabled && (refused || isQueuedForRemoteAccess(features))
+  /* The Media Server records a refused enable as an enable, so waiting for access is a state the
+     toggle is on for. The wait is reported alongside it rather than instead of it. */
+  const queued = refused || isQueuedForRemoteAccess(features)
+
+  const criteriaNotice = ENABLE_REQUIRES_SUBSCRIPTION
+    ? i18n['cloud-service.criteria.subscribed'][lang]
+    : i18n['cloud-service.criteria.free'][lang]
 
   /* Enabling mints a cloud credential, so it goes through the connect endpoint rather than a
      settings write. The Media Server owns the setting; pull it back once the call lands. */
@@ -165,7 +173,7 @@ function RemoteAccess() {
             {i18n['ra.configure'][lang]}
           </Button>
         )
-        : i18n['cloud-service.criteria.free'][lang]
+        : criteriaNotice
       }
     >
       <div className="description">

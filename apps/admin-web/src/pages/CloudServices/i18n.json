@@ -3,10 +3,10 @@
     "en": "Cloud Services"
   },
   "cloud-service.criteria.free": {
-    "en": "Log in with any Cardinal account to enable this."
+    "en": "Log in with any Cardinal account to use this."
   },
   "cloud-service.criteria.subscribed": {
-    "en": "Log in with a subscribed Cardinal account to enable this."
+    "en": "Log in with a subscribed Cardinal account to use this."
   },
   "pdp.title": {
     "en": "Popularity Data Pool"
