@@ -12,6 +12,8 @@ import {
   WSS_CLOSE_SUPERSEDED,
   WSS_CLOSE_FORBIDDEN,
   WSS_CLOSE_PING_TIMEOUT,
+  WSS_CLOSE_NOT_APPROVED,
+  WSS_CLOSE_BANNED,
   PROBE_TIMESTAMP_SKEW_SECONDS,
   PROTOCOL_VERSION,
 } from '../src'
@@ -62,6 +64,13 @@ describe('numeric and string constants', () => {
     expect(WSS_CLOSE_SUPERSEDED).toBe(4000)
     expect(WSS_CLOSE_FORBIDDEN).toBe(4001)
     expect(WSS_CLOSE_PING_TIMEOUT).toBe(4002)
+    expect(WSS_CLOSE_NOT_APPROVED).toBe(4004)
+    expect(WSS_CLOSE_BANNED).toBe(4005)
+  })
+
+  // Recoverable rejections must be distinguishable from the permanently-fatal 4001.
+  test('not-approved and banned are distinct from the forbidden code', () => {
+    expect(new Set([WSS_CLOSE_FORBIDDEN, WSS_CLOSE_NOT_APPROVED, WSS_CLOSE_BANNED]).size).toBe(3)
   })
 
   test('PROBE_TIMESTAMP_SKEW_SECONDS is 5 minutes', () => {

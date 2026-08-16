@@ -41,6 +41,13 @@ export const WSS_PATH = '/connect'
 export const WSS_CLOSE_SUPERSEDED = 4000
 export const WSS_CLOSE_FORBIDDEN = 4001
 export const WSS_CLOSE_PING_TIMEOUT = 4002
+/*
+ * 4004 and 4005 are recoverable rejections and must stay distinct from 4001, which the Media Server
+ * treats as permanently fatal: 4004 clears when the account's cloud service access is approved (or the
+ * feature opens to everyone), 4005 clears when staff lift the suspension.
+ */
+export const WSS_CLOSE_NOT_APPROVED = 4004
+export const WSS_CLOSE_BANNED = 4005
 
 // Max clock skew accepted on probe-header timestamps (design §9 step 2).
 export const PROBE_TIMESTAMP_SKEW_SECONDS = 5 * 60

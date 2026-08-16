@@ -67,6 +67,29 @@ describe('discriminated unions narrow on `type`', () => {
     }
   })
 
+  test('ServerToMediaMessage registered config carries the optional relayHostname', () => {
+    const msg: ServerToMediaMessage = {
+      type: 'registered',
+      publicIp: '203.0.113.5',
+      hostname: 'abc.connect.cardinalapps.host',
+      signingKey: 'base64-key',
+      config: { relayHostname: 'relay.cardinalapps.host' },
+    }
+    if (msg.type === 'registered') {
+      expect(msg.config.relayHostname).toBe('relay.cardinalapps.host')
+    }
+  })
+
+  test('ConfigUpdatePayload carries the optional relayHostname', () => {
+    const msg: ServerToMediaMessage = {
+      type: 'config:update',
+      relayHostname: 'relay.cardinalapps.host',
+    }
+    if (msg.type === 'config:update') {
+      expect(msg.relayHostname).toBe('relay.cardinalapps.host')
+    }
+  })
+
   test('ConnectionInfo offline server omits direct block and has no candidates', () => {
     const info: ConnectionInfo = {
       online: false,

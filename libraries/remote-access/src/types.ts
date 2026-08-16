@@ -37,19 +37,30 @@ export interface CertPayload {
   not_after: string
 }
 
+/*
+ * Server-assigned settings carried in `registered`. Open-ended like ConfigUpdatePayload so new keys
+ * don't need a protocol-version bump. `relayHostname` is the relay endpoint this deployment actually
+ * serves, which lets Media Servers display it instead of their compiled-in default.
+ */
+export interface RegisteredConfig {
+  relayHostname?: string
+  [key: string]: unknown
+}
+
 // Payload of a successful `registered` message (design §8).
 export interface RegisteredPayload {
   publicIp: string
   hostname: string
   signingKey: string
   cert?: CertPayload
-  config: Record<string, unknown>
+  config: RegisteredConfig
 }
 
 // Payload of a `config:update` message. The shape is intentionally open so
 // new keys can be added without a protocol-version bump.
 export interface ConfigUpdatePayload {
   signingKey?: string
+  relayHostname?: string
   [key: string]: unknown
 }
 

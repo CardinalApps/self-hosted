@@ -18,6 +18,8 @@ describe('@cardinalapps/remote-access barrel exports', () => {
       'WSS_CLOSE_SUPERSEDED',
       'WSS_CLOSE_FORBIDDEN',
       'WSS_CLOSE_PING_TIMEOUT',
+      'WSS_CLOSE_NOT_APPROVED',
+      'WSS_CLOSE_BANNED',
       'PROBE_TIMESTAMP_SKEW_SECONDS',
       'PROTOCOL_VERSION',
 
