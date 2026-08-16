@@ -27,6 +27,7 @@ import {
   isContainerEnv,
 } from './utils/env'
 import { setupOpenApiDoc } from './utils/openApi'
+import { getEnabledLogLevels } from './utils/logging'
 
 const PORT = envVar('CARDINAL_HOME_SERVER_PORT', 3080) as number
 
@@ -84,7 +85,9 @@ async function startup() {
   /**
    * Create Nest.js app instance.
    */
-  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: getEnabledLogLevels(),
+  })
 
   app.use(cookieParser())
 

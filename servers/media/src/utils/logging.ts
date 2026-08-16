@@ -1,5 +1,5 @@
-import { Logger } from '@nestjs/common'
-import { envVar } from './env'
+import { Logger, LogLevel as NestLogLevel } from '@nestjs/common'
+import { ENV_VAR, envVar, getCurrentMode, Mode } from './env'
 
 // Severity levels
 export enum LogLevel {
@@ -14,6 +14,36 @@ export enum LogModule {
   INDEXING = 'Indexing',
   JOBS = 'Jobs',
   TRANSCODING = 'Transcoding',
+}
+
+// Every env var that can turn a module's output up to the debug tier
+const MODULE_LOG_LEVEL_VARS: ENV_VAR[] = [
+  'HTTP_LOG_LEVEL',
+  'EVENTS_LOG_LEVEL',
+  'INDEXING_LOG_LEVEL',
+  'JOBS_LOG_LEVEL',
+  'TRANSCODER_LOG_LEVEL',
+  'DATABASE_LOG_LEVEL',
+]
+
+const QUIET_LEVELS: NestLogLevel[] = ['log', 'warn', 'error', 'fatal']
+const ALL_LEVELS: NestLogLevel[] = [...QUIET_LEVELS, 'debug', 'verbose']
+
+/**
+ * The severities this server prints. Nest enables every one of them out of the
+ * box, which leaves a self-hosted server narrating its own housekeeping to a
+ * log nobody reads. Debug output is worth having, but only when it was asked
+ * for: by developing against the server, or by turning a module's level up.
+ */
+export const getEnabledLogLevels = (): NestLogLevel[] => {
+  if (getCurrentMode() === Mode.DEVELOPMENT) {
+    return ALL_LEVELS
+  }
+
+  const moduleDebugRequested = MODULE_LOG_LEVEL_VARS
+    .some((variable) => Number(envVar(variable, LogLevel.SILENT)) >= LogLevel.DEBUG)
+
+  return moduleDebugRequested ? ALL_LEVELS : QUIET_LEVELS
 }
 
 /**
