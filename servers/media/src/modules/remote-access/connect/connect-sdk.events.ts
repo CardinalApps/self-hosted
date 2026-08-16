@@ -9,7 +9,18 @@ import type {
   RelayHttpRequestEnd,
 } from '@cardinalapps/remote-access/dist/cjs'
 
-export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'auth_failed'
+/*
+ * `auth_failed` is terminal and needs the owner. `not_approved` (the account has no approved access
+ * to a Remote Access feature) and `suspended` (staff have suspended the account) clear on someone
+ * else's action, so the server keeps retrying them slowly on its own.
+ */
+export type ConnectionState =
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'auth_failed'
+  | 'not_approved'
+  | 'suspended'
 
 export type BinaryFramePayload = {
   requestId: string,

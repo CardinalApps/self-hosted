@@ -1,4 +1,13 @@
-import { BadRequestException, ConflictException, Controller, Get, InternalServerErrorException, Post, Req } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  Controller,
+  ForbiddenException,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Req,
+} from '@nestjs/common'
 import { ApiConflictResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 
 import { CloudEnableError, ConnectSDKService } from './connect-sdk.service'
@@ -25,6 +34,7 @@ export class ConnectSDKController {
     cloudUserHeader: true,
     errors: {
       400: ['The cloud account JWT header is missing'],
+      403: ['The cloud account has no approved access to Remote Access, and the request has been queued (code <code>service_access_required</code>)'],
     },
   })
   @ApiConflictResponse({ description: 'The cloud IDP refused: every server slot on the cloud account is occupied.' })
@@ -42,6 +52,11 @@ export class ConnectSDKController {
       // The cloud's own refusals carry user-facing messages; pass them through
       if (error instanceof CloudEnableError && error.status === 409) {
         throw new ConflictException(error.message)
+      }
+      /* The code travels with the refusal: the Admin app tells "waiting on approval" apart from
+         "not allowed" by that alone, and Remote Access stays on the server's side waiting. */
+      if (error instanceof CloudEnableError && error.status === 403) {
+        throw new ForbiddenException({ statusCode: 403, message: error.message, code: error.code })
       }
       throw new InternalServerErrorException(`Could not enable Remote Access: ${error.message}`)
     }

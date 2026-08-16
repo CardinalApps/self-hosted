@@ -18,7 +18,10 @@ export class ConnectStatusResponse {
   @ApiProperty({ description: 'Whether Remote Access is enabled on this server.' })
   enabled: boolean
 
-  @ApiProperty({ enum: ['disconnected', 'connecting', 'connected', 'auth_failed'], description: 'Live state of the control channel to the Remote Access Server.' })
+  @ApiProperty({
+    enum: ['disconnected', 'connecting', 'connected', 'auth_failed', 'not_approved', 'suspended'],
+    description: 'Live state of the control channel to the Remote Access Server. `not_approved` means the cloud account is waiting on service access for a Remote Access feature, and `suspended` means the account is suspended; both retry on their own.',
+  })
   state: string
 
   @ApiProperty({ nullable: true, description: 'The hostname assigned by the Remote Access Server, once registered.' })

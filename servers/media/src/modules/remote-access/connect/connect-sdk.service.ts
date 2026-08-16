@@ -7,7 +7,9 @@ import type { WebSocket } from 'ws'
 import {
   MediaToServerMessage,
   ServerToMediaMessage,
+  WSS_CLOSE_BANNED,
   WSS_CLOSE_FORBIDDEN,
+  WSS_CLOSE_NOT_APPROVED,
   WSS_CLOSE_SUPERSEDED,
   WSS_PATH,
   decodeRelayBinaryFrame,
@@ -35,11 +37,11 @@ export type ConnectWebSocket = Pick<WebSocket, 'send' | 'close' | 'terminate' | 
 export type ConnectWsFactory = (url: string) => ConnectWebSocket
 export const CONNECT_WS_FACTORY = 'CONNECT_WS_FACTORY'
 
-// A refusal from the cloud IDP while enabling, kept with its HTTP status so
-// the controller can pass meaningful refusals (like a full slot allowance)
-// through to the Admin app instead of flattening them into a 500
+// A refusal from the cloud IDP while enabling, kept with its HTTP status and error code so the
+// controller can pass meaningful refusals (a full slot allowance, an unapproved account) through
+// to the Admin app instead of flattening them into a 500
 export class CloudEnableError extends Error {
-  constructor(message: string, readonly status: number) {
+  constructor(message: string, readonly status: number, readonly code?: string) {
     super(message)
   }
 }
@@ -48,10 +50,27 @@ export const ENABLE_REMOTE_ACCESS = 'enable_remote_access'
 export const ENABLE_REMOTE_ACCESS_DIRECT = 'enable_remote_access_direct'
 export const ENABLE_REMOTE_ACCESS_RELAY = 'enable_remote_access_relay'
 
+// The cloud IDP's code for "this account has no approved access to a Remote Access feature yet"
+export const SERVICE_ACCESS_REQUIRED = 'service_access_required'
+
 const PING_INTERVAL_MS = 30_000
 const PONG_TIMEOUT_MS = 90_000
 const RECONNECT_BASE_MS = 1_000
 const RECONNECT_CAP_MS = 60_000
+
+/*
+ * Retry cadence for refusals that only somebody else can clear: an approval, or a lifted
+ * suspension. The backoff schedule would spend hours knocking on a door that has already been
+ * answered, but never retrying would mean an approval only takes effect on the next restart.
+ */
+export const SLOW_RETRY_MS = 15 * 60 * 1000
+
+/*
+ * The first application close code this client has no meaning for. Newer gate codes land here, and
+ * they get the slow retry so an old client waiting on a decision cannot hot-loop the server.
+ */
+const UNKNOWN_CLOSE_CODE_FLOOR = 4006
+const APPLICATION_CLOSE_CODE_CEILING = 4999
 
 export type ConnectStatus = {
   enabled: boolean,
@@ -80,6 +99,10 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
   private pingTimer: NodeJS.Timeout | null = null
   private lastPongAt = 0
   private manualStop = false
+  private pendingEnableJwt: string | null = null
+
+  // The slow-retry cadence, mutable so tests do not have to wait out a real 15 minutes
+  static slowRetryMs = SLOW_RETRY_MS
 
   constructor(
     private readonly databaseService: DatabaseService,
@@ -149,9 +172,41 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
    * stores it, marks Remote Access enabled, and connects.
    */
   async enable(cloudJwt: string): Promise<void> {
+    const response = await this.mintServerToken(cloudJwt)
+
+    if (response.status === 201) {
+      await this.acceptServerToken(await response.json())
+      return
+    }
+
+    const body = await response.json().catch(() => null)
+
+    /*
+     * The cloud files the account's access requests as it refuses, so the refusal is already the
+     * queue entry. Hold the enable open and keep asking rather than dropping the owner back to a
+     * toggle they have to remember to flip again.
+     */
+    if (response.status === 403 && body?.code === SERVICE_ACCESS_REQUIRED) {
+      // Enabling is the owner asking for the channel, which clears any earlier manual stop
+      this.manualStop = false
+      this.pendingEnableJwt = cloudJwt
+      this.setState('not_approved')
+      this.scheduleSlowRetry()
+      Logger.log('Remote Access is waiting on cloud service access approval', 'ConnectSDK')
+    }
+
+    throw new CloudEnableError(
+      body?.message || `Cloud IDP returned ${response.status} while issuing a server token`,
+      response.status,
+      body?.code,
+    )
+  }
+
+  // Asks the cloud IDP for a long-lived server token; raw so refusals keep their status and code
+  private async mintServerToken(cloudJwt: string): Promise<Response> {
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
 
-    const response = await fetchAuthAPI<Response>('/user/server-tokens', 'POST', getCurrentMode() as MixedAppEnv, {
+    return await fetchAuthAPI<Response>('/user/server-tokens', 'POST', getCurrentMode() as MixedAppEnv, {
       headers: {
         ...outboundHeaders(),
         Authorization: `Bearer ${cloudJwt}`,
@@ -159,23 +214,53 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       body: { instanceId: instanceId as string },
       returnRawResponse: true,
     })
+  }
 
-    if (response.status !== 201) {
-      const body = await response.json().catch(() => null)
-      throw new CloudEnableError(
-        body?.message || `Cloud IDP returned ${response.status} while issuing a server token`,
-        response.status,
-      )
-    }
-
-    const body = await response.json()
-
+  // Stores a freshly minted server token, marks Remote Access enabled, and opens the channel
+  private async acceptServerToken(body: { serverToken: string }): Promise<void> {
+    this.pendingEnableJwt = null
     await this.databaseService.saveOption(OPTIONS.CONNECT_SERVER_TOKEN.name, body.serverToken)
     await this.setEnabled(true)
     this.tokenRefresher.clear()
 
     Logger.log('Remote Access enabled', 'ConnectSDK')
     void this.connect()
+  }
+
+  /*
+   * Re-attempts a mint the cloud refused for want of access. The admin's cloud JWT is only good for
+   * so long, so a refusal that is not the access gate ends the wait and leaves it to the owner.
+   */
+  private async retryPendingEnable(): Promise<void> {
+    const cloudJwt = this.pendingEnableJwt
+
+    if (!cloudJwt) {
+      return
+    }
+
+    let response: Response
+    try {
+      response = await this.mintServerToken(cloudJwt)
+    } catch (err) {
+      Logger.warn(`Could not reach the cloud IDP while waiting on Remote Access approval: ${err}`, 'ConnectSDK')
+      this.scheduleSlowRetry()
+      return
+    }
+
+    if (response.status === 201) {
+      await this.acceptServerToken(await response.json())
+      return
+    }
+
+    const body = await response.json().catch(() => null)
+
+    if (response.status === 403 && body?.code === SERVICE_ACCESS_REQUIRED) {
+      this.scheduleSlowRetry()
+      return
+    }
+
+    this.pendingEnableJwt = null
+    Logger.warn(`Stopped waiting on Remote Access approval: the cloud IDP returned ${response.status}`, 'ConnectSDK')
   }
 
   /**
@@ -263,6 +348,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
    */
   async disconnect(): Promise<void> {
     this.manualStop = true
+    this.pendingEnableJwt = null
     await this.setEnabled(false)
     this.cancelReconnect()
     this.stopHeartbeat()
@@ -280,6 +366,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const signingKey = await this.databaseService.getOption(OPTIONS.CONNECT_SIGNING_KEY.name)
     const tokenExpiresAt = await this.tokenRefresher.getServerTokenExpiry()
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
+    const relayHost = await this.databaseService.getOption(OPTIONS.CONNECT_RELAY_HOST.name)
     // No fallback here: the UI should say nothing rather than name a port nobody can be reached on
     const publicPort = await this.getPublicPort(null)
 
@@ -293,7 +380,9 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       tokenExpiresAt: tokenExpiresAt?.toISOString() ?? null,
       publicPort,
       directUrl: buildDirectUrl(hostname as string, publicPort),
-      relayUrl: instanceId ? `https://${envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}` : null,
+      relayUrl: instanceId
+        ? `https://${(relayHost as string) || envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}`
+        : null,
       https: this.httpsStatusStore.get(),
     }
   }
@@ -375,6 +464,19 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     })
   }
 
+  /*
+   * Keeps the relay hostname the Remote Access Server advertises, when it advertises one. The
+   * built-in fallback names the production relay, which is the wrong address on a stack that runs
+   * its own. Display-only: nothing dials the relay from this side.
+   */
+  private async rememberRelayHostname(hostname: unknown): Promise<void> {
+    if (typeof hostname !== 'string' || !hostname) {
+      return
+    }
+
+    await this.databaseService.saveOption(OPTIONS.CONNECT_RELAY_HOST.name, hostname)
+  }
+
   // Routes JSON control messages and binary relay frames
   private async handleMessage(data: Buffer, isBinary: boolean): Promise<void> {
     if (isBinary) {
@@ -399,6 +501,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       case 'registered': {
         await this.databaseService.saveOption(OPTIONS.CONNECT_SIGNING_KEY.name, message.signingKey)
         await this.databaseService.saveOption(OPTIONS.CONNECT_HOSTNAME.name, message.hostname)
+        await this.rememberRelayHostname(message.config?.relayHostname)
         if (message.cert) {
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_CERT_PEM.name, message.cert.cert_pem)
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_KEY_PEM.name, message.cert.key_pem)
@@ -423,6 +526,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
         if (message.signingKey) {
           await this.databaseService.saveOption(OPTIONS.CONNECT_SIGNING_KEY.name, message.signingKey)
         }
+        await this.rememberRelayHostname(message.relayHostname)
         this.events.emit('config:update', message)
         break
       }
@@ -477,6 +581,27 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       return
     }
 
+    if (code === WSS_CLOSE_BANNED) {
+      this.setState('suspended')
+      Logger.error('The Remote Access Server refused this connection: the cloud account is suspended. Retrying periodically.', 'ConnectSDK')
+      this.scheduleSlowRetry()
+      return
+    }
+
+    if (code === WSS_CLOSE_NOT_APPROVED) {
+      this.setState('not_approved')
+      Logger.warn('The Remote Access Server refused this connection: the cloud account has no approved access. Retrying periodically.', 'ConnectSDK')
+      this.scheduleSlowRetry()
+      return
+    }
+
+    if (code >= UNKNOWN_CLOSE_CODE_FLOOR && code <= APPLICATION_CLOSE_CODE_CEILING) {
+      this.setState('disconnected')
+      Logger.warn(`The Remote Access Server closed the connection with an unrecognized code (${code}). Retrying periodically.`, 'ConnectSDK')
+      this.scheduleSlowRetry()
+      return
+    }
+
     this.setState('disconnected')
     this.scheduleReconnect()
   }
@@ -515,6 +640,22 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       this.reconnectTimer = null
       void this.connect()
     }, delay)
+  }
+
+  /*
+   * The recovery path for a refusal that clears on someone else's action. It shares the reconnect
+   * timer slot so a manual disable cancels it like any other pending attempt, and it resumes
+   * whichever half of the handshake was refused: the token mint, or the socket.
+   */
+  private scheduleSlowRetry(): void {
+    if (this.reconnectTimer || this.manualStop) {
+      return
+    }
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null
+      void (this.pendingEnableJwt ? this.retryPendingEnable() : this.connect())
+    }, ConnectSDKService.slowRetryMs)
   }
 
   private cancelReconnect(): void {

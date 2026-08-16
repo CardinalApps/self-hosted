@@ -1,9 +1,10 @@
 import * as http from 'http'
 import { AddressInfo } from 'net'
 import { WebSocket, WebSocketServer } from 'ws'
+import { WSS_CLOSE_BANNED } from '@cardinalapps/remote-access/dist/cjs'
 
 import { createTestApp, TestApp } from '../../../helpers/create-app'
-import { ConnectSDKService } from '../../../../src/modules/remote-access/connect/connect-sdk.service'
+import { ConnectSDKService, SLOW_RETRY_MS } from '../../../../src/modules/remote-access/connect/connect-sdk.service'
 import { TokenRefresher } from '../../../../src/modules/remote-access/connect/token-refresher'
 import { DatabaseService } from '../../../../src/modules/database/database.service'
 import { OPTIONS } from '../../../../src/utils/options'
@@ -48,6 +49,8 @@ describe('ConnectSDK (integration)', () => {
   let wssHttp: http.Server
   let wss: WebSocketServer
   const connections: ReceivedConnection[] = []
+  // When set, the stub turns every arriving connection away with this close code
+  let refuseWithCode: number | null = null
 
   beforeAll(async () => {
     wssHttp = http.createServer()
@@ -59,6 +62,10 @@ describe('ConnectSDK (integration)', () => {
       socket.on('message', (data) => {
         connection.messages.push(JSON.parse(data.toString()))
       })
+
+      if (refuseWithCode) {
+        socket.close(refuseWithCode)
+      }
     })
     await new Promise<void>((resolve) => wssHttp.listen(0, '127.0.0.1', resolve))
     const wssPort = (wssHttp.address() as AddressInfo).port
@@ -87,6 +94,7 @@ describe('ConnectSDK (integration)', () => {
 
   afterAll(async () => {
     delete process.env.CONNECT_HTTPS_PORT
+    ConnectSDKService.slowRetryMs = SLOW_RETRY_MS
     await service?.disconnect()
     await testApp?.app.close()
     await new Promise((resolve) => wss.close(resolve))
@@ -135,5 +143,37 @@ describe('ConnectSDK (integration)', () => {
     connection.socket.send(JSON.stringify({ type: 'config:update', signingKey: rotatedKey }))
 
     await waitFor(async () => (await databaseService.getOption(OPTIONS.CONNECT_SIGNING_KEY.name)) === rotatedKey)
+  })
+
+  /* A suspension is lifted by staff, not by the server owner, so the server has to find its own
+     way back without anyone touching the Admin app. */
+  it('waits out a 4005 suspension and reconnects once the server stops refusing', async () => {
+    ConnectSDKService.slowRetryMs = 250
+    refuseWithCode = WSS_CLOSE_BANNED
+    const refusedFrom = connections.length
+
+    connections[connections.length - 1].socket.close(WSS_CLOSE_BANNED)
+
+    await waitFor(async () => (await service.getStatus()).state === 'suspended')
+
+    // The retries keep coming while the suspension stands, and keep being turned away
+    await waitFor(() => connections.length > refusedFrom + 1)
+    expect((await service.getStatus()).state).toBe('suspended')
+
+    refuseWithCode = null
+    const recovered = await waitFor(() => connections
+      .slice(refusedFrom)
+      .find((connection) => connection.messages.some((message) => message.type === 'register')))
+
+    recovered.socket.send(JSON.stringify({
+      type: 'registered',
+      publicIp: '203.0.113.9',
+      hostname: 'itest-instance-1.connect.cardinalapps.host',
+      signingKey: Buffer.alloc(32, 9).toString('base64'),
+      config: { relayHostname: 'relay.itest.internal' },
+    }))
+
+    await waitFor(async () => (await service.getStatus()).state === 'connected')
+    expect((await service.getStatus()).relayUrl).toBe('https://relay.itest.internal/relay/itest-instance-1')
   })
 })

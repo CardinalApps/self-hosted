@@ -80,6 +80,12 @@ export const OPTIONS = {
     name: 'connect_tls_key_pem',
     default: undefined,
   },
+  // The relay hostname the Remote Access Server advertises on registration; unset falls back to
+  // CONNECT_RELAY_HOST. Display-only: it names the relay in the Admin app
+  CONNECT_RELAY_HOST: <Option>{
+    name: 'connect_relay_host',
+    default: undefined,
+  },
   // User-provided FQDN (Path 1); null/unset for Path 2
   CONNECT_BYO_HOSTNAME: <Option>{
     name: 'connect_byo_hostname',

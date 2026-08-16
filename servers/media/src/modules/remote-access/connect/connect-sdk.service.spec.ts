@@ -1,8 +1,30 @@
 /* eslint-disable turbo/no-undeclared-env-vars -- tests drive the advertised port through the real env vars */
 import { EventEmitter } from 'node:events'
-import { encodeRelayBinaryFrame, WSS_CLOSE_FORBIDDEN, WSS_CLOSE_SUPERSEDED } from '@cardinalapps/remote-access/dist/cjs'
+import {
+  encodeRelayBinaryFrame,
+  WSS_CLOSE_BANNED,
+  WSS_CLOSE_FORBIDDEN,
+  WSS_CLOSE_NOT_APPROVED,
+  WSS_CLOSE_PING_TIMEOUT,
+  WSS_CLOSE_SUPERSEDED,
+} from '@cardinalapps/remote-access/dist/cjs'
 
-import { ConnectSDKService, ConnectWebSocket, getLocalIps } from './connect-sdk.service'
+jest.mock('@cardinalapps/topology/dist/cjs', () => ({
+  ...jest.requireActual('@cardinalapps/topology/dist/cjs'),
+  fetchAuthAPI: jest.fn(),
+}))
+
+import { fetchAuthAPI } from '@cardinalapps/topology/dist/cjs'
+
+import {
+  CloudEnableError,
+  ConnectSDKService,
+  ConnectWebSocket,
+  ENABLE_REMOTE_ACCESS,
+  getLocalIps,
+  SERVICE_ACCESS_REQUIRED,
+  SLOW_RETRY_MS,
+} from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
 import { HttpsStatusStore } from './https-status.store'
 import { SettingsService } from '../../settings/settings.service'
@@ -97,6 +119,15 @@ function makeRefresher() {
     getServerTokenExpiry: jest.fn(async () => new Date(Date.now() + 1000000)),
     clear: jest.fn(),
   }
+}
+
+const mockedFetchAuthAPI = fetchAuthAPI as jest.Mock
+
+// The cloud IDP's answers to a server-token mint
+const cloudResponses = {
+  minted: (serverToken = 'server-token') => ({ status: 201, json: async () => ({ serverToken }) }),
+  gated: () => ({ status: 403, json: async () => ({ message: 'Access has not been approved.', code: SERVICE_ACCESS_REQUIRED }) }),
+  slotsExhausted: () => ({ status: 409, json: async () => ({ message: 'Every server slot is in use.', code: 'server_slots_exhausted' }) }),
 }
 
 // Flushes pending microtasks without advancing fake timers
@@ -558,6 +589,157 @@ describe('ConnectSDKService enabled setting', () => {
   })
 })
 
+describe('ConnectSDKService access gate', () => {
+  // Connects and opens a socket, then hands back the harness
+  async function live(dbOptions: Record<string, string> = ENABLED_OPTIONS) {
+    const harness = makeService(dbOptions)
+    await harness.service.connect()
+    await flush()
+    harness.sockets[0].open()
+    await flush()
+    return harness
+  }
+
+  it('lands in suspended after a 4005 close instead of the fatal auth_failed', async () => {
+    const { service, sockets } = await live()
+
+    sockets[0].emit('close', WSS_CLOSE_BANNED)
+    await flush()
+
+    expect((await service.getStatus()).state).toBe('suspended')
+  })
+
+  it('lands in not_approved after a 4004 close', async () => {
+    const { service, sockets } = await live()
+
+    sockets[0].emit('close', WSS_CLOSE_NOT_APPROVED)
+    await flush()
+
+    expect((await service.getStatus()).state).toBe('not_approved')
+  })
+
+  // A lifted suspension has to recover on its own, but slowly enough to not hammer the server
+  it.each([
+    ['a suspension', WSS_CLOSE_BANNED],
+    ['a refused access gate', WSS_CLOSE_NOT_APPROVED],
+    ['an unknown application close code', 4006],
+  ])('retries %s on the slow cadence rather than the backoff schedule', async (_label, code) => {
+    const { factory, sockets } = await live()
+
+    sockets[0].emit('close', code)
+    await advance(60_000)
+    expect(factory).toHaveBeenCalledTimes(1)
+
+    await advance(SLOW_RETRY_MS)
+    expect(factory).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps the fast backoff for a ping-timeout close', async () => {
+    const { factory, sockets } = await live()
+
+    sockets[0].emit('close', WSS_CLOSE_PING_TIMEOUT)
+    await advance(1_250)
+
+    expect(factory).toHaveBeenCalledTimes(2)
+  })
+
+  it('stops retrying a suspension once the owner turns Remote Access off', async () => {
+    const { service, factory, sockets } = await live()
+
+    sockets[0].emit('close', WSS_CLOSE_BANNED)
+    await flush()
+    await service.disconnect()
+    await advance(SLOW_RETRY_MS * 2)
+
+    expect(factory).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('ConnectSDKService enable', () => {
+  const DISABLED_OPTIONS = { [OPTIONS.INSTANCE_ID.name]: 'instance-1234' }
+
+  beforeEach(() => {
+    mockedFetchAuthAPI.mockReset()
+  })
+
+  it('stores the minted token, enables, and opens the channel', async () => {
+    const { service, db, settings, factory } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.minted())
+
+    await service.enable('admin-jwt')
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_SERVER_TOKEN.name]).toBe('server-token')
+    expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBe('true')
+    expect(settings.values[ENABLE_REMOTE_ACCESS]).toBe(true)
+    expect(factory).toHaveBeenCalledTimes(1)
+  })
+
+  /* The refusal is the queue entry, so the server waits it out instead of making the owner
+     come back and try again. */
+  it('reports the gate refusal with its code and leaves the enabled state alone', async () => {
+    const { service, db, settings } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+
+    await expect(service.enable('admin-jwt')).rejects.toMatchObject({
+      status: 403,
+      code: SERVICE_ACCESS_REQUIRED,
+    })
+
+    expect((await service.getStatus()).state).toBe('not_approved')
+    expect(settings.set).not.toHaveBeenCalled()
+    expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBeUndefined()
+  })
+
+  it('finishes enabling when a later retry finds the account approved', async () => {
+    const { service, db, factory } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI
+      .mockResolvedValueOnce(cloudResponses.gated())
+      .mockResolvedValueOnce(cloudResponses.minted('approved-token'))
+
+    await expect(service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+    await advance(SLOW_RETRY_MS)
+
+    expect(db.options[OPTIONS.CONNECT_SERVER_TOKEN.name]).toBe('approved-token')
+    expect(db.options[OPTIONS.CONNECT_ENABLED.name]).toBe('true')
+    expect(factory).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps retrying while the account is still waiting for approval', async () => {
+    const { service } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+
+    await expect(service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+    await advance(SLOW_RETRY_MS)
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(3)
+    expect((await service.getStatus()).state).toBe('not_approved')
+  })
+
+  // Enabling is the owner asking again, so an earlier disable must not smother the new wait
+  it('waits again when the owner re-enables after having turned Remote Access off', async () => {
+    const { service } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.gated())
+
+    await service.disconnect()
+    await expect(service.enable('admin-jwt')).rejects.toBeInstanceOf(CloudEnableError)
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not retry refusals the account cannot wait out', async () => {
+    const { service } = makeService(DISABLED_OPTIONS)
+    mockedFetchAuthAPI.mockResolvedValue(cloudResponses.slotsExhausted())
+
+    await expect(service.enable('admin-jwt')).rejects.toMatchObject({ status: 409 })
+    await advance(SLOW_RETRY_MS)
+
+    expect(mockedFetchAuthAPI).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('the advertised public port', () => {
   afterEach(() => {
     delete process.env.CONNECT_HTTPS_PORT
@@ -675,6 +857,33 @@ describe('ConnectSDKService connection URLs', () => {
     const { service } = makeService()
 
     expect((await service.getStatus()).relayUrl).toBe('https://relay.cardinalapps.host/relay/instance-1234')
+  })
+
+  /* The built-in host is the production one, which is wrong on a self-contained stack. The
+     Remote Access Server knows where its own relay answers, so its answer wins. */
+  it('prefers the relay hostname the Remote Access Server advertises', async () => {
+    const { service, sockets } = makeService()
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+    sockets[0].receive({
+      type: 'registered',
+      publicIp: '203.0.113.7',
+      hostname: 'h',
+      signingKey: 'a2V5',
+      config: { relayHostname: 'relay.test.internal' },
+    })
+    await flush()
+
+    expect((await service.getStatus()).relayUrl).toBe('https://relay.test.internal/relay/instance-1234')
+  })
+
+  it('keeps the advertised relay hostname across restarts', async () => {
+    const { service } = makeService({ ...ENABLED_OPTIONS, [OPTIONS.CONNECT_RELAY_HOST.name]: 'relay.test.internal' })
+
+    expect((await service.getStatus()).relayUrl).toBe('https://relay.test.internal/relay/instance-1234')
   })
 
   it('surfaces the HTTPS listener state that the listener published', async () => {
