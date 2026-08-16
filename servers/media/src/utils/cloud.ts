@@ -28,6 +28,8 @@ type AuthFetchOptions = {
   headers?: Record<string, string>,
   body?: Record<string, string>,
   JWT?: string,
+  // Hands back the untouched Response, which is the only way a caller can read the status of a refusal
+  returnRawResponse?: boolean,
 }
 
 type WebsiteFetchOptions = {
@@ -126,6 +128,7 @@ export function authAPI<T>(endpoint: Endpoint, method?: HTTPMethod, options?: Au
       {
         headers,
         body: options.body,
+        returnRawResponse: options?.returnRawResponse,
       },
     )
       .then((res: T) => {

@@ -2,6 +2,7 @@ import {
   Controller,
   Logger,
   ForbiddenException,
+  ServiceUnavailableException,
   UnauthorizedException,
   Post,
   Body,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common'
 import {
   ApiHeader,
+  ApiServiceUnavailableResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
@@ -19,7 +21,8 @@ import { LoginDetails } from './dtos/LoginDetails.dto'
 import { AuthService } from './auth.service'
 import { TokenService } from './token.service'
 import { UserService } from '../user/user.service'
-import { CloudUserService } from '../user/cloud-user.service'
+import { CloudUserService, CloudUserLookupError } from '../user/cloud-user.service'
+import { AUTH_ERROR_CODE } from './types'
 
 import { LoginResponse } from './dtos/LoginResponse.dto'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
@@ -118,7 +121,12 @@ export class LoginController {
   @StandardEndpoint({
     auth: false,
     summary: 'Refresh access token using the httpOnly cookie.',
+    cloudUserHeader: true,
+    errors: {
+      401: [`A cloud-linked account sent no cloud token, or one the cloud no longer accepts (code <code>${AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED}</code>). The local session is unaffected: sign back into the Cardinal account and retry`],
+    },
   })
+  @ApiServiceUnavailableResponse({ description: `The Cardinal cloud could not be reached to verify a cloud-linked account (code <code>${AUTH_ERROR_CODE.CLOUD_UNAVAILABLE}</code>). Nothing about the session has changed.` })
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -144,12 +152,7 @@ export class LoginController {
 
     // Validate status of the cloud account
     if (user.cardinalId) {
-      const cloudJWT = getCardinalTolkienFromHeaders(req.headers)
-      if (!cloudJWT) {
-        throw new UnauthorizedException('Cloud-linked account must present a cloud token')
-      }
-      const cloudUser = await this.cloudUserService.getCardinalCloudUser(cloudJWT)
-      this.cloudUserService.throwIfInvalidCardinalAccount(cloudUser)
+      await this.validateCloudAccount(req)
     }
 
     const newAccessToken = await this.tokenService.createAccessToken(payload.uid)
@@ -165,6 +168,40 @@ export class LoginController {
     res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshToken, cookieOptions)
 
     return { JWT: newAccessToken, scope: (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local' }
+  }
+
+  /*
+   * Judges the cloud half of a cloud-linked session. Every answer here is coded, because the client
+   * holds two credentials and only ever sees one status line: an uncoded 401 costs it the local
+   * session too, and an outage dressed up as a 401 costs the user both for nothing.
+   */
+  private async validateCloudAccount(req: Request): Promise<void> {
+    const cloudJWT = getCardinalTolkienFromHeaders(req.headers)
+
+    if (!cloudJWT) {
+      throw new UnauthorizedException({
+        code: AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED,
+        message: 'This account is linked to a Cardinal account, so a cloud token must be sent.',
+      })
+    }
+
+    try {
+      const cloudUser = await this.cloudUserService.getCardinalCloudUser(cloudJWT)
+      this.cloudUserService.throwIfInvalidCardinalAccount(cloudUser)
+    } catch (error) {
+      if (error instanceof CloudUserLookupError && !error.cloudAnswered) {
+        Logger.warn(`Could not verify a cloud account while refreshing: ${error.message}`, 'Auth')
+        throw new ServiceUnavailableException({
+          code: AUTH_ERROR_CODE.CLOUD_UNAVAILABLE,
+          message: 'The Cardinal cloud could not be reached. Your session has been left alone.',
+        })
+      }
+
+      throw new UnauthorizedException({
+        code: AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED,
+        message: error?.message || 'This Cardinal account could not be verified.',
+      })
+    }
   }
 
   /**
