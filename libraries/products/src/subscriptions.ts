@@ -24,7 +24,11 @@ export type SubscriptionTier = {
     remote_access_slots: number,
   },
   prices: {
-    // Use the "Lookup Key" in Stripe for each price
+    /*
+     * Keys of STRIPE_PRICES in the auth server, which is what resolves them to
+     * a Stripe price ID. Deliberately not Stripe's own lookup keys: those are
+     * dated per repricing, and these are the app's stable internal identifier.
+     */
     monthly?: string,
     yearly?: string,
   },
@@ -42,7 +46,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "free",
     provides: {
-      seats: 2,
+      seats: 1,
       popularity_data_pool: true,
       remote_access_slots: 1,
     },
@@ -71,7 +75,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "starter",
     provides: {
-      seats: 5,
+      seats: 2,
       popularity_data_pool: true,
       remote_access_slots: 1,
     },
@@ -86,7 +90,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "pro",
     provides: {
-      seats: 20,
+      seats: 6,
       popularity_data_pool: true,
       remote_access_slots: 1,
     },
@@ -101,7 +105,7 @@ export const SUBSCRIPTIONS = {
     },
     slug: "ultimate",
     provides: {
-      seats: 40,
+      seats: 12,
       popularity_data_pool: true,
       remote_access_slots: 1,
     },

@@ -92,7 +92,7 @@ describe('GET /api/v1/licensing/seats', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .expect(200)
 
-    expect(res.body.total).toBe(2)
+    expect(res.body.total).toBe(1)
   })
 
   it('used seats does not count the guest account', async () => {
@@ -124,7 +124,7 @@ describe('seat and subscription changes after a cloud owner is added', () => {
     const databaseService = testApp.moduleRef.get(DatabaseService)
 
     // Insert a cloud user directly, bypassing the JWT validation that
-    // createServerOwner() requires. The pro tier provides 20 seats.
+    // createServerOwner() requires. The pro tier provides 6 seats.
     const ownerData: Partial<User> = {
       userId: 'test-cloud-owner',
       cardinalId: 'test-cardinal-id',
@@ -162,7 +162,7 @@ describe('seat and subscription changes after a cloud owner is added', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .expect(200)
 
-    expect(res.body.total).toBe(20)
+    expect(res.body.total).toBe(6)
   })
 
   it('used seats counts the cloud owner', async () => {
