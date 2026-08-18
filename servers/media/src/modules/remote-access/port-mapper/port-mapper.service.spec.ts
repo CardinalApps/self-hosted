@@ -5,9 +5,8 @@ import {
   ENABLE_REMOTE_ACCESS_UPNP,
   PortMapperService,
   classifyMappingError,
-  isDockerBridgeAddress,
-  looksLikeDockerBridge,
 } from './port-mapper.service'
+import { isDockerBridgeAddress, looksLikeDockerBridge } from '../docker'
 import { UpnpClient } from './port-mapper.types'
 import { DatabaseService } from '../../database/database.service'
 import { SettingsService } from '../../settings/settings.service'

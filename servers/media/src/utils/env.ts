@@ -66,7 +66,8 @@ export type ENV_VAR =
   'SQLITE_WAL' |
   'SQLITE_PATH' |
   'SECURE_COOKIES' |
-  'CONNECT_HTTPS_PORT'
+  'CONNECT_HTTPS_PORT' |
+  'CONNECT_LAN_IPS'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.

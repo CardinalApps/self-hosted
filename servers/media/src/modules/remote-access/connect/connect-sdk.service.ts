@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as os from 'os'
+import * as net from 'net'
 import * as path from 'path'
 import * as crypto from 'crypto'
 import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common'
@@ -22,6 +23,7 @@ import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
 import { HttpsStatus, HttpsStatusStore } from './https-status.store'
 import { ConnectAuthError, TokenRefresher } from './token-refresher'
 import { getPinnedHttpsPort, resolvePublicPort, toPort } from '../ports'
+import { isDockerBridgeAddress, looksLikeDockerBridge } from '../docker'
 import { SettingsService } from '../../settings/settings.service'
 import { SettingsEvents, SettingsChangedEventPayload } from '../../settings/events'
 import { SettingName } from '../../settings/types'
@@ -483,7 +485,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       type: 'register',
       instanceId: instanceId as string,
       publicPort,
-      localIps: getLocalIps(),
+      localIps: resolveLanIps(),
       version: getServerVersion(),
       ...(byoHostname ? { byoHostname: byoHostname as string } : {}),
       directEnabled: await this.isPathEnabled(ENABLE_REMOTE_ACCESS_DIRECT),
@@ -610,7 +612,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
 
     if (code === WSS_CLOSE_BANNED) {
       this.setState('suspended')
-      Logger.error('The Remote Access Server refused this connection: the cloud account is suspended. Retrying periodically.', 'ConnectSDK')
+      Logger.error('The Remote Access Server refused this connection: this Media Server is suspended. Retrying periodically.', 'ConnectSDK')
       this.scheduleSlowRetry()
       return
     }
@@ -707,6 +709,59 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     this.state = state
     this.events.emit('connection:state', state)
   }
+}
+
+// The advice is worth saying once at startup, not on every register the socket makes
+let warnedAboutBridgedLan = false
+
+/**
+ * The addresses advertised to the Remote Access Server as this server's LAN candidates.
+ *
+ * `CONNECT_LAN_IPS` wins outright: on a bridged container, or behind any other layer of address
+ * translation, only the deployment knows the address clients can actually dial. Failing that the
+ * interfaces are the answer, minus the container's own bridge address — a candidate nothing outside
+ * the bridge can reach costs every LAN-first client a connection timeout before it falls back.
+ */
+export function resolveLanIps(
+  configured = envVar('CONNECT_LAN_IPS', null),
+  interfaces = os.networkInterfaces(),
+  inContainer = fs.existsSync('/.dockerenv'),
+): string[] {
+  const declared = parseLanIps(configured)
+
+  if (declared.length) {
+    return declared
+  }
+
+  const detected = getLocalIps(interfaces)
+
+  if (!looksLikeDockerBridge(inContainer, interfaces)) {
+    return detected
+  }
+
+  if (!warnedAboutBridgedLan) {
+    warnedAboutBridgedLan = true
+    Logger.warn(
+      'This server is on a Docker bridge network, so the address it sees is not one your other devices can reach. '
+      + 'It will not be offered for local connections. Set CONNECT_LAN_IPS to this machine\'s address on your '
+      + 'network so nearby devices connect directly instead of over the internet.',
+      'ConnectSDK',
+    )
+  }
+
+  return detected.filter((address) => !isDockerBridgeAddress(address))
+}
+
+// Splits the configured addresses, dropping anything that is not one so a typo cannot be advertised
+function parseLanIps(configured: unknown): string[] {
+  if (typeof configured !== 'string') {
+    return []
+  }
+
+  return configured
+    .split(',')
+    .map((address) => address.trim())
+    .filter((address) => net.isIP(address) !== 0)
 }
 
 /**

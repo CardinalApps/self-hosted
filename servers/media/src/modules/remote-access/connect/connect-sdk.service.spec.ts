@@ -1,5 +1,6 @@
 /* eslint-disable turbo/no-undeclared-env-vars -- tests drive the advertised port through the real env vars */
 import { EventEmitter } from 'node:events'
+import { Logger } from '@nestjs/common'
 import {
   encodeRelayBinaryFrame,
   WSS_CLOSE_BANNED,
@@ -22,6 +23,7 @@ import {
   ConnectWebSocket,
   ENABLE_REMOTE_ACCESS,
   getLocalIps,
+  resolveLanIps,
   SERVICE_ACCESS_REQUIRED,
   SLOW_RETRY_MS,
 } from './connect-sdk.service'
@@ -1021,25 +1023,25 @@ describe('ConnectSDKService connection URLs', () => {
   })
 })
 
-describe('getLocalIps', () => {
-  const v4 = (address: string, internal = false) => ({
-    address,
-    netmask: '255.255.255.0',
-    family: 'IPv4' as const,
-    mac: '00:00:00:00:00:00',
-    internal,
-    cidr: `${address}/24`,
-  })
-  const v6 = (address: string, scopeid = 0, internal = false) => ({
-    address,
-    netmask: 'ffff:ffff:ffff:ffff::',
-    family: 'IPv6' as const,
-    mac: '00:00:00:00:00:00',
-    internal,
-    scopeid,
-    cidr: `${address}/64`,
-  })
+const v4 = (address: string, internal = false) => ({
+  address,
+  netmask: '255.255.255.0',
+  family: 'IPv4' as const,
+  mac: '00:00:00:00:00:00',
+  internal,
+  cidr: `${address}/24`,
+})
+const v6 = (address: string, scopeid = 0, internal = false) => ({
+  address,
+  netmask: 'ffff:ffff:ffff:ffff::',
+  family: 'IPv6' as const,
+  mac: '00:00:00:00:00:00',
+  internal,
+  scopeid,
+  cidr: `${address}/64`,
+})
 
+describe('getLocalIps', () => {
   it('collects external IPv4 plus global and ULA IPv6', () => {
     const ips = getLocalIps({
       eth0: [v4('192.168.1.40'), v6('2001:db8::5'), v6('fd00::5')],
@@ -1053,5 +1055,65 @@ describe('getLocalIps', () => {
       eth0: [v4('169.254.10.4'), v6('fe80::1', 2), v6('fe80::2', 3)],
     })
     expect(ips).toEqual([])
+  })
+})
+
+describe('resolveLanIps', () => {
+  const bridge = { eth0: [v4('172.18.0.2')] }
+
+  beforeEach(() => {
+    delete process.env.CONNECT_LAN_IPS
+    jest.spyOn(Logger, 'warn').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    delete process.env.CONNECT_LAN_IPS
+    jest.restoreAllMocks()
+  })
+
+  it('advertises the configured addresses instead of the ones on the interfaces', () => {
+    process.env.CONNECT_LAN_IPS = '192.168.2.232'
+
+    expect(resolveLanIps(undefined, bridge, true)).toEqual(['192.168.2.232'])
+  })
+
+  it('accepts a list and drops entries that are not addresses', () => {
+    process.env.CONNECT_LAN_IPS = ' 192.168.2.232 ,not-an-ip, 2001:db8::5 '
+
+    expect(resolveLanIps(undefined, bridge, true)).toEqual(['192.168.2.232', '2001:db8::5'])
+  })
+
+  it('falls back to the interfaces when the value is empty', () => {
+    process.env.CONNECT_LAN_IPS = ''
+
+    expect(resolveLanIps(undefined, { eth0: [v4('192.168.1.40')] }, false)).toEqual(['192.168.1.40'])
+  })
+
+  it('advertises no LAN address at all inside an unconfigured bridged container', () => {
+    expect(resolveLanIps(undefined, bridge, true)).toEqual([])
+  })
+
+  it('keeps the addresses a bridged container really can be reached on', () => {
+    const interfaces = { eth0: [v4('172.18.0.2'), v6('2001:db8::5')] }
+
+    expect(resolveLanIps(undefined, interfaces, true)).toEqual(['2001:db8::5'])
+  })
+
+  it('leaves a host that legitimately uses 172.16/12 alone', () => {
+    expect(resolveLanIps(undefined, { eth0: [v4('172.20.5.5')] }, false)).toEqual(['172.20.5.5'])
+  })
+
+  // A fresh registry, because the guard that makes this a startup notice and not a per-register one
+  // is module state that the tests above have already spent
+  it('says something about the bridged container once, not on every register', async () => {
+    jest.resetModules()
+    const freshLogger = (await import('@nestjs/common')).Logger
+    const warn = jest.spyOn(freshLogger, 'warn').mockImplementation(() => undefined)
+    const { resolveLanIps: isolated } = await import('./connect-sdk.service')
+
+    isolated(undefined, bridge, true)
+    isolated(undefined, bridge, true)
+
+    expect(warn).toHaveBeenCalledTimes(1)
   })
 })

@@ -1,5 +1,3 @@
-import * as fs from 'fs'
-import * as os from 'os'
 import { Inject, Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common'
 
 import {
@@ -9,6 +7,7 @@ import {
   UpnpClient,
   UpnpClientFactory,
 } from './port-mapper.types'
+import { looksLikeDockerBridge } from '../docker'
 import { DatabaseService } from '../../database/database.service'
 import { SettingsService } from '../../settings/settings.service'
 import { CardinalApp } from '../../../utils/apps'
@@ -297,38 +296,6 @@ export class PortMapperService implements OnApplicationBootstrap, OnApplicationS
       Logger.log('Port mapping disabled', 'PortMapper')
     }
   }
-}
-
-/**
- * Whether this process looks like it is running on a Docker bridge network,
- * where UPnP can never work. Both signals are needed: host networking also
- * reports `/.dockerenv`, and a plain host can legitimately use 172.16/12.
- */
-export function looksLikeDockerBridge(
-  inContainer = fs.existsSync('/.dockerenv'),
-  interfaces = os.networkInterfaces(),
-): boolean {
-  if (!inContainer) {
-    return false
-  }
-
-  const addresses = Object.values(interfaces)
-    .flatMap((entries) => entries ?? [])
-    .filter((entry) => !entry.internal && entry.family === 'IPv4')
-    .map((entry) => entry.address)
-
-  return addresses.length > 0 && addresses.every(isDockerBridgeAddress)
-}
-
-// Whether an IPv4 address is inside 172.16.0.0/12, Docker's default bridge pool
-export function isDockerBridgeAddress(address: string): boolean {
-  const octets = address.split('.').map(Number)
-
-  if (octets.length !== 4 || octets.some((octet) => !Number.isInteger(octet))) {
-    return false
-  }
-
-  return octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31
 }
 
 /**
