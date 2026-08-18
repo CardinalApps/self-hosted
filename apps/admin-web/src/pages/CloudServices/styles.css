@@ -29,6 +29,11 @@
 
   .alert {
     margin-top: 10px;
+    margin-bottom: 10px;
+
+    .span-icon i {
+      color: inherit;
+    }
   }
 }
 
@@ -39,6 +44,10 @@
 
   .alert {
     margin-top: 10px;
+
+    .span-icon i {
+      color: inherit;
+    }
   }
 
   .cors-origins {

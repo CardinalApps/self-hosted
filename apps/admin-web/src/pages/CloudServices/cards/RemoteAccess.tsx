@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -32,7 +32,9 @@ import {
 import {
   useEnableRemoteAccessMutation,
   useDisableRemoteAccessMutation,
+  useGetConnectStatusQuery,
 } from '@cardinalapps/ui/src/store/apis/remoteAccess'
+import type { ConnectionState } from '@cardinalapps/ui/src/store/apis/remoteAccess'
 
 import { ENABLE_REMOTE_ACCESS_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access'
 import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_direct'
@@ -55,6 +57,8 @@ const ACCESS_TITLES = {
 } as const
 
 const ENABLE_REQUIRES_SUBSCRIPTION = true
+
+const STATUS_POLL_MS = 20000
 
 // Card for the Remote Access cloud service
 function RemoteAccess() {
@@ -82,6 +86,41 @@ function RemoteAccess() {
   /* The Media Server records a refused enable as an enable, so waiting for access is a state the
      toggle is on for. The wait is reported alongside it rather than instead of it. */
   const queued = refused || isQueuedForRemoteAccess(features)
+
+  /* The same fold the path rows' checkmarks use, so an opened gate still counts as access once
+     Remote Access outgrows the beta. A suspension leaves the grant approved on purpose: the drawer
+     is where a suspended account reads what happened. */
+  const approved = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) =>
+    serviceAccessIndicator(features, slug) === 'granted')
+
+  /* Approvals and lifted suspensions are decided on Cardinal's side and picked up by the Media
+     Server on its own retry schedule, so the only way this card hears about one is by watching.
+     Display data only — the switches keep reading the settings slice. */
+  const { data: status } = useGetConnectStatusQuery(undefined, {
+    skip: !canUpdate || !(enabled || queued),
+    pollingInterval: STATUS_POLL_MS,
+  })
+
+  const connectionState = status?.state ?? null
+  const lastConnectionState = useRef<ConnectionState | null>(null)
+
+  // Re-read everything the card paints from whenever the Media Server's connection changes under it
+  useEffect(() => {
+    const previous = lastConnectionState.current
+    lastConnectionState.current = connectionState
+
+    if (!connectionState || !previous || previous === connectionState) {
+      return
+    }
+
+    // A live connection is proof the refused enable has since been granted, so the wait can end
+    if (connectionState === 'connected') {
+      setRefused(false)
+    }
+
+    void dispatch(sync(CardinalApp.ADMIN))
+    void refresh()
+  }, [connectionState, dispatch, refresh])
 
   const criteriaNotice = ENABLE_REQUIRES_SUBSCRIPTION
     ? i18n['cloud-service.criteria.subscribed'][lang]
@@ -168,17 +207,24 @@ function RemoteAccess() {
         />
       }
       footer={enabled
-        ? (
+        ? (approved && (
           <Button type="button" onClick={() => setShowConfigure(true)}>
             {i18n['ra.configure'][lang]}
           </Button>
-        )
+        ))
         : criteriaNotice
       }
     >
       <div className="description">
         <p>{i18n['ra.desc'][lang]}</p>
       </div>
+
+      {queued && (
+        <Alert
+          type="info"
+          message={i18n['ra.queued.desc'][lang]}
+        />
+      )}
 
       <List
         className="remote-access-paths"
@@ -210,13 +256,6 @@ function RemoteAccess() {
           },
         ]}
       />
-
-      {queued && (
-        <Alert
-          type="info"
-          message={i18n['ra.queued.desc'][lang]}
-        />
-      )}
 
       {showRequestAccess && (
         <Confirm

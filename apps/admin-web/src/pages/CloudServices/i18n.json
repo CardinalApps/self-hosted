@@ -54,7 +54,7 @@
     "en": "Your account is queued for this"
   },
   "ra.queued.desc": {
-    "en": "Your account is in the queue for Remote Access. Cardinal will approve it when there is room for another media server, and this media server switches Remote Access on by itself once that happens."
+    "en": "This server is queued for Remote Access."
   },
   "ra.confirm-disable.title": {
     "en": "Disable Remote Access?"
