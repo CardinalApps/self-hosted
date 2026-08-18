@@ -13,6 +13,8 @@ import i18n from '../i18n.json'
 
 import '../styles.css'
 
+const SERVER_NAME_PATTERN = /^[A-Za-z0-9 \-_]*$/
+
 type ServerNameProps = {
   next: () => void,
   prev: () => void,
@@ -28,11 +30,9 @@ function ServerName({
 }: ServerNameProps) {
   const { lang } = useSelector(settingsSelectors.current)
 
+  // Blank is allowed so the input can be fully erased; the "next" button is what refuses to advance
   const handleServerNameOnChange = (val) => {
-    // Allow an empty string so that the user can fully erase the input. The
-    // "next" button won't let them go forward if it's empty.
-    const valid = (val.match(/[A-Za-z-_1234567890]/gm)?.length === val.length) || val.length === 0
-    if (valid) {
+    if (SERVER_NAME_PATTERN.test(val)) {
       setServerName(val)
     }
   }
@@ -55,7 +55,7 @@ function ServerName({
                 data-testid="setup-step-next"
                 textual={true}
                 onClick={() => {
-                  if (serverName) {
+                  if (serverName.trim()) {
                     next()
                   }
                 }}
@@ -70,7 +70,7 @@ function ServerName({
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              if (serverName) {
+              if (serverName.trim()) {
                 next()
               }
             }}

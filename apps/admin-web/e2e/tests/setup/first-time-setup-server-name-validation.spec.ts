@@ -11,11 +11,11 @@ import {
 
 /*
   Server-name step validation. Two paths:
-    1. Submitting empty doesn't advance — the `next` handler short-circuits
-       when serverName is falsy (FirstTimeSetup.tsx and ServerName.tsx
-       both guard with `if (serverName) next()`).
+    1. Submitting a blank name doesn't advance — the `next` handler
+       short-circuits when serverName has no non-whitespace content.
     2. Invalid characters never make it into state — handleServerNameOnChange
-       only updates state when every character matches /[A-Za-z-_1234567890]/.
+       only updates state when the whole value matches SERVER_NAME_PATTERN.
+       Spaces are inside that set: they are legal in a display name.
 
   Neither test needs SSO / cleanup; we never reach Finish, so nothing is
   persisted on either server.
@@ -46,7 +46,7 @@ test(
 )
 
 test(
-  'characters outside [A-Za-z-_0-9] are filtered out of the server-name input',
+  'the server-name input keeps spaces and rejects characters outside the allowed set',
   { tag: '@journey:first-time-setup-server-name-validation' },
   async ({ page }) => {
     await page.goto('/admin/setup')
@@ -54,22 +54,16 @@ test(
     await pickTheme(page, 'light')
     await waitForSetupStep(page, 'server-name')
 
-    // ServerName.tsx's onChange filter rejects any value that contains a
-    // char outside the allowed set, leaving state at the prior value.
-    // Type a mixed string and assert the input reflects only the
-    // accepted characters that survived round-by-round filtering.
     const input = page.locator('[data-testid="setup-step"][data-step-name="server-name"] [data-testid="setup-server-name-input"]')
 
-    // Fill with valid first to give the input a baseline value the
-    // invalid attempt can be compared against.
-    await fillServerName(page, 'okname')
-    await expect(input).toHaveValue('okname')
+    // A multi-word name survives intact; the spaces are not stripped back out.
+    await fillServerName(page, 'ok name here')
+    await expect(input).toHaveValue('ok name here')
 
-    // Type an invalid character — the filter rejects the new value (the
-    // invalid char breaks the regex test for the WHOLE string), so the
-    // input stays at 'okname'.
+    // An invalid character still breaks the regex test for the WHOLE value, so
+    // the filter rejects the new value and the input keeps the prior one.
     await input.focus()
     await page.keyboard.type('!')
-    await expect(input).toHaveValue('okname')
+    await expect(input).toHaveValue('ok name here')
   },
 )
