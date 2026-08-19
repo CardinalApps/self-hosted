@@ -72,6 +72,12 @@ export function hasServerSlots(slug: string): boolean {
   return (REMOTE_ACCESS_FEATURE_SLUGS as readonly string[]).includes(slug)
 }
 
+/* True when the feature carries a per-account relay bandwidth override. Slots are shared by both
+   Remote Access features, but bandwidth is only ever spent on the relay path. */
+export function hasRelayQuota(slug: string): boolean {
+  return slug === 'remote_access_relay'
+}
+
 // Folds a feature's mode together with an account's grant into the one answer callers need.
 export function isEffectivelyAccessible(mode: ServiceAccessMode, status: ServiceAccessStatus): boolean {
   return mode === 'open' || status === 'approved'
