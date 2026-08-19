@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
+import clsx from 'clsx'
 
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
-import Alert from '@cardinalapps/ui/src/components/interaction/Alert'
 import Button from '@cardinalapps/ui/src/components/interaction/Button'
 import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
 import List from '@cardinalapps/ui/src/components/interaction/List'
@@ -24,10 +24,10 @@ import {
   REMOTE_ACCESS_DIRECT_FEATURE,
   REMOTE_ACCESS_FEATURE_SLUGS,
   REMOTE_ACCESS_RELAY_FEATURE,
-  isQueuedForRemoteAccess,
   isServiceAccessRefusal,
   serviceAccessIndicator,
 } from '@cardinalapps/ui/src/lib/auth/serviceAccess'
+import type { ServiceAccessIndicator } from '@cardinalapps/ui/src/lib/auth/serviceAccess'
 
 import {
   useEnableRemoteAccessMutation,
@@ -40,6 +40,8 @@ import { ENABLE_REMOTE_ACCESS_SLUG } from '@cardinalapps/app-settings/src/admin/
 import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_direct'
 import { ENABLE_REMOTE_ACCESS_RELAY_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_relay'
 
+import ReloadButton from '../../../components/ReloadButton'
+
 import ConfigureRemoteAccessDrawer from '../ConfigureRemoteAccessDrawer'
 
 import i18n from '../i18n.json'
@@ -48,17 +50,22 @@ const ACCESS_ICONS = {
   loading: 'fas fa-circle-notch fa-spin',
   granted: 'fas fa-check-circle',
   queued: 'fas fa-hourglass-half',
+  denied: 'fas fa-exclamation-circle',
 } as const
 
 const ACCESS_TITLES = {
   loading: 'ra.access.checking',
   granted: 'ra.access.granted',
   queued: 'ra.access.queued',
+  denied: 'ra.access.declined',
 } as const
 
 const ENABLE_REQUIRES_SUBSCRIPTION = true
 
 const STATUS_POLL_MS = 20000
+
+// The grants live in the cloud rather than on the LAN, so they are read a third as often
+const GRANTS_POLL_MS = 60000
 
 // Card for the Remote Access cloud service
 function RemoteAccess() {
@@ -71,7 +78,7 @@ function RemoteAccess() {
   const [enableRemoteAccess] = useEnableRemoteAccessMutation()
   const [disableRemoteAccess] = useDisableRemoteAccessMutation()
 
-  const { features, refresh, retract } = useServiceAccess({ skip: !cloudLoggedIn })
+  const { features, error: accessUnreadable, refresh, retract } = useServiceAccess({ skip: !cloudLoggedIn })
 
   const [showRequestAccess, setShowRequestAccess] = useState(false)
   const [showConfirmDisable, setShowConfirmDisable] = useState(false)
@@ -83,22 +90,39 @@ function RemoteAccess() {
   const directEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_DIRECT_SLUG] === true
   const relayEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_RELAY_SLUG] === true
 
-  /* The Media Server records a refused enable as an enable, so waiting for access is a state the
-     toggle is on for. The wait is reported alongside it rather than instead of it. */
-  const queued = refused || isQueuedForRemoteAccess(features)
+  /* Every access claim the card makes comes through here, so a row's icon and the note above it
+     can never describe different states. The Media Server records a refused enable as an enable,
+     so a refusal this session is the queue entry the next grants read has yet to catch up with. */
+  const pathIndicator = (slug: string): ServiceAccessIndicator => {
+    const indicator = serviceAccessIndicator(features, slug)
 
-  /* The same fold the path rows' checkmarks use, so an opened gate still counts as access once
-     Remote Access outgrows the beta. A suspension leaves the grant approved on purpose: the drawer
-     is where a suspended account reads what happened. */
-  const approved = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) =>
-    serviceAccessIndicator(features, slug) === 'granted')
+    return refused && indicator === 'unavailable' ? 'queued' : indicator
+  }
+
+  const queued = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) => pathIndicator(slug) === 'queued')
+
+  /* An opened gate still counts as access once Remote Access outgrows the beta. A suspension
+     leaves the grant approved on purpose: the drawer is where a suspended account reads why. */
+  const approved = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) => pathIndicator(slug) === 'granted')
+
+  /* A decision, not a gap. The auth server leaves a denied grant untouched when a request is filed
+     over it, so re-asking would be a silent no-op the card would keep repeating. */
+  const declined = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) => pathIndicator(slug) === 'denied')
+
+  /* Settings that say Remote Access is on while Cardinal has granted nothing — either a refusal or
+     the state a stale localStorage leaves behind. An unreadable cloud is not an answer. */
+  const unavailable = enabled && !accessUnreadable
+    && REMOTE_ACCESS_FEATURE_SLUGS.every((slug) => ['unavailable', 'denied'].includes(pathIndicator(slug)))
+
+  const grantStatus = (slug: string) => features?.find((feature) => feature.slug === slug)?.status ?? 'missing'
 
   /* Approvals and lifted suspensions are decided on Cardinal's side and picked up by the Media
      Server on its own retry schedule, so the only way this card hears about one is by watching.
      Display data only — the switches keep reading the settings slice. */
-  const { data: status } = useGetConnectStatusQuery(undefined, {
+  const { data: status, refetch: refetchStatus, isUninitialized } = useGetConnectStatusQuery(undefined, {
     skip: !canUpdate || !(enabled || queued),
     pollingInterval: STATUS_POLL_MS,
+    refetchOnFocus: true,
   })
 
   const connectionState = status?.state ?? null
@@ -121,6 +145,60 @@ function RemoteAccess() {
     void dispatch(sync(CardinalApp.ADMIN))
     void refresh()
   }, [connectionState, dispatch, refresh])
+
+  /* Leaving the switch on IS the request, so a server whose grant went missing or was retracted
+     files one itself instead of sitting there switched on and disconnected. Keyed on the grants it
+     saw, so it files once per answer rather than once per poll; a real failure clears the key and
+     the next grants read may try again. A refusal is not a failure — it is the queue entry. */
+  const autoFiledFor = useRef<string | null>(null)
+  const autoFileKey = REMOTE_ACCESS_FEATURE_SLUGS.map(grantStatus).join('|')
+  const shouldAutoFile = unavailable && !declined && !saving && canUpdate && cloudLoggedIn
+
+  useEffect(() => {
+    if (!shouldAutoFile || autoFiledFor.current === autoFileKey) {
+      return
+    }
+
+    autoFiledFor.current = autoFileKey
+
+    void (async () => {
+      try {
+        await enableRemoteAccess().unwrap()
+        setRefused(false)
+      } catch (error) {
+        if (isServiceAccessRefusal(error)) {
+          setRefused(true)
+        } else {
+          autoFiledFor.current = null
+          return
+        }
+      }
+
+      await dispatch(sync(CardinalApp.ADMIN))
+      await refresh()
+    })()
+    // `features` is a dep so a cleared key gets its retry on the next grants read, not sooner
+  }, [shouldAutoFile, autoFileKey, features, enableRemoteAccess, dispatch, refresh])
+
+  /* Cardinal can decide the grant long before the Media Server's own retry proves it, so the wait
+     states re-read it on their own rather than sitting on a stale answer until the next reload. */
+  useEffect(() => {
+    if (!cloudLoggedIn || !(enabled || queued)) {
+      return
+    }
+
+    const id = setInterval(() => { void refresh() }, GRANTS_POLL_MS)
+
+    return () => clearInterval(id)
+  }, [cloudLoggedIn, enabled, queued, refresh])
+
+  /* Every source the card paints from, re-read together so none of them can be the stale one.
+     Refetching a query that never started throws, so the query's own flag decides. */
+  const reload = () => Promise.all([
+    isUninitialized ? Promise.resolve() : refetchStatus(),
+    refresh(),
+    dispatch(sync(CardinalApp.ADMIN)),
+  ])
 
   const criteriaNotice = ENABLE_REQUIRES_SUBSCRIPTION
     ? i18n['cloud-service.criteria.subscribed'][lang]
@@ -174,11 +252,13 @@ function RemoteAccess() {
   /* The user owns the path toggles; this only reports what Cardinal has granted the account. There
      is nothing to report until Remote Access is on and there is a cloud account to report about. */
   const pathControl = (slug: string, toggle: ReactNode) => {
-    if (!enabled || !cloudLoggedIn) {
+    const indicator = pathIndicator(slug)
+
+    /* A path nobody has decided on gets no icon rather than one implying a queue it is not in. A
+       refusal is a decision, so it reports like any other failed connection. */
+    if (!enabled || !cloudLoggedIn || indicator === 'unavailable') {
       return toggle
     }
-
-    const indicator = serviceAccessIndicator(features, slug)
 
     return (
       <span className="path-control">
@@ -194,17 +274,20 @@ function RemoteAccess() {
     <CardGrid.Card
       size="m"
       className="cloud-service-card"
-      icon={<Icon fa="fas fa-globe" />}
+      icon={<Icon fa="fas fa-satellite" />}
       header={
         <H5>{i18n['ra.title'][lang]}</H5>
       }
       headerRight={
-        <ToggleSwitch
-          name="enable-remote-access"
-          value={enabled}
-          onChange={handleChange}
-          disabled={!cloudLoggedIn || !canUpdate}
-        />
+        <span className="card-controls">
+          <ReloadButton title={i18n['ra.reload'][lang]} onClick={reload} />
+          <ToggleSwitch
+            name="enable-remote-access"
+            value={enabled}
+            onChange={handleChange}
+            disabled={!cloudLoggedIn || !canUpdate}
+          />
+        </span>
       }
       footer={enabled
         ? (approved && (
@@ -219,11 +302,14 @@ function RemoteAccess() {
         <p>{i18n['ra.desc'][lang]}</p>
       </div>
 
-      {queued && (
-        <Alert
-          type="info"
-          message={i18n['ra.queued.desc'][lang]}
-        />
+      {(queued || unavailable) && (
+        <p className={clsx('access-note', declined && !queued && 'failed')}>
+          <Icon fa={declined && !queued ? 'fas fa-exclamation-circle' : 'fas fa-info-circle'} hoverType={null} />
+          {queued
+            ? i18n['ra.queued.desc'][lang]
+            : i18n[declined ? 'ra.declined.desc' : 'ra.unavailable.desc'][lang]
+          }
+        </p>
       )}
 
       <List

@@ -56,15 +56,21 @@ describe('serviceAccessIndicator', () => {
     }
   })
 
-  it('queues a feature the account has no grant row for', () => {
-    expect(serviceAccessIndicator([], 'remote_access_direct')).toBe('queued')
+  it('reports a feature the account has no grant row for as unavailable, not queued', () => {
+    expect(serviceAccessIndicator([], 'remote_access_direct')).toBe('unavailable')
   })
 
-  it('queues denied and retracted grants rather than calling them out', () => {
-    for (const status of ['denied', 'retracted', 'none'] as const) {
+  it('separates retracted and none from an actual queue entry', () => {
+    for (const status of ['retracted', 'none'] as const) {
       const features = [feature('remote_access_direct', 'gated', status)]
-      expect(serviceAccessIndicator(features, 'remote_access_direct')).toBe('queued')
+      expect(serviceAccessIndicator(features, 'remote_access_direct')).toBe('unavailable')
     }
+  })
+
+  // A refusal is a decision the UI shows, not the same silence as an account that never asked
+  it('reports a denied grant as denied rather than merely unavailable', () => {
+    const features = [feature('remote_access_direct', 'gated', 'denied')]
+    expect(serviceAccessIndicator(features, 'remote_access_direct')).toBe('denied')
   })
 })
 
@@ -98,6 +104,16 @@ describe('isQueuedForRemoteAccess', () => {
 
   it('ignores pending requests for other features', () => {
     expect(isQueuedForRemoteAccess([feature('popularity_data_pool', 'gated', 'pending')])).toBe(false)
+  })
+
+  /* An account with no grants at all used to light up the per-path indicators while this stayed
+     false, so the rows claimed a wait the alert denied. Both now read the same answer. */
+  it('agrees with the per-path indicator for an account that has no grants', () => {
+    expect(isQueuedForRemoteAccess([])).toBe(false)
+
+    for (const slug of REMOTE_ACCESS_FEATURE_SLUGS) {
+      expect(serviceAccessIndicator([], slug)).not.toBe('queued')
+    }
   })
 })
 

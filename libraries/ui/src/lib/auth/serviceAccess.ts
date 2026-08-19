@@ -20,7 +20,7 @@ export type ServiceAccessFeature = {
 }
 
 // What a feature's gate looks like beside the control that uses it
-export type ServiceAccessIndicator = 'loading' | 'granted' | 'queued'
+export type ServiceAccessIndicator = 'loading' | 'granted' | 'queued' | 'denied' | 'unavailable'
 
 export const REMOTE_ACCESS_DIRECT_FEATURE = 'remote_access_direct'
 export const REMOTE_ACCESS_RELAY_FEATURE = 'remote_access_relay'
@@ -59,7 +59,10 @@ export function isEffectivelyAccessible(feature: ServiceAccessFeature): boolean 
   return feature.mode === 'open' || feature.status === 'approved'
 }
 
-// Null grants mean the account's access has not been read yet, which reads as in-progress
+/* Null grants mean the account's access has not been read yet, which reads as in-progress. Only a
+   pending request is a queue entry, and only a refusal is a decision: none, retracted and a missing
+   row all mean the account simply never asked, and reporting those as a wait is what let the UI
+   claim a queue that the cloud knows nothing about. */
 export function serviceAccessIndicator(
   features: ServiceAccessFeature[] | null,
   slug: string,
@@ -70,16 +73,21 @@ export function serviceAccessIndicator(
 
   const feature = features.find((candidate) => candidate.slug === slug)
 
-  return feature && isEffectivelyAccessible(feature) ? 'granted' : 'queued'
+  if (feature && isEffectivelyAccessible(feature)) {
+    return 'granted'
+  }
+
+  if (feature?.status === 'pending') {
+    return 'queued'
+  }
+
+  return feature?.status === 'denied' ? 'denied' : 'unavailable'
 }
 
-// True while the account is waiting on Cardinal to decide either Remote Access path
+/* True while the account is waiting on Cardinal to decide either Remote Access path. Defined in
+   terms of the indicator so a row's icon and the card's alert cannot describe different states. */
 export function isQueuedForRemoteAccess(features: ServiceAccessFeature[] | null): boolean {
-  return REMOTE_ACCESS_FEATURE_SLUGS.some((slug) => {
-    const feature = features?.find((candidate) => candidate.slug === slug)
-
-    return !!feature && feature.status === 'pending' && !isEffectivelyAccessible(feature)
-  })
+  return REMOTE_ACCESS_FEATURE_SLUGS.some((slug) => serviceAccessIndicator(features, slug) === 'queued')
 }
 
 /* True when a failure was the access gate rather than a real error. The refusal starts at the cloud

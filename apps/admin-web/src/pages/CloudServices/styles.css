@@ -3,6 +3,32 @@
     margin-bottom: 10px;
   }
 
+  .card-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .access-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 4px;
+    margin-bottom: 10px;
+    color: var(--text-color-2);
+    font-size: 13px;
+    line-height: 1.4em;
+
+    i {
+      font-size: 13px;
+      color: var(--text-color-3);
+    }
+
+    &.failed i {
+      color: var(--danger);
+    }
+  }
+
   .remote-access-paths {
     .item-list-item-name {
       word-break: break-all;
@@ -15,6 +41,8 @@
     }
 
     .path-access {
+      width: 12px;
+      justify-content: center;
       display: inline-flex;
 
       i {
@@ -24,15 +52,10 @@
       &[data-access="granted"] i {
         color: var(--success);
       }
-    }
-  }
 
-  .alert {
-    margin-top: 10px;
-    margin-bottom: 10px;
-
-    .span-icon i {
-      color: inherit;
+      &[data-access="denied"] i {
+        color: var(--danger);
+      }
     }
   }
 }

@@ -53,8 +53,20 @@
   "ra.access.queued": {
     "en": "Your account is queued for this"
   },
+  "ra.access.declined": {
+    "en": "Access to the closed beta was not approved"
+  },
   "ra.queued.desc": {
     "en": "This server is queued for Remote Access."
+  },
+  "ra.unavailable.desc": {
+    "en": "This server is not approved for Remote Access yet."
+  },
+  "ra.declined.desc": {
+    "en": "Cardinal declined Remote Access for this account."
+  },
+  "ra.reload": {
+    "en": "Reload Remote Access state"
   },
   "ra.confirm-disable.title": {
     "en": "Disable Remote Access?"
