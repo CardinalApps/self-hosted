@@ -15,6 +15,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import set from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
 import sync from '@cardinalapps/ui/src/store/slices/settings/thunks/sync'
 import { cloudUserSelectors } from '@cardinalapps/ui/src/store/slices/cloudUser'
+import { SubscriptionTierSlug } from '@cardinalapps/products/src/subscriptions'
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
 import useServiceAccess from '@cardinalapps/ui/src/hooks/useServiceAccess'
@@ -74,6 +75,7 @@ function RemoteAccess() {
   const settings = useSelector(settingsSelectors.current)
   const { lang } = settings
   const cloudLoggedIn = useSelector(cloudUserSelectors.loggedIn)
+  const cloudUser = useSelector(cloudUserSelectors.current)
   /* `loggedIn` only settles once a session check runs, so a pure local-IDP session sits at null
      forever. Whether this local user is cloud-linked is canonically their `cardinalId`. */
   const localUser = useSelector(homeServerUserSelectors.current)
@@ -211,9 +213,16 @@ function RemoteAccess() {
     dispatch(sync(CardinalApp.ADMIN)),
   ])
 
-  const criteriaNotice = ENABLE_REQUIRES_SUBSCRIPTION
-    ? i18n['cloud-service.criteria.subscribed'][lang]
-    : i18n['cloud-service.criteria.free'][lang]
+  /* The notice is a login prompt, so an account that already meets the bar shouldn't see it —
+     including while the feature is off. */
+  const meetsCriteria = cloudLoggedIn === true
+    && (!ENABLE_REQUIRES_SUBSCRIPTION
+      || (!!cloudUser.subscription && cloudUser.subscription !== SubscriptionTierSlug.FREE))
+  const criteriaNotice = meetsCriteria
+    ? undefined
+    : ENABLE_REQUIRES_SUBSCRIPTION
+      ? i18n['cloud-service.criteria.subscribed'][lang]
+      : i18n['cloud-service.criteria.free'][lang]
 
   /* Enabling mints a cloud credential, so it goes through the connect endpoint rather than a
      settings write. The Media Server owns the setting; pull it back once the call lands. */

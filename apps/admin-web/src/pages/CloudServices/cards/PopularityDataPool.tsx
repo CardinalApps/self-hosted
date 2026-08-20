@@ -39,9 +39,13 @@ function PopularityDataPool() {
 
   const { data: stats } = useGetPopularityStatsQuery(undefined, { skip: !canUpdate })
 
-  const criteriaNotice = ENABLE_REQUIRES_SUBSCRIPTION
-    ? i18n['cloud-service.criteria.subscribed'][lang]
-    : i18n['cloud-service.criteria.free'][lang]
+  /* The notice is a login prompt, so an account that already meets the bar shouldn't see it —
+     including while the feature is off. */
+  const criteriaNotice = cloudLoggedIn === true
+    ? undefined
+    : ENABLE_REQUIRES_SUBSCRIPTION
+      ? i18n['cloud-service.criteria.subscribed'][lang]
+      : i18n['cloud-service.criteria.free'][lang]
 
   // Saves the toggle server-wide; the thunk itself toasts on failure
   const save = async (value: boolean) => {
