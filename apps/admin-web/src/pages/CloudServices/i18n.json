@@ -86,6 +86,9 @@
   "ra.drawer.relay.title": {
     "en": "Relay Connection"
   },
+  "ra.drawer.relay.active": {
+    "en": "Relay is active, and will be used automatically when a direct connection is not possible."
+  },
   "ra.upnp.label": {
     "en": "Automatic port forwarding (UPnP)"
   },

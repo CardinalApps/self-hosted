@@ -286,11 +286,16 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
         <Card padding="thin">
           <List
             layout="compact"
-            items={[
-              ...urlItem('relay-url', relayEnabled ? status?.relayUrl : null),
-              ...(status ? connectionItem(status.state) : []),
-            ]}
+            items={status ? connectionItem(status.state) : []}
           />
+
+          {/* The relay only accepts bearer-authenticated requests, so its URL is never shown as pastable */}
+          {relayEnabled && !!status?.relayUrl && (
+            <Alert
+              type="info"
+              message={i18n['ra.drawer.relay.active'][lang]}
+            />
+          )}
 
           {status?.state === 'auth_failed' && (
             <Alert
