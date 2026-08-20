@@ -1,6 +1,16 @@
 .card-grid {
   margin-bottom: var(--gutter);
 
+  .card .card-content {
+    p {
+      font-size: 15px;
+    }
+
+    .written-text {
+      margin-bottom: 20px;
+    }
+  }
+
   &[data-layout="flex"] {
     
     .card-grid-layout {

@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux'
 
 import CardGrid from '@cardinalapps/ui/src/components/layout/CardGrid'
 import Icon from '@cardinalapps/ui/src/components/typography/Icon'
+import P from '@cardinalapps/ui/src/components/typography/P'
 import H5 from '@cardinalapps/ui/src/components/typography/H5'
+import WrittenText from '@cardinalapps/ui/src/components/typography/WrittenText'
 import ToggleSwitch from '@cardinalapps/ui/src/components/forms/ToggleSwitch'
 import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
 
@@ -78,9 +80,10 @@ function PopularityDataPool() {
       }
       footer={enabled ? undefined : criteriaNotice}
     >
-      <div className="description">
-        <p>{i18n['pdp.desc'][lang]}</p>
-      </div>
+      <WrittenText>
+        <P>{i18n['pdp.desc-1'][lang]}</P>
+        <P>{i18n['pdp.desc-2'][lang]}</P>
+      </WrittenText>
 
       {!!stats && (
         <List
