@@ -19,6 +19,7 @@ import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
 import useServiceAccess from '@cardinalapps/ui/src/hooks/useServiceAccess'
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
+import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
 
 import {
   REMOTE_ACCESS_DIRECT_FEATURE,
@@ -73,6 +74,10 @@ function RemoteAccess() {
   const settings = useSelector(settingsSelectors.current)
   const { lang } = settings
   const cloudLoggedIn = useSelector(cloudUserSelectors.loggedIn)
+  /* `loggedIn` only settles once a session check runs, so a pure local-IDP session sits at null
+     forever. Whether this local user is cloud-linked is canonically their `cardinalId`. */
+  const localUser = useSelector(homeServerUserSelectors.current)
+  const cloudSignedOut = cloudLoggedIn === false || (cloudLoggedIn === null && !localUser?.cardinalId)
   const canUpdate = useHasCapability('ServerSettings.Update')
 
   const [enableRemoteAccess] = useEnableRemoteAccessMutation()
@@ -113,6 +118,12 @@ function RemoteAccess() {
      the state a stale localStorage leaves behind. An unreadable cloud is not an answer. */
   const unavailable = enabled && !accessUnreadable
     && REMOTE_ACCESS_FEATURE_SLUGS.every((slug) => ['unavailable', 'denied'].includes(pathIndicator(slug)))
+
+  /* The grants live in the cloud, so a signed-out browser and an unreachable cloud IDP both leave
+     the card holding no answer at all. `loggedIn` is null until the session is settled, which is
+     still a wait rather than an outage. */
+  const signedOut = enabled && cloudSignedOut
+  const unknownAccess = enabled && !signedOut && accessUnreadable
 
   const grantStatus = (slug: string) => features?.find((feature) => feature.slug === slug)?.status ?? 'missing'
 
@@ -270,6 +281,34 @@ function RemoteAccess() {
     )
   }
 
+  /* One note at a time, so the card cannot claim a queue and an outage in the same breath. Proof
+     first: a queue entry the card watched itself outranks anything read from grants, and a cloud
+     the card could not read at all outranks a verdict it would be inventing. While Remote Access
+     is on there is always something to say — silence would read as everything being fine. */
+  const accessNote = (): { text: string, icon: string, failed?: boolean } | null => {
+    if (queued) {
+      return { text: i18n['ra.queued.desc'][lang], icon: 'fas fa-info-circle' }
+    }
+
+    if (signedOut) {
+      return { text: i18n['ra.signed-out.desc'][lang], icon: 'fas fa-question-circle' }
+    }
+
+    if (unknownAccess) {
+      return { text: i18n['ra.unknown.desc'][lang], icon: 'fas fa-question-circle' }
+    }
+
+    if (!unavailable) {
+      return null
+    }
+
+    return declined
+      ? { text: i18n['ra.declined.desc'][lang], icon: 'fas fa-exclamation-circle', failed: true }
+      : { text: i18n['ra.unavailable.desc'][lang], icon: 'fas fa-info-circle' }
+  }
+
+  const note = accessNote()
+
   return (
     <CardGrid.Card
       size="m"
@@ -290,7 +329,9 @@ function RemoteAccess() {
         </span>
       }
       footer={enabled
-        ? (approved && (
+        /* A local-IDP admin can already flip the per-path toggles, so a signed-out session still
+           gets the drawer; only a cloud session awaiting approval has nothing to configure. */
+        ? ((approved || cloudSignedOut) && (
           <Button type="button" onClick={() => setShowConfigure(true)}>
             {i18n['ra.configure'][lang]}
           </Button>
@@ -302,13 +343,10 @@ function RemoteAccess() {
         <p>{i18n['ra.desc'][lang]}</p>
       </div>
 
-      {(queued || unavailable) && (
-        <p className={clsx('access-note', declined && !queued && 'failed')}>
-          <Icon fa={declined && !queued ? 'fas fa-exclamation-circle' : 'fas fa-info-circle'} hoverType={null} />
-          {queued
-            ? i18n['ra.queued.desc'][lang]
-            : i18n[declined ? 'ra.declined.desc' : 'ra.unavailable.desc'][lang]
-          }
+      {note && (
+        <p className={clsx('access-note', note.failed && 'failed')}>
+          <Icon fa={note.icon} hoverType={null} />
+          {note.text}
         </p>
       )}
 

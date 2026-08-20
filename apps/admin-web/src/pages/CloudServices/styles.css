@@ -67,10 +67,6 @@
 
   .alert {
     margin-top: 10px;
-
-    .span-icon i {
-      color: inherit;
-    }
   }
 
   .cors-origins {

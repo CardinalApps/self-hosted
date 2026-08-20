@@ -102,6 +102,10 @@
     font-size: 18px;
   }
 
+  .alert-icon i {
+    color: inherit;
+  }
+
   p {
     font-size: 13px !important;
     font-weight: 500 !important;

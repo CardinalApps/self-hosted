@@ -65,6 +65,12 @@
   "ra.declined.desc": {
     "en": "Cardinal declined Remote Access for this account."
   },
+  "ra.unknown.desc": {
+    "en": "Cardinal Cloud can't be reached, so this server's Remote Access status is unknown."
+  },
+  "ra.signed-out.desc": {
+    "en": "You are signed out of Cardinal Cloud, so this server's Remote Access status is unknown."
+  },
   "ra.reload": {
     "en": "Reload Remote Access state"
   },
@@ -135,16 +141,19 @@
     "en": "Suspended"
   },
   "ra.auth-failed.desc": {
-    "en": "Cardinal Cloud rejected this media server's credentials. Sign in again to re-enable Remote Access."
+    "en": "Cardinal Cloud rejected this server's credentials. Sign in again to re-enable Remote Access."
   },
   "ra.auth-failed.cta": {
     "en": "Sign in again"
   },
   "ra.not-approved.desc": {
-    "en": "This media server is queued for Remote Access. It keeps asking on its own and connects as soon as Cardinal approves your account."
+    "en": "This server is queued for Remote Access. It keeps asking on its own and connects as soon as Cardinal approves your account."
+  },
+  "ra.declined.detail": {
+    "en": "Cardinal declined Remote Access for this account. This server keeps asking on its own, but it cannot connect unless Cardinal revisits that decision."
   },
   "ra.suspended.desc": {
-    "en": "Cardinal staff suspended Remote Access for this account. Signing in again will not lift it. The media server keeps retrying on its own and reconnects if the suspension is lifted."
+    "en": "Cardinal suspended Remote Access for this account. Signing in again will not lift it. This server keeps retrying on its own and reconnects if the suspension is lifted."
   },
   "ra.https.label": {
     "en": "HTTPS listener"

@@ -15,9 +15,16 @@ import type { ListItem, ListItemControls } from '@cardinalapps/ui/src/components
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import sync from '@cardinalapps/ui/src/store/slices/settings/thunks/sync'
+import { cloudUserSelectors } from '@cardinalapps/ui/src/store/slices/cloudUser'
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
 import useHasCapability from '@cardinalapps/ui/src/hooks/useHasCapability'
+import useServiceAccess from '@cardinalapps/ui/src/hooks/useServiceAccess'
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
+
+import {
+  REMOTE_ACCESS_FEATURE_SLUGS,
+  serviceAccessIndicator,
+} from '@cardinalapps/ui/src/lib/auth/serviceAccess'
 
 import {
   useGetConnectStatusQuery,
@@ -91,7 +98,15 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
   const navigate = useNavigate()
   const settings = useSelector(settingsSelectors.current)
   const { lang } = settings
+  const cloudLoggedIn = useSelector(cloudUserSelectors.loggedIn)
   const canUpdate = useHasCapability('ServerSettings.Update')
+
+  /* The Media Server reports a refused account and a declined one identically, because from the
+     relay's side both are just an unapproved connection. The grants are the only place the
+     difference is written down, so the copy comes from there rather than from the connection. */
+  const { features } = useServiceAccess({ skip: !cloudLoggedIn })
+  const declined = REMOTE_ACCESS_FEATURE_SLUGS.some((slug) =>
+    serviceAccessIndicator(features, slug) === 'denied')
 
   /* Only the hostname, URLs, and live states come from here. The switches read the settings slice,
      which is seeded and persisted client-side, so they paint in the right position instead of
@@ -308,11 +323,11 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
             />
           )}
 
-          {/* Both gates clear on Cardinal's side, so neither offers a remedy to click */}
+          {/* Every gate here clears on Cardinal's side, so none of them offers a remedy to click */}
           {status?.state === 'not_approved' && (
             <Alert
-              type="info"
-              message={i18n['ra.not-approved.desc'][lang]}
+              type={declined ? 'error' : 'info'}
+              message={i18n[declined ? 'ra.declined.detail' : 'ra.not-approved.desc'][lang]}
             />
           )}
 
