@@ -41,9 +41,15 @@ export interface CertPayload {
  * Server-assigned settings carried in `registered`. Open-ended like ConfigUpdatePayload so new keys
  * don't need a protocol-version bump. `relayHostname` is the relay endpoint this deployment actually
  * serves, which lets Media Servers display it instead of their compiled-in default.
+ *
+ * `verifiedExternalPort` is the port a reachability probe proved this server answers on from the
+ * internet, when that is not the port it advertised — today only 443, which is what lets the direct
+ * URL drop its port. It is always present in `registered`, so a fresh register is authoritative;
+ * null means no such proof exists and the advertised port stands.
  */
 export interface RegisteredConfig {
   relayHostname?: string
+  verifiedExternalPort?: number | null
   [key: string]: unknown
 }
 
@@ -56,11 +62,15 @@ export interface RegisteredPayload {
   config: RegisteredConfig
 }
 
-// Payload of a `config:update` message. The shape is intentionally open so
-// new keys can be added without a protocol-version bump.
+/*
+ * Payload of a `config:update` message. The shape is intentionally open so new keys can be added
+ * without a protocol-version bump. Absent keys mean "unchanged"; `verifiedExternalPort` uses an
+ * explicit null to retract a verdict, so absence and retraction stay distinguishable.
+ */
 export interface ConfigUpdatePayload {
   signingKey?: string
   relayHostname?: string
+  verifiedExternalPort?: number | null
   [key: string]: unknown
 }
 

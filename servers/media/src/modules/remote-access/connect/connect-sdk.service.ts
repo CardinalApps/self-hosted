@@ -391,6 +391,7 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const relayHost = await this.databaseService.getOption(OPTIONS.CONNECT_RELAY_HOST.name)
     // No fallback here: the UI should say nothing rather than name a port nobody can be reached on
     const publicPort = await this.getPublicPort(null)
+    const verifiedExternalPort = toPort(await this.databaseService.getOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name))
 
     return {
       enabled: isOptionEnabled(enabled),
@@ -401,7 +402,11 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
         : null,
       tokenExpiresAt: tokenExpiresAt?.toISOString() ?? null,
       publicPort,
-      directUrl: buildDirectUrl(hostname as string, publicPort),
+      /*
+       * The verified port wins, being the one the cloud actually reached this server on. Negotiation
+       * applies the same precedence to the same pair, so the URL shown here is the URL clients get.
+       */
+      directUrl: buildDirectUrl(hostname as string, verifiedExternalPort ?? publicPort),
       relayUrl: instanceId
         ? `https://${(relayHost as string) || envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}`
         : null,
@@ -506,6 +511,26 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     await this.databaseService.saveOption(OPTIONS.CONNECT_RELAY_HOST.name, hostname)
   }
 
+  /*
+   * Keeps the external port the Remote Access Server's probe vouches for, which is what lets the
+   * direct URL drop its port. An explicit null retracts the verdict and the URL grows the port back;
+   * anything else, including a value from a server that does not send the key, is left alone.
+   */
+  private async rememberVerifiedExternalPort(port: unknown): Promise<void> {
+    if (port === null) {
+      await this.databaseService.saveOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name, '')
+      return
+    }
+
+    const verified = toPort(port)
+
+    if (verified === null) {
+      return
+    }
+
+    await this.databaseService.saveOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name, String(verified))
+  }
+
   // Routes JSON control messages and binary relay frames
   private async handleMessage(data: Buffer, isBinary: boolean): Promise<void> {
     if (isBinary) {
@@ -531,6 +556,12 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
         await this.databaseService.saveOption(OPTIONS.CONNECT_SIGNING_KEY.name, message.signingKey)
         await this.databaseService.saveOption(OPTIONS.CONNECT_HOSTNAME.name, message.hostname)
         await this.rememberRelayHostname(message.config?.relayHostname)
+        /*
+         * A register is the authoritative statement of the port verdict, so a config that names no
+         * port is a cloud that vouches for none — including one too old to have an opinion, whose
+         * negotiation answers would otherwise disagree with the URL shown here.
+         */
+        await this.rememberVerifiedExternalPort(message.config?.verifiedExternalPort ?? null)
         if (message.cert) {
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_CERT_PEM.name, message.cert.cert_pem)
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_KEY_PEM.name, message.cert.key_pem)
@@ -556,6 +587,10 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
           await this.databaseService.saveOption(OPTIONS.CONNECT_SIGNING_KEY.name, message.signingKey)
         }
         await this.rememberRelayHostname(message.relayHostname)
+        // A patch, not a snapshot: only a key that is actually present says anything about the port
+        if ('verifiedExternalPort' in message) {
+          await this.rememberVerifiedExternalPort(message.verifiedExternalPort)
+        }
         this.events.emit('config:update', message)
         break
       }

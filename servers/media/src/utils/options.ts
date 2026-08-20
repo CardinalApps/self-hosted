@@ -98,6 +98,13 @@ export const OPTIONS = {
     name: 'connect_public_port',
     default: undefined,
   },
+  // The external port the Remote Access Server's probe proved this server answers on, when it is
+  // not the advertised one. Only ever 443 today, which is what lets the direct URL drop its port.
+  // Assigned by the cloud; unset means the advertised port is the only one anything reached
+  CONNECT_VERIFIED_EXTERNAL_PORT: <Option>{
+    name: 'connect_verified_external_port',
+    default: undefined,
+  },
   // UPnP/NAT-PMP automatic port mapping. Opt-in via the Admin app; only works
   // with host networking
   PORT_MAPPING_ENABLED: <Option>{
