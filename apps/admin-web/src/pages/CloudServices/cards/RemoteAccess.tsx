@@ -121,11 +121,9 @@ function RemoteAccess() {
   const unavailable = enabled && !accessUnreadable
     && REMOTE_ACCESS_FEATURE_SLUGS.every((slug) => ['unavailable', 'denied'].includes(pathIndicator(slug)))
 
-  /* The grants live in the cloud, so a signed-out browser and an unreachable cloud IDP both leave
-     the card holding no answer at all. `loggedIn` is null until the session is settled, which is
-     still a wait rather than an outage. */
-  const signedOut = enabled && cloudSignedOut
-  const unknownAccess = enabled && !signedOut && accessUnreadable
+  /* An unreachable cloud IDP leaves the card holding no answer, but only for a session that could
+     have gotten one — a signed-out session has nothing to read and gets no note at all. */
+  const unknownAccess = enabled && !cloudSignedOut && accessUnreadable
 
   const grantStatus = (slug: string) => features?.find((feature) => feature.slug === slug)?.status ?? 'missing'
 
@@ -297,10 +295,6 @@ function RemoteAccess() {
   const accessNote = (): { text: string, icon: string, failed?: boolean } | null => {
     if (queued) {
       return { text: i18n['ra.queued.desc'][lang], icon: 'fas fa-info-circle' }
-    }
-
-    if (signedOut) {
-      return { text: i18n['ra.signed-out.desc'][lang], icon: 'fas fa-question-circle' }
     }
 
     if (unknownAccess) {

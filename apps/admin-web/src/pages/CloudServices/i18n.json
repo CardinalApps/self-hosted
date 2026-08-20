@@ -11,8 +11,11 @@
   "pdp.title": {
     "en": "Popularity Data Pool"
   },
-  "pdp.desc": {
-    "en": "Allow this media server to join the Popularity Data Pool and contribute anonymous play counts. Your media apps will also use the pool's data with your own media to display trends."
+  "pdp.desc-1": {
+    "en": "Join the Popularity Data Pool with this media server to contribute anonymous play counts from your Music and Cinema apps."
+  },
+  "pdp.desc-2": {
+    "en": "In return, your self-hosted apps receive popularity data from all Cardinal users to use in their features."
   },
   "pdp.plays-contributed": {
     "en": "Plays contributed"
@@ -66,10 +69,7 @@
     "en": "Cardinal declined Remote Access for this account."
   },
   "ra.unknown.desc": {
-    "en": "Cardinal Cloud can't be reached, so this server's Remote Access status is unknown."
-  },
-  "ra.signed-out.desc": {
-    "en": "You are signed out of Cardinal Cloud, so this server's Remote Access status is unknown."
+    "en": "Remote Access servers cannot be reached."
   },
   "ra.reload": {
     "en": "Reload Remote Access state"
