@@ -67,7 +67,9 @@ export function isServiceAccessFeature(slug: string): boolean {
   return !!getServiceAccessFeature(slug)
 }
 
-// True when the feature carries a per-account server-slot override (only Remote Access does).
+/* True when an approval for this feature may carry the serverSlots rider (only Remote Access may).
+   Slots are stored once per account and spent by both paths together, so this is not a licence to
+   offer a slots control per feature — a caller rendering one must render a single account-level input. */
 export function hasServerSlots(slug: string): boolean {
   return (REMOTE_ACCESS_FEATURE_SLUGS as readonly string[]).includes(slug)
 }
