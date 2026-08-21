@@ -16,7 +16,7 @@ import {
   decodeRelayBinaryFrame,
   encodeRelayBinaryFrame,
 } from '@cardinalapps/remote-access/dist/cjs'
-import { fetchAuthAPI, MixedAppEnv } from '@cardinalapps/topology/dist/cjs'
+import { Endpoint, HTTPMethod, MixedAppEnv, fetchAuthAPI, fetchRemoteAccessAPI } from '@cardinalapps/topology/dist/cjs'
 
 import { DatabaseService } from '../../database/database.service'
 import { ConnectSDKEvents, ConnectionState } from './connect-sdk.events'
@@ -46,6 +46,19 @@ export class CloudEnableError extends Error {
   constructor(message: string, readonly status: number, readonly code?: string) {
     super(message)
   }
+}
+
+/*
+ * Nothing to ask the Remote Access Server with: Remote Access is off, this server has never been
+ * given an instance ID, or its cloud credential is gone. The controller answers 400 rather than
+ * spending a cloud round-trip that could only come back unauthorized.
+ */
+export class VanityUnavailableError extends Error {}
+
+// One untouched answer from the Remote Access Server's owner API.
+export type VanityProxyResponse = {
+  status: number,
+  body: unknown,
 }
 
 export const ENABLE_REMOTE_ACCESS = 'enable_remote_access'
@@ -458,6 +471,96 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const value = await this.settingsService.get(CardinalApp.ADMIN, slug)
 
     return value === null || value === undefined ? true : value === true || value === 'true'
+  }
+
+  /**
+   * Asks the Remote Access Server whether a vanity name can be claimed.
+   */
+  async getVanityAvailability(name: string): Promise<VanityProxyResponse> {
+    return await this.vanityRequest(`/vanity/availability?name=${encodeURIComponent(name)}`, 'GET')
+  }
+
+  /**
+   * Returns the vanity names the Remote Access Server holds for this server.
+   */
+  async getVanity(): Promise<VanityProxyResponse> {
+    return await this.vanityRequest(`/servers/${await this.requireInstanceId()}/vanity`, 'GET')
+  }
+
+  /**
+   * Claims a vanity name for this server.
+   */
+  async setVanity(name: string): Promise<VanityProxyResponse> {
+    return await this.vanityRequest(`/servers/${await this.requireInstanceId()}/vanity`, 'PUT', { name })
+  }
+
+  /**
+   * Gives a vanity name held by this server back up.
+   */
+  async releaseVanity(name: string): Promise<VanityProxyResponse> {
+    return await this.vanityRequest(
+      `/servers/${await this.requireInstanceId()}/vanity?name=${encodeURIComponent(name)}`,
+      'DELETE',
+    )
+  }
+
+  /*
+   * One call to the Remote Access Server's owner API, made as this server. Status and body come
+   * back untouched: the owner API's refusals carry the codes the Admin app branches on, and
+   * re-mapping them here would flatten that. The Account Portal will later call the same API
+   * directly with the owner's own cloud JWT, which is why nothing but transport lives here.
+   */
+  private async vanityRequest(endpoint: Endpoint, method: HTTPMethod, body?: Record<string, unknown>): Promise<VanityProxyResponse> {
+    const token = await this.requireOwnerToken()
+
+    const response = await fetchRemoteAccessAPI<Response>(endpoint, method, getCurrentMode() as MixedAppEnv, {
+      headers: {
+        ...outboundHeaders(),
+        Authorization: `Bearer ${token}`,
+      },
+      body,
+      returnRawResponse: true,
+    })
+
+    return { status: response.status, body: await response.json().catch(() => null) }
+  }
+
+  /*
+   * The short-lived cloud token this server already authenticates its control channel with. The
+   * owner API introspects it exactly as the control channel's is introspected, so it resolves to
+   * the account that owns this server — which is what the owner gate there requires.
+   */
+  private async requireOwnerToken(): Promise<string> {
+    const enabled = await this.databaseService.getOption(OPTIONS.CONNECT_ENABLED.name)
+
+    if (!isOptionEnabled(enabled)) {
+      throw new VanityUnavailableError('Remote Access is not enabled on this server.')
+    }
+
+    const serverToken = await this.databaseService.getOption(OPTIONS.CONNECT_SERVER_TOKEN.name)
+
+    if (!serverToken) {
+      throw new VanityUnavailableError('This server has no Remote Access credential. Enable Remote Access first.')
+    }
+
+    try {
+      return await this.tokenRefresher.getCurrentToken()
+    } catch (err) {
+      if (err instanceof ConnectAuthError) {
+        throw new VanityUnavailableError(err.message)
+      }
+      throw err
+    }
+  }
+
+  private async requireInstanceId(): Promise<string> {
+    const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
+
+    if (!instanceId) {
+      throw new VanityUnavailableError('This server does not have an instance ID yet.')
+    }
+
+    return instanceId as string
   }
 
   /**

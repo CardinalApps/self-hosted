@@ -13,9 +13,10 @@ import {
 jest.mock('@cardinalapps/topology/dist/cjs', () => ({
   ...jest.requireActual('@cardinalapps/topology/dist/cjs'),
   fetchAuthAPI: jest.fn(),
+  fetchRemoteAccessAPI: jest.fn(),
 }))
 
-import { fetchAuthAPI } from '@cardinalapps/topology/dist/cjs'
+import { fetchAuthAPI, fetchRemoteAccessAPI } from '@cardinalapps/topology/dist/cjs'
 
 import {
   CloudEnableError,
@@ -26,6 +27,7 @@ import {
   resolveLanIps,
   SERVICE_ACCESS_REQUIRED,
   SLOW_RETRY_MS,
+  VanityUnavailableError,
 } from './connect-sdk.service'
 import { ConnectSDKEvents } from './connect-sdk.events'
 import { HttpsStatusStore } from './https-status.store'
@@ -124,6 +126,7 @@ function makeRefresher() {
 }
 
 const mockedFetchAuthAPI = fetchAuthAPI as jest.Mock
+const mockedFetchRemoteAccessAPI = fetchRemoteAccessAPI as jest.Mock
 
 // The cloud IDP's answers to a server-token mint
 const cloudResponses = {
@@ -1246,5 +1249,105 @@ describe('resolveLanIps', () => {
     isolated(undefined, bridge, true)
 
     expect(warn).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('ConnectSDKService vanity proxy', () => {
+  // The Remote Access Server's answers, as the raw Response the proxy reads
+  function cloudAnswer(status: number, body: unknown) {
+    return { status, json: async () => body }
+  }
+
+  function lastCall() {
+    const calls = mockedFetchRemoteAccessAPI.mock.calls
+    const [endpoint, method, env, options] = calls[calls.length - 1]
+    return { endpoint, method, env, options }
+  }
+
+  beforeEach(() => {
+    mockedFetchRemoteAccessAPI.mockReset()
+  })
+
+  it('asks the owner API about a name with this server\'s bearer token', async () => {
+    const { service } = makeService()
+    mockedFetchRemoteAccessAPI.mockResolvedValue(cloudAnswer(200, { name: 'brianflix', available: true }))
+
+    const result = await service.getVanityAvailability('BrianFlix')
+
+    expect(lastCall().endpoint).toBe('/vanity/availability?name=BrianFlix')
+    expect(lastCall().method).toBe('GET')
+    expect(lastCall().options.headers.Authorization).toBe('Bearer access-jwt')
+    expect(lastCall().options.returnRawResponse).toBe(true)
+    expect(result).toEqual({ status: 200, body: { name: 'brianflix', available: true } })
+  })
+
+  it('reads and writes the names under this server\'s own instance ID', async () => {
+    const { service } = makeService()
+    mockedFetchRemoteAccessAPI.mockResolvedValue(cloudAnswer(200, { labels: ['brianflix'], primary: 'brianflix', state: 'live' }))
+
+    await service.getVanity()
+    expect(lastCall().endpoint).toBe('/servers/instance-1234/vanity')
+    expect(lastCall().method).toBe('GET')
+
+    await service.setVanity('brianflix')
+    expect(lastCall().endpoint).toBe('/servers/instance-1234/vanity')
+    expect(lastCall().method).toBe('PUT')
+    expect(lastCall().options.body).toEqual({ name: 'brianflix' })
+
+    await service.releaseVanity('brian flix')
+    expect(lastCall().endpoint).toBe('/servers/instance-1234/vanity?name=brian%20flix')
+    expect(lastCall().method).toBe('DELETE')
+  })
+
+  const refusals: { status: number, body: Record<string, unknown> }[] = [
+    { status: 422, body: { error: 'invalid_name' } },
+    { status: 409, body: { error: 'name_unavailable' } },
+    { status: 409, body: { error: 'label_limit_reached', limit: 1 } },
+    { status: 429, body: { error: 'rename_cooldown', retryAfterSeconds: 86400 } },
+    { status: 402, body: { error: 'cert_unavailable', labels: ['brianflix'], primary: 'brianflix', state: 'pending' } },
+    { status: 503, body: { error: 'vanity_disabled' } },
+    { status: 404, body: { error: 'not_found' } },
+  ]
+
+  it.each(refusals)('hands back a $status refusal exactly as the owner API gave it', async ({ status, body }) => {
+    const { service } = makeService()
+    mockedFetchRemoteAccessAPI.mockResolvedValue(cloudAnswer(status, body))
+
+    expect(await service.setVanity('brianflix')).toEqual({ status, body })
+  })
+
+  it('does not call the owner API when Remote Access is off', async () => {
+    const { service } = makeService({ ...ENABLED_OPTIONS, [OPTIONS.CONNECT_ENABLED.name]: 'false' })
+
+    await expect(service.getVanity()).rejects.toBeInstanceOf(VanityUnavailableError)
+    expect(mockedFetchRemoteAccessAPI).not.toHaveBeenCalled()
+  })
+
+  it('does not call the owner API when no server token is stored', async () => {
+    const { service } = makeService({
+      [OPTIONS.CONNECT_ENABLED.name]: 'true',
+      [OPTIONS.INSTANCE_ID.name]: 'instance-1234',
+    })
+
+    await expect(service.setVanity('brianflix')).rejects.toBeInstanceOf(VanityUnavailableError)
+    expect(mockedFetchRemoteAccessAPI).not.toHaveBeenCalled()
+  })
+
+  it('does not call the owner API when the stored credential has been rejected', async () => {
+    const { service, refresher } = makeService()
+    refresher.getCurrentToken.mockRejectedValue(new ConnectAuthError('The Remote Access server token was rejected.'))
+
+    await expect(service.getVanityAvailability('brianflix')).rejects.toBeInstanceOf(VanityUnavailableError)
+    expect(mockedFetchRemoteAccessAPI).not.toHaveBeenCalled()
+  })
+
+  it('does not call the owner API before this server has an instance ID', async () => {
+    const { service } = makeService({
+      [OPTIONS.CONNECT_ENABLED.name]: 'true',
+      [OPTIONS.CONNECT_SERVER_TOKEN.name]: 'server-token',
+    })
+
+    await expect(service.getVanity()).rejects.toBeInstanceOf(VanityUnavailableError)
+    expect(mockedFetchRemoteAccessAPI).not.toHaveBeenCalled()
   })
 })

@@ -1,19 +1,32 @@
 import {
+  BadGatewayException,
   BadRequestException,
+  Body,
   ConflictException,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   InternalServerErrorException,
   Post,
+  Put,
+  Query,
   Req,
+  Res,
 } from '@nestjs/common'
 import { ApiConflictResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { Response } from 'express'
 
-import { CloudEnableError, ConnectSDKService } from './connect-sdk.service'
+import { CloudEnableError, ConnectSDKService, VanityProxyResponse, VanityUnavailableError } from './connect-sdk.service'
 import { ConnectStatusResponse } from './dtos/ConnectStatusResponse.dto'
+import { SetVanityNameDto, VanityNameQueryDto } from './dtos/VanityName.dto'
+import { VanityAvailabilityResponse, VanityStatusResponse } from './dtos/VanityResponse.dto'
 import { StandardEndpoint } from '../../../decorators/StandardEndpoint.decorator'
 import { getCardinalTolkienFromHeaders } from '../../../utils/jwt'
+
+// The refusals the vanity endpoints hand back, documented once because all four share them.
+const VANITY_PROXY_DESCRIPTION = 'Answers from the Remote Access Server are passed through untouched, including its refusals: <code>422 invalid_name</code>, <code>409 name_unavailable</code> / <code>label_limit_reached</code>, <code>429 rename_cooldown</code>, <code>402 cert_unavailable</code> and <code>503 vanity_disabled</code>.'
+const VANITY_PROXY_ERRORS = { 400: ['Remote Access is not enabled on this server, or it holds no cloud credential'] }
 
 @Controller()
 @ApiTags('Remote Access')
@@ -96,4 +109,85 @@ export class ConnectSDKController {
   async status(): Promise<ConnectStatusResponse> {
     return await this.connectSDKService.getStatus()
   }
+
+  /**
+   * Reports whether a vanity name is free for this server to take.
+   */
+  @Get('/connect/vanity/availability')
+  @StandardEndpoint({
+    summary: 'Check whether a vanity hostname is available.',
+    description: VANITY_PROXY_DESCRIPTION,
+    capabilities: ['ServerSettings.Update'],
+    errors: VANITY_PROXY_ERRORS,
+  })
+  @ApiOkResponse({ type: VanityAvailabilityResponse })
+  async vanityAvailability(@Query() { name }: VanityNameQueryDto, @Res({ passthrough: true }) res: Response): Promise<unknown> {
+    return await proxy(res, () => this.connectSDKService.getVanityAvailability(name))
+  }
+
+  /**
+   * Returns the vanity names this server currently holds.
+   */
+  @Get('/connect/vanity')
+  @StandardEndpoint({
+    summary: 'Get this server\'s vanity hostnames.',
+    description: VANITY_PROXY_DESCRIPTION,
+    capabilities: ['ServerSettings.Update'],
+    errors: VANITY_PROXY_ERRORS,
+  })
+  @ApiOkResponse({ type: VanityStatusResponse })
+  async vanity(@Res({ passthrough: true }) res: Response): Promise<unknown> {
+    return await proxy(res, () => this.connectSDKService.getVanity())
+  }
+
+  /**
+   * Claims a vanity name for this server.
+   */
+  @Put('/connect/vanity')
+  @StandardEndpoint({
+    summary: 'Claim a vanity hostname for this server.',
+    description: VANITY_PROXY_DESCRIPTION,
+    capabilities: ['ServerSettings.Update'],
+    errors: VANITY_PROXY_ERRORS,
+  })
+  @ApiOkResponse({ type: VanityStatusResponse })
+  async setVanity(@Body() { name }: SetVanityNameDto, @Res({ passthrough: true }) res: Response): Promise<unknown> {
+    return await proxy(res, () => this.connectSDKService.setVanity(name))
+  }
+
+  /**
+   * Gives one of this server's vanity names back up.
+   */
+  @Delete('/connect/vanity')
+  @StandardEndpoint({
+    summary: 'Release one of this server\'s vanity hostnames.',
+    description: VANITY_PROXY_DESCRIPTION,
+    capabilities: ['ServerSettings.Update'],
+    errors: VANITY_PROXY_ERRORS,
+  })
+  @ApiOkResponse({ type: VanityStatusResponse })
+  async releaseVanity(@Query() { name }: VanityNameQueryDto, @Res({ passthrough: true }) res: Response): Promise<unknown> {
+    return await proxy(res, () => this.connectSDKService.releaseVanity(name))
+  }
+}
+
+/*
+ * Wears the Remote Access Server's answer as this endpoint's own. The Admin app's rename drawer
+ * reads the error codes in the body, so nothing here interprets or re-maps them.
+ */
+async function proxy(res: Response, call: () => Promise<VanityProxyResponse>): Promise<unknown> {
+  let result: VanityProxyResponse
+
+  try {
+    result = await call()
+  } catch (error) {
+    if (error instanceof VanityUnavailableError) {
+      throw new BadRequestException(error.message)
+    }
+    throw new BadGatewayException(`Could not reach the Remote Access Server: ${error.message}`)
+  }
+
+  res.status(result.status)
+
+  return result.body
 }
