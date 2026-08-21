@@ -443,6 +443,94 @@ describe('ConnectSDKService', () => {
     expect(configEvents).toHaveLength(1)
   })
 
+  it('persists the vanity hostname a register vouches for', async () => {
+    const { service, db, sockets } = makeService()
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    sockets[0].receive({
+      type: 'registered',
+      publicIp: '203.0.113.7',
+      hostname: 'instance-1234.connect.cardinalapps.host',
+      signingKey: 'a2V5',
+      config: { vanityHostname: 'brians-server.connect.cardinalapps.host' },
+    })
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_VANITY_HOSTNAME.name]).toBe('brians-server.connect.cardinalapps.host')
+  })
+
+  /* A register is the authoritative statement, so a cloud too old to send the key is one that vouches for
+     no vanity name — leaving a stale one in place would keep naming a certificate nobody holds. */
+  it('retracts a stored vanity hostname when a register does not name one', async () => {
+    const { service, db, sockets } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+    })
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    sockets[0].receive({ type: 'registered', publicIp: '203.0.113.7', hostname: 'h', signingKey: 'a2V5', config: {} })
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_VANITY_HOSTNAME.name]).toBe('')
+  })
+
+  it('applies a vanity hostname sent as a config:update patch', async () => {
+    const { service, db, sockets } = makeService()
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    sockets[0].receive({ type: 'config:update', vanityHostname: 'brians-server.connect.cardinalapps.host' })
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_VANITY_HOSTNAME.name]).toBe('brians-server.connect.cardinalapps.host')
+  })
+
+  it('retracts the vanity hostname on an explicit null in a config:update', async () => {
+    const { service, db, sockets } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+    })
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    sockets[0].receive({ type: 'config:update', vanityHostname: null })
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_VANITY_HOSTNAME.name]).toBe('')
+  })
+
+  // A patch, not a snapshot: an update about something else says nothing about the vanity name
+  it('leaves the vanity hostname alone when a config:update omits the key', async () => {
+    const { service, db, sockets } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+    })
+
+    await service.connect()
+    await flush()
+    sockets[0].open()
+    await flush()
+
+    sockets[0].receive({ type: 'config:update', signingKey: 'bmV3LWtleQ==' })
+    await flush()
+
+    expect(db.options[OPTIONS.CONNECT_VANITY_HOSTNAME.name]).toBe('brians-server.connect.cardinalapps.host')
+  })
+
   it('emits relay and binary frame events for the relay tickets to consume', async () => {
     const { service, events, sockets } = makeService()
     const relayRequests: unknown[] = []
@@ -978,6 +1066,49 @@ describe('ConnectSDKService connection URLs', () => {
     })
 
     expect((await service.getStatus()).directUrl).toBe('https://media.example.com')
+  })
+
+  it('prefers the vanity hostname over the assigned one', async () => {
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'instance-1234.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '31000',
+    })
+
+    const status = await service.getStatus()
+
+    expect(status.directUrl).toBe('https://brians-server.connect.cardinalapps.host:31000')
+    // The assigned name stays reported — it is still on the certificate, and support asks for it
+    expect(status.hostname).toBe('instance-1234.connect.cardinalapps.host')
+    expect(status.vanityHostname).toBe('brians-server.connect.cardinalapps.host')
+  })
+
+  // The two preferences are independent, so a server with both gets the shortest URL it can honestly offer
+  it('combines the vanity hostname with a verified port that drops', async () => {
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'instance-1234.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '31000',
+      [OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name]: '443',
+    })
+
+    expect((await service.getStatus()).directUrl).toBe('https://brians-server.connect.cardinalapps.host')
+  })
+
+  it('falls back to the assigned hostname once the vanity name is retracted', async () => {
+    const { service } = makeService({
+      ...ENABLED_OPTIONS,
+      [OPTIONS.CONNECT_HOSTNAME.name]: 'instance-1234.connect.cardinalapps.host',
+      [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: '',
+      [OPTIONS.CONNECT_PUBLIC_PORT.name]: '443',
+    })
+
+    const status = await service.getStatus()
+
+    expect(status.directUrl).toBe('https://instance-1234.connect.cardinalapps.host')
+    expect(status.vanityHostname).toBeNull()
   })
 
   // The relay is reached on a shared host with the instance in the path, unlike direct

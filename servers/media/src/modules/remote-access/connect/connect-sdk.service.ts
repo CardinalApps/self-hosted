@@ -86,6 +86,7 @@ export type ConnectStatus = {
   enabled: boolean,
   state: ConnectionState,
   hostname: string | null,
+  vanityHostname: string | null,
   signingKeyFingerprint: string | null,
   tokenExpiresAt: string | null,
   publicPort: number | null,
@@ -392,21 +393,25 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     // No fallback here: the UI should say nothing rather than name a port nobody can be reached on
     const publicPort = await this.getPublicPort(null)
     const verifiedExternalPort = toPort(await this.databaseService.getOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name))
+    const vanityHostname = ((await this.databaseService.getOption(OPTIONS.CONNECT_VANITY_HOSTNAME.name)) as string) || null
 
     return {
       enabled: isOptionEnabled(enabled),
       state: this.state,
       hostname: (hostname as string) || null,
+      vanityHostname,
       signingKeyFingerprint: signingKey
         ? crypto.createHash('sha256').update(Buffer.from(signingKey as string, 'base64')).digest('hex').slice(0, 16)
         : null,
       tokenExpiresAt: tokenExpiresAt?.toISOString() ?? null,
       publicPort,
       /*
-       * The verified port wins, being the one the cloud actually reached this server on. Negotiation
-       * applies the same precedence to the same pair, so the URL shown here is the URL clients get.
+       * The vanity name wins when one is live: it is on the same certificate, so it validates, and it
+       * is the name the owner picked. The verified port wins over the advertised one, being the one the
+       * cloud actually reached this server on. The two compose — a vanity name can also be portless.
+       * Negotiation applies the same precedence, so the URL shown here is the URL clients get.
        */
-      directUrl: buildDirectUrl(hostname as string, verifiedExternalPort ?? publicPort),
+      directUrl: buildDirectUrl(vanityHostname ?? (hostname as string), verifiedExternalPort ?? publicPort),
       relayUrl: instanceId
         ? `https://${(relayHost as string) || envVar('CONNECT_RELAY_HOST', 'relay.cardinalapps.host')}/relay/${instanceId}`
         : null,
@@ -531,6 +536,24 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     await this.databaseService.saveOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name, String(verified))
   }
 
+  /*
+   * Keeps the vanity hostname the Remote Access Server's certificate covers, which is the name this
+   * server prefers to call itself by. An explicit null retracts it and the assigned hostname takes
+   * over again; anything else, including a value from a server that does not send the key, is left alone.
+   */
+  private async rememberVanityHostname(hostname: unknown): Promise<void> {
+    if (hostname === null) {
+      await this.databaseService.saveOption(OPTIONS.CONNECT_VANITY_HOSTNAME.name, '')
+      return
+    }
+
+    if (typeof hostname !== 'string' || !hostname) {
+      return
+    }
+
+    await this.databaseService.saveOption(OPTIONS.CONNECT_VANITY_HOSTNAME.name, hostname)
+  }
+
   // Routes JSON control messages and binary relay frames
   private async handleMessage(data: Buffer, isBinary: boolean): Promise<void> {
     if (isBinary) {
@@ -562,6 +585,8 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
          * negotiation answers would otherwise disagree with the URL shown here.
          */
         await this.rememberVerifiedExternalPort(message.config?.verifiedExternalPort ?? null)
+        // Authoritative for the same reason: a config naming no vanity name is a cloud saying none is live
+        await this.rememberVanityHostname(message.config?.vanityHostname ?? null)
         if (message.cert) {
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_CERT_PEM.name, message.cert.cert_pem)
           await this.databaseService.saveOption(OPTIONS.CONNECT_TLS_KEY_PEM.name, message.cert.key_pem)
@@ -590,6 +615,9 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
         // A patch, not a snapshot: only a key that is actually present says anything about the port
         if ('verifiedExternalPort' in message) {
           await this.rememberVerifiedExternalPort(message.verifiedExternalPort)
+        }
+        if ('vanityHostname' in message) {
+          await this.rememberVanityHostname(message.vanityHostname)
         }
         this.events.emit('config:update', message)
         break

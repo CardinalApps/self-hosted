@@ -46,10 +46,15 @@ export interface CertPayload {
  * internet, when that is not the port it advertised — today only 443, which is what lets the direct
  * URL drop its port. It is always present in `registered`, so a fresh register is authoritative;
  * null means no such proof exists and the advertised port stands.
+ *
+ * `vanityHostname` is the full hostname of the server's primary vanity label, carried only once the
+ * delivered certificate actually covers it. Always present in `registered` for the same reason the
+ * port verdict is; null means no vanity name of this server's is live and the assigned one stands.
  */
 export interface RegisteredConfig {
   relayHostname?: string
   verifiedExternalPort?: number | null
+  vanityHostname?: string | null
   [key: string]: unknown
 }
 
@@ -64,13 +69,15 @@ export interface RegisteredPayload {
 
 /*
  * Payload of a `config:update` message. The shape is intentionally open so new keys can be added
- * without a protocol-version bump. Absent keys mean "unchanged"; `verifiedExternalPort` uses an
- * explicit null to retract a verdict, so absence and retraction stay distinguishable.
+ * without a protocol-version bump. Absent keys mean "unchanged"; `verifiedExternalPort` and
+ * `vanityHostname` use an explicit null to retract a verdict, so absence and retraction stay
+ * distinguishable — a vanity name that stops being live retracts to null rather than going quiet.
  */
 export interface ConfigUpdatePayload {
   signingKey?: string
   relayHostname?: string
   verifiedExternalPort?: number | null
+  vanityHostname?: string | null
   [key: string]: unknown
 }
 

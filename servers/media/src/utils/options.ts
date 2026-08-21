@@ -105,6 +105,13 @@ export const OPTIONS = {
     name: 'connect_verified_external_port',
     default: undefined,
   },
+  // The vanity hostname the Remote Access Server's certificate covers, once the owner's chosen name
+  // is live. Preferred over the assigned hostname everywhere this server names itself.
+  // Assigned by the cloud; unset means no vanity name is live and the assigned hostname stands
+  CONNECT_VANITY_HOSTNAME: <Option>{
+    name: 'connect_vanity_hostname',
+    default: undefined,
+  },
   // UPnP/NAT-PMP automatic port mapping. Opt-in via the Admin app; only works
   // with host networking
   PORT_MAPPING_ENABLED: <Option>{

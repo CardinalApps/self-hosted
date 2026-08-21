@@ -27,6 +27,9 @@ export class ConnectStatusResponse {
   @ApiProperty({ nullable: true, description: 'The hostname assigned by the Remote Access Server, once registered.' })
   hostname: string | null
 
+  @ApiProperty({ nullable: true, description: 'The owner-chosen vanity hostname, once the certificate covers it. Preferred over `hostname` when set.' })
+  vanityHostname: string | null
+
   @ApiProperty({ nullable: true, description: 'Truncated SHA-256 fingerprint of the probe signing key, for support diagnostics.' })
   signingKeyFingerprint: string | null
 

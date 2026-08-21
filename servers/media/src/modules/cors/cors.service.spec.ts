@@ -100,6 +100,24 @@ describe('CorsService.isOriginAllowed', () => {
       expect(await service.isOriginAllowed('https://media.example.com')).toBe(true)
     })
 
+    /* The vanity name is on the same certificate as the assigned one, so a client that dialled it is
+       talking to this very server — refusing it would break the URL the owner is actually handed. */
+    it('allows the live vanity hostname', async () => {
+      const { service } = makeService([], {
+        [OPTIONS.CONNECT_HOSTNAME.name]: 'abc123.connect.cardinalapps.host',
+        [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: 'brians-server.connect.cardinalapps.host',
+      })
+
+      expect(await service.isOriginAllowed('https://brians-server.connect.cardinalapps.host')).toBe(true)
+      expect(await service.isOriginAllowed('https://brians-server.connect.cardinalapps.host:24900')).toBe(true)
+    })
+
+    it('denies a vanity hostname that has been retracted', async () => {
+      const { service } = makeService([], { [OPTIONS.CONNECT_VANITY_HOSTNAME.name]: '' })
+
+      expect(await service.isOriginAllowed('https://brians-server.connect.cardinalapps.host')).toBe(false)
+    })
+
     it('denies other hostnames when no own hostname is set', async () => {
       const { service } = makeService()
       expect(await service.isOriginAllowed('https://abc123.connect.cardinalapps.host')).toBe(false)

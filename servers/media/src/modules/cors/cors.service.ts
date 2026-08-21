@@ -100,8 +100,9 @@ export class CorsService {
   }
 
   // Matches the origin's hostname against the server's own hostnames (the
-  // Cardinal-assigned one and the user's BYO one), ignoring scheme and port —
-  // it's the same Media Server regardless of which port the client used
+  // Cardinal-assigned one, the live vanity one, and the user's BYO one), ignoring
+  // scheme and port — it's the same Media Server regardless of which port the
+  // client used, and the vanity name is on the same certificate as the assigned one
   private async matchesOwnHostname(origin: string): Promise<boolean> {
     let originHostname: string
     try {
@@ -112,6 +113,7 @@ export class CorsService {
 
     const ownHostnames = [
       await this.databaseService.getOption(OPTIONS.CONNECT_HOSTNAME.name),
+      await this.databaseService.getOption(OPTIONS.CONNECT_VANITY_HOSTNAME.name),
       await this.databaseService.getOption(OPTIONS.CONNECT_BYO_HOSTNAME.name),
     ]
 
