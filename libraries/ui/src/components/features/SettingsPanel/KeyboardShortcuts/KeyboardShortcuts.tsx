@@ -331,6 +331,8 @@ const KeyboardShortcuts = ({ app }: { app: CardinalApp }) => {
             <div className="shortcut-action">
               <Select
                 size="s"
+                multi={false}
+                min={1}
                 value={binding.action}
                 options={actionOptions}
                 onChange={(selected) => changeAction(index, selected || binding.action)}

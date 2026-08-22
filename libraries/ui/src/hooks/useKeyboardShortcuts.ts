@@ -34,8 +34,14 @@ const useKeyboardShortcuts = () => {
       }))
   ), [settings?.shortcut_set, settings?.custom_shortcut_sets, settings?.single_key_shortcuts])
 
+  /*
+   * Deduplicated: a combination listed twice is listened for twice, and the callback would fire
+   * once per listing. Two bindings sharing keys is a conflict the editor warns about, but it has
+   * to resolve to the first of them firing once rather than to a toggle firing twice and
+   * appearing to do nothing at all.
+   */
   useHotkeys(
-    bindings.map((binding) => binding.keys),
+    [...new Set(bindings.map((binding) => binding.keys))],
     (event, hotkey) => {
       const pressed = bindings.find((binding) => binding.keys === hotkey.hotkey)
 
