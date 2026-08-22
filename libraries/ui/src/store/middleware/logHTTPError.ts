@@ -21,6 +21,11 @@ export const shouldToastHTTPError = (action: unknown): boolean => {
   // 401s are handled by the reauth base query; no toast needed
   if ((payload as ApiErrorPayload)?.data?.statusCode === 401) return false
 
+  /* The server can mark a refusal as a capability answer rather than a fault — `Cardinal-Toast:
+     none` — and the feature's own UI renders it. Anything the server flags this way stays quiet. */
+  const meta = (action as { meta?: { baseQueryMeta?: { response?: { headers?: Headers } } } }).meta
+  if (meta?.baseQueryMeta?.response?.headers?.get?.('Cardinal-Toast') === 'none') return false
+
   /* A cloud service access refusal is not a fault: the request has already been queued, and the
      card that made the call says so in place of an error. */
   return !isServiceAccessRefusal(payload)

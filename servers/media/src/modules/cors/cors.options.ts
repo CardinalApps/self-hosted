@@ -17,6 +17,7 @@ export function buildCorsOptions(corsService: CorsService): CorsOptions {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     exposedHeaders: [
       'Cardinal-Extra-Message',
+      'Cardinal-Toast',
     ],
     credentials: true,
   }

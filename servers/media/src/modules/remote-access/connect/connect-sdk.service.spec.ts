@@ -130,13 +130,13 @@ const mockedFetchRemoteAccessAPI = fetchRemoteAccessAPI as jest.Mock
 
 // The cloud IDP's answers to a server-token mint
 const cloudResponses = {
-  minted: (serverToken = 'server-token') => ({ status: 201, json: async () => ({ serverToken }) }),
-  gated: () => ({ status: 403, json: async () => ({ message: 'Access has not been approved.', code: SERVICE_ACCESS_REQUIRED }) }),
-  slotsExhausted: () => ({ status: 409, json: async () => ({ message: 'Every server slot is in use.', code: 'server_slots_exhausted' }) }),
-  suspended: () => ({ status: 403, json: async () => ({ message: 'This account is suspended.', code: 'account_suspended' }) }),
-  expiredJwt: () => ({ status: 401, json: async () => ({ message: 'Invalid or expired token.' }) }),
-  serverError: () => ({ status: 500, json: async () => ({ message: 'Something went wrong.' }) }),
-  rateLimited: () => ({ status: 429, json: async () => ({ message: 'Slow down.' }) }),
+  minted: (serverToken = 'server-token') => ({ status: 201, headers: new Headers(), json: async () => ({ serverToken }) }),
+  gated: () => ({ status: 403, headers: new Headers(), json: async () => ({ message: 'Access has not been approved.', code: SERVICE_ACCESS_REQUIRED }) }),
+  slotsExhausted: () => ({ status: 409, headers: new Headers(), json: async () => ({ message: 'Every server slot is in use.', code: 'server_slots_exhausted' }) }),
+  suspended: () => ({ status: 403, headers: new Headers(), json: async () => ({ message: 'This account is suspended.', code: 'account_suspended' }) }),
+  expiredJwt: () => ({ status: 401, headers: new Headers(), json: async () => ({ message: 'Invalid or expired token.' }) }),
+  serverError: () => ({ status: 500, headers: new Headers(), json: async () => ({ message: 'Something went wrong.' }) }),
+  rateLimited: () => ({ status: 429, headers: new Headers(), json: async () => ({ message: 'Slow down.' }) }),
 }
 
 // Flushes pending microtasks without advancing fake timers
@@ -1254,8 +1254,8 @@ describe('resolveLanIps', () => {
 
 describe('ConnectSDKService vanity proxy', () => {
   // The Remote Access Server's answers, as the raw Response the proxy reads
-  function cloudAnswer(status: number, body: unknown) {
-    return { status, json: async () => body }
+  function cloudAnswer(status: number, body: unknown, headers: Record<string, string> = {}) {
+    return { status, headers: new Headers(headers), json: async () => body }
   }
 
   function lastCall() {

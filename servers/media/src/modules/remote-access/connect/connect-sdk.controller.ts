@@ -182,11 +182,15 @@ async function proxy(res: Response, call: () => Promise<VanityProxyResponse>): P
     result = await call()
   } catch (error) {
     if (error instanceof VanityUnavailableError) {
+      /* Not a fault either: Remote Access is simply off or unlinked here, and the drawer hides the
+         feature on this answer. The header keeps generic error-toast layers out of it. */
+      res.setHeader('Cardinal-Toast', 'none')
       throw new BadRequestException(error.message)
     }
     throw new BadGatewayException(`Could not reach the Remote Access Server: ${error.message}`)
   }
 
+  if (result.noToast) res.setHeader('Cardinal-Toast', 'none')
   res.status(result.status)
 
   return result.body

@@ -17,11 +17,15 @@ function makeService() {
   }
 }
 
-// Only the status hook the proxy touches
+// The status and header hooks the proxy touches
 function makeResponse() {
   const statuses: number[] = []
-  const res = { status: jest.fn((code: number) => { statuses.push(code); return res }) }
-  return { res: res as unknown as Response, statuses }
+  const headers: Record<string, string> = {}
+  const res = {
+    status: jest.fn((code: number) => { statuses.push(code); return res }),
+    setHeader: jest.fn((name: string, value: string) => { headers[name] = value }),
+  }
+  return { res: res as unknown as Response, statuses, headers }
 }
 
 function makeController(service = makeService()) {

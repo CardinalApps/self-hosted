@@ -15,6 +15,15 @@ describe('shouldToastHTTPError', () => {
     expect(shouldToastHTTPError(rejection({ status: 500, data: { statusCode: 500, message: 'boom' } }))).toBe(true)
   })
 
+  it('stays quiet when the server marks the answer Cardinal-Toast: none', () => {
+    const action = rejection({ status: 503, data: { statusCode: 503, message: 'vanity_disabled' } }) as Record<string, unknown>
+    action.meta = {
+      ...(action.meta as Record<string, unknown>),
+      baseQueryMeta: { response: { headers: new Headers({ 'Cardinal-Toast': 'none' }) } },
+    }
+    expect(shouldToastHTTPError(action)).toBe(false)
+  })
+
   it('leaves 401s to the reauth base query', () => {
     expect(shouldToastHTTPError(rejection({ status: 401, data: { statusCode: 401, message: 'nope' } }))).toBe(false)
   })

@@ -59,6 +59,7 @@ export class VanityUnavailableError extends Error {}
 export type VanityProxyResponse = {
   status: number,
   body: unknown,
+  noToast?: boolean,
 }
 
 export const ENABLE_REMOTE_ACCESS = 'enable_remote_access'
@@ -522,7 +523,12 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
       returnRawResponse: true,
     })
 
-    return { status: response.status, body: await response.json().catch(() => null) }
+    return {
+      status: response.status,
+      body: await response.json().catch(() => null),
+      // The cloud marks capability refusals it never wants surfaced as error toasts; carried through.
+      ...(response.headers.get('Cardinal-Toast') === 'none' ? { noToast: true } : {}),
+    }
   }
 
   /*
