@@ -98,6 +98,7 @@
 
     .vanity-availability {
       margin-top: 6px;
+      padding: 3px 0px 0 10px;
       font-size: 13px;
       color: var(--text-color-2);
 
