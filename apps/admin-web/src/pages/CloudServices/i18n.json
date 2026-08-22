@@ -42,10 +42,10 @@
     "en": "Request beta access"
   },
   "ra.request-access.desc-p1": {
-    "en": "Remote Access is currently a beta feature that is available to a limited number of users. Once enabled, you will remain in a queue until there is room for your media server. There is a maximum of one (1) media server per user during the beta."
+    "en": "Remote Access is in Closed Beta. Once enabled, you will remain in a queue until there is room for your media server. There is a maximum of one (1) media server per user during the beta."
   },
   "ra.request-access.desc-p2": {
-    "en": "Inactive servers may be pruned from the beta. If that happens to you, feel free to queue up again."
+    "en": "Inactive servers may be pruned from the Closed Beta. Feel free to requeue at any time."
   },
   "ra.queued.desc": {
     "en": "This server is queued for Remote Access."
