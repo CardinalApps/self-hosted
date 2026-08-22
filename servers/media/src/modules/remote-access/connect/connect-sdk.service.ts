@@ -404,8 +404,10 @@ export class ConnectSDKService implements OnApplicationBootstrap, OnApplicationS
     const tokenExpiresAt = await this.tokenRefresher.getServerTokenExpiry()
     const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
     const relayHost = await this.databaseService.getOption(OPTIONS.CONNECT_RELAY_HOST.name)
-    // No fallback here: the UI should say nothing rather than name a port nobody can be reached on
-    const publicPort = await this.getPublicPort(null)
+    /* The same resolution register advertises to the cloud, so the URL shown here is the one
+       negotiation probes and hands out — the two surfaces can never disagree. */
+    const publicPort = (await this.getPublicPort(Number(envVar('CARDINAL_HOME_SERVER_PORT', 3080))))
+      ?? Number(envVar('CARDINAL_HOME_SERVER_PORT', 3080))
     const verifiedExternalPort = toPort(await this.databaseService.getOption(OPTIONS.CONNECT_VERIFIED_EXTERNAL_PORT.name))
     const vanityHostname = ((await this.databaseService.getOption(OPTIONS.CONNECT_VANITY_HOSTNAME.name)) as string) || null
 
@@ -972,11 +974,12 @@ export function getLocalIps(interfaces = os.networkInterfaces()): string[] {
  * which is what a Path 1 reverse proxy in front of this server would use.
  */
 function buildDirectUrl(hostname: string | null, publicPort: number | null): string | null {
-  if (!hostname) {
+  // No known port is no URL — a portless URL is a claim that 443 answers, and null is not that claim
+  if (!hostname || publicPort === null) {
     return null
   }
 
-  return publicPort && publicPort !== 443
+  return publicPort !== 443
     ? `https://${hostname}:${publicPort}`
     : `https://${hostname}`
 }
