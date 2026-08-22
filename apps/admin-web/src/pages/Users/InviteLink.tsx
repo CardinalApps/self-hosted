@@ -147,7 +147,7 @@ function InvitationLinks({ getExpiration }: DrawIntitationTabType) {
           <List
             items={data?.map((invitation) => {
               return {
-                name: (
+                label: (
                   <div className="invite-link-info">
                     <P truncate={true}>
                       <Span>

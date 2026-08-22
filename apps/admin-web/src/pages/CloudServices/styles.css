@@ -10,14 +10,6 @@
   }
 
   .remote-access-status {
-    .item-list-item-name {
-      white-space: nowrap;
-    }
-
-    .item-list-item-label {
-      text-align: right;
-    }
-
     .status-value {
       display: inline-flex;
       align-items: center;
@@ -55,7 +47,7 @@
 }
 
 .configure-remote-access-drawer {
-  .item-list-item-name {
+  .item-list-item-label {
     word-break: break-all;
   }
 

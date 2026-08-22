@@ -115,11 +115,11 @@ function ReleaseMeta({
           layout="compact"
           items={[
             {
-              name: <><strong>{i18n['music-release.meta.name']['en']}</strong> <span>{release?.title || UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.name']['en']}</strong> <span>{release?.title || UNKNOWN}</span></>,
               title: i18n['music-release.meta.name']['en'],
             },
             {
-              name: (
+              label: (
                 <>
                   <strong>{i18n['music-release.meta.artists']['en']}</strong>
                   <span className="release-meta-artists">
@@ -141,15 +141,15 @@ function ReleaseMeta({
               title: i18n['music-release.meta.artists']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.year']['en']}</strong> <span>{year ? String(year) : UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.year']['en']}</strong> <span>{year ? String(year) : UNKNOWN}</span></>,
               title: i18n['music-release.meta.year']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.type']['en']}</strong> <span>{releaseTypeLabel || UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.type']['en']}</strong> <span>{releaseTypeLabel || UNKNOWN}</span></>,
               title: i18n['music-release.meta.type']['en'],
             },
             {
-              name: (
+              label: (
                 <>
                   <strong>{i18n['music-release.meta.genres']['en']}</strong>
                   <span>
@@ -163,7 +163,7 @@ function ReleaseMeta({
               title: i18n['music-release.meta.genres']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.label']['en']}</strong> <span>{label ? String(label) : UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.label']['en']}</strong> <span>{label ? String(label) : UNKNOWN}</span></>,
               title: i18n['music-release.meta.label']['en'],
             },
           ]}
@@ -173,27 +173,27 @@ function ReleaseMeta({
           layout="compact"
           items={[
             {
-              name: <><strong>{i18n['music-release.meta.tracks']['en']}</strong> <span>{release?.tracks?.length.toString() || '0'}</span></>,
+              label: <><strong>{i18n['music-release.meta.tracks']['en']}</strong> <span>{release?.tracks?.length.toString() || '0'}</span></>,
               title: i18n['music-release.meta.tracks']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.discs']['en']}</strong> <span>{countDiscs()}</span></>,
+              label: <><strong>{i18n['music-release.meta.discs']['en']}</strong> <span>{countDiscs()}</span></>,
               title: i18n['music-release.meta.discs']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.runtime']['en']}</strong> <span>{runtimeSeconds ? formatRuntime(runtimeSeconds) : UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.runtime']['en']}</strong> <span>{runtimeSeconds ? formatRuntime(runtimeSeconds) : UNKNOWN}</span></>,
               title: i18n['music-release.meta.runtime']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.quality']['en']}</strong> <span>{quality() || UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.quality']['en']}</strong> <span>{quality() || UNKNOWN}</span></>,
               title: i18n['music-release.meta.quality']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.country']['en']}</strong> <span>{country ? String(country) : UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.country']['en']}</strong> <span>{country ? String(country) : UNKNOWN}</span></>,
               title: i18n['music-release.meta.country']['en'],
             },
             {
-              name: <><strong>{i18n['music-release.meta.added']['en']}</strong> <span>{addedAt || UNKNOWN}</span></>,
+              label: <><strong>{i18n['music-release.meta.added']['en']}</strong> <span>{addedAt || UNKNOWN}</span></>,
               title: i18n['music-release.meta.added']['en'],
             },
           ]}

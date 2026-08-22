@@ -51,23 +51,23 @@ function MediaFolders() {
         items={[
           {
             icon: { fa: 'far fa-folder-open' },
-            name: i18n['dirs.music'][lang],
-            label: mediaDirs?.music ? mediaDirs.music : i18n['dirs.no-dir'][lang],
+            label: i18n['dirs.music'][lang],
+            value: mediaDirs?.music ? mediaDirs.music : i18n['dirs.no-dir'][lang],
           },
           {
             icon: { fa: 'far fa-folder-open' },
-            name: i18n['dirs.photos'][lang],
-            label: mediaDirs?.photos ? mediaDirs.photos : i18n['dirs.no-dir'][lang],
+            label: i18n['dirs.photos'][lang],
+            value: mediaDirs?.photos ? mediaDirs.photos : i18n['dirs.no-dir'][lang],
           },
           {
             icon: { fa: 'far fa-folder-open' },
-            name: i18n['dirs.movies'][lang],
-            label: mediaDirs?.movies ? mediaDirs.movies : i18n['dirs.no-dir'][lang],
+            label: i18n['dirs.movies'][lang],
+            value: mediaDirs?.movies ? mediaDirs.movies : i18n['dirs.no-dir'][lang],
           },
           {
             icon: { fa: 'far fa-folder-open' },
-            name: i18n['dirs.tv'][lang],
-            label: mediaDirs?.tv ? mediaDirs.tv : i18n['dirs.no-dir'][lang],
+            label: i18n['dirs.tv'][lang],
+            value: mediaDirs?.tv ? mediaDirs.tv : i18n['dirs.no-dir'][lang],
           },
         ]}
       />

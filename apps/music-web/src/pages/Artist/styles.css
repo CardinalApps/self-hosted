@@ -77,7 +77,7 @@
   .artist-meta-list {
     width: 100%;
 
-    .item-list-item-name {
+    .item-list-item-label {
       width: 100%;
       display: flex;
       justify-content: space-between;

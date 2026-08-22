@@ -94,8 +94,8 @@ function PopularityDataPool() {
           layout="compact"
           items={[
             {
-              name: i18n['pdp.plays-contributed'][lang],
-              label: String(stats.playsContributed),
+              label: i18n['pdp.plays-contributed'][lang],
+              value: String(stats.playsContributed),
             },
           ]}
         />

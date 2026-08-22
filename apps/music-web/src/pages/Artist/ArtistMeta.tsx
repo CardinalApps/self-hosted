@@ -191,7 +191,7 @@ function ArtistMeta({
   ]
 
   const toListItems = (rows: MetaRow[]) => rows.map((row) => ({
-    name: (
+    label: (
       <>
         <strong>{t(row.labelKey)}</strong>
         {loading

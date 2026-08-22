@@ -83,9 +83,5 @@
 
   .server-info-list {
     width: 100%;
-
-    .item-list-item-name {
-      min-width: 35%;
-    }
   }
 }

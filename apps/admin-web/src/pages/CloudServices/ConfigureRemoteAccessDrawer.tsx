@@ -69,14 +69,14 @@ const AVAILABILITY_DEBOUNCE_MS = 400
 const SHOW_UPNP = false
 
 // A copyable row for a connection URL, or nothing when that path is off or unassigned
-function urlItem(value: string, url: string | null | undefined): ListItem[] {
+function urlItem(id: string, url: string | null | undefined): ListItem[] {
   if (!url) {
     return []
   }
 
   return [{
-    value,
-    name: url,
+    id,
+    label: url,
     title: url,
     copyable: url,
     controls: ['copy'],
@@ -334,9 +334,9 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
   /* The row answers for the relay path, not the control channel: a connected server with the relay
      switched off is not "Active" here. Off — globally or per-path — is a settled answer. */
   const connectionItem = (state: ConnectionState): ListItem[] => [{
-    value: 'connection-state',
-    name: i18n['ra.status.label'][lang],
-    label: enabled && relayEnabled ? connectionStateLabel(state, lang) : i18n['ra.status.disabled'][lang],
+    id: 'connection-state',
+    label: i18n['ra.status.label'][lang],
+    value: enabled && relayEnabled ? connectionStateLabel(state, lang) : i18n['ra.status.disabled'][lang],
   }]
 
   const httpsItem = (https: HttpsListenerStatus): ListItem[] => {
@@ -347,11 +347,11 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
     }
 
     return [{
-      value: 'https-listener',
-      name: i18n['ra.https.label'][lang],
+      id: 'https-listener',
+      label: i18n['ra.https.label'][lang],
       title: https.state === 'error' ? https.lastError ?? undefined : https.port ? `:${https.port}` : undefined,
       // Same settled-answer rule as the relay row: a listener that is off by choice is not "Stopped"
-      label: enabled && directEnabled ? labels[https.state] : i18n['ra.status.disabled'][lang],
+      value: enabled && directEnabled ? labels[https.state] : i18n['ra.status.disabled'][lang],
     }]
   }
 
@@ -369,8 +369,8 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
     ]
 
     return [{
-      ...(row ?? { value: 'vanity-name', name, title: name }),
-      label: state ? labels[state] : undefined,
+      ...(row ?? { id: 'vanity-name', label: name, title: name }),
+      value: state ? labels[state] : undefined,
       controls,
       onDelete: () => setNameToRelease(name),
     }]
@@ -409,23 +409,23 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
   const upnpStatusItem = (mapper: PortMapperStatus): ListItem[] => {
     if (mapper.state === 'active') {
       return [{
-        value: 'upnp-status',
-        name: `${mapper.externalIp ?? '?'}:${mapper.externalPort}`,
-        label: i18n['ra.upnp.status.active'][lang],
+        id: 'upnp-status',
+        label: `${mapper.externalIp ?? '?'}:${mapper.externalPort}`,
+        value: i18n['ra.upnp.status.active'][lang],
       }]
     }
 
     if (mapper.state === 'failed') {
       return [{
-        value: 'upnp-status',
-        name: i18n[`ra.upnp.reason.${mapper.reason ?? 'unknown'}`]?.[lang] ?? i18n['ra.upnp.reason.unknown'][lang],
-        label: i18n['ra.upnp.status.failed'][lang],
+        id: 'upnp-status',
+        label: i18n[`ra.upnp.reason.${mapper.reason ?? 'unknown'}`]?.[lang] ?? i18n['ra.upnp.reason.unknown'][lang],
+        value: i18n['ra.upnp.status.failed'][lang],
       }]
     }
 
     return [{
-      value: 'upnp-status',
-      name: i18n['ra.upnp.status.waiting'][lang],
+      id: 'upnp-status',
+      label: i18n['ra.upnp.status.waiting'][lang],
     }]
   }
 
@@ -509,9 +509,9 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
               ...urlItem('direct-url', directEnabled ? assignedUrl : null),
               ...(status ? httpsItem(status.https) : []),
               ...(SHOW_UPNP ? [{
-                value: 'upnp',
-                name: i18n['ra.upnp.label'][lang],
-                label: (
+                id: 'upnp',
+                label: i18n['ra.upnp.label'][lang],
+                value: (
                   <ToggleSwitch
                     name="enable-upnp"
                     value={upnpEnabled}
@@ -601,8 +601,8 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
               ? <List
                   layout="compact"
                   items={corsOrigins.map((origin): ListItem => ({
-                    value: origin.corsOriginId,
-                    name: origin.origin,
+                    id: origin.corsOriginId,
+                    label: origin.origin,
                     title: origin.origin,
                     controls: enabled && canUpdate ? (['delete'] as ListItemControls[]) : [],
                     onDelete: () => setOriginToDelete(origin),

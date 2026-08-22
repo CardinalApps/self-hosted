@@ -83,8 +83,8 @@ function Indexer() {
         layout="compact"
         items={[
           {
-            name: i18n['status.current-status'][lang],
-            label: (
+            label: i18n['status.current-status'][lang],
+            value: (
               <span
                 data-testid="indexing-state-indicator"
                 data-state={indexingServiceState ?? 'unknown'}
@@ -123,24 +123,24 @@ function Indexer() {
             ),
           },
           {
-            name: i18n['status.elapsed'][lang],
-            label: startedAtCounter,
+            label: i18n['status.elapsed'][lang],
+            value: startedAtCounter,
           },
           {
-            name: i18n['status.total-files-found'][lang],
-            label: formatWithCommas(numFilesFound) + ' ' + i18n['files'][lang],
+            label: i18n['status.total-files-found'][lang],
+            value: formatWithCommas(numFilesFound) + ' ' + i18n['files'][lang],
           },
           {
-            name: i18n['status.total-files-indexed'][lang],
-            label: formatWithCommas(numFilesIndexed) + ' ' + i18n['files'][lang],
+            label: i18n['status.total-files-indexed'][lang],
+            value: formatWithCommas(numFilesIndexed) + ' ' + i18n['files'][lang],
           },
           {
-            name: i18n['status.total-files-skipped'][lang],
-            label: formatWithCommas(numFilesSkipped) + ' ' + i18n['files'][lang],
+            label: i18n['status.total-files-skipped'][lang],
+            value: formatWithCommas(numFilesSkipped) + ' ' + i18n['files'][lang],
           },
           {
-            name: i18n['status.total-files-errored'][lang],
-            label: formatWithCommas(numFilesErrored) + ' ' + i18n['files'][lang],
+            label: i18n['status.total-files-errored'][lang],
+            value: formatWithCommas(numFilesErrored) + ' ' + i18n['files'][lang],
           },
         ]}
       />

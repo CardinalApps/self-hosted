@@ -62,13 +62,13 @@ function History() {
     }
     return jobReports.map((job: Job) => {
       return {
-        name: (
+        label: (
           <>
             {i18n[`job.${job.type}.title`]?.[lang]}
           </>
         ),
         icon: { fa: 'fas fa-check', className: 'success-color' },
-        label: formatTimeAgo(job?.createdAt, lang, 'exact'),
+        value: formatTimeAgo(job?.createdAt, lang, 'exact'),
         controls: ['view'],
         onView: () => setDetailsId(job.id),
       } as ListItem

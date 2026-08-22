@@ -328,11 +328,13 @@ function RemoteAccess() {
         layout="compact"
         items={[
           {
-            value: 'connection-status',
-            name: i18n['ra.connection.label'][lang],
-            label: (
+            id: 'connection-status',
+            label: i18n['ra.connection.label'][lang],
+            value: (
               <span className="status-value">
-                {refreshing && <Icon fa="fas fa-circle-notch fa-spin" hoverType={null} />}
+                {(refreshing || (enabled && status && ['connecting', 'disconnected'].includes(status.state))) && (
+                  <Icon fa="fas fa-circle-notch fa-spin" hoverType={null} />
+                )}
                 {/* Off is a settled answer, and a cached state from before the flip must never outrank it */}
                 {!enabled
                   ? i18n['ra.status.disabled'][lang]
@@ -341,10 +343,10 @@ function RemoteAccess() {
             ),
           },
           {
-            value: 'public-url',
-            name: i18n['ra.public-url.label'][lang],
-            label: publicUrl ?? NO_VALUE,
-            ...(publicUrl ? { title: publicUrl, copyable: publicUrl, controls: ['copy' as const], truncateLabel: true } : {}),
+            id: 'public-url',
+            label: i18n['ra.public-url.label'][lang],
+            value: publicUrl ?? NO_VALUE,
+            ...(publicUrl ? { title: publicUrl, copyable: publicUrl, controls: ['copy' as const] } : {}),
           },
         ]}
       />
