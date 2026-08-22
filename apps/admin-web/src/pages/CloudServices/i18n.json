@@ -167,6 +167,63 @@
   "ra.https.error": {
     "en": "Error"
   },
+  "ra.vanity.title": {
+    "en": "Custom address"
+  },
+  "ra.vanity.desc": {
+    "en": "Replace the assigned address with a name of your own."
+  },
+  "ra.vanity.placeholder": {
+    "en": "myserver"
+  },
+  "ra.vanity.checking": {
+    "en": "Checking availability…"
+  },
+  "ra.vanity.available": {
+    "en": "Available"
+  },
+  "ra.vanity.taken": {
+    "en": "Not available"
+  },
+  "ra.vanity.invalid": {
+    "en": "3 to 30 characters, using lowercase letters, numbers and dashes"
+  },
+  "ra.vanity.state.pending": {
+    "en": "Setting up"
+  },
+  "ra.vanity.state.live": {
+    "en": "Active"
+  },
+  "ra.vanity.state.failed": {
+    "en": "Couldn't be set up"
+  },
+  "ra.vanity.failed.desc": {
+    "en": "This address couldn't be set up. Cardinal keeps retrying on its own, and it starts working as soon as one of those attempts lands."
+  },
+  "ra.vanity.cert-deferred.desc": {
+    "en": "The address is yours, but Cardinal has no certificate to spare right now. Setup finishes on its own once the budget frees up."
+  },
+  "ra.vanity.error.invalid_name": {
+    "en": "Use 3 to 30 characters: lowercase letters, numbers and dashes."
+  },
+  "ra.vanity.error.name_unavailable": {
+    "en": "That address is not available. Try another one."
+  },
+  "ra.vanity.error.label_limit_reached": {
+    "en": "Your plan allows a maximum of {limit} on this server. Release an address before taking another."
+  },
+  "ra.vanity.error.rename_cooldown": {
+    "en": "Custom addresses can only be changed occasionally. Try again in {wait}."
+  },
+  "ra.vanity.error.unknown": {
+    "en": "That address could not be set. Try again in a moment."
+  },
+  "ra.vanity.confirm-release.title": {
+    "en": "Release this address?"
+  },
+  "ra.vanity.confirm-release.desc": {
+    "en": "The address stops working right away, and it stays out of circulation for a while afterwards. This server remains reachable at its assigned address."
+  },
   "ra.cors.title": {
     "en": "Custom CORS origins"
   },

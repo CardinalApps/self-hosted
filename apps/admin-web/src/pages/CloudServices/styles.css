@@ -69,14 +69,17 @@
     margin-top: 10px;
   }
 
-  .cors-origins {
+  .cors-origins,
+  .vanity {
     margin-top: 14px;
 
-    .cors-empty {
+    .cors-empty,
+    .vanity-desc {
       color: var(--text-color-2);
     }
 
-    .cors-add {
+    .cors-add,
+    .vanity-add {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -91,5 +94,19 @@
       }
     }
 
+    .vanity-availability {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-color-2);
+
+      &[data-state="available"] {
+        color: var(--success);
+      }
+
+      &[data-state="taken"],
+      &[data-state="invalid"] {
+        color: var(--danger);
+      }
+    }
   }
 }
