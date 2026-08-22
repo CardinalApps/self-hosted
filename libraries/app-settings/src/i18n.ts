@@ -227,4 +227,46 @@ export default {
   "settings.inactive-session-timeout.desc": {
     "en": "How long users stay logged in for after their last activity. Changing this setting takes up to 15 minutes to apply. Reducing the timeout will not immediately expire existing sessions.",
   },
+  "settings.shortcut-set.label": {
+    "en": "Shortcut set",
+  },
+  "settings.shortcut-set.default": {
+    "en": "Default",
+  },
+  "settings.custom-shortcut-sets.label": {
+    "en": "Saved shortcut sets",
+  },
+  "settings.single-key-shortcuts.label": {
+    "en": "Use single-key shortcuts without a modifier key",
+  },
+  "settings.single-key-shortcuts.desc": {
+    "en": "Shortcuts that only use Cmd or Ctrl fire from the key on its own. Shortcuts with another modifier are unchanged.",
+  },
+  "settings.shortcuts.action.open-settings": {
+    "en": "Open settings",
+  },
+  "settings.shortcuts.action.toggle-nav-sidebar": {
+    "en": "Collapse or expand the navigation sidebar",
+  },
+  "settings.shortcuts.action.toggle-playback-sidebar": {
+    "en": "Open or close the playback sidebar",
+  },
+  "settings.shortcuts.action.play-pause": {
+    "en": "Play or pause",
+  },
+  "settings.shortcuts.action.previous-track": {
+    "en": "Previous track",
+  },
+  "settings.shortcuts.action.next-track": {
+    "en": "Next track",
+  },
+  "settings.shortcuts.action.mute": {
+    "en": "Mute or unmute",
+  },
+  "settings.shortcuts.action.volume-up": {
+    "en": "Volume up",
+  },
+  "settings.shortcuts.action.volume-down": {
+    "en": "Volume down",
+  },
 }

@@ -43,6 +43,8 @@ export type Player = {
   initializedAt: number,
   currentSeconds?: number,
   currentQueueItem?: QueueItem,
+  // The volume to come back to when a mute is lifted; absent whenever the player is not muted
+  volumeBeforeMute?: number,
 }
 
 type InitialState = {
@@ -86,6 +88,34 @@ const audioSlice = createSlice({
       const player = state.players[payload.playerId]
       if (player) {
         player.volume = payload.volume
+      }
+    },
+    // Step a player's volume, clamped to the range the volume control offers
+    changeVolume: (state, { payload }: PayloadAction<{ playerId: string, delta: number }>) => {
+      const player = state.players[payload.playerId]
+      if (player) {
+        player.volume = Math.min(1, Math.max(0, (player.volume ?? 1) + payload.delta))
+        // A volume the user chose replaces the one a mute was going to restore
+        delete player.volumeBeforeMute
+      }
+    },
+    /*
+     * Silence a player and remember where its volume was, or put that volume back. A player
+     * already at zero without a remembered volume was silenced by hand, so unmuting it has
+     * nothing to restore and goes to full.
+     */
+    toggleMute: (state, { payload: playerId }: PayloadAction<string>) => {
+      const player = state.players[playerId]
+      if (!player) {
+        return
+      }
+
+      if (player.volume === 0) {
+        player.volume = player.volumeBeforeMute ?? 1
+        delete player.volumeBeforeMute
+      } else {
+        player.volumeBeforeMute = player.volume ?? 1
+        player.volume = 0
       }
     },
     // Jump a player to another item in its own queue. Loading state plus the new track ID
@@ -262,6 +292,27 @@ const selectLoading = createSelector((state) => state.players, (players) => {
   return Object.values(players)
     .filter((player: Player) => player.state === PLAYBACK_STATE.LOADING)
 })
+
+/**
+ * The player a playback shortcut acts on.
+ *
+ * Follows the same rule as the visible player: whatever the user can hear wins, and the newest
+ * one breaks the tie. That rule lives in a hook for the players on screen, which holds local
+ * state a listener middleware cannot read, so it is applied to the store directly here.
+ */
+export const activePlayerId = (players: Record<string, Player>): string | undefined => {
+  const all = Object.values(players || {})
+  const playing = all.filter((player) => player.state === PLAYBACK_STATE.PLAYING)
+  const newest = (candidates: Player[], key: keyof Player) => (
+    [...candidates].sort((a, b) => Number(b[key] ?? 0) - Number(a[key] ?? 0))[0]
+  )
+
+  if (playing.length) {
+    return newest(playing, 'currentPlaybackStartedAt')?.id
+  }
+
+  return newest(all, 'initializedAt')?.id
+}
 
 export const audioSelectors = audioSlice.selectors
 export const audioActions = audioSlice.actions

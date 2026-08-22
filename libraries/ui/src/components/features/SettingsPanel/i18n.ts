@@ -22,6 +22,9 @@ const i18n: StringList = {
   "settings.tab-name-theme": {
     "en": "Theme",
   },
+  "settings.tab-name-keyboard-shortcuts": {
+    "en": "Keyboard Shortcuts",
+  },
   "settings.tab-name-server": {
     "en": "Server",
   },
@@ -162,6 +165,63 @@ const i18n: StringList = {
   },
   "settings.theme-editor.font.mono": {
     "en": "Monospace",
+  },
+  "settings.shortcuts.column-keys": {
+    "en": "Shortcut",
+  },
+  "settings.shortcuts.column-action": {
+    "en": "Action",
+  },
+  "settings.shortcuts.press-keys": {
+    "en": "Press keys…",
+  },
+  "settings.shortcuts.add": {
+    "en": "Add shortcut",
+  },
+  "settings.shortcuts.remove": {
+    "en": "Remove shortcut",
+  },
+  "settings.shortcuts.conflict": {
+    "en": "Another shortcut already uses these keys.",
+  },
+  "settings.shortcuts.single-key-title": {
+    "en": "Use single-key shortcuts without a modifier key",
+  },
+  "settings.shortcuts.single-key-desc": {
+    "en": "Shortcuts that only use Cmd or Ctrl fire from the key on its own. Shortcuts with another modifier are unchanged.",
+  },
+  "settings.shortcuts.set-default": {
+    "en": "Default",
+  },
+  "settings.shortcuts.custom-set-name": {
+    "en": "Custom Shortcuts {n}",
+  },
+  "settings.shortcuts.rename": {
+    "en": "Rename",
+  },
+  "settings.shortcuts.duplicate": {
+    "en": "Duplicate",
+  },
+  "settings.shortcuts.reset": {
+    "en": "Reset to defaults",
+  },
+  "settings.shortcuts.delete": {
+    "en": "Delete",
+  },
+  "settings.shortcuts.delete-title": {
+    "en": "Delete shortcut set",
+  },
+  "settings.shortcuts.delete-message": {
+    "en": "Delete \"{name}\"? The Default set will be selected instead.",
+  },
+  "settings.shortcuts.rename-title": {
+    "en": "Rename shortcut set",
+  },
+  "settings.shortcuts.rename-cancel": {
+    "en": "Cancel",
+  },
+  "settings.shortcuts.rename-save": {
+    "en": "Save",
   },
 }
 

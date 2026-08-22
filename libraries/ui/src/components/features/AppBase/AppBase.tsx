@@ -50,6 +50,7 @@ import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
 import useAppliedTheme from '../../../hooks/useAppliedTheme'
 import useCanLogIntoApp from '../../../hooks/useCanLogIntoApp'
+import useKeyboardShortcuts from '../../../hooks/useKeyboardShortcuts'
 
 import { getJWT, isJwtExpired, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
@@ -114,6 +115,7 @@ function AppBase({
 }: AppBaseProps) {
   useServerSideEvents()
   useHowler()
+  useKeyboardShortcuts()
   const dispatch = useAppDispatch()
   const [tokenReady, setTokenReady] = useState(false)
   const { navigate, location } = router

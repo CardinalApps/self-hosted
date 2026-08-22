@@ -1,7 +1,6 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit'
 import type { Action, ThunkAction } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import merge from 'lodash.merge'
 
 /**
  * Slices
@@ -34,6 +33,7 @@ import sseFactoryResetMiddleware from './middleware/sseFactoryReset'
 import sseLatestEventMiddleware from './slices/homeServer/middleware/sseLatestEvent'
 import sseWaveformReadyMiddleware from './slices/music/middleware/sseWaveformReady'
 import sseQueueExtendedMiddleware from './slices/music/middleware/sseQueueExtended'
+import shortcutPlaybackMiddleware from './middleware/shortcutPlayback'
 import logHTTPError from './middleware/logHTTPError'
 
 /**
@@ -46,6 +46,7 @@ import remoteAccessBeforeStoreInit from './slices/remoteAccess/lifecycle/beforeS
  * Utils
  */
 import getCachedStore from './utils/getCachedStore'
+import mergeCachedStore from './utils/mergeCachedStore'
 import createDefaultStore from './utils/createDefaultStore'
 import deletePendingRTKCache from './utils/deletePendingRTKCache'
 import triggerLifecycle from './utils/triggerLifecycle'
@@ -101,7 +102,7 @@ const createStore = () => {
     clearResetAppQueryParam()
   }
 
-  merge(preloadedState, cachedStore)
+  mergeCachedStore(preloadedState, cachedStore)
 
   // FIXME delete these two once all of the RTK APIs extend the base
   deletePendingRTKCache(preloadedState)
@@ -125,6 +126,7 @@ const createStore = () => {
         sseLatestEventMiddleware.middleware,
         sseWaveformReadyMiddleware.middleware,
         sseQueueExtendedMiddleware.middleware,
+        shortcutPlaybackMiddleware.middleware,
         logHTTPError.middleware,
         baseHomeServerApi.middleware,
       )

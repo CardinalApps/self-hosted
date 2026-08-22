@@ -275,6 +275,10 @@
 
     .custom-select {
       z-index: 2;
+
+      &:has(.options) {
+        z-index: 3;
+      }
     }
   }
 
