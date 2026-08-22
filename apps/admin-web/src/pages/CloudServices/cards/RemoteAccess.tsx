@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import clsx from 'clsx'
 
@@ -12,7 +11,6 @@ import Confirm from '@cardinalapps/ui/src/components/interaction/Confirm'
 import List from '@cardinalapps/ui/src/components/interaction/List'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
-import set from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
 import sync from '@cardinalapps/ui/src/store/slices/settings/thunks/sync'
 import { cloudUserSelectors } from '@cardinalapps/ui/src/store/slices/cloudUser'
 import { SubscriptionTierSlug } from '@cardinalapps/products/src/subscriptions'
@@ -23,15 +21,14 @@ import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
 import { homeServerUserSelectors } from '@cardinalapps/ui/src/store/slices/homeServerUser'
 
 import {
-  REMOTE_ACCESS_DIRECT_FEATURE,
   REMOTE_ACCESS_FEATURE_SLUGS,
-  REMOTE_ACCESS_RELAY_FEATURE,
   isServiceAccessRefusal,
   serviceAccessIndicator,
 } from '@cardinalapps/ui/src/lib/auth/serviceAccess'
 import type { ServiceAccessIndicator } from '@cardinalapps/ui/src/lib/auth/serviceAccess'
 
 import {
+  connectUrls,
   useEnableRemoteAccessMutation,
   useDisableRemoteAccessMutation,
   useGetConnectStatusQuery,
@@ -40,27 +37,15 @@ import type { ConnectionState } from '@cardinalapps/ui/src/store/apis/remoteAcce
 
 import { ENABLE_REMOTE_ACCESS_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access'
 import { ENABLE_REMOTE_ACCESS_DIRECT_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_direct'
-import { ENABLE_REMOTE_ACCESS_RELAY_SLUG } from '@cardinalapps/app-settings/src/admin/enable_remote_access_relay'
 
 import ReloadButton from '../../../components/ReloadButton'
 
-import ConfigureRemoteAccessDrawer from '../ConfigureRemoteAccessDrawer'
+import ConfigureRemoteAccessDrawer, { connectionStateLabel } from '../ConfigureRemoteAccessDrawer'
 
 import i18n from '../i18n.json'
 
-const ACCESS_ICONS = {
-  loading: 'fas fa-circle-notch fa-spin',
-  granted: 'fas fa-check-circle',
-  queued: 'fas fa-hourglass-half',
-  denied: 'fas fa-exclamation-circle',
-} as const
-
-const ACCESS_TITLES = {
-  loading: 'ra.access.checking',
-  granted: 'ra.access.granted',
-  queued: 'ra.access.queued',
-  denied: 'ra.access.declined',
-} as const
+// What a row reports when there is no settled answer to give, rather than a guess
+const NO_VALUE = '-'
 
 const ENABLE_REQUIRES_SUBSCRIPTION = true
 
@@ -92,10 +77,9 @@ function RemoteAccess() {
   const [showConfigure, setShowConfigure] = useState(false)
   const [saving, setSaving] = useState(false)
   const [refused, setRefused] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const enabled = settings[ENABLE_REMOTE_ACCESS_SLUG] === true
-  const directEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_DIRECT_SLUG] === true
-  const relayEnabled = enabled && settings[ENABLE_REMOTE_ACCESS_RELAY_SLUG] === true
 
   /* Every access claim the card makes comes through here, so a row's icon and the note above it
      can never describe different states. The Media Server records a refused enable as an enable,
@@ -204,12 +188,17 @@ function RemoteAccess() {
   }, [cloudLoggedIn, enabled, queued, refresh])
 
   /* Every source the card paints from, re-read together so none of them can be the stale one.
-     Refetching a query that never started throws, so the query's own flag decides. */
-  const reload = () => Promise.all([
-    isUninitialized ? Promise.resolve() : refetchStatus(),
-    refresh(),
-    dispatch(sync(CardinalApp.ADMIN)),
-  ])
+     Refetching a query that never started throws, so the query's own flag decides. The connection
+     row watches this rather than the query's own fetching flag, which the poll keeps flipping. */
+  const reload = () => {
+    setRefreshing(true)
+
+    return Promise.all([
+      isUninitialized ? Promise.resolve() : refetchStatus(),
+      refresh(),
+      dispatch(sync(CardinalApp.ADMIN)),
+    ]).finally(() => setRefreshing(false))
+  }
 
   /* The notice is a login prompt, so an account that already meets the bar shouldn't see it —
      including while the feature is off. */
@@ -252,40 +241,12 @@ function RemoteAccess() {
     setShowConfirmDisable(false)
   }
 
-  const setPath = (slug: string, value: boolean) => {
-    dispatch(set({
-      settings: { [slug]: value },
-      app: CardinalApp.ADMIN,
-    }))
-  }
-
   const handleChange = (value: boolean) => {
     if (value) {
       setShowRequestAccess(true)
     } else {
       setShowConfirmDisable(true)
     }
-  }
-
-  /* The user owns the path toggles; this only reports what Cardinal has granted the account. There
-     is nothing to report until Remote Access is on and there is a cloud account to report about. */
-  const pathControl = (slug: string, toggle: ReactNode) => {
-    const indicator = pathIndicator(slug)
-
-    /* A path nobody has decided on gets no icon rather than one implying a queue it is not in. A
-       refusal is a decision, so it reports like any other failed connection. */
-    if (!enabled || !cloudLoggedIn || indicator === 'unavailable') {
-      return toggle
-    }
-
-    return (
-      <span className="path-control">
-        <span className="path-access" data-access={indicator}>
-          <Icon fa={ACCESS_ICONS[indicator]} title={i18n[ACCESS_TITLES[indicator]][lang]} hoverType={null} />
-        </span>
-        {toggle}
-      </span>
-    )
   }
 
   /* One note at a time, so the card cannot claim a queue and an outage in the same breath. Proof
@@ -311,6 +272,15 @@ function RemoteAccess() {
   }
 
   const note = accessNote()
+
+  /* The address the outside world dials, taken from the connection itself: a live custom name has
+     already replaced the assigned one there. Nothing is offered unless the server is answering on
+     it, because a URL that does not resolve is worse than no URL at all. */
+  const { assigned: assignedUrl, vanity: vanityUrl } = connectUrls(status, null)
+  /* Direct off means the URL is refused by policy even while the relay keeps the server connected —
+     a row this card asks users to trust cannot show an address that will not answer. */
+  const directOn = settings[ENABLE_REMOTE_ACCESS_DIRECT_SLUG] === true
+  const publicUrl = enabled && directOn && status?.state === 'connected' ? vanityUrl ?? assignedUrl : null
 
   return (
     <CardGrid.Card
@@ -354,32 +324,27 @@ function RemoteAccess() {
       )}
 
       <List
-        className="remote-access-paths"
+        className="remote-access-status"
         layout="compact"
         items={[
           {
-            value: 'direct',
-            name: i18n['ra.direct.label'][lang],
-            label: pathControl(REMOTE_ACCESS_DIRECT_FEATURE, (
-              <ToggleSwitch
-                name="enable-direct-connections"
-                value={directEnabled}
-                disabled={!enabled || !canUpdate}
-                onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_DIRECT_SLUG, value)}
-              />
-            )),
+            value: 'connection-status',
+            name: i18n['ra.connection.label'][lang],
+            label: (
+              <span className="status-value">
+                {refreshing && <Icon fa="fas fa-circle-notch fa-spin" hoverType={null} />}
+                {/* Off is a settled answer, and a cached state from before the flip must never outrank it */}
+                {!enabled
+                  ? i18n['ra.status.disabled'][lang]
+                  : status ? connectionStateLabel(status.state, lang) : NO_VALUE}
+              </span>
+            ),
           },
           {
-            value: 'relay',
-            name: i18n['ra.relay.label'][lang],
-            label: pathControl(REMOTE_ACCESS_RELAY_FEATURE, (
-              <ToggleSwitch
-                name="enable-relay-connections"
-                value={relayEnabled}
-                disabled={!enabled || !canUpdate}
-                onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_RELAY_SLUG, value)}
-              />
-            )),
+            value: 'public-url',
+            name: i18n['ra.public-url.label'][lang],
+            label: publicUrl ?? NO_VALUE,
+            ...(publicUrl ? { title: publicUrl, copyable: publicUrl, controls: ['copy' as const], truncateLabel: true } : {}),
           },
         ]}
       />

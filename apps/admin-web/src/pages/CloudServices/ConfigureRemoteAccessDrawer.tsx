@@ -14,6 +14,7 @@ import List from '@cardinalapps/ui/src/components/interaction/List'
 import type { ListItem, ListItemControls } from '@cardinalapps/ui/src/components/interaction/List/List'
 
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
+import set from '@cardinalapps/ui/src/store/slices/settings/thunks/set'
 import sync from '@cardinalapps/ui/src/store/slices/settings/thunks/sync'
 import { cloudUserSelectors } from '@cardinalapps/ui/src/store/slices/cloudUser'
 import { useAppDispatch } from '@cardinalapps/ui/src/hooks/useAppDispatch'
@@ -80,6 +81,21 @@ function urlItem(value: string, url: string | null | undefined): ListItem[] {
     copyable: url,
     controls: ['copy'],
   }]
+}
+
+/* The one place a connection state becomes a sentence. The card asks the same question of the same
+   status, so it reads its answer from here rather than keeping a second table in step. */
+export function connectionStateLabel(state: ConnectionState, lang: string): string {
+  const labels: Record<ConnectionState, string> = {
+    connected: i18n['ra.status.connected'][lang],
+    connecting: i18n['ra.status.reconnecting'][lang],
+    disconnected: i18n['ra.status.reconnecting'][lang],
+    auth_failed: i18n['ra.status.auth-failed'][lang],
+    not_approved: i18n['ra.status.not-approved'][lang],
+    suspended: i18n['ra.status.suspended'][lang],
+  }
+
+  return labels[state]
 }
 
 // The Remote Access Server normalizes before it validates, so the picker probes what it would claim
@@ -198,6 +214,13 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
     }
   }, [statusFetchedAt, vanitySettling, vanitySkipped, refetchVanity])
 
+  const setPath = (slug: string, value: boolean) => {
+    dispatch(set({
+      settings: { [slug]: value },
+      app: CardinalApp.ADMIN,
+    }))
+  }
+
   // The Media Server owns this setting: enabling maps the port right away
   const setUpnp = async (value: boolean) => {
     setUpnpSaving(true)
@@ -308,22 +331,13 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
   const vanityName = vanity?.primary ?? null
   const { assigned: assignedUrl, vanity: vanityUrl } = connectUrls(status, vanityName)
 
-  const connectionItem = (state: ConnectionState): ListItem[] => {
-    const labels: Record<ConnectionState, string> = {
-      connected: i18n['ra.status.connected'][lang],
-      connecting: i18n['ra.status.reconnecting'][lang],
-      disconnected: i18n['ra.status.reconnecting'][lang],
-      auth_failed: i18n['ra.status.auth-failed'][lang],
-      not_approved: i18n['ra.status.not-approved'][lang],
-      suspended: i18n['ra.status.suspended'][lang],
-    }
-
-    return [{
-      value: 'connection-state',
-      name: i18n['ra.status.label'][lang],
-      label: labels[state],
-    }]
-  }
+  /* The row answers for the relay path, not the control channel: a connected server with the relay
+     switched off is not "Active" here. Off — globally or per-path — is a settled answer. */
+  const connectionItem = (state: ConnectionState): ListItem[] => [{
+    value: 'connection-state',
+    name: i18n['ra.status.label'][lang],
+    label: enabled && relayEnabled ? connectionStateLabel(state, lang) : i18n['ra.status.disabled'][lang],
+  }]
 
   const httpsItem = (https: HttpsListenerStatus): ListItem[] => {
     const labels = {
@@ -336,7 +350,8 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
       value: 'https-listener',
       name: i18n['ra.https.label'][lang],
       title: https.state === 'error' ? https.lastError ?? undefined : https.port ? `:${https.port}` : undefined,
-      label: labels[https.state],
+      // Same settled-answer rule as the relay row: a listener that is off by choice is not "Stopped"
+      label: enabled && directEnabled ? labels[https.state] : i18n['ra.status.disabled'][lang],
     }]
   }
 
@@ -420,12 +435,77 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
       title={i18n['ra.drawer.title'][lang]}
       onClose={onClose}
     >
-      <Drawer.Section title={i18n['ra.drawer.direct.title'][lang]}>
+      {showVanity && (
+        <Drawer.Section title={i18n['ra.vanity.title'][lang]}>
+          <Card padding="thin">
+            {vanityName
+              ? <List
+                  layout="compact"
+                  items={vanityItem(vanityName, vanity.state)}
+                />
+              : <FormField
+                  className="vanity"
+                  labelFor="vanity-name-draft"
+                  error={nameError ?? undefined}
+                >
+                  <p className="vanity-desc">{i18n['ra.vanity.desc'][lang]}</p>
+
+                  <div className="vanity-add">
+                    <TextInput
+                      name="vanity-name-draft"
+                      id="vanity-name-draft"
+                      value={nameDraft}
+                      placeholder={i18n['ra.vanity.placeholder'][lang]}
+                      disabled={!canUpdate || assigning}
+                      onChange={(value) => {
+                        setNameDraft(value)
+                        setNameError(null)
+                      }}
+                      onEnter={handleAssignName}
+                    />
+                    <Icon fa="fas fa-plus-circle" onClick={() => canUpdate && handleAssignName()} />
+                  </div>
+
+                  {!!nameHint && (
+                    <p className="vanity-availability" data-state={nameHint.state}>{nameHint.text}</p>
+                  )}
+                </FormField>
+            }
+
+            {vanity.state === 'failed' && (
+              <Alert
+                type="warning"
+                message={i18n['ra.vanity.failed.desc'][lang]}
+              />
+            )}
+
+            {!!nameNotice && (
+              <Alert
+                type={nameNotice.type}
+                message={nameNotice.message}
+              />
+            )}
+          </Card>
+        </Drawer.Section>
+      )}
+
+      <Drawer.Section>
+        <div className="drawer-section-heading">
+          <p className="drawer-section-title">{i18n['ra.drawer.direct.title'][lang]}</p>
+          <ToggleSwitch
+            name="enable-direct-connections"
+            showActiveLabel
+            labelAlign="left"
+            value={directEnabled}
+            disabled={!enabled || !canUpdate}
+            onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_DIRECT_SLUG, value)}
+          />
+        </div>
+
         <Card padding="thin">
           <List
             layout="compact"
             items={[
-              ...(showVanity && vanityName && directEnabled ? vanityItem(vanityName, vanity.state) : []),
               ...urlItem('direct-url', directEnabled ? assignedUrl : null),
               ...(status ? httpsItem(status.https) : []),
               ...(SHOW_UPNP ? [{
@@ -450,65 +530,70 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
               message={i18n['ra.upnp.docker-bridge-banner'][lang]}
             />
           )}
+        </Card>
+      </Drawer.Section>
 
-          {/* The picker gives way to the row once a name is held, unless that row is hidden with the
-              direct URLs — in which case it moves here so the name can still be seen and released. */}
-          {showVanity && (!vanityName || !directEnabled) && (
-            <FormField
-              className="vanity"
-              label={i18n['ra.vanity.title'][lang]}
-              labelFor="vanity-name-draft"
-              error={nameError ?? undefined}
-            >
-              {vanityName
-                ? <List
-                    layout="compact"
-                    items={vanityItem(vanityName, vanity.state)}
-                  />
-                : <>
-                    <p className="vanity-desc">{i18n['ra.vanity.desc'][lang]}</p>
+      <Drawer.Section>
+        <div className="drawer-section-heading">
+          <p className="drawer-section-title">{i18n['ra.drawer.relay.title'][lang]}</p>
+          <ToggleSwitch
+            name="enable-relay-connections"
+            showActiveLabel
+            labelAlign="left"
+            value={relayEnabled}
+            disabled={!enabled || !canUpdate}
+            onChange={(value) => setPath(ENABLE_REMOTE_ACCESS_RELAY_SLUG, value)}
+          />
+        </div>
 
-                    <div className="vanity-add">
-                      <TextInput
-                        name="vanity-name-draft"
-                        id="vanity-name-draft"
-                        value={nameDraft}
-                        placeholder={i18n['ra.vanity.placeholder'][lang]}
-                        disabled={!canUpdate || assigning}
-                        onChange={(value) => {
-                          setNameDraft(value)
-                          setNameError(null)
-                        }}
-                        onEnter={handleAssignName}
-                      />
-                      <Icon fa="fas fa-plus-circle" onClick={() => canUpdate && handleAssignName()} />
-                    </div>
-
-                    {!!nameHint && (
-                      <p className="vanity-availability" data-state={nameHint.state}>{nameHint.text}</p>
-                    )}
-                  </>
-              }
-            </FormField>
+        <Card padding="thin">
+          {/* The relay only accepts bearer-authenticated requests, so its URL is never shown as pastable.
+              "Active" is a claim about now, so a queued (or otherwise unconnected) server keeps quiet. */}
+          {relayEnabled && status?.state === 'connected' && !!status?.relayUrl && (
+            <p className="access-note">
+              <Icon fa="fas fa-info-circle" hoverType={null} />
+              {i18n['ra.drawer.relay.active'][lang]}
+            </p>
           )}
 
-          {showVanity && vanity.state === 'failed' && (
+          <List
+            layout="compact"
+            items={status ? connectionItem(status.state) : []}
+          />
+
+          {status?.state === 'auth_failed' && (
+            <Alert
+              type="error"
+              message={i18n['ra.auth-failed.desc'][lang]}
+              buttons={[{
+                label: i18n['ra.auth-failed.cta'][lang],
+                onClick: () => navigate(routes.LOGIN),
+              }]}
+            />
+          )}
+
+          {/* Every gate here clears on Cardinal's side, so none of them offers a remedy to click */}
+          {/* Queued needs no alert — the Connection row already says so; only a decline explains itself */}
+          {status?.state === 'not_approved' && declined && (
+            <Alert
+              type="error"
+              message={i18n['ra.declined.detail'][lang]}
+            />
+          )}
+
+          {status?.state === 'suspended' && (
             <Alert
               type="warning"
-              message={i18n['ra.vanity.failed.desc'][lang]}
+              message={i18n['ra.suspended.desc'][lang]}
             />
           )}
+        </Card>
+      </Drawer.Section>
 
-          {showVanity && !!nameNotice && (
-            <Alert
-              type={nameNotice.type}
-              message={nameNotice.message}
-            />
-          )}
-
+      <Drawer.Section title={i18n['ra.cors.title'][lang]}>
+        <Card padding="thin">
           <FormField
             className="cors-origins"
-            label={i18n['ra.cors.title'][lang]}
             labelFor="cors-origin-draft"
             error={originError ?? undefined}
           >
@@ -541,49 +626,6 @@ function ConfigureRemoteAccessDrawer({ onClose }: ConfigureRemoteAccessDrawerPro
               <Icon fa="fas fa-plus-circle" onClick={() => enabled && canUpdate && handleAddOrigin()} />
             </div>
           </FormField>
-        </Card>
-      </Drawer.Section>
-
-      <Drawer.Section title={i18n['ra.drawer.relay.title'][lang]}>
-        <Card padding="thin">
-          <List
-            layout="compact"
-            items={status ? connectionItem(status.state) : []}
-          />
-
-          {/* The relay only accepts bearer-authenticated requests, so its URL is never shown as pastable */}
-          {relayEnabled && !!status?.relayUrl && (
-            <Alert
-              type="info"
-              message={i18n['ra.drawer.relay.active'][lang]}
-            />
-          )}
-
-          {status?.state === 'auth_failed' && (
-            <Alert
-              type="error"
-              message={i18n['ra.auth-failed.desc'][lang]}
-              buttons={[{
-                label: i18n['ra.auth-failed.cta'][lang],
-                onClick: () => navigate(routes.LOGIN),
-              }]}
-            />
-          )}
-
-          {/* Every gate here clears on Cardinal's side, so none of them offers a remedy to click */}
-          {status?.state === 'not_approved' && (
-            <Alert
-              type={declined ? 'error' : 'info'}
-              message={i18n[declined ? 'ra.declined.detail' : 'ra.not-approved.desc'][lang]}
-            />
-          )}
-
-          {status?.state === 'suspended' && (
-            <Alert
-              type="warning"
-              message={i18n['ra.suspended.desc'][lang]}
-            />
-          )}
         </Card>
       </Drawer.Section>
 

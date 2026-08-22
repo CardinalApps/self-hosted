@@ -138,6 +138,21 @@
         text-overflow: ellipsis;
       }
 
+      /* A truncating label owns the leftover space; the name keeps its natural width beside it */
+      &:has(.item-list-item-label.truncate) {
+        .item-list-item-name {
+          min-width: auto;
+          flex-grow: 0;
+          overflow: visible;
+          white-space: nowrap;
+        }
+
+        .item-list-item-label.truncate {
+          flex-grow: 1;
+          min-width: 0;
+        }
+      }
+
       .item-list-item-controls {
         display: flex;
 

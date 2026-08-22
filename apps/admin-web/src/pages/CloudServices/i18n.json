@@ -32,11 +32,11 @@
   "ra.desc": {
     "en": "Enable remote access for this media server to reach your self-hosted apps from anywhere."
   },
-  "ra.direct.label": {
-    "en": "Enable direct remote connections"
+  "ra.connection.label": {
+    "en": "Connection status"
   },
-  "ra.relay.label": {
-    "en": "Enable metered relay connections"
+  "ra.public-url.label": {
+    "en": "Public URL"
   },
   "ra.request-access.title": {
     "en": "Request beta access"
@@ -46,18 +46,6 @@
   },
   "ra.request-access.desc-p2": {
     "en": "Inactive servers may be pruned from the beta. If that happens to you, feel free to queue up again."
-  },
-  "ra.access.checking": {
-    "en": "Checking your access"
-  },
-  "ra.access.granted": {
-    "en": "Your account is approved for this"
-  },
-  "ra.access.queued": {
-    "en": "Your account is queued for this"
-  },
-  "ra.access.declined": {
-    "en": "Access to the closed beta was not approved"
   },
   "ra.queued.desc": {
     "en": "This server is queued for Remote Access."
@@ -93,7 +81,7 @@
     "en": "Relay Connection"
   },
   "ra.drawer.relay.active": {
-    "en": "Relay is active, and will be used automatically when a direct connection is not possible."
+    "en": "Relay will be used automatically when a direct connection is not possible."
   },
   "ra.upnp.label": {
     "en": "Automatic port forwarding (UPnP)"
@@ -126,7 +114,7 @@
     "en": "Connection"
   },
   "ra.status.connected": {
-    "en": "Active"
+    "en": "Established"
   },
   "ra.status.reconnecting": {
     "en": "Reconnecting…"
@@ -140,14 +128,14 @@
   "ra.status.suspended": {
     "en": "Suspended"
   },
+  "ra.status.disabled": {
+    "en": "Disabled"
+  },
   "ra.auth-failed.desc": {
     "en": "Cardinal Cloud rejected this server's credentials. Sign in again to re-enable Remote Access."
   },
   "ra.auth-failed.cta": {
     "en": "Sign in again"
-  },
-  "ra.not-approved.desc": {
-    "en": "This server is queued for Remote Access. It keeps asking on its own and connects as soon as Cardinal approves your account."
   },
   "ra.declined.detail": {
     "en": "Cardinal declined Remote Access for this account. This server keeps asking on its own, but it cannot connect unless Cardinal revisits that decision."

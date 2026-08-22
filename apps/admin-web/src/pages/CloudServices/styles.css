@@ -9,6 +9,30 @@
     gap: 4px;
   }
 
+  .remote-access-status {
+    .item-list-item-name {
+      white-space: nowrap;
+    }
+
+    .item-list-item-label {
+      text-align: right;
+    }
+
+    .status-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      i {
+        font-size: 12px;
+        color: var(--text-color-3);
+      }
+    }
+  }
+}
+
+.cloud-service-card,
+.configure-remote-access-drawer {
   .access-note {
     display: flex;
     align-items: center;
@@ -28,36 +52,6 @@
       color: var(--danger);
     }
   }
-
-  .remote-access-paths {
-    .item-list-item-name {
-      word-break: break-all;
-    }
-
-    .path-control {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .path-access {
-      width: 12px;
-      justify-content: center;
-      display: inline-flex;
-
-      i {
-        font-size: 14px;
-      }
-
-      &[data-access="granted"] i {
-        color: var(--success);
-      }
-
-      &[data-access="denied"] i {
-        color: var(--danger);
-      }
-    }
-  }
 }
 
 .configure-remote-access-drawer {
@@ -69,10 +63,26 @@
     margin-top: 10px;
   }
 
+  .drawer-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .drawer-section-title {
+      margin-bottom: 0;
+    }
+
+    .toggle-switch-label {
+      font-size: 13px;
+      color: var(--text-color-2);
+    }
+  }
+
   .cors-origins,
   .vanity {
-    margin-top: 14px;
-
     .cors-empty,
     .vanity-desc {
       color: var(--text-color-2);
