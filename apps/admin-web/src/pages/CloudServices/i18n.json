@@ -117,7 +117,7 @@
     "en": "Established"
   },
   "ra.status.reconnecting": {
-    "en": "Reconnecting…"
+    "en": "Connecting…"
   },
   "ra.status.auth-failed": {
     "en": "Authorization failed"
