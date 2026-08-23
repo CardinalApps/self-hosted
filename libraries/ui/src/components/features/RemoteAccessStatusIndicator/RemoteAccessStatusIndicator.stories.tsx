@@ -40,7 +40,7 @@ store.dispatch(remoteAccessActions.connectionResolved({
 }))
 
 const meta = {
-  title: 'Features/RemoteAccessStatusIndicator',
+  title: 'Feature/RemoteAccessStatusIndicator',
   component: RemoteAccessStatusIndicator,
 } satisfies Meta<typeof RemoteAccessStatusIndicator>
 type Story = StoryObj<typeof meta>
