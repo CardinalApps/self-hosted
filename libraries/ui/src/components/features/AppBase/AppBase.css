@@ -192,9 +192,29 @@
     height: 100%;
     padding: 0;
   }
+}
 
-  .sidebar-nav:before {
-    box-shadow: var(--box-shadow-1);
+/*
+  The two layouts that force the sidebar collapsed. The rail's own pill is narrower than the
+  nav column, so the nav items have to shed the 8px offset they carry when it can expand.
+*/
+[data-layout="full"],
+[data-layout="files"] {
+
+  .sidebar-nav.collapsed {
+
+    li {
+
+      a {
+        width: 48px;
+      }
+
+      @media (min-width: 768px) {
+        i {
+          left: 0;
+        }
+      }
+    }
   }
 }
 
@@ -315,25 +335,6 @@
   .app-header {
     left: 10px;
     right: 10px;
-  }
-
-  .sidebar-nav {
-
-    &.collapsed {
-      
-      li {
-
-        a {
-          width: 48px;
-        }
-
-        @media (min-width: 768px) {
-          i {
-            left: 0;
-          }
-        }
-      }
-    }
   }
 
   @media (max-width: 768px) {
