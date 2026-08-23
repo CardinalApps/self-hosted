@@ -1,3 +1,7 @@
+/**
+ * @deprecated Use PhotoRoutes from '@cardinalapps/ui/src/lib/net/router' instead.
+ */
+
 export const ROOT = '/'
 
 // Outer
