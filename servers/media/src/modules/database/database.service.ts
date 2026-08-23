@@ -88,6 +88,14 @@ export class DatabaseService {
          ON music_release (title) WHERE deleted_at IS NULL`,
       `CREATE INDEX IF NOT EXISTS idx_music_artist_active_name
          ON music_artist (name) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_photo_active_taken_at
+         ON photo (taken_at) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_photo_active_taken_on_day
+         ON photo (taken_on_day) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_photo_album_entry_active_photo_album_id
+         ON photo_album_entry (photo_album_id) WHERE deleted_at IS NULL`,
+      `CREATE INDEX IF NOT EXISTS idx_photo_album_entry_active_photo_id
+         ON photo_album_entry (photo_id) WHERE deleted_at IS NULL`,
     ]
 
     for (const sql of indexes) {
