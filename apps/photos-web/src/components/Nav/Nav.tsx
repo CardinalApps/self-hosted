@@ -22,6 +22,8 @@ function Nav({ children }: PropsWithChildren) {
       <li
         className={activeItem === routes.ROOT ? 'active' : ''}
         key="overview"
+        data-testid="photos-nav-item"
+        data-nav-key="archive"
       >
         <Link to={routes.ROOT}>
           <Icon fa="fas fa-images" />
@@ -33,6 +35,8 @@ function Nav({ children }: PropsWithChildren) {
       <li
         className={`${activeItem === routes.PHOTO_ALBUMS || activeItem === routes.PHOTO_ALBUM ? 'active' : ''}`}
         key="albums"
+        data-testid="photos-nav-item"
+        data-nav-key="albums"
       >
         <Link to={routes.PHOTO_ALBUMS}>
           <Icon fa="fas fa-book" />
@@ -44,6 +48,8 @@ function Nav({ children }: PropsWithChildren) {
       <li
         className={`${activeItem === routes.PEOPLE ? 'active' : ''}`}
         key="people"
+        data-testid="photos-nav-item"
+        data-nav-key="people"
       >
         <Link to={routes.PEOPLE}>
           <Icon fa="fas fa-users" />
@@ -55,6 +61,8 @@ function Nav({ children }: PropsWithChildren) {
       <li
         className={`${activeItem === routes.LOCATIONS ? 'active' : ''}`}
         key="locations"
+        data-testid="photos-nav-item"
+        data-nav-key="locations"
       >
         <Link to={routes.LOCATIONS}>
           <Icon fa="fas fa-map-marked-alt" />

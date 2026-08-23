@@ -12,7 +12,10 @@
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "build": "vite build && cp ./serve.json ./dist/serve.json",
-    "serve": "serve dist"
+    "serve": "serve dist",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test --config e2e/playwright.config.ts --ui",
+    "test:e2e:install": "playwright install chromium --with-deps"
   },
   "dependencies": {
     "@cardinalapps/access-control": "workspace:*",
@@ -32,9 +35,11 @@
     "serve": "^14.2.1"
   },
   "devDependencies": {
+    "@cardinalapps/e2e-helpers": "workspace:*",
     "@cardinalapps/eslint-config": "workspace:*",
     "@cardinalapps/typescript-config": "workspace:*",
     "@eslint/js": "9.20.0",
+    "@playwright/test": "^1.52.0",
     "@types/ms": "^2.1.0",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.0",
