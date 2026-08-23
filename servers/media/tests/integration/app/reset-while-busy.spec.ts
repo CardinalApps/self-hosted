@@ -7,6 +7,7 @@ import { createTestApp, destroyTestApp, waitForBackgroundJobs, TestApp } from '.
 import { UserService } from '../../../src/modules/user/user.service'
 import { IndexingService } from '../../../src/modules/indexing/indexing.service'
 import { ScannerService, ScanResults } from '../../../src/modules/indexing/scanner.service'
+import { MusicIndexingService } from '../../../src/modules/indexing/media/music/indexing.music.service'
 import { IndexingStates, RunType } from '../../../src/modules/indexing/enums'
 import { File } from '../../../src/modules/indexing/entities/file.entity'
 import { Run } from '../../../src/modules/indexing/entities/run.entity'
@@ -111,24 +112,63 @@ afterEach(() => {
 
 describe('POST /api/v1/reset during an indexing run', () => {
   it('stops the run, and nothing indexed lands after the media is gone', async () => {
-    await startIndexingRun().expect(201)
+    const musicIndexingService = testApp.moduleRef.get(MusicIndexingService)
+    const indexTrack = musicIndexingService.indexMusicTrackEntities.bind(musicIndexingService)
+    const pauseIndexing = indexingService.pause.bind(indexingService)
 
-    // Reset only once the run is far enough along that there is real work to interrupt
-    const caughtMidRun = await waitFor(async () => (
-      indexingService.getCurrentState() === IndexingStates.INDEXING && !!await fileRepository.count()
-    ))
-    expect(caughtMidRun).toBe(true)
+    /*
+     * The whole fixture library indexes in well under a tenth of a second, so watching for the
+     * run to be mid-flight is a race the machine wins. Instead the import loop is held on its
+     * second track: one track is committed behind it and another is genuinely in flight, and it
+     * stays that way for as long as the spec needs.
+     */
+    let releaseHeldTrack: () => void
+    let tracksStarted = 0
+    const heldTrackInFlight = new Promise<void>((trackReached) => {
+      jest.spyOn(musicIndexingService, 'indexMusicTrackEntities').mockImplementation(async (file, queryRunner) => {
+        tracksStarted++
 
-    await resetMedia().expect(201)
+        if (tracksStarted === 2) {
+          trackReached()
+          await new Promise<void>((release) => { releaseHeldTrack = release })
+        }
 
-    expect(indexingService.getCurrentState()).toBe(IndexingStates.IDLE)
-    expect(indexingService.getCurrentRun()).toBeNull()
+        return indexTrack(file, queryRunner)
+      })
+    })
 
-    await settle()
+    /*
+     * The reset stops indexing before it deletes, and that stop waits for the file in flight to
+     * finish writing. Letting the held track go the moment the reset asks for the pause is what
+     * puts the reset and the in-flight write in the order this spec is about.
+     */
+    jest.spyOn(indexingService, 'pause').mockImplementation(() => {
+      const paused = pauseIndexing()
+      releaseHeldTrack?.()
+      return paused
+    })
 
-    expect(await fileRepository.count()).toBe(0)
-    expect(await runRepository.count()).toBe(0)
-    expect(unhandledRejections).toEqual([])
+    try {
+      await startIndexingRun().expect(201)
+      await heldTrackInFlight
+
+      expect(indexingService.getCurrentState()).toBe(IndexingStates.INDEXING)
+      expect(await fileRepository.count()).toBeGreaterThan(0)
+
+      await resetMedia().expect(201)
+
+      expect(indexingService.getCurrentState()).toBe(IndexingStates.IDLE)
+      expect(indexingService.getCurrentRun()).toBeNull()
+
+      await settle()
+
+      expect(await fileRepository.count()).toBe(0)
+      expect(await runRepository.count()).toBe(0)
+      expect(unhandledRejections).toEqual([])
+    } finally {
+      releaseHeldTrack?.()
+      jest.restoreAllMocks()
+    }
   }, 60000)
 })
 
