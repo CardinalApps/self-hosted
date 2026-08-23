@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
-import { Repository, DataSource, FindManyOptions } from 'typeorm'
+import { Repository, DataSource, FindManyOptions, In } from 'typeorm'
 
 import { PhotoAlbum } from './photo-album.entity'
 import { PhotoAlbumEntry } from './photo-album-entry.entity'
@@ -78,21 +78,32 @@ export class PhotoAlbumEntryService {
   }
 
   /**
-   * 
-   * 
-   * TODO
+   * Removes entries from a photo album. Does not delete the album, nor the
+   * photo entities that the entries point at.
+   *
+   * @param photoAlbumId The album to remove the entries from.
+   * @param ids Entry IDs. Entries that belong to another album are ignored.
    */
-  async removeEntriesFromPhotoAlbum(ids: number | number[]): Promise<boolean> {
+  async removeEntriesFromPhotoAlbum(photoAlbumId: number, ids: number | number[]): Promise<boolean> {
     if (!Array.isArray(ids)) {
       ids = [ids]
     }
 
-    const deleted = await this.photoAlbumRepository.delete(ids)
+    if (!ids.length) {
+      return true
+    }
+
+    const deleted = await this.photoAlbumEntryRepository.delete({
+      id: In(ids),
+      photoAlbum: {
+        id: photoAlbumId,
+      },
+    })
 
     if (deleted?.affected === ids.length) {
       return true
     } else {
-      Logger.log(`Unexpected amount of deleted photo albums. Wanted to delete: (${ids.length}), but deleted (${deleted?.affected}) instead.`, 'Photo Albums')
+      Logger.log(`Unexpected amount of deleted photo album entries. Wanted to delete: (${ids.length}), but deleted (${deleted?.affected}) instead.`, 'Photo Albums')
       return false
     }
   }
