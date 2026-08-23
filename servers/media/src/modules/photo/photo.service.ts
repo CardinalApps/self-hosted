@@ -85,9 +85,8 @@ function dateFromParts(year: number, month: number, day: number, hours = 0, minu
 
 /**
  * Formats a date as `YYYY-MM-DDTHH:mm:ss`, which reads as local time because it
- * carries no timezone designator. The indexer runs the dates it finds through
- * sanitizeDateString(), which mangles the `+` in the offset of a
- * `Date.toString()`, so the value has to be parseable without one.
+ * carries no timezone designator. A date parsed out of a file name has no zone
+ * to begin with, so emitting one would invent information the name never had.
  */
 function toLocalDateTimeString(date: Date): string {
   const pad = (value: number, length = 2) => String(value).padStart(length, '0')
