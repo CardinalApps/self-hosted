@@ -19,7 +19,8 @@ import { User } from '../user/user.entity'
 import { GetMusicReleasesDto } from './dtos/GetMusicReleases.dto'
 import { MusicArtist } from '../music-artist/music-artist.entity'
 import { MusicGenre } from '../music-genres/music-genre.entity'
-import { isNumeric, sortableString } from '../../utils/string'
+import { sortableString } from '../../utils/string'
+import { isRowId } from '../../utils/identifiers'
 
 import { ALBUM_ART_FILE_NAME, ALBUM_ART_FILE_EXTENSION } from './types'
 import { LibraryService } from '../library/library.service'
@@ -59,9 +60,9 @@ export class MusicReleaseService {
    * Gets a single music release.
    */
   async get(id: number | string, relations = {}, user?: User): Promise<MusicRelease | null> {
-    const where = isNumeric(id)
-      ? { id: id as number }
-      : { musicReleaseId: id as string }
+    const where = isRowId(id)
+      ? { id: Number(id) }
+      : { musicReleaseId: String(id) }
 
     try {
       const musicRelease = await this.musicReleaseRepository.find({

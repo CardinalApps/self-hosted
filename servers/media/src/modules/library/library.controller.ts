@@ -17,6 +17,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { CurrentUser } from '../../decorators/CurrentUser.decorator'
+import { isRowId } from '../../utils/identifiers'
 
 import { Library } from './library.entity'
 import { LibraryService } from './library.service'
@@ -87,7 +88,7 @@ export class LibraryController {
   ): Promise<Library> {
     const library = await this.libraryRepository.findOne({
       where: {
-        id: params.id,
+        ...(isRowId(params.id) ? { id: Number(params.id) } : { libraryId: params.id }),
         user: user.id,
       },
     })
@@ -110,9 +111,12 @@ export class LibraryController {
     @Body() body: UpdateLibraryBodyDto,
   ): Promise<Library> {
     if (!Object.keys(body).length) throw new BadRequestException('At least one updated value is required.')
-    if (!await this.libraryService.getLibrary(id)) throw new NotFoundException()
 
-    const updated = await this.libraryService.updateLibrary(id, body)
+    const library = await this.libraryService.getLibrary(id)
+
+    if (!library) throw new NotFoundException()
+
+    const updated = await this.libraryService.updateLibrary(library.id, body)
 
     if (!updated) {
       throw new InternalServerErrorException()
@@ -132,9 +136,11 @@ export class LibraryController {
     capabilities: ['Libraries.Delete'],
   })
   async deleteLibrary(@Param() { id }: DeleteLibraryDto): Promise<void> {
-    if (!await this.libraryService.getLibrary(id)) throw new NotFoundException()
+    const library = await this.libraryService.getLibrary(id)
 
-    const deleted = await this.libraryService.deleteLibraries(id)
+    if (!library) throw new NotFoundException()
+
+    const deleted = await this.libraryService.deleteLibraries(library.id)
     if (!deleted) throw new InternalServerErrorException()
 
     this.eventService.emitPublic(LibraryEvents.DELETED, { deleted })

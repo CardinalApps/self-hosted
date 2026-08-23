@@ -1,10 +1,10 @@
 import { Transform } from 'class-transformer'
-import { IsNumber } from 'class-validator'
+import { IsString } from 'class-validator'
 
-import { toNumber } from '../../../utils/transformers'
+import { toString } from '../../../utils/transformers'
 
 export class GetLibraryDto {
-  @Transform(toNumber)
-  @IsNumber()
-  id: number
+  @Transform(toString)
+  @IsString()
+  id: string
 }

@@ -7,6 +7,7 @@ import { Library } from './library.entity'
 import { EventService } from '../event/event.service'
 import { User } from '../user/user.entity'
 import { envVar } from '../../utils/env'
+import { isRowId } from '../../utils/identifiers'
 
 @Injectable()
 export class LibraryService {
@@ -43,10 +44,14 @@ export class LibraryService {
   }
 
   /**
-   * Get a library.
+   * Gets a single library by either of its identifiers: the numeric row ID
+   * (given as a number, or as the all-digits string that arrives in a URL
+   * param) or the UUID library ID.
    */
   async getLibrary(id: number | string): Promise<Library | null> {
-    const where = typeof id === 'number' ? { id: id } : { libraryId: id }
+    const where = isRowId(id)
+      ? { id: Number(id) }
+      : { libraryId: String(id) }
 
     const library = await this.libraryRepository.findOne({
       where,

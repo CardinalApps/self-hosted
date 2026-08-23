@@ -1,12 +1,12 @@
 import { Transform } from 'class-transformer'
-import { IsArray, IsString, IsNumber, IsOptional } from 'class-validator'
+import { IsArray, IsString, IsOptional } from 'class-validator'
 
-import { toNumber, toString } from '../../../utils/transformers'
+import { toString } from '../../../utils/transformers'
 
 export class UpdateLibraryParamsDto {
-  @Transform(toNumber)
-  @IsNumber()
-  id: number
+  @Transform(toString)
+  @IsString()
+  id: string
 }
 
 export class UpdateLibraryBodyDto {
