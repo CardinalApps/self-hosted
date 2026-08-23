@@ -116,18 +116,24 @@ export class JobTaskQueueService implements QueueService {
   }
 
   /**
-   * Count the number of completed tasks for this job.
+   * Count the tasks of this job, optionally narrowed to a single status.
    */
-  async countCompletedTasks(): Promise<number> {
-    const completed = await this.jobTaskRepository.count({
+  async countTasks(status?: JobTaskStatus): Promise<number> {
+    return await this.jobTaskRepository.count({
       where: {
         job: {
           id: this.job.id,
         },
+        ...(status && { status }),
       },
     })
+  }
 
-    return completed
+  /**
+   * Count the number of completed tasks for this job.
+   */
+  async countCompletedTasks(): Promise<number> {
+    return await this.countTasks(JobTaskStatus.COMPLETED)
   }
 
   /**
@@ -164,7 +170,11 @@ export class JobTaskQueueService implements QueueService {
       const completed = await this.countCompletedTasks()
       const ignore = await this.getFailedTaskIds()
       const remaining = await this.jobWorkerService.countWork(ignore)
-      const total = Number(completed) + Number(remaining)
+
+      // Errored tasks are excluded from the remaining count, so they have to be added back in
+      // for the total to still describe all of the work the job took on
+      const errored = await this.countTasks(JobTaskStatus.ERRORED)
+      const total = Number(completed) + Number(errored) + Number(remaining)
 
       const updated = await this.jobService.updateJob(this.job.id, {
         completedTasks: completed,
@@ -264,14 +274,58 @@ export class JobTaskQueueService implements QueueService {
    * When the queue is done.
    */
   async onQueueDone(): Promise<void> {
+    // The counts are only refreshed after tasks that succeed, so the ones cached during the
+    // run are stale by exactly the failures that decide the job's outcome
+    await this.updateCachedTaskCounts()
+
+    const current = await this.jobService.getJob(this.job.id)
+
+    // Canceling already gave the job its final status, and the queue tearing itself down
+    // afterwards must not report an outcome over top of it
+    if (!current || current.status === JobStatus.CANCELED) {
+      return
+    }
+
+    const attempted = await this.countTasks()
+    const completed = await this.countCompletedTasks()
+    const unfinished = attempted - completed
+
     const updated = await this.jobService.updateJob(this.job.id, {
-      status: JobStatus.COMPLETED,
+      status: unfinished ? JobStatus.ERRORED : JobStatus.COMPLETED,
       completedAt: new Date(),
+      errorMessage: unfinished ? await this.buildErrorSummary(unfinished, attempted) : null,
     })
 
     this.eventService.emitAll(JobEvents.COMPLETED, { updated })
 
-    log(LogModule.JOBS, LogLevel.INFO, `Completed job ${this.job.id} (${this.job.type})`)
+    if (unfinished) {
+      Logger.error(`Job ${this.job.id} (${this.job.type}) ended with ${unfinished} of ${attempted} tasks unfinished`, 'Jobs')
+    } else {
+      log(LogModule.JOBS, LogLevel.INFO, `Completed job ${this.job.id} (${this.job.type})`)
+    }
+  }
+
+  /**
+   * Describe why a job did not fully succeed, for the job's own error message.
+   */
+  private async buildErrorSummary(unfinished: number, attempted: number): Promise<string> {
+    const lastErrored = await this.jobTaskRepository.findOne({
+      where: {
+        job: {
+          id: this.job.id,
+        },
+        status: JobTaskStatus.ERRORED,
+      },
+      order: {
+        updatedAt: 'desc',
+      },
+    })
+
+    const summary = `${unfinished} of ${attempted} tasks did not complete.`
+
+    return lastErrored?.errorMessage
+      ? `${summary} Last error: ${lastErrored.errorMessage}`
+      : summary
   }
 
   /**
