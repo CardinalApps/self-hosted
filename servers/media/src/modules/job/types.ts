@@ -23,7 +23,7 @@ export interface JobProcessor {
    * @returns Each item returned in the array will be stringified and set as the
    * "target" of each eventual JobTask.
    */
-  getWork: (exclude: number[], batchSize: number) => Promise<string | number[]>
+  getWork: (exclude: number[], batchSize: number) => Promise<string[] | number[]>
 
   /**
    * Prepares a job by analyzing the job parameters and the user's indexed

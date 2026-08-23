@@ -148,7 +148,10 @@ export class JobQueueService implements QueueService {
     try {
       const taskQueue = await this.moduleRef.resolve(JobTaskQueueService)
       taskQueue.start(current)
-      taskQueue.queue.on('drain', () => {
+
+      // Not the queue's drain event: that fires every time the queue empties between
+      // batches, which would free this slot for another job while this one is still running
+      taskQueue.on('done', () => {
         cb(null)
       })
       taskQueue.on('cancel', () => {

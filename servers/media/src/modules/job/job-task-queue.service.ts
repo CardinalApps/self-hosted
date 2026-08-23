@@ -42,7 +42,7 @@ export class JobTaskQueueService implements QueueService {
     this.queue = new Queue(this.tick.bind(this))
     this.queue.on('task_finish', this.onTickSuccess.bind(this))
     this.queue.on('task_failed', this.onTickFailed.bind(this))
-    this.queue.on('drain', this.onQueueDone.bind(this))
+    this.queue.on('drain', this.finalize.bind(this))
   }
 
   queue: Queue
@@ -53,6 +53,21 @@ export class JobTaskQueueService implements QueueService {
 
   private jobTaskCountsLastCachedAt = 0
   private listeners: { [event: string]: (() => void)[] } = {}
+
+  /*
+   * The queue's own length excludes the task it is currently running, so it cannot answer
+   * "is there still work out there". These three do: how many targets are queued or running,
+   * whether the worker has run out of work, and whether the job has already been finalized.
+   */
+  private tasksInFlight = 0
+  private noMoreWork = false
+  private finished = false
+
+  // Targets this run already handed out. A worker reports its remaining work from the
+  // database, so a target whose work never landed still reads as remaining to it.
+  private readonly dispatchedTargets = new Set<string>()
+
+  private batchError: string = null
 
   private job: Job = null
   private tasks: JobTask[] = []
@@ -99,12 +114,13 @@ export class JobTaskQueueService implements QueueService {
       throw new Error('Could not initialize job worker service')
     }
 
-    await this.updateCachedTaskCounts()
+    await this.updateCachedTaskCounts(true)
 
     if (!this.job.totalTasks) {
       log(LogModule.JOBS, LogLevel.DEBUG, `Job ${this.job.id} (${this.job.type}) has no work to do`)
+      this.noMoreWork = true
+      await this.finalize()
       this.trigger('no_work')
-      this.onQueueDone()
       return
     }
 
@@ -147,7 +163,9 @@ export class JobTaskQueueService implements QueueService {
         },
         status: JobTaskStatus.ERRORED,
       },
-      take: 9999999999999,
+      select: {
+        target: true,
+      },
     })
 
     const ignore = [...new Set(
@@ -162,10 +180,13 @@ export class JobTaskQueueService implements QueueService {
   /**
    * Count the amount of work remaining and cache it in the job.
    */
-  async updateCachedTaskCounts(): Promise<void> {
-    if (Date.now() < this.jobTaskCountsLastCachedAt + 1000) {
+  async updateCachedTaskCounts(force = false): Promise<void> {
+    if (!force && Date.now() < this.jobTaskCountsLastCachedAt + 1000) {
       return
     }
+
+    this.jobTaskCountsLastCachedAt = Date.now()
+
     try {
       const completed = await this.countCompletedTasks()
       const ignore = await this.getFailedTaskIds()
@@ -198,21 +219,33 @@ export class JobTaskQueueService implements QueueService {
    * usage low.
    */
   async populateQueue(): Promise<void> {
+    if (this.finished) {
+      return
+    }
+
     try {
       const ignore = await this.getFailedTaskIds()
-      const nextBatch = await this.jobWorkerService.getWork(ignore, this.taskBatchSize)
+      const nextBatch: (string | number)[] = await this.jobWorkerService.getWork(ignore, this.taskBatchSize)
+      const toDispatch = nextBatch.filter((id) => !this.dispatchedTargets.has(String(id)))
 
-      if (nextBatch.length) {
-        nextBatch.forEach((id) => {
+      if (toDispatch.length) {
+        toDispatch.forEach((id) => {
+          this.dispatchedTargets.add(String(id))
+          this.tasksInFlight++
           this.queue.push(id)
         })
-      } else {
-        return this.onQueueDone()
+
+        return
       }
     } catch (error) {
       Logger.error(`Could not get next batch of work in job ${this.job.id} (${this.job.type})`, 'Jobs')
       Logger.error(error)
+      this.batchError = error.message
     }
+
+    this.noMoreWork = true
+
+    await this.finalize()
   }
 
   /**
@@ -223,13 +256,15 @@ export class JobTaskQueueService implements QueueService {
       job: { id: this.job.id },
     })
 
+    let task: JobTask
+
     /*
      * The draft is written inside the try because the job it belongs to can be deleted out from
      * under a task that is already in flight. That write fails on the foreign key, and outside
      * of the try it takes the whole process down instead of just the task.
      */
     try {
-      const task = await this.jobTaskRepository.save({
+      task = await this.jobTaskRepository.save({
         target: id,
         status: JobTaskStatus.DRAFT,
         job: {
@@ -238,15 +273,49 @@ export class JobTaskQueueService implements QueueService {
       } as Partial<JobTask>)
 
       const taskAfterWork = await this.jobWorkerService.executeTask(task)
+
       if (taskAfterWork.status === JobTaskStatus.COMPLETED) {
-        cb(null, task)
-      } else {
-        cb('invalid-status-at-end')
+        return cb(null, task)
       }
+
+      // A task that ends in neither of the two final states is a task nothing will ever
+      // reconcile, so the queue records the failure the worker did not
+      if (taskAfterWork.status !== JobTaskStatus.ERRORED) {
+        await this.recordTaskFailure(task, `Task ended in an unexpected state: ${taskAfterWork.status}`)
+      }
+
+      cb('invalid-status-at-end')
     } catch (error) {
       Logger.error(`Error when executing job: ${this.job.type}`)
       Logger.error(error.stack)
+      await this.recordTaskFailure(task, error.message)
       cb(error.message)
+    }
+  }
+
+  /**
+   * Write the failure of a task that its worker did not get to write itself. Without this
+   * the row stays a draft, which no status filter reports and no later run reconciles.
+   */
+  private async recordTaskFailure(task: JobTask | undefined, errorMessage: string): Promise<void> {
+    if (!task) {
+      return
+    }
+
+    /*
+     * An update rather than a save: the job can be deleted out from under a task that is
+     * already in flight, taking its tasks with it, and saving a row by an id that is no
+     * longer there writes it back into existence.
+     */
+    try {
+      await this.jobTaskRepository.update({ id: task.id }, {
+        status: JobTaskStatus.ERRORED,
+        completedAt: new Date(),
+        errorMessage,
+      } as Partial<JobTask>)
+    } catch (error) {
+      Logger.error(`Could not record the failure of task ${task.id} in job ${this.job.id} (${this.job.type})`, 'Jobs')
+      Logger.error(error)
     }
   }
 
@@ -254,20 +323,56 @@ export class JobTaskQueueService implements QueueService {
    * When a task finishes successfully.
    */
   async onTickSuccess(taskId, task: JobTask, stats): Promise<void> {
+    this.tasksInFlight--
+
     log(LogModule.JOBS, LogLevel.DEBUG, `Completed task for job ${taskId}; total job run time: ${stats.elapsed / 1000} seconds.`)
 
     await this.updateCachedTaskCounts()
-
-    if ('length' in this.queue && !this.queue.length) {
-      this.populateQueue()
-    }
+    await this.advance()
   }
 
   /**
    * When a task fails.
    */
   async onTickFailed(taskId): Promise<void> {
+    this.tasksInFlight--
+
     this.eventService.emitAll(JobEvents.TASK_FAILED, taskId)
+
+    await this.advance()
+  }
+
+  /**
+   * Decide what the queue does after a task settles: fetch the next batch, or, once every
+   * target this run took on has settled and the worker has no more, end the job.
+   */
+  private async advance(): Promise<void> {
+    if (this.tasksInFlight > 0) {
+      return
+    }
+
+    if (this.noMoreWork) {
+      return await this.finalize()
+    }
+
+    await this.populateQueue()
+  }
+
+  /**
+   * End the job, once. Both the queue draining mid-run and a batch coming back empty used to
+   * report an outcome, so a long job could be stamped with a terminal status while it was
+   * still working and corrected later.
+   */
+  private async finalize(): Promise<void> {
+    if (this.finished || !this.noMoreWork || this.tasksInFlight > 0) {
+      return
+    }
+
+    this.finished = true
+
+    await this.onQueueDone()
+
+    this.trigger('done')
   }
 
   /**
@@ -276,7 +381,7 @@ export class JobTaskQueueService implements QueueService {
   async onQueueDone(): Promise<void> {
     // The counts are only refreshed after tasks that succeed, so the ones cached during the
     // run are stale by exactly the failures that decide the job's outcome
-    await this.updateCachedTaskCounts()
+    await this.updateCachedTaskCounts(true)
 
     const current = await this.jobService.getJob(this.job.id)
 
@@ -290,10 +395,14 @@ export class JobTaskQueueService implements QueueService {
     const completed = await this.countCompletedTasks()
     const unfinished = attempted - completed
 
+    // A job that stopped because it could not read its own remaining work did not succeed,
+    // however many of the tasks it did hand out came back completed
+    const succeeded = !unfinished && !this.batchError
+
     const updated = await this.jobService.updateJob(this.job.id, {
-      status: unfinished ? JobStatus.ERRORED : JobStatus.COMPLETED,
+      status: succeeded ? JobStatus.COMPLETED : JobStatus.ERRORED,
       completedAt: new Date(),
-      errorMessage: unfinished ? await this.buildErrorSummary(unfinished, attempted) : null,
+      errorMessage: succeeded ? null : await this.buildErrorSummary(unfinished, attempted),
     })
 
     this.eventService.emitAll(JobEvents.COMPLETED, { updated })
@@ -321,11 +430,21 @@ export class JobTaskQueueService implements QueueService {
       },
     })
 
-    const summary = `${unfinished} of ${attempted} tasks did not complete.`
+    const parts = []
 
-    return lastErrored?.errorMessage
-      ? `${summary} Last error: ${lastErrored.errorMessage}`
-      : summary
+    if (unfinished) {
+      parts.push(`${unfinished} of ${attempted} tasks did not complete.`)
+    }
+
+    if (this.batchError) {
+      parts.push(`Could not read the remaining work: ${this.batchError}`)
+    }
+
+    if (lastErrored?.errorMessage) {
+      parts.push(`Last error: ${lastErrored.errorMessage}`)
+    }
+
+    return parts.join(' ')
   }
 
   /**
@@ -353,6 +472,11 @@ export class JobTaskQueueService implements QueueService {
    */
   async cancel(jobToCancel: Job): Promise<void> {
     if (this.job?.id == jobToCancel.id) {
+      // A job being torn down must not reach for another batch: the rows it would write
+      // outlive the job they belong to
+      this.noMoreWork = true
+      this.finished = true
+
       this.queue.pause()
       this.queue.destroy(() => undefined)
       this.trigger('cancel')
@@ -363,7 +487,7 @@ export class JobTaskQueueService implements QueueService {
   /**
    * Attach event listeners.
    */
-  on(event: 'cancel' | 'no_work', cb: () => void) {
+  on(event: 'cancel' | 'no_work' | 'done', cb: () => void) {
     if (!Array.isArray(this.listeners[event])) {
       this.listeners[event] = []
     }

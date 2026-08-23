@@ -38,20 +38,9 @@ function createFakeWorker(outcomes: Record<number, JobTaskStatus>): JobProcessor
   const done = new Set<number>()
   const remaining = (exclude: number[]) => targets.filter((target) => !done.has(target) && !exclude.includes(target))
 
-  /*
-   * The queue asks for a new batch as soon as it empties, which can happen while the tasks
-   * it just handed out are still in flight. Real workers answer from the database and so can
-   * hand the same target out twice; the fake refuses to, to keep this spec deterministic.
-   */
-  const dispatched = new Set<number>()
-
   return {
     countWork: async (exclude: number[]) => remaining(exclude).length,
-    getWork: async (exclude: number[], batchSize: number) => {
-      const batch = remaining(exclude).filter((target) => !dispatched.has(target)).slice(0, batchSize)
-      batch.forEach((target) => dispatched.add(target))
-      return batch
-    },
+    getWork: async (exclude: number[], batchSize: number) => remaining(exclude).slice(0, batchSize),
     executeTask: async (task: JobTask) => {
       const status = outcomes[Number(task.target)]
 
