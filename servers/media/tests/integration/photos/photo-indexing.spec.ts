@@ -131,6 +131,24 @@ describe('a full indexing run over the photo fixtures', () => {
     }
   })
 
+  it('dates a photo from a plain yyyy-mm-dd filename rather than from the file mtime', async () => {
+    const photos = await photoRepository.find({ relations: { file: true } })
+
+    // The fixtures on disk were written when the repo was checked out, so an
+    // mtime fallback would date all of them to today.
+    const expectations: [string, Date][] = [
+      ['2024-01-01.jpg', new Date(2024, 0, 1)],
+      ['2024-02-15.png', new Date(2024, 1, 15)],
+    ]
+
+    for (const [fileName, expected] of expectations) {
+      const photo = photos.find((p) => p.file.absolutePath.endsWith(fileName))
+
+      expect(photo.takenOnDay).toBe(expected.toDateString())
+      expect(Number(photo.timestamp)).toBe(expected.getTime())
+    }
+  })
+
   it('reports the completed run in the runs list', async () => {
     const res = await request(testApp.app.getHttpServer())
       .get('/api/v1/index/runs')
@@ -208,6 +226,13 @@ describe('indexing a photo that carries Exif metadata', () => {
 
     expect(takenAt.getUTCFullYear()).toBe(2024)
     expect(takenAt.getUTCMonth()).toBe(2)
+  })
+
+  it('prefers the Exif original date over the date in the filename', () => {
+    // This fixture's name is also a yyyy-mm-dd date, which would put it at
+    // local midnight. The Exif tag carries a time of day, so the two disagree.
+    expect(Number(gpsPhoto.timestamp)).not.toBe(new Date(2024, 2, 10).getTime())
+    expect(new Date(gpsPhoto.takenAt).getUTCFullYear()).toBe(2024)
   })
 
   it('leaves the Exif-derived columns null for photos with no Exif metadata', async () => {
