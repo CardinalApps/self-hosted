@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import * as os from 'os'
 import * as path from 'path'
 import * as request from 'supertest'
 import { getRepositoryToken } from '@nestjs/typeorm'
@@ -8,13 +9,26 @@ import { v4 as uuid } from 'uuid'
 import { createTestApp, destroyTestApp, waitForBackgroundJobs, TestApp } from '../../helpers/create-app'
 import { UserService } from '../../../src/modules/user/user.service'
 import { IndexingStates, RunType } from '../../../src/modules/indexing/enums'
+import { File } from '../../../src/modules/indexing/entities/file.entity'
 import { Photo } from '../../../src/modules/photo/photo.entity'
 import { PhotoThumbnail } from '../../../src/modules/photo/photo-thumbnail.entity'
+import { PhotoVariation } from '../../../src/modules/photo/photo-variation.entity'
+import { JobTask } from '../../../src/modules/job/job-task.entity'
+import { JobTaskStatus } from '../../../src/modules/job/enums'
+import { PhotoThumbnailsJobService } from '../../../src/modules/job/jobs/photo-thumbnails.service'
+import { ThumbnailService } from '../../../src/modules/thumbnail/thumbnail.service'
 import { OutputCacheDirectories } from '../../../src/modules/thumbnail/enums'
 import { getAppDir, touchAppDir } from '../../../src/utils/env'
 
 const PHOTO_FIXTURES_DIR = path.resolve(__dirname, '../../fixtures/photos')
 const NUM_PHOTO_FIXTURES = 3
+
+// Seeded photos live outside PHOTO_FIXTURES_DIR so that the indexing run in
+// beforeAll never picks them up and skews the fixture counts.
+const SEED_DIR = path.join(os.tmpdir(), `cardinal-photo-seed-${process.pid}-${Date.now()}`)
+
+// Anything but Safari 17, which is the one client the server trusts with HEIF.
+const NON_HEIF_USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 /**
  * Polls the indexing state endpoint until the service is idle.
@@ -33,10 +47,88 @@ async function waitForIdleState(app: ReturnType<TestApp['app']['getHttpServer']>
   throw new Error(`Indexing service did not become idle within ${timeoutMs}ms`)
 }
 
+/**
+ * Reads a response body as raw bytes rather than letting superagent parse it.
+ */
+function readBlob(url: string, userAgent?: string) {
+  const req = request(testApp.app.getHttpServer())
+    .get(url)
+    .set('Authorization', `Bearer ${authToken}`)
+
+  if (userAgent) {
+    req.set('User-Agent', userAgent)
+  }
+
+  return req
+    .buffer(true)
+    .parse((response, callback) => {
+      const chunks = []
+      response.on('data', (chunk) => chunks.push(chunk))
+      response.on('end', () => callback(null, Buffer.concat(chunks)))
+    })
+}
+
+/**
+ * Writes a file into the seed directory and returns its absolute path.
+ */
+function writeSeedFile(name: string, bytes: Buffer): string {
+  fs.mkdirSync(SEED_DIR, { recursive: true })
+  const absolutePath = path.join(SEED_DIR, name)
+  fs.writeFileSync(absolutePath, bytes)
+  return absolutePath
+}
+
+/**
+ * Plants a photo and its file row straight into the database. The indexer only
+ * walks the photos directory, and the fixtures there hold no HEIC, so HEIC
+ * sources and their variations have to be seeded by hand.
+ */
+async function seedPhoto(extension: string, bytes: Buffer): Promise<Photo> {
+  const absolutePath = writeSeedFile(`source-${uuid()}.${extension}`, bytes)
+
+  const file = await fileRepository.save({
+    fileId: uuid(),
+    absolutePath,
+    relativePath: path.basename(absolutePath),
+    extension,
+    mimeType: `image/${extension}`,
+    app: 'photos',
+    mediaType: 'photos',
+    size: bytes.length,
+    lastSeen: new Date(),
+  })
+
+  return await photoRepository.save({
+    photoId: uuid(),
+    file,
+    takenAt: new Date(),
+    takenOnDay: '2024-05-01',
+    timestamp: Date.now(),
+  })
+}
+
+/**
+ * Plants one variation of a seeded photo, with a real file behind it.
+ */
+async function seedVariation(photo: Photo, format: string, bytes: Buffer): Promise<PhotoVariation> {
+  const absolutePath = writeSeedFile(`variation-${uuid()}.${format}`, bytes)
+
+  return await photoVariationRepository.save({
+    variationId: uuid(),
+    absolutePath,
+    relativeSrc: path.basename(absolutePath),
+    format,
+    bytes: bytes.length,
+    photo,
+  })
+}
+
 let testApp: TestApp
 let authToken: string
+let fileRepository: Repository<File>
 let photoRepository: Repository<Photo>
 let photoThumbnailRepository: Repository<PhotoThumbnail>
+let photoVariationRepository: Repository<PhotoVariation>
 
 // A photo that is known to have been indexed from the Exif-bearing fixture.
 let gpsPhoto: Photo
@@ -61,8 +153,10 @@ beforeAll(async () => {
     .expect(201)
 
   authToken = loginRes.body.JWT
+  fileRepository = testApp.moduleRef.get(getRepositoryToken(File))
   photoRepository = testApp.moduleRef.get(getRepositoryToken(Photo))
   photoThumbnailRepository = testApp.moduleRef.get(getRepositoryToken(PhotoThumbnail))
+  photoVariationRepository = testApp.moduleRef.get(getRepositoryToken(PhotoVariation))
 
   await request(testApp.app.getHttpServer())
     .post('/api/v1/index/run')
@@ -82,6 +176,7 @@ afterAll(async () => {
   delete process.env.PHOTOS_DIR
   await waitForBackgroundJobs(testApp)
   await destroyTestApp(testApp)
+  fs.rmSync(SEED_DIR, { recursive: true, force: true })
 }, 90000)
 
 // -------------------------------------------------------------------------
@@ -169,10 +264,91 @@ describe('GET /api/v1/photos', () => {
       .expect(400)
   })
 
+  it('accepts a lower case ordering direction', async () => {
+    const res = await request(testApp.app.getHttpServer())
+      .get('/api/v1/photos?orderBy=takenAt&order=asc')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200)
+
+    const timestamps = res.body[0].map((photo) => new Date(photo.takenAt).getTime())
+    expect(timestamps).toEqual([...timestamps].sort((a, b) => a - b))
+  })
+
+  it('rejects an ordering direction that is neither ASC nor DESC', () => {
+    return request(testApp.app.getHttpServer())
+      .get('/api/v1/photos?order=sideways')
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(400)
+  })
+
   it('returns 401 without auth', () => {
     return request(testApp.app.getHttpServer())
       .get('/api/v1/photos')
       .expect(401)
+  })
+
+  // The three fixtures alone happen to be indexed newest-first, so they cannot
+  // tell a real ordering apart from insertion order. These rows are seeded so
+  // that the two disagree.
+  describe('default ordering', () => {
+    const seededTakenAt = ['2025-05-05T10:00:00.000Z', '2023-01-01T10:00:00.000Z', '2024-06-06T10:00:00.000Z']
+    let seededIds: number[]
+
+    beforeAll(async () => {
+      seededIds = []
+
+      for (const takenAt of seededTakenAt) {
+        const saved = await photoRepository.save({ photoId: uuid(), takenAt: new Date(takenAt) })
+        seededIds.push(saved.id)
+      }
+    })
+
+    afterAll(async () => {
+      await photoRepository.delete(seededIds)
+    })
+
+    it('falls back to newest-first by takenAt when no ordering params are sent', async () => {
+      const res = await request(testApp.app.getHttpServer())
+        .get('/api/v1/photos?take=100')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      const timestamps = res.body[0].map((photo) => new Date(photo.takenAt).getTime())
+      expect(timestamps).toEqual([...timestamps].sort((a, b) => b - a))
+    })
+
+    it('applies that default to paginated slices too', async () => {
+      const wholeLibrary = await request(testApp.app.getHttpServer())
+        .get('/api/v1/photos?take=100')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      const pages = []
+      for (let skip = 0; skip < wholeLibrary.body[1]; skip += 2) {
+        const page = await request(testApp.app.getHttpServer())
+          .get(`/api/v1/photos?take=2&skip=${skip}`)
+          .set('Authorization', `Bearer ${authToken}`)
+          .expect(200)
+
+        pages.push(...page.body[0])
+      }
+
+      expect(pages.map((photo) => photo.photoId)).toEqual(wholeLibrary.body[0].map((photo) => photo.photoId))
+    })
+
+    it('returns the same default order on repeated calls', async () => {
+      const first = await request(testApp.app.getHttpServer())
+        .get('/api/v1/photos?take=100')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      const second = await request(testApp.app.getHttpServer())
+        .get('/api/v1/photos?take=100')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200)
+
+      expect(second.body[0].map((photo) => photo.photoId)).toEqual(first.body[0].map((photo) => photo.photoId))
+    })
   })
 })
 
@@ -330,7 +506,7 @@ describe('GET /api/v1/photo/:id/blob', () => {
       .expect(200)
 
     // Only HEIF sources are converted, so no transformation headers are set.
-    expect(res.headers['x-cardinal-converted-photo-from']).toBeUndefined()
+    expect(res.headers['cardinal-converted-photo-from']).toBeUndefined()
   })
 
   it('returns 404 for a row ID that does not exist', () => {
@@ -367,6 +543,93 @@ describe('GET /api/v1/photo/:id/blob', () => {
       .get(`/api/v1/photo/${uuid()}/blob`)
       .set('Authorization', `Bearer ${authToken}`)
       .expect(404)
+  })
+})
+
+// -------------------------------------------------------------------------
+// GET /api/v1/photo/:id/blob for a HEIC source
+//
+// A client that cannot render HEIF is served the photo's JPEG variation when
+// one exists, and an on-the-fly conversion of the source when one doesn't.
+// The conversion runs in a worker thread that Node resolves from __dirname,
+// which under ts-jest holds the uncompiled heic-to-jpg.ts, so it always
+// resolves to nothing here — these specs therefore either supply a JPEG
+// variation or assert only that the request survives the failed conversion.
+// -------------------------------------------------------------------------
+
+describe('GET /api/v1/photo/:id/blob for a HEIC source', () => {
+  const heicBytes = Buffer.from('heic-source-bytes')
+  const jpegVariationBytes = Buffer.from('jpeg-variation-bytes')
+  const pngVariationBytes = Buffer.from('png-variation-bytes')
+
+  let withJpegVariation: Photo
+  let withOnlyPngVariation: Photo
+
+  beforeAll(async () => {
+    withJpegVariation = await seedPhoto('heic', heicBytes)
+    await seedVariation(withJpegVariation, 'jpeg', jpegVariationBytes)
+
+    withOnlyPngVariation = await seedPhoto('heic', heicBytes)
+    await seedVariation(withOnlyPngVariation, 'png', pngVariationBytes)
+  })
+
+  it('converts by default, when the request carries no autoConvert param', async () => {
+    const res = await readBlob(`/api/v1/photo/${withJpegVariation.id}/blob`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.equals(jpegVariationBytes)).toBe(true)
+    expect(res.headers['cardinal-converted-photo-from']).toBe('heic')
+    expect(res.headers['cardinal-converted-photo-to']).toBe('jpeg')
+  })
+
+  it('serves the JPEG variation when autoConvert is explicitly true', async () => {
+    const res = await readBlob(`/api/v1/photo/${withJpegVariation.id}/blob?autoConvert=true`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.equals(jpegVariationBytes)).toBe(true)
+    expect(res.headers['cardinal-converted-photo-from']).toBe('heic')
+  })
+
+  it('serves the untouched source when autoConvert is explicitly false', async () => {
+    const res = await readBlob(`/api/v1/photo/${withJpegVariation.id}/blob?autoConvert=false`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.equals(heicBytes)).toBe(true)
+    expect(res.headers['cardinal-converted-photo-from']).toBeUndefined()
+  })
+
+  it('does not fail when the photo has variations but none of them is a JPEG', async () => {
+    const res = await readBlob(`/api/v1/photo/${withOnlyPngVariation.id}/blob?autoConvert=true`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.length).toBeGreaterThan(0)
+    expect(res.body.equals(pngVariationBytes)).toBe(false)
+  })
+
+  it('does not fail when the photo has no variations at all', async () => {
+    const withoutVariations = await seedPhoto('heic', heicBytes)
+
+    const res = await readBlob(`/api/v1/photo/${withoutVariations.id}/blob?autoConvert=true`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.length).toBeGreaterThan(0)
+  })
+
+  // A repeated query param arrives as an array of strings rather than a
+  // string, which the autoConvert transform has to survive.
+  it('does not fail when autoConvert is given more than once', async () => {
+    const res = await readBlob(`/api/v1/photo/${withJpegVariation.id}/blob?autoConvert=true&autoConvert=false`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.body.equals(heicBytes)).toBe(true)
+    expect(res.headers['cardinal-converted-photo-from']).toBeUndefined()
+  })
+
+  it('does not claim a conversion happened when none did', async () => {
+    const res = await readBlob(`/api/v1/photo/${withOnlyPngVariation.id}/blob?autoConvert=true`, NON_HEIF_USER_AGENT)
+      .expect(200)
+
+    expect(res.headers['cardinal-converted-photo-from']).toBeUndefined()
   })
 })
 
@@ -595,5 +858,82 @@ describe('PATCH /api/v1/photo/:id', () => {
       .patch(`/api/v1/photo/${gpsPhoto.photoId}`)
       .send({ photoAlbums: [] })
       .expect(401)
+  })
+})
+
+// -------------------------------------------------------------------------
+// The photo thumbnails job
+//
+// Thumbnailing a HEIC source means decoding it twice, so the job prefers the
+// JPEG variation the variations job already produced. The thumbnail files
+// themselves cannot be produced under ts-jest (the worker thread resolves an
+// uncompiled .ts file), so these specs stub the thumbnail service and assert
+// on the source file the job hands it.
+// -------------------------------------------------------------------------
+
+describe('the source file that the photo thumbnails job works from', () => {
+  const heicBytes = Buffer.from('heic-source-bytes')
+  const jpegBytes = Buffer.from('jpeg-bytes')
+  const pngBytes = Buffer.from('png-bytes')
+
+  let jobService: PhotoThumbnailsJobService
+  let jobTaskRepository: Repository<JobTask>
+  let createThumbnails: jest.SpyInstance
+
+  /**
+   * Runs one thumbnail task against a photo and returns the source file path
+   * the job asked the thumbnail service to work from.
+   */
+  async function sourceFileFor(photo: Photo): Promise<string> {
+    const task = await jobTaskRepository.save({
+      jobTaskId: uuid(),
+      target: String(photo.id),
+      status: JobTaskStatus.IN_QUEUE,
+    })
+
+    createThumbnails.mockClear()
+    await jobService.executeTask(task as JobTask)
+
+    return createThumbnails.mock.calls[0][0].absoluteFilePath
+  }
+
+  beforeAll(async () => {
+    jobService = await testApp.moduleRef.resolve(PhotoThumbnailsJobService, undefined, { strict: false })
+    jobTaskRepository = testApp.moduleRef.get(getRepositoryToken(JobTask))
+    createThumbnails = jest
+      .spyOn(testApp.moduleRef.get(ThumbnailService), 'createThumbnails')
+      .mockResolvedValue({ status: 'success', executionDuration: 0, files: {} })
+  })
+
+  afterAll(() => {
+    createThumbnails.mockRestore()
+  })
+
+  it('works from the JPEG variation, not from whichever variation comes first', async () => {
+    const photo = await seedPhoto('heic', heicBytes)
+    await seedVariation(photo, 'png', pngBytes)
+    const jpegVariation = await seedVariation(photo, 'jpeg', jpegBytes)
+
+    expect(await sourceFileFor(photo)).toBe(jpegVariation.absolutePath)
+  })
+
+  it('recognises a jpg variation as a JPEG one', async () => {
+    const photo = await seedPhoto('heic', heicBytes)
+    const jpgVariation = await seedVariation(photo, 'jpg', jpegBytes)
+
+    expect(await sourceFileFor(photo)).toBe(jpgVariation.absolutePath)
+  })
+
+  it('works from the source file when the photo has no variations', async () => {
+    const photo = await seedPhoto('jpeg', jpegBytes)
+
+    expect(await sourceFileFor(photo)).toBe(photo.file.absolutePath)
+  })
+
+  it('works from the source file when none of the variations is a JPEG', async () => {
+    const photo = await seedPhoto('heic', heicBytes)
+    await seedVariation(photo, 'png', pngBytes)
+
+    expect(await sourceFileFor(photo)).toBe(photo.file.absolutePath)
   })
 })
