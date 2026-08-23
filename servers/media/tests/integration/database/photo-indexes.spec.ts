@@ -47,7 +47,23 @@ describe('photo table indexes', () => {
   })
 })
 
+describe('photo_album table indexes', () => {
+  it('indexes photo_album_id uniquely, because it is the public lookup key', async () => {
+    const index = findIndexOn(await readIndexes(dataSource, 'photo_album'), ['photo_album_id'])
+
+    expect(index).toBeDefined()
+    expect(index.unique).toBe(true)
+  })
+})
+
 describe('photo_album_entry table indexes', () => {
+  it('indexes photo_album_entry_id uniquely, because it is the public lookup key', async () => {
+    const index = findIndexOn(await readIndexes(dataSource, 'photo_album_entry'), ['photo_album_entry_id'])
+
+    expect(index).toBeDefined()
+    expect(index.unique).toBe(true)
+  })
+
   it('indexes photo_album_id, for listing the entries of an album', async () => {
     expect(findIndexOn(await readIndexes(dataSource, 'photo_album_entry'), ['photo_album_id'])).toBeDefined()
   })

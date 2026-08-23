@@ -1,12 +1,14 @@
 import {
   Entity,
   Column,
+  Index,
   OneToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
 
 import { BaseEntity } from '../../entities/base.entity'
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 import { PhotoAlbumEntry } from  './photo-album-entry.entity'
 import { PhotoAlbumMetadata } from './photo-album-metadata.entity'
 import { User } from '../user/user.entity'
@@ -17,7 +19,8 @@ export class PhotoAlbum extends BaseEntity {
   @JoinColumn()
   user?: User
 
-  @Column()
+  @Index({ unique: true })
+  @UuidColumn()
   photoAlbumId: string
 
   @Column()
