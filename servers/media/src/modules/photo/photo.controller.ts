@@ -17,6 +17,7 @@ import {
   ApiTags,
   ApiSecurity,
   ApiOkResponse,
+  ApiParam,
 } from '@nestjs/swagger'
 
 import { ApiSecurityTypes } from '../../guards/types'
@@ -37,6 +38,12 @@ import { getAppDir } from '../../utils/env'
 import { SupportedPhotoFileExtensions, canonicalExtension } from '../../utils/media'
 import { PhotoTransformationHeaders } from '../../utils/headers'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+
+const photoIdParam = {
+  name: 'id',
+  type: String,
+  description: 'The photo to address, given as either its numeric row ID or its UUID photo ID.',
+}
 
 @Controller()
 @ApiTags('Photos')
@@ -88,14 +95,15 @@ export class PhotoController {
   }
 
   /**
-   * Get data about a photo.
+   * Get data about a photo. Accepts the numeric row ID or the photoId.
    */
   @Get('/photo/:id')
   @StandardEndpoint({
     summary: 'Get data about a photo.',
     capabilities: ['Photos.Read'],
   })
-  async getPhoto(@Param('id') id: number, @Query() query: GetPhotoDto): Promise<Photo> {
+  @ApiParam(photoIdParam)
+  async getPhoto(@Param('id') id: string, @Query() query: GetPhotoDto): Promise<Photo> {
     const found = await this.photoService.getPhoto(id, {
       file: query.file,
       metadata: query.metadata,
@@ -111,15 +119,17 @@ export class PhotoController {
   }
 
   /**
-   * Returns the blob data of one of the photos in the photo library.
+   * Returns the blob data of one of the photos in the photo library. Accepts
+   * the numeric row ID or the photoId.
    */
   @Get('/photo/:id/blob')
   @StandardEndpoint({
     summary: 'Get a photo blob.',
     capabilities: ['Photos.Read'],
   })
+  @ApiParam(photoIdParam)
   async getPhotoBlob(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Query() query: GetPhotoBlobDto,
     @Headers() headers,
     @Response({ passthrough: true }) response,
@@ -166,13 +176,14 @@ export class PhotoController {
   }
 
   /**
-   * Updates a photo.
+   * Updates a photo. Accepts the numeric row ID or the photoId.
    */
   @Patch('/photo/:id')
   @StandardEndpoint({
     summary:  'Update a photo.',
     capabilities: ['Photos.Update'],
   })
+  @ApiParam(photoIdParam)
   async updatePhoto(
     @Param() { id }: UpdatePhotoParamsDto,
     @Body() body: UpdatePhotoBodyDto,
@@ -198,13 +209,15 @@ export class PhotoController {
   }
 
   /**
-   * Returns the blob data of a photo thumbnail. Supports numeric row ID and photoId.
+   * Returns the blob data of a photo thumbnail. Accepts the numeric row ID or
+   * the photoId.
    */
   @Get('/photo/:id/thumbnail')
   @StandardEndpoint({
     summary:  'Get a photo thumbnail.',
     capabilities: ['Photos.Read'],
   })
+  @ApiParam(photoIdParam)
   async getReleaseCoverBlob(
     @Param('id') id: string,
     @Query() query: getPhotoThumbnailDto,

@@ -29,6 +29,14 @@ import { log, LogModule, LogLevel } from '../../utils/logging'
 
 import { HeicToJpgWorkerInput } from './types'
 
+/**
+ * Row IDs are a 32 bit signed integer column, so an all-digits identifier that
+ * overflows it cannot be one. Postgres throws on an out of range comparison
+ * where SQLite simply matches nothing, so these are treated as photo IDs and
+ * fall through to a 404.
+ */
+const MAX_ROW_ID = 2147483647
+
 @Injectable()
 export class PhotoService {
   constructor(
@@ -374,12 +382,18 @@ export class PhotoService {
   }
 
   /**
-   * Gets a single photo.
+   * Gets a single photo by either of its identifiers: the numeric row ID
+   * (given as a number, or as the all-digits string that arrives in a URL
+   * param) or the UUID photo ID.
    */
   async getPhoto(id: number | string, relations: Record<string, boolean | Record<string, unknown>> = {}): Promise<Photo | null> {
-    const where = typeof id === 'number'
-      ? { id: id }
-      : { photoId: id }
+    const isRowId = typeof id === 'number'
+      ? Number.isInteger(id) && id <= MAX_ROW_ID
+      : /^\d+$/.test(id) && Number(id) <= MAX_ROW_ID
+
+    const where = isRowId
+      ? { id: Number(id) }
+      : { photoId: String(id) }
 
     const photo = await this.photoRepository.find({
       where,
