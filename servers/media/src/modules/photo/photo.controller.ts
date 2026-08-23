@@ -144,32 +144,43 @@ export class PhotoController {
     }
 
     let file
+    let convertedFrom: string = null
 
-    if (query.autoConvert) {
-      // HEIF to JPEG for clients that don't support it
-      if (
-        canonicalExtension(photo.file.extension) === SupportedPhotoFileExtensions.HEIF
-        && !this.photoService.clientDeviceSupportsHEIF(headers?.['user-agent'])
-      ) {
-        // use variation
-        if (photo.variations.length) {
-          const jpegVariation = photo.variations.find((variation) => {
-            return variation.format === SupportedPhotoFileExtensions.JPEG || variation.format === SupportedPhotoFileExtensions.JPG
-          })
-          file = fs.createReadStream(jpegVariation.absolutePath)
-        }
-        // there is no variation, create a jpeg (this is slow)
-        else {
-          file = await this.photoService.heifToJpeg(photo.file.absolutePath)
-        }
-        response.set({ 'Access-Control-Expose-Headers': '*' })
-        response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_FROM]: photo.file.extension })
-        response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_TO]: SupportedPhotoFileExtensions.JPEG })
+    // HEIF to JPEG for clients that don't support it
+    if (
+      query.autoConvert
+      && canonicalExtension(photo.file.extension) === SupportedPhotoFileExtensions.HEIF
+      && !this.photoService.clientDeviceSupportsHEIF(headers?.['user-agent'])
+    ) {
+      const jpegVariation = photo.variations?.find((variation) => {
+        return canonicalExtension(variation.format) === SupportedPhotoFileExtensions.JPEG
+      })
+
+      if (jpegVariation) {
+        file = fs.createReadStream(jpegVariation.absolutePath)
+        convertedFrom = photo.file.extension
       } else {
-        file = fs.createReadStream(photo.file.absolutePath)
+        // No variation to reach for, so convert now (this is slow). The
+        // conversion yields nothing when the source cannot be read or decoded.
+        const converted = await this.photoService.heifToJpeg(photo.file.absolutePath)
+
+        if (converted) {
+          file = converted
+          convertedFrom = photo.file.extension
+        }
       }
-    } else {
+    }
+
+    // Anything the client asked not to convert, could not be converted, or was
+    // never a candidate is served as it sits on disk.
+    if (!file) {
       file = fs.createReadStream(photo.file.absolutePath)
+    }
+
+    if (convertedFrom) {
+      response.set({ 'Access-Control-Expose-Headers': '*' })
+      response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_FROM]: convertedFrom })
+      response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_TO]: SupportedPhotoFileExtensions.JPEG })
     }
 
     return new StreamableFile(file)
