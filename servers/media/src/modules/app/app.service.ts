@@ -66,7 +66,8 @@ export class AppService {
    */
   async onModuleInit(): Promise<void> {
     this.ensureInstallationDate()
-    this.ensureInstanceId()
+    // Awaited because the refresh tolkien cookie is named after the instance ID from the first request on
+    await this.ensureInstanceId()
   }
 
   /**

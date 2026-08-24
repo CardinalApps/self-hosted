@@ -1,0 +1,2 @@
+import RemoteAccessStatusIndicator from './RemoteAccessStatusIndicator'
+export default RemoteAccessStatusIndicator

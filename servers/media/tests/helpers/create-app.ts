@@ -16,10 +16,11 @@ export interface TestApp {
 /**
  * Creates an isolated NestJS application for integration testing. Each call
  * gets its own temporary SQLite database file so tests never touch the
- * development database.
+ * development database. Pass `existingDbPath` to boot against a pre-seeded
+ * database file instead, e.g. to exercise upgrade paths.
  */
-export async function createTestApp(): Promise<TestApp> {
-  const dbPath = path.join(os.tmpdir(), `cardinal-test-${process.pid}-${Date.now()}.sqlite3`)
+export async function createTestApp(existingDbPath?: string): Promise<TestApp> {
+  const dbPath = existingDbPath ?? path.join(os.tmpdir(), `cardinal-test-${process.pid}-${Date.now()}.sqlite3`)
 
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   process.env.SQLITE_PATH = dbPath
@@ -34,7 +35,11 @@ export async function createTestApp(): Promise<TestApp> {
 
   const app = moduleRef.createNestApplication({ logger: false })
 
+  const { CorsService } = await import('../../src/modules/cors/cors.service')
+  const { buildCorsOptions } = await import('../../src/modules/cors/cors.options')
+
   app.use(cookieParser())
+  app.enableCors(buildCorsOptions(moduleRef.get(CorsService)))
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.setGlobalPrefix('api')
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' })

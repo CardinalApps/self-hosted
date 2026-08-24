@@ -10,8 +10,9 @@ import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
 import { useGetMusicHistoryQuery } from '@cardinalapps/ui/src/store/apis/musicHistory'
 import { useExtendQueueMutation } from '@cardinalapps/ui/src/store/apis/playbackQueues'
+import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 
-import MixButton from '../../components/MixButton'
+import DynamicQueueActionButton from '../../components/DynamicQueueActionButton'
 
 import i18n from './i18n.json'
 
@@ -59,7 +60,7 @@ function ReleasePlayActions({
   })
 
   const orderedIds = orderedTracks.map(trackId)
-  const favoriteIds = orderedTracks.filter((track) => Number(track?.rating) > 0).map(trackId)
+  const favoriteIds = orderedTracks.filter((track) => isFavorite(track?.rating)).map(trackId)
   const unheardIds = orderedTracks.filter((track) => !Number(track?.playCount)).map(trackId)
   const topTrackIds = [...orderedTracks]
     .sort((a, b) => (
@@ -161,14 +162,14 @@ function ReleasePlayActions({
   return (
     <div className="release-play-actions">
       <div className="release-mix-row">
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_release"
           seedMediaId={releaseId}
           dynamicQueueType="house_mix"
           icon="fas fa-dna"
           label={i18n['music-release.play-actions.house-mix'][lang]}
         />
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_release"
           seedMediaId={releaseId}
           dynamicQueueType="encore"

@@ -1,6 +1,7 @@
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useState, type CSSProperties, type PropsWithChildren } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Button from '../Button'
+import H3 from '../../typography/H3'
 import { WheelGesturesPlugin } from 'embla-carousel-wheel-gestures'
 
 import './Carousel.css'
@@ -26,6 +27,12 @@ type CarouselProps = {
   dragFree?: boolean,
   itemWidth?: string | number,
   itemsPerSlide?: number,
+  /**
+   * Lays each slide out as this many columns, filled top to bottom before
+   * moving right, so a slide can hold a whole page of a list.
+   */
+  columns?: number,
+  rows?: number,
   // Gives the pagination pill and the prev/next buttons the theme's glass treatment
   glass?: boolean,
   items: React.ReactNode[],
@@ -49,6 +56,8 @@ const Carousel = ({
   dragFree = true,
   itemWidth = '100%',
   itemsPerSlide = 1,
+  columns = 1,
+  rows = 4,
   glass = false,
   items = [],
   onChange = () => {},
@@ -63,6 +72,22 @@ const Carousel = ({
     forceWheelAxis: 'x',
   })])
 
+  // Pagination only means something once there's more than one page to page through
+  const [hasMultiplePages, setHasMultiplePages] = useState(false)
+
+  useEffect(() => {
+    if (!emblaApi) return
+
+    const updatePageCount = () => setHasMultiplePages(emblaApi.scrollSnapList().length > 1)
+
+    updatePageCount()
+    emblaApi.on('reInit', updatePageCount)
+
+    return () => {
+      emblaApi.off('reInit', updatePageCount)
+    }
+  }, [emblaApi])
+
   const goToPrev = () => {
     emblaApi?.scrollPrev()
   }
@@ -70,27 +95,27 @@ const Carousel = ({
     emblaApi?.scrollNext()
   }
 
-  const prevBtn = () => (
+  const prevBtn = () => hasMultiplePages ? (
     <Button
       className={clsx('embla__prev', glass && 'glass')}
       onClick={goToPrev}
       icon="fas fa-angle-left"
       circleIcon
     />
-  )
+  ) : null
 
-  const nextBtn = () => (
+  const nextBtn = () => hasMultiplePages ? (
     <Button
       className={clsx('embla__next', glass && 'glass')}
       onClick={goToNext}
       icon="fas fa-angle-right"
       circleIcon
     />
-  )
+  ) : null
 
-  const pagination = () => (
+  const pagination = () => hasMultiplePages ? (
     <div className={clsx('carousel-pagination', glass && 'glass')}>{emblaApi?.selectedScrollSnap() + 1} / {maxPages}</div>
-  )
+  ) : null
 
   useEffect(() => {
     const update: CarouselState = {
@@ -104,7 +129,7 @@ const Carousel = ({
       })
     }
     onChange?.(update)
-  }, [emblaApi, maxPages, glass])
+  }, [emblaApi, maxPages, glass, hasMultiplePages])
 
   return (
     <div
@@ -120,20 +145,22 @@ const Carousel = ({
       {(title || prev || next ) && (
           <header className="carousel-header">
             {title && (
-              <div className="carousel-title">
+              <H3 className="carousel-title">
                 {title}
+              </H3>
+            )}
+            {hasMultiplePages && (prev || next) && (
+              <div className="carousel-controls">
+                <div className="carousel-pagination">
+                  {prev && (
+                    prevBtn()
+                  )}
+                  {next && (
+                    nextBtn()
+                  )}
+                </div>
               </div>
             )}
-            <div className="carousel-controls">
-              <div className="carousel-pagination">
-                {prev && (
-                  prevBtn()
-                )}
-                {next && (
-                  nextBtn()
-                )}
-              </div>
-            </div>
           </header>
       )}
       <div
@@ -143,7 +170,11 @@ const Carousel = ({
         <div className="embla__container">
           {items.map((item, i) => {
             return (
-              <div className="embla__slide" key={i}>
+              <div
+                className={clsx('embla__slide', columns > 1 && 'columns')}
+                key={i}
+                style={columns > 1 ? { '--slide-columns': columns, '--slide-rows': rows } as CSSProperties : undefined}
+              >
                 {item}
               </div>
             )

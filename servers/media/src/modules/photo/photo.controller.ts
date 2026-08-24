@@ -17,6 +17,7 @@ import {
   ApiTags,
   ApiSecurity,
   ApiOkResponse,
+  ApiParam,
 } from '@nestjs/swagger'
 
 import { ApiSecurityTypes } from '../../guards/types'
@@ -37,6 +38,12 @@ import { getAppDir } from '../../utils/env'
 import { SupportedPhotoFileExtensions, canonicalExtension } from '../../utils/media'
 import { PhotoTransformationHeaders } from '../../utils/headers'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
+
+const photoIdParam = {
+  name: 'id',
+  type: String,
+  description: 'The photo to address, given as either its numeric row ID or its UUID photo ID.',
+}
 
 @Controller()
 @ApiTags('Photos')
@@ -88,14 +95,15 @@ export class PhotoController {
   }
 
   /**
-   * Get data about a photo.
+   * Get data about a photo. Accepts the numeric row ID or the photoId.
    */
   @Get('/photo/:id')
   @StandardEndpoint({
     summary: 'Get data about a photo.',
     capabilities: ['Photos.Read'],
   })
-  async getPhoto(@Param('id') id: number, @Query() query: GetPhotoDto): Promise<Photo> {
+  @ApiParam(photoIdParam)
+  async getPhoto(@Param('id') id: string, @Query() query: GetPhotoDto): Promise<Photo> {
     const found = await this.photoService.getPhoto(id, {
       file: query.file,
       metadata: query.metadata,
@@ -111,15 +119,17 @@ export class PhotoController {
   }
 
   /**
-   * Returns the blob data of one of the photos in the photo library.
+   * Returns the blob data of one of the photos in the photo library. Accepts
+   * the numeric row ID or the photoId.
    */
   @Get('/photo/:id/blob')
   @StandardEndpoint({
     summary: 'Get a photo blob.',
     capabilities: ['Photos.Read'],
   })
+  @ApiParam(photoIdParam)
   async getPhotoBlob(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Query() query: GetPhotoBlobDto,
     @Headers() headers,
     @Response({ passthrough: true }) response,
@@ -134,45 +144,57 @@ export class PhotoController {
     }
 
     let file
+    let convertedFrom: string = null
 
-    if (query.autoConvert) {
-      // HEIF to JPEG for clients that don't support it
-      if (
-        canonicalExtension(photo.file.extension) === SupportedPhotoFileExtensions.HEIF
-        && !this.photoService.clientDeviceSupportsHEIF(headers?.['user-agent'])
-      ) {
-        // use variation
-        if (photo.variations.length) {
-          const jpegVariation = photo.variations.find((variation) => {
-            return variation.format === SupportedPhotoFileExtensions.JPEG || variation.format === SupportedPhotoFileExtensions.JPG
-          })
-          file = fs.createReadStream(jpegVariation.absolutePath)
-        }
-        // there is no variation, create a jpeg (this is slow)
-        else {
-          file = await this.photoService.heifToJpeg(photo.file.absolutePath)
-        }
-        response.set({ 'Access-Control-Expose-Headers': '*' })
-        response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_FROM]: photo.file.extension })
-        response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_TO]: SupportedPhotoFileExtensions.JPEG })
+    // HEIF to JPEG for clients that don't support it
+    if (
+      query.autoConvert
+      && canonicalExtension(photo.file.extension) === SupportedPhotoFileExtensions.HEIF
+      && !this.photoService.clientDeviceSupportsHEIF(headers?.['user-agent'])
+    ) {
+      const jpegVariation = photo.variations?.find((variation) => {
+        return canonicalExtension(variation.format) === SupportedPhotoFileExtensions.JPEG
+      })
+
+      if (jpegVariation) {
+        file = fs.createReadStream(jpegVariation.absolutePath)
+        convertedFrom = photo.file.extension
       } else {
-        file = fs.createReadStream(photo.file.absolutePath)
+        // No variation to reach for, so convert now (this is slow). The
+        // conversion yields nothing when the source cannot be read or decoded.
+        const converted = await this.photoService.heifToJpeg(photo.file.absolutePath)
+
+        if (converted) {
+          file = converted
+          convertedFrom = photo.file.extension
+        }
       }
-    } else {
+    }
+
+    // Anything the client asked not to convert, could not be converted, or was
+    // never a candidate is served as it sits on disk.
+    if (!file) {
       file = fs.createReadStream(photo.file.absolutePath)
+    }
+
+    if (convertedFrom) {
+      response.set({ 'Access-Control-Expose-Headers': '*' })
+      response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_FROM]: convertedFrom })
+      response.set({ [PhotoTransformationHeaders.CONVERTED_PHOTO_TO]: SupportedPhotoFileExtensions.JPEG })
     }
 
     return new StreamableFile(file)
   }
 
   /**
-   * Updates a photo.
+   * Updates a photo. Accepts the numeric row ID or the photoId.
    */
   @Patch('/photo/:id')
   @StandardEndpoint({
     summary:  'Update a photo.',
     capabilities: ['Photos.Update'],
   })
+  @ApiParam(photoIdParam)
   async updatePhoto(
     @Param() { id }: UpdatePhotoParamsDto,
     @Body() body: UpdatePhotoBodyDto,
@@ -198,13 +220,15 @@ export class PhotoController {
   }
 
   /**
-   * Returns the blob data of a photo thumbnail. Supports numeric row ID and photoId.
+   * Returns the blob data of a photo thumbnail. Accepts the numeric row ID or
+   * the photoId.
    */
   @Get('/photo/:id/thumbnail')
   @StandardEndpoint({
     summary:  'Get a photo thumbnail.',
     capabilities: ['Photos.Read'],
   })
+  @ApiParam(photoIdParam)
   async getReleaseCoverBlob(
     @Param('id') id: string,
     @Query() query: getPhotoThumbnailDto,

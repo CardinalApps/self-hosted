@@ -22,6 +22,16 @@ class PhotosPagination extends Pagination {
   @IsString()
   @IsIn(Object.values(AllowedPhotosOrderBy))
   orderBy?: AllowedPhotosOrderBy = AllowedPhotosOrderBy.takenAt
+
+  /**
+   * A photo library reads newest-first, so the direction is defaulted here.
+   * The shared Pagination class deliberately leaves it open: defaulting it
+   * there would flip every other endpoint, including the ones ordered by name.
+   */
+  @Transform(({ value }) => String(value).toUpperCase())
+  @IsOptional()
+  @IsIn(['ASC', 'DESC'])
+  order?: 'ASC' | 'DESC' = 'DESC'
 }
 
 export class GetPhotosDto extends PhotosPagination {

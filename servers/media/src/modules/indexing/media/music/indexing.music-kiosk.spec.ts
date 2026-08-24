@@ -1,4 +1,4 @@
-import { parseKioskPath, buildKioskEmbeddedMetadata } from './indexing.music-kiosk'
+import { parseKioskPath, buildKioskEmbeddedMetadata, buildKioskReleaseDate } from './indexing.music-kiosk'
 
 describe('Kiosk path parsing', () => {
   it('reads a leading track number and cleans the title (demo seed layout)', () => {
@@ -27,5 +27,39 @@ describe('Kiosk path parsing', () => {
     expect(meta.artist).toBe('Neon Harbor')
     expect(meta.album).toBe('Golden Hour')
     expect(meta.track.no).toBe(1)
+  })
+})
+
+describe('Kiosk release dates', () => {
+  it('lands within the 35-year spread and formats a valid date', () => {
+    const currentYear = new Date().getFullYear()
+    const { year, date } = buildKioskReleaseDate('Neon Harbor', 'Golden Hour')
+    expect(year).toBeGreaterThanOrEqual(currentYear - 34)
+    expect(year).toBeLessThanOrEqual(currentYear)
+    expect(date).toMatch(new RegExp(`^${year}-(0[1-9]|1[0-2])-(0[1-9]|1\\d|2[0-8])$`))
+  })
+
+  it('gives every track of a release the same date', () => {
+    const a = buildKioskEmbeddedMetadata('/music/Contemporary/Neon Harbor/Golden Hour/01 Ghost Lights.mp3')
+    const b = buildKioskEmbeddedMetadata('/music/Contemporary/Neon Harbor/Golden Hour/09 Paper Trails.mp3')
+    expect(a.year).toBe(b.year)
+    expect(a.date).toBe(b.date)
+  })
+
+  it('spreads different releases across different years', () => {
+    const albums = [
+      'Golden Hour',
+      'Static Bloom',
+      'Midnight Weather',
+      'Winter Anthems',
+      'Endless Season',
+      'Velvet Distance',
+      'Slow Currents',
+      'Neon Interiors',
+      'Pale Horizons',
+      'Amber Nights',
+    ]
+    const years = new Set(albums.map((album) => buildKioskReleaseDate('Neon Harbor', album).year))
+    expect(years.size).toBeGreaterThan(3)
   })
 })

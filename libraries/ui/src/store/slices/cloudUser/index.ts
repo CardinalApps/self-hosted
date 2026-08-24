@@ -14,6 +14,7 @@ export type CloudUser = {
   avatar?: Record<string, string>,
   publicName?: string,
   subscription?: string,
+  confirmedEmail?: boolean,
   userDefinedSettings?: Record<string, unknown>,
   pii?: Record<string, unknown>,
 }
@@ -37,6 +38,7 @@ const initialState: CloudUserSliceState = {
     avatar: {},
     publicName: '',
     subscription: '',
+    confirmedEmail: false,
     userDefinedSettings: {},
   },
 }
@@ -196,6 +198,7 @@ const cloudUserSlice = createSlice({
     current: (state) => state.current,
     currentUserRole: (state) => state.current?.role,
     userDefinedSettings: (state) => state.current?.userDefinedSettings,
+    confirmedEmail: (state) => state.current?.confirmedEmail === true,
   },
 })
 

@@ -39,23 +39,23 @@ function FileCounts() {
         items={[
           {
             icon: { fa: 'far fa-file-audio' },
-            name: i18n['counts.songs'][lang],
-            label: `${formatWithCommas(totalMusicFilesIndexed)} ${i18n['files'][lang]}`,
+            label: i18n['counts.songs'][lang],
+            value: `${formatWithCommas(totalMusicFilesIndexed)} ${i18n['files'][lang]}`,
           },
           {
             icon: { fa: 'far fa-file-image' },
-            name: i18n['counts.photos'][lang],
-            label: `${formatWithCommas(totalPhotoFilesIndexed)} ${i18n['files'][lang]}`,
+            label: i18n['counts.photos'][lang],
+            value: `${formatWithCommas(totalPhotoFilesIndexed)} ${i18n['files'][lang]}`,
           },
           {
             icon: { fa: 'far fa-file-video' },
-            name: i18n['counts.movies'][lang],
-            label: `${formatWithCommas(totalMovieFilesIndexed)} ${i18n['files'][lang]}`,
+            label: i18n['counts.movies'][lang],
+            value: `${formatWithCommas(totalMovieFilesIndexed)} ${i18n['files'][lang]}`,
           },
           {
             icon: { fa: 'far fa-file-video' },
-            name: i18n['counts.tv'][lang],
-            label: `${formatWithCommas(totalTVFilesIndexed)} ${i18n['files'][lang]}`,
+            label: i18n['counts.tv'][lang],
+            value: `${formatWithCommas(totalTVFilesIndexed)} ${i18n['files'][lang]}`,
           },
         ]}
       />

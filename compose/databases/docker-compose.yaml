@@ -26,6 +26,19 @@ services:
       database-network:
         ipv4_address: 172.20.0.3
 
+  # Database for the popularity server
+  cardinal-popularity-dev:
+    container_name: cardinal-db-popularity-server
+    image: mongo:7.0.12
+    restart: always
+    volumes:
+      - cardinal-popularity-server:/data/db
+    ports:
+      - "27019:27017"
+    networks:
+      database-network:
+        ipv4_address: 172.20.0.5
+
   # Database for the CMS
   cardinal-cms-dev:
     container_name: cardinal-db-cms
@@ -52,5 +65,7 @@ volumes:
     name: "cardinal-media-server-pg-db-data"
   cardinal-auth-server:
     name: "cardinal-auth-server-db-data"
+  cardinal-popularity-server:
+    name: "cardinal-popularity-server-db-data"
   cardinal-cms:
     name: "cardinal-cms-db-data"

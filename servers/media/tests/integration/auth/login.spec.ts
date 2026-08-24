@@ -7,6 +7,7 @@ import { UserService } from '../../../src/modules/user/user.service'
 import { CloudUserService } from '../../../src/modules/user/cloud-user.service'
 import { User } from '../../../src/modules/user/user.entity'
 import { TestApp, createTestApp, destroyTestApp } from '../../helpers/create-app'
+import { findSetCookie, getRefreshCookieName, OLD_SHARED_COOKIE_NAME } from '../../helpers/refresh-cookie'
 
 /**
  * Creates a minimal JWT-shaped string that jwtDecode can parse. The cloud auth
@@ -66,9 +67,14 @@ describe('POST /api/v1/auth/login', () => {
       expect(response.body.JWT.length).toBeGreaterThan(0)
     })
 
-    it('sets the httpOnly cardinal_refresh_tolkien cookie on successful login', async () => {
+    /*
+     * The name carries this instance's ID because browsers key cookies by host and ignore the port:
+     * two servers on one machine would otherwise overwrite each other's refresh tolkien.
+     */
+    it('sets the httpOnly refresh tolkien cookie under this instance\'s name on successful login', async () => {
       const userService = moduleRef.get(UserService)
       const guestAccount = await userService.getGuestAccount()
+      const cookieName = await getRefreshCookieName(testApp)
 
       const response = await request(testApp.app.getHttpServer())
         .post('/api/v1/auth/login')
@@ -76,9 +82,9 @@ describe('POST /api/v1/auth/login', () => {
         .send({ userId: guestAccount.userId })
         .expect(201)
 
-      const rawCookies = response.headers['set-cookie']
-      const cookies: string[] = Array.isArray(rawCookies) ? rawCookies : rawCookies ? [rawCookies] : []
-      const refreshCookie = cookies.find((c) => c.startsWith('cardinal_refresh_tolkien='))
+      expect(cookieName).not.toBe(OLD_SHARED_COOKIE_NAME)
+
+      const refreshCookie = findSetCookie(response, cookieName)
       expect(refreshCookie).toBeDefined()
       expect(refreshCookie).toContain('HttpOnly')
       expect(refreshCookie).toContain('Path=/api/v1/auth')

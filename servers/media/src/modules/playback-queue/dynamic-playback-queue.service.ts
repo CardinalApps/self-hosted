@@ -54,16 +54,21 @@ export class DynamicPlayback implements OnModuleInit {
 
   /**
    * Throws when a queue creation request needs a seed that is missing or unknown.
+   * A seed is validated whenever one is provided, even for types that can seed
+   * themselves.
    */
   async validateSeed(createPlaybackQueueDto: CreatePlaybackQueueDto): Promise<void> {
     const { type, dynamicType, seedMediaType, seedMediaId } = createPlaybackQueueDto
 
-    if (type !== 'dynamic' || !this.dynamicQueues.requiresSeed(dynamicType)) {
+    if (type !== 'dynamic') {
       return
     }
 
     if (!seedMediaType || !seedMediaId) {
-      throw new BadRequestException(`The ${dynamicType} queue type requires a seed.`)
+      if (this.dynamicQueues.requiresSeed(dynamicType)) {
+        throw new BadRequestException(`The ${dynamicType} queue type requires a seed.`)
+      }
+      return
     }
 
     if (seedMediaType === 'music_artist') {

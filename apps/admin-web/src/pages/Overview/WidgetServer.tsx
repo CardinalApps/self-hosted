@@ -90,32 +90,29 @@ function WidgetServer() {
           layout="compact"
           items={[
             {
-              name: i18n['server.server-name'][lang],
-              label: instanceData?.serverName,
-              truncateLabel: true,
+              label: i18n['server.server-name'][lang],
+              value: instanceData?.serverName,
               title: instanceData?.serverName,
             },
             {
-              name: i18n['server.subscription'][lang],
-              label: subscriptionData?.name?.[lang],
+              label: i18n['server.subscription'][lang],
+              value: subscriptionData?.name?.[lang],
             },
             {
-              name: i18n['server.release-channel'][lang],
-              label: <span style={{ textTransform: 'capitalize' }}>{releaseChannelsData?.current}</span>,
+              label: i18n['server.release-channel'][lang],
+              value: <span style={{ textTransform: 'capitalize' }}>{releaseChannelsData?.current}</span>,
             },
             {
-              name: i18n['server.version'][lang],
-              label: `v${versionsData?.cardinal_home_server}`,
+              label: i18n['server.version'][lang],
+              value: `v${versionsData?.cardinal_home_server}`,
             },
             {
-              name: i18n['server.build'][lang],
-              label: versionsData?.build_tag || i18n['server.build.untagged']['en'],
-              truncateLabel: true,
+              label: i18n['server.build'][lang],
+              value: versionsData?.build_tag || i18n['server.build.untagged']['en'],
             },
             {
-              name: i18n['server.instance-id'][lang],
-              label: instanceData?.instanceId,
-              truncateLabel: true,
+              label: i18n['server.instance-id'][lang],
+              value: instanceData?.instanceId,
               title: instanceData?.instanceId,
             },
           ]}

@@ -1,17 +1,20 @@
 import {
   Entity,
   Column,
+  Index,
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
 
 import { BaseEntity } from '../../entities/base.entity'
+import { UuidColumn } from '../../decorators/UuidColumn.decorator'
 import { Photo } from  '../photo/photo.entity'
 import { PhotoAlbum } from  './photo-album.entity'
 
 @Entity()
 export class PhotoAlbumEntry extends BaseEntity {
-  @Column()
+  @Index({ unique: true })
+  @UuidColumn()
   photoAlbumEntryId: string
 
   @ManyToOne(() => Photo, (photo) => photo.photoAlbumEntries, { onDelete: 'CASCADE' })

@@ -8,8 +8,9 @@ import { audioSelectors } from '@cardinalapps/ui/src/store/slices/music'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import play from '@cardinalapps/ui/src/store/slices/music/thunks/play'
 import { useExtendQueueMutation } from '@cardinalapps/ui/src/store/apis/playbackQueues'
+import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 
-import MixButton from '../../components/MixButton'
+import DynamicQueueActionButton from '../../components/DynamicQueueActionButton'
 
 import { discographyTrackIds, discographyTracks, type DiscographyEntry } from './discography'
 
@@ -52,7 +53,7 @@ function ArtistPlayActions({
   const oldestFirstIds = discographyTrackIds([...discography].reverse())
   const tracks = discographyTracks(discography)
 
-  const favoriteIds = tracks.filter((track) => Number(track?.rating) > 0).map((track) => track.musicTrackId)
+  const favoriteIds = tracks.filter((track) => isFavorite(track?.rating)).map((track) => track.musicTrackId)
   const unheardIds = tracks.filter((track) => !Number(track?.playCount)).map((track) => track.musicTrackId)
   const topTrackIds = [...tracks]
     .sort((a, b) => (
@@ -133,14 +134,14 @@ function ArtistPlayActions({
   return (
     <div className="artist-play-actions">
       <div className="artist-mix-row">
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_artist"
           seedMediaId={artistId}
           dynamicQueueType="house_mix"
           icon="fas fa-dna"
           label={t('music-artist.play-actions.house-mix')}
         />
-        <MixButton
+        <DynamicQueueActionButton
           seedMediaType="music_artist"
           seedMediaId={artistId}
           dynamicQueueType="undertow"

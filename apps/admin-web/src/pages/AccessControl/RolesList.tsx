@@ -79,8 +79,8 @@ function RolesList() {
     return Object.keys(MediaServerRoles).map((role) => {
       const numUsersWithRole = usersWithRole(role).length
       return {
-        name: ACi18n[`role.${role}.name`]?.[lang],
-        label: pluralize(numUsersWithRole, i18n['roles.num-users.singular'][lang], i18n['roles.num-users.plural'][lang]).replace('{num}', numUsersWithRole),
+        label: ACi18n[`role.${role}.name`]?.[lang],
+        value: pluralize(numUsersWithRole, i18n['roles.num-users.singular'][lang], i18n['roles.num-users.plural'][lang]).replace('{num}', numUsersWithRole),
         controls: ['view'],
         onView: () => setDrawerRoleSlug(role as MediaServerRoleName),
       } as ListItem
@@ -93,7 +93,7 @@ function RolesList() {
   const roleUsersUneditableList = (roleSlug: MediaServerRoleNames) => {
     return usersWithRole(roleSlug).map((user: UserType) => {
       return {
-        name: <UserTag user={user} size="s" />,
+        label: <UserTag user={user} size="s" />,
       } as ListItem
     })
   }
@@ -217,20 +217,20 @@ function RolesList() {
               layout='compact'
               items={[
                 {
-                  name: i18n['roles.drawer.max-assignments'][lang],
-                  label: MediaServerRoles[drawerRoleSlug].maxUsers !== null
+                  label: i18n['roles.drawer.max-assignments'][lang],
+                  value: MediaServerRoles[drawerRoleSlug].maxUsers !== null
                     ? MediaServerRoles[drawerRoleSlug].maxUsers
                     : i18n['roles.drawer.max-assignments.unlimited'][lang],
                 },
                 {
-                  name: i18n['roles.drawer.can-be-assigned'][lang],
-                  label: MediaServerRoles[drawerRoleSlug].revocable
+                  label: i18n['roles.drawer.can-be-assigned'][lang],
+                  value: MediaServerRoles[drawerRoleSlug].revocable
                     ? i18n['roles.drawer.can-be-assigned.true'][lang]
                     : i18n['roles.drawer.can-be-assigned.false'][lang],
                 },
                 {
-                  name: i18n['roles.drawer.can-be-revoked'][lang],
-                  label: MediaServerRoles[drawerRoleSlug].revocable
+                  label: i18n['roles.drawer.can-be-revoked'][lang],
+                  value: MediaServerRoles[drawerRoleSlug].revocable
                     ? i18n['roles.drawer.can-be-assigned.true'][lang]
                     : i18n['roles.drawer.can-be-assigned.false'][lang],
                 },

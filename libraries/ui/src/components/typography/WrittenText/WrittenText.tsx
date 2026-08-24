@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from 'react'
+import clsx from 'clsx'
 
 import './WrittenText.css'
 
@@ -14,12 +15,12 @@ const WrittenText = ({ children, ...args }: PropsWithChildren<WrittenTextProps>)
   return typeof children === 'string'
     ? <section
         {...args}
-        className={`written-text ${args?.className}`}
+        className={clsx('written-text', args?.className)}
         dangerouslySetInnerHTML={{ __html: children }}
       />
     : <section
         {...args}
-        className={`written-text ${args?.className}`}
+        className={clsx('written-text', args?.className)}
       >
         {children}
       </section>

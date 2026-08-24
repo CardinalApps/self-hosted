@@ -5,6 +5,7 @@ import clsx from 'clsx'
 
 import TextInput from '../TextInput'
 import List from '../../interaction/List'
+import type { ListItem } from '../../interaction/List/List'
 import Icon from '../../typography/Icon'
 
 import { settingsSelectors } from '../../../store/slices/settings'
@@ -63,10 +64,15 @@ const AddRemove = ({
   /**
    * Marks an item as pending deletion. Actual deletion is handled externally.
    */
-  const togglePendingDelete = (item) => {
-    if (pendingDelete.find((pending) => pending?.value === item?.value)) {
-      setPendingDelete(pendingDelete.filter((pending) => pending?.value !== item?.value))
-    } else {
+  const togglePendingDelete = (value) => {
+    if (pendingDelete.find((pending) => pending?.value === value)) {
+      setPendingDelete(pendingDelete.filter((pending) => pending?.value !== value))
+      return
+    }
+
+    const item = selectedItems?.find((candidate) => candidate?.value === value)
+
+    if (item) {
       setPendingDelete([...pendingDelete, item])
     }
   }
@@ -74,8 +80,12 @@ const AddRemove = ({
   /**
    * Marks an item as pending addition. Actual addition is handled externally.
    */
-  const handleAdd = (item) => {
-    setPendingAdd([...pendingAdd, item])
+  const handleAdd = (value) => {
+    const item = availableItems?.find((candidate) => candidate?.value === value)
+
+    if (item) {
+      setPendingAdd([...pendingAdd, item])
+    }
   }
 
   /**
@@ -108,8 +118,8 @@ const AddRemove = ({
   /**
    * Immediately undo pending addition.
    */
-  const handleRemove = (item) => {
-    setPendingAdd([...pendingAdd].filter((pending) => pending?.value !== item?.value))
+  const handleRemove = (value) => {
+    setPendingAdd([...pendingAdd].filter((pending) => pending?.value !== value))
   }
 
   /**
@@ -145,6 +155,18 @@ const AddRemove = ({
       ...(!!pendingDelete.find((pending) => pending?.value === item?.value) && { pendingDelete: true }),
     }
   }
+
+  /**
+   * Maps an item onto the shape a List row wants. These items carry their identity in `value`,
+   * which is the List's `id`; nothing of theirs belongs in a row's value column.
+   */
+  const toListItem = (item): ListItem => ({
+    ...resolveStateKeys(item),
+    id: item?.value,
+    label: item?.name,
+    value: undefined,
+    controls: resolveControls(item),
+  })
 
   /**
    * Removes all keys added by this component.
@@ -213,11 +235,10 @@ const AddRemove = ({
           <List
             items={selectedItems
               .concat(pendingAdd)
-              .map((item) => ({ ...item, controls: resolveControls(item) }))
-              .map((item) => resolveStateKeys(item))
+              .map((item) => toListItem(item))
             }
-            onRemove={(item) => handleRemove(item)}
-            onDelete={(item) => togglePendingDelete(item)}
+            onRemove={(item) => handleRemove(item?.id)}
+            onDelete={(item) => togglePendingDelete(item?.id)}
           />
         </div>
       }
@@ -226,11 +247,10 @@ const AddRemove = ({
           {!!availableTitle && <p className="add-remove-title">{availableTitle}</p>}
           <List
             items={availableItems
-              .map((item) => ({ ...item, controls: resolveControls(item) }) )
-              .map((item) => resolveStateKeys(item))
               .filter((item) => !pendingAdd.find((pending) => pending?.value === item?.value))
+              .map((item) => toListItem(item))
             }
-            onAdd={(item) => handleAdd(item)}
+            onAdd={(item) => handleAdd(item?.id)}
           />
         </div>
       }

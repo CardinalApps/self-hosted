@@ -1,6 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { motion, useReducedMotion } from 'framer-motion'
 import clsx from 'clsx'
 
 import Card from '../../layout/Card'
@@ -23,6 +22,8 @@ type DiskMapProps = {
   blocks: DiskMapBlock[]
   /** One color per group, assigned in order of first appearance. Repeats when short. */
   palette?: string[]
+  /** Draws a pulsing placeholder grid while the caller's data is still on its way. */
+  loading?: boolean
   /** Sweeps the blocks in on mount, like a disk scan. Ignored under prefers-reduced-motion. */
   animate?: boolean
   /** Lights up a whole group, for hovering something outside the map. */
@@ -53,34 +54,7 @@ const FRAME_STEP_PX = 10
    to anything else the box does. */
 const SWEEP_MS = 800
 
-/* A nudge, as if the box sat on a long spring and a finger pushed it: it is eased off centre,
-   let go, and then wobbles back through centre before settling. Low stiffness with light
-   damping is what makes the spring feel long rather than taut. */
-const PUSH_MS = 170
-const PUSH_TWEEN = { type: 'tween' as const, duration: PUSH_MS / 1000, ease: 'easeInOut' as const }
-const SETTLE_SPRING = { type: 'spring' as const, stiffness: 90, damping: 6, mass: 1 }
-const AT_REST = { x: 0, y: 0, rotate: 0 }
-
-const MIN_NUDGE_PX = 2
-const MAX_NUDGE_PX = 5
-const MAX_TILT_DEG = 3
-
 const COVER_PX = 100
-
-/* The spring is always the same one; what changes is the shove. Every hover gets its own
-   direction, strength and tilt, so running the cursor across the map doesn't look mechanical.
-   The tilt is rolled separately from the direction: tie the two together and the box reads as
-   hinged at a corner rather than wobbling about its middle. */
-const randomNudge = () => {
-  const angle = Math.random() * Math.PI * 2
-  const distance = MIN_NUDGE_PX + Math.random() * (MAX_NUDGE_PX - MIN_NUDGE_PX)
-
-  return {
-    x: Math.cos(angle) * distance,
-    y: Math.sin(angle) * distance,
-    rotate: (Math.random() * 2 - 1) * MAX_TILT_DEG,
-  }
-}
 
 /*
   Blocks in a group share one color, so without this a single-release map is a flat slab of
@@ -91,16 +65,17 @@ const randomNudge = () => {
 const SHADE_STEPS = [1, 0.91, 1.07, 0.96, 1.03]
 
 /*
-  A kiosk server indexes no files, so there is nothing to map. Rather than an empty frame, the
-  map is drawn as a dead grid of placeholder blocks: it still reads as the component it is,
-  while being obviously switched off. The sizes vary, since a grid of identical boxes doesn't
-  look like a disk map, but only enough to keep the rows full — a wide spread leaves the packer
-  a sliver at the bottom, which reads as a fault rather than as a placeholder. The sequence is
-  fixed rather than random so the grid never re-packs between renders.
+  Stands in when there is nothing to map: a kiosk server indexes no files, and a loading map
+  hasn't been told its files yet. Rather than an empty frame, the map is drawn as a dead grid
+  of placeholder blocks: it still reads as the component it is, while being obviously not the
+  real thing. The sizes vary, since a grid of identical boxes doesn't look like a disk map,
+  but only enough to keep the rows full — a wide spread leaves the packer a sliver at the
+  bottom, which reads as a fault rather than as a placeholder. The sequence is fixed rather
+  than random so the grid never re-packs between renders.
 */
-const KIOSK_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
-  id: `kiosk-${index}`,
-  groupId: 'kiosk',
+const PLACEHOLDER_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
+  id: `placeholder-${index}`,
+  groupId: 'placeholder',
   bytes: 10 + ((index * 3) % 7),
 }))
 
@@ -116,6 +91,7 @@ const KIOSK_BLOCKS: DiskMapBlock[] = Array.from({ length: 30 }, (_, index) => ({
 const DiskMap = ({
   blocks,
   palette = [],
+  loading = false,
   animate = true,
   activeGroupId,
   groupLinks,
@@ -127,29 +103,10 @@ const DiskMap = ({
   const { navigate } = useContext(RouterContext)
   const { lang, enable_glass } = useSelector(settingsSelectors.current)
   const kioskMode = useAppSelector(appSelectors.kioskMode)
-  const shouldReduceMotion = useReducedMotion()
   const frameRef = useRef<HTMLDivElement>(null)
   const { width, height } = useElementSize(frameRef)
   const [hoveredBlockIndex, setHoveredBlockIndex] = useState<number | null>(null)
-  const [nudge, setNudge] = useState<ReturnType<typeof randomNudge> | null>(null)
-  const [pushing, setPushing] = useState(false)
   const [sweeping, setSweeping] = useState(animate)
-  const pushTimer = useRef<ReturnType<typeof setTimeout>>()
-
-  /*
-    The push out and the wobble back are two moves, not one. Landing the box off centre in a
-    single frame and letting the spring take it from there snaps; easing it out and only then
-    handing it to the spring gives the finger somewhere to start.
-  */
-  const handleBlockEnter = (blockIndex: number) => {
-    clearTimeout(pushTimer.current)
-    setHoveredBlockIndex(blockIndex)
-    setNudge(randomNudge())
-    setPushing(true)
-    pushTimer.current = setTimeout(() => setPushing(false), PUSH_MS)
-  }
-
-  useEffect(() => () => clearTimeout(pushTimer.current), [])
 
   useEffect(() => {
     if (!animate) {
@@ -188,18 +145,19 @@ const DiskMap = ({
     })
   }, [blocks])
 
-  const kioskRects = useMemo(
-    () => kioskMode
-      ? layoutDiskMap(KIOSK_BLOCKS, { width: frameWidth, height: frameHeight, minBlockPx: MIN_BLOCK_PX })
+  const placeholderRects = useMemo(
+    () => kioskMode || loading
+      ? layoutDiskMap(PLACEHOLDER_BLOCKS, { width: frameWidth, height: frameHeight, minBlockPx: MIN_BLOCK_PX })
       : [],
-    [kioskMode, frameWidth, frameHeight],
+    [kioskMode, loading, frameWidth, frameHeight],
   )
 
-  if (kioskMode) {
+  // Kiosk wins over loading: a switched-off map has nothing on its way
+  if (kioskMode || loading) {
     return (
-      <div ref={frameRef} className={clsx('disk-map', 'is-kiosk', className)}>
+      <div ref={frameRef} className={clsx('disk-map', kioskMode ? 'is-kiosk' : 'is-loading', className)}>
         <div className="disk-map-blocks" aria-hidden="true">
-          {kioskRects.map((rect) => (
+          {placeholderRects.map((rect) => (
             <div
               key={rect.blockIndex}
               className="disk-map-block"
@@ -208,19 +166,22 @@ const DiskMap = ({
                 top: `${rect.y * 100}%`,
                 width: `${rect.width * 100}%`,
                 height: `${rect.height * 100}%`,
+                ...(loading && !kioskMode ? { animationDelay: `${(rect.blockIndex / placeholderRects.length) * 1000}ms` } : {}),
               }}
             />
           ))}
         </div>
 
-        <Card
-          className={clsx('disk-map-kiosk-notice', enable_glass && 'glass')}
-          bg={1}
-          border={2}
-          padding="thin"
-        >
-          {i18n['disk-map.kiosk-disabled'][lang]}
-        </Card>
+        {kioskMode && (
+          <Card
+            className={clsx('disk-map-kiosk-notice', enable_glass && 'glass')}
+            bg={1}
+            border={2}
+            padding="thin"
+          >
+            {i18n['disk-map.kiosk-disabled'][lang]}
+          </Card>
+        )}
       </div>
     )
   }
@@ -288,7 +249,7 @@ const DiskMap = ({
             const isActiveGroup = !!activeGroupId && block.groupId === activeGroupId
 
             return (
-              <motion.div
+              <div
                 key={block.id || rect.blockIndex}
                 className={clsx(
                   'disk-map-block',
@@ -304,21 +265,12 @@ const DiskMap = ({
                   width: `${rect.width * 100}%`,
                   height: `${rect.height * 100}%`,
                   backgroundColor: groupColors.get(block.groupId),
-                  // Rotation pivots on the middle of the box, not wherever the layout put it
-                  transformOrigin: 'center',
                   '--disk-map-shade': blockShades[rect.blockIndex],
                   /* Only while the sweep is running: left on, this staggers everything else
                      the box does, so a box late in the map waits half a second to react. */
                   ...(sweeping ? { animationDelay: `${(rect.blockIndex / rects.length) * 500}ms` } : {}),
                 } as React.CSSProperties}
-                initial={false}
-                animate={
-                  !shouldReduceMotion && pushing && nudge && hoveredBlockIndex === rect.blockIndex
-                    ? nudge
-                    : AT_REST
-                }
-                transition={pushing ? PUSH_TWEEN : SETTLE_SPRING}
-                onMouseEnter={() => handleBlockEnter(rect.blockIndex)}
+                onMouseEnter={() => setHoveredBlockIndex(rect.blockIndex)}
                 onClick={() => onBlockClick?.(block)}
               />
             )

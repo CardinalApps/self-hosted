@@ -4,8 +4,10 @@ import { Repository } from 'typeorm'
 import { getDefaultSettings, getScopedSlugs, getStoredSlugs } from '@cardinalapps/app-settings/dist/cjs'
 
 import { Setting } from './setting.entity'
+import { SettingsEvents } from './events'
 import { SettingName, SettingValue, SettingsObject } from './types'
 
+import { EventService } from '../event/event.service'
 import { CardinalApp } from '../../utils/apps'
 
 // The `app` value for settings that apply to every Cardinal app
@@ -22,6 +24,7 @@ export class SettingsService {
   constructor(
     @InjectRepository(Setting)
     private settingRepository: Repository<Setting>,
+    private readonly eventService: EventService,
   ) {}
 
   // The server only persists home_server settings; client-stored settings live
@@ -125,6 +128,11 @@ export class SettingsService {
           await this.settingRepository.insert(entity)
         }
       }
+
+      // Lets modules act on a setting the moment it changes rather than at the next restart
+      this.eventService.emitPrivate(SettingsEvents.CHANGED, {
+        names: [...new Set(entities.map((entity) => entity.name))],
+      })
 
       return entities
     } catch (error) {

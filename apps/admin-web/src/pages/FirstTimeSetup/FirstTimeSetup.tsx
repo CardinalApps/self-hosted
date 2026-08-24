@@ -42,7 +42,7 @@ function FirstTimeSetup() {
   const [visibleStepNum, setVisibleStepNum] = useState(step)
   const [theme, setTheme] = useState('light')
   const [serverName, setServerName] = useState('')
-  const [agreeToAnonymousUsageData, setAgreeToAnonymousUsageData] = useState(true)
+  const [agreeToAnonymousUsageData, setAgreeToAnonymousUsageData] = useState(false)
 
   // The user who logs into their account during the First Time Setup will be
   // kept here instead of being fully logged in

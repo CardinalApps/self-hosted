@@ -24,6 +24,8 @@ const TAG_GENRES_COUNTED = 5
 type ArtistMetaProps = {
   artist: MusicArtistType,
   tracks: MusicTrackType[],
+  /** Draws shimmer bars in place of the values while the summary is on its way. */
+  loading?: boolean,
 }
 
 type MetaRow = {
@@ -38,6 +40,7 @@ type MetaRow = {
 function ArtistMeta({
   artist,
   tracks,
+  loading = false,
 }: ArtistMetaProps) {
   const { lang } = useSelector(settingsSelectors.current)
   const summary = artist?.summary
@@ -96,15 +99,6 @@ function ArtistMeta({
     return `${secondsToMMSS(shortest)} – ${secondsToMMSS(longest)}`
   }
 
-  const formats = () => {
-    if (!summary?.formats?.length) {
-      return null
-    }
-    return summary.formats
-      .map((format) => `${format.numTracks} ${format.extension.toUpperCase()}`)
-      .join(' · ')
-  }
-
   const quality = () => {
     const rates = (summary?.sampleRates ?? [])
       .map((rate) => template('music-artist.meta.khz', { khz: String(Math.round(rate / 100) / 10) }))
@@ -113,21 +107,6 @@ function ArtistMeta({
     const parts = [rates.join(', '), depths.join(', ')].filter(Boolean)
 
     return parts.length ? parts.join(' · ') : null
-  }
-
-  const loudness = () => {
-    if (summary?.integratedLufs === null || summary?.integratedLufs === undefined) {
-      return null
-    }
-
-    const lufs = template('music-artist.meta.lufs', { lufs: summary.integratedLufs.toFixed(1) })
-
-    if (summary.truePeakDb === null || summary.truePeakDb === undefined) {
-      return lufs
-    }
-
-    const peak = `${summary.truePeakDb > 0 ? '+' : ''}${summary.truePeakDb.toFixed(1)}`
-    return `${lufs} · ${template('music-artist.meta.peak', { peak })}`
   }
 
   const mostPlayed = () => {
@@ -187,14 +166,6 @@ function ArtistMeta({
     { labelKey: 'music-artist.meta.years', value: years() },
     { labelKey: 'music-artist.meta.labels', value: summarizeList(summary?.labels ?? [], MAX_ENCODERS) },
     { labelKey: 'music-artist.meta.track-length', value: trackLength() },
-  ]
-
-  const onDisk: MetaRow[] = [
-    {
-      labelKey: 'music-artist.meta.per-track',
-      value: summary?.bytes && summary?.numTracks ? formatBytes(Math.round(summary.bytes / summary.numTracks)) : null,
-    },
-    { labelKey: 'music-artist.meta.formats', value: formats() },
     { labelKey: 'music-artist.meta.sample-rate', value: quality() },
     { labelKey: 'music-artist.meta.encoders', value: summarizeList(summary?.encoders ?? [], MAX_ENCODERS) },
     { labelKey: 'music-artist.meta.media', value: summarizeList(summary?.mediaTypes ?? [], MAX_ENCODERS) },
@@ -202,7 +173,6 @@ function ArtistMeta({
       labelKey: 'music-artist.meta.country',
       value: summarizeList((summary?.countries ?? []).map((code) => countryName(code, lang)), MAX_ENCODERS),
     },
-    { labelKey: 'music-artist.meta.loudness', value: loudness() },
   ]
 
   const yourListening: MetaRow[] = [
@@ -221,7 +191,14 @@ function ArtistMeta({
   ]
 
   const toListItems = (rows: MetaRow[]) => rows.map((row) => ({
-    name: <><strong>{t(row.labelKey)}</strong> <span>{row.value || UNKNOWN}</span></>,
+    label: (
+      <>
+        <strong>{t(row.labelKey)}</strong>
+        {loading
+          ? <span className="meta-value-skeleton" />
+          : <span>{row.value || UNKNOWN}</span>}
+      </>
+    ),
     title: t(row.labelKey),
   }))
 
@@ -233,14 +210,17 @@ function ArtistMeta({
       </div>
 
       <div className="artist-meta">
-        <p className="meta-section-title">{t('music-artist.meta.collection')}</p>
-        <List className="artist-meta-list" layout="compact" items={toListItems(collection)} />
+        <div className="artist-meta-cols">
+          <div className="artist-meta-col">
+            <p className="meta-section-title">{t('music-artist.meta.collection')}</p>
+            <List className="artist-meta-list" layout="compact" items={toListItems(collection)} />
+          </div>
 
-        <p className="meta-section-title">{t('music-artist.meta.on-disk')}</p>
-        <List className="artist-meta-list" layout="compact" items={toListItems(onDisk)} />
-
-        <p className="meta-section-title">{t('music-artist.meta.listening')}</p>
-        <List className="artist-meta-list" layout="compact" items={toListItems(yourListening)} />
+          <div className="artist-meta-col">
+            <p className="meta-section-title">{t('music-artist.meta.listening')}</p>
+            <List className="artist-meta-list" layout="compact" items={toListItems(yourListening)} />
+          </div>
+        </div>
       </div>
     </div>
   )

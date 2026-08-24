@@ -43,7 +43,7 @@ import {
   MediaAppType,
   MediaType,
 } from '../../utils/media'
-import { makeMediaFilePathRelative } from '../../utils/file'
+import { makeMediaFilePathRelative, statWithRetry } from '../../utils/file'
 import { log, LogModule, LogLevel } from '../../utils/logging'
 
 // How long a caller waits for a queued pause before it stops expecting one
@@ -644,7 +644,10 @@ export class IndexingService {
 
       this.scannerAbortController = null
       this.clearFilesFoundInterval()
-      this.importLoop()
+
+      this.recordScanVerification(scanResults).finally(() => {
+        this.importLoop()
+      })
     }
 
     this.scannerAbortController = new AbortController()
@@ -655,6 +658,49 @@ export class IndexingService {
       movies: this.currentRun.options.mediaTypes.movies,
       tv: this.currentRun.options.mediaTypes.tv,
     })
+  }
+
+  /**
+   * Records the outcome of the scan verification passes in the run log, so
+   * that recovered files and unverifiable directories are visible per-run
+   * instead of only in the application log.
+   */
+  private async recordScanVerification(scanResults: ScanResults): Promise<void> {
+    const verification = scanResults.musicVerification
+
+    if (!verification || !this.runEntity) {
+      return
+    }
+
+    try {
+      if (verification.recoveredFiles.length) {
+        await this.runLogRepository.save({
+          run: this.runEntity,
+          event: RunLogEvent.SCAN_RECOVERED,
+          mediaType: MediaType.MUSIC,
+          details: {
+            recovered: verification.recoveredFiles.length,
+            passes: verification.passes,
+          },
+        })
+      }
+
+      if (!verification.converged) {
+        await this.runLogRepository.save({
+          run: this.runEntity,
+          event: RunLogEvent.SCAN_INCOMPLETE,
+          mediaType: MediaType.MUSIC,
+          details: {
+            passes: verification.passes,
+            // Capped so a wide failure cannot balloon the row
+            unreadableDirs: verification.unreadableDirs.slice(0, 50),
+            unreadableDirCount: verification.unreadableDirs.length,
+          },
+        })
+      }
+    } catch (error) {
+      Logger.error(`Could not record scan verification in the run log. ${error?.message}`, 'Indexing')
+    }
   }
 
   /**
@@ -769,8 +815,6 @@ export class IndexingService {
     const relativePath = makeMediaFilePathRelative(absolutePath)
     const extension = absolutePath.split('.').pop().toLowerCase()
     let mimeType
-    let size
-    let mtime: Date
 
     try {
       const info = await fileType.fromFile(absolutePath)
@@ -779,13 +823,19 @@ export class IndexingService {
       Logger.error(`Error parsing mime type. ${error?.message}`, 'Indexing')
     }
 
-    try {
-      const stats = fs.statSync(absolutePath)
-      size = stats?.size || 0
-      mtime = stats?.mtime instanceof Date && isFinite(stats.mtime.getTime()) ? stats.mtime : null
-    } catch (error) {
-      Logger.error(`Error reading file stats for ${absolutePath}. ${error?.message}`, 'Indexing')
+    // Stats are required (the file row's size column is NOT NULL), so a file
+    // whose stats cannot be read even with retries is recorded as errored
+    // instead of attempting a doomed insert
+    const stats = await statWithRetry(absolutePath)
+
+    if (!stats) {
+      Logger.error(`Error reading file stats for ${absolutePath} after retries`, 'Indexing')
+      await this.recordFileErrored(relativePath, mediaType, 'Could not read file stats from the file system')
+      return
     }
+
+    const size = stats.size || 0
+    const mtime = stats.mtime instanceof Date && isFinite(stats.mtime.getTime()) ? stats.mtime : null
 
     let app
 
@@ -861,22 +911,30 @@ export class IndexingService {
       Logger.error(`Could not index ${relativePath} because of an error: ${error?.message}`, 'Indexing')
       Logger.error(error?.stack, 'Indexing')
       await queryRunner.rollbackTransaction()
-      this.currentRun[mediaType].errored++
-
-      await this.runLogRepository.save({
-        run: this.runEntity,
-        event: RunLogEvent.FILE_ERRORED,
-        filePath: relativePath,
-        mediaType,
-        details: { message: error?.message },
-      })
-
-      this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
-        mediaType,
-      })
+      await this.recordFileErrored(relativePath, mediaType, error?.message)
     } finally {
       await queryRunner.release()
     }
+  }
+
+  /**
+   * Records a file that could not be indexed: the run counter, the run log,
+   * and the private event.
+   */
+  private async recordFileErrored(relativePath: string, mediaType: MediaType, message: string): Promise<void> {
+    this.currentRun[mediaType].errored++
+
+    await this.runLogRepository.save({
+      run: this.runEntity,
+      event: RunLogEvent.FILE_ERRORED,
+      filePath: relativePath,
+      mediaType,
+      details: { message },
+    })
+
+    this.eventService.emitPrivate(IndexingEvents.FILE_ERRORED, {
+      mediaType,
+    })
   }
 
   /**
@@ -907,12 +965,14 @@ export class IndexingService {
     let size: number
     let mtime: Date
 
-    try {
-      const stats = fs.statSync(absolutePath)
-      size = stats?.size || 0
-      mtime = stats?.mtime instanceof Date && isFinite(stats.mtime.getTime()) ? stats.mtime : null
-    } catch (error) {
-      Logger.error(`Error reading file stats for ${absolutePath}. ${error?.message}`, 'Indexing')
+    const stats = await statWithRetry(absolutePath)
+
+    if (stats) {
+      size = stats.size || 0
+      mtime = stats.mtime instanceof Date && isFinite(stats.mtime.getTime()) ? stats.mtime : null
+    } else {
+      // The row keeps its existing size and mtime; undefined columns are not written
+      Logger.error(`Error reading file stats for ${absolutePath} after retries`, 'Indexing')
     }
 
     const queryRunner = this.dataSource.createQueryRunner()

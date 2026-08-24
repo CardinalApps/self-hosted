@@ -16,6 +16,7 @@ export enum AdminRoutes {
   first_time_setup            = '/setup',
   login                       = '/login',
   settings                    = '/settings',
+  cloud_services              = '/cloud-services',
   users                       = '/users',
   access_control              = '/access-control',
   indexing                    = '/indexing',

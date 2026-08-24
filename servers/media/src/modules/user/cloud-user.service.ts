@@ -7,6 +7,21 @@ import { authAPI } from '../../utils/cloud'
 
 import { User } from './user.entity'
 
+/*
+ * A failed cloud user lookup, carrying the one distinction callers need: whether the cloud answered.
+ * A rejected token is a verdict on a credential; an outage is not, and turning one into the other
+ * costs the user a session they never lost.
+ */
+export class CloudUserLookupError extends Error {
+  constructor(message: string, readonly cloudAnswered: boolean, readonly status?: number) {
+    super(message)
+    this.name = 'CloudUserLookupError'
+  }
+}
+
+// Statuses that mean the cloud is having a bad day rather than refusing this particular token
+const UNAVAILABLE_STATUSES = [408, 429]
+
 /**
  * This class is focused on working with the Cardinal auth servers.
  */
@@ -50,20 +65,35 @@ export class CloudUserService {
    * returned. This is the best way to verify an unknown Cardinal JWT.
    */
   async getCardinalCloudUser(JWT): Promise<Record<string, unknown> | null> {
-    let response = null
+    let response: Response
 
     try {
-      response = await authAPI('/user', 'GET', {
+      response = await authAPI<Response>('/user', 'GET', {
         headers: {
           Authorization: `Bearer ${JWT}`,
         },
+        returnRawResponse: true,
       })
     } catch (error) {
-      Logger.error(`Error when fetching cloud user: ${error}`, 'User')
-      throw new Error(error)
+      Logger.error(`Could not reach the cloud auth servers: ${error}`, 'User')
+      throw new CloudUserLookupError('The Cardinal cloud could not be reached.', false)
     }
 
-    return response
+    // A body that will not parse leaves the caller with nothing to vouch for, which they already handle
+    if (response.ok) {
+      return await response.json().catch(() => null)
+    }
+
+    const unavailable = response.status >= 500 || UNAVAILABLE_STATUSES.includes(response.status)
+    const detail = await response.text().catch(() => '')
+
+    Logger.error(`Error when fetching cloud user: ${response.status} ${detail}`, 'User')
+
+    throw new CloudUserLookupError(
+      unavailable ? 'The Cardinal cloud could not be reached.' : 'This Cardinal account could not be verified.',
+      !unavailable,
+      response.status,
+    )
   }
 
   /**
@@ -112,7 +142,8 @@ export class CloudUserService {
           cachedCloudUserAt: new Date(),
         },
       )
-      Logger.log('Cloud user data refreshed.', 'User')
+      // Every signed-in cloud account renews this cache every few seconds, which is not news
+      Logger.debug('Cloud user data refreshed.', 'User')
       return await this.userRepository.findOneBy({ userId: userId })
     } catch (error) {
       Logger.error('Could not update cloud user with refreshed data.', 'User')

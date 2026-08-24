@@ -14,6 +14,7 @@ import { DevController } from './dev.controller'
 
 import { AuthModule } from '../auth/auth.module'
 import { DatabaseModule } from '../database/database.module'
+import { createDataSource } from '../database/data-source-factory'
 import { EventModule } from '../event/event.module'
 import { SettingsModule } from '../settings/settings.module'
 import { UserModule } from '../user/user.module'
@@ -32,7 +33,16 @@ import { MusicHistoryModule } from '../music-history/music-history.module'
 import { RatingModule } from '../rating/rating.module'
 import { InvitationModule } from '../invitation/invitation.module'
 import { ClaimModule } from '../claim/claim.module'
+import { ConnectSDKModule } from '../remote-access/connect/connect-sdk.module'
+import { CorsModule } from '../cors/cors.module'
+import { HttpsModule } from '../remote-access/https/https.module'
+import { MuxModule } from '../remote-access/mux/mux.module'
+import { PingModule } from '../remote-access/ping/ping.module'
+import { RelayModule } from '../remote-access/relay/relay.module'
+import { PortMapperModule } from '../remote-access/port-mapper/port-mapper.module'
 import { PlaybackQueueModule } from '../playback-queue/playback-queue.module'
+import { PopularityModule } from '../popularity/popularity.module'
+import { RecommendationModule } from '../recommendation/recommendation.module'
 import { TranscodingModule } from '../transcoding/transcoding.module'
 import { WaveformModule } from '../waveform/waveform.module'
 
@@ -43,6 +53,7 @@ import { AttachLocalUserToRequest } from '../../middleware/AttachLocalUser.middl
 import { AttachCloudUserToRequest } from '../../middleware/AttachCloudUser.middleware'
 import { UserActivity } from '../../middleware/UserActivity.middleware'
 import { MaybeTriggerClaim } from '../../middleware/MaybeTriggerClaim'
+import { SendPopularityBatch } from '../../middleware/SendPopularityBatch.middleware'
 
 //import { ExampleInterceptor } from '../../interceptors/example.interceptor'
 
@@ -94,35 +105,38 @@ const resolvePostgresHost = () => {
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // @ts-expect-error FIXME didn't feel like typing this when converting from vanilla JS
-    TypeOrmModule.forRoot(envVar('CARDINAL_POSTGRES', false)
-      ? {
-          type: 'postgres',
-          host: resolvePostgresHost(),
-          port: envVar('POSTGRES_PORT', 5432),
-          username: envVar('POSTGRES_USER', 'cardinal'),
-          password: envVar('POSTGRES_PASSWORD', 'cardinal'),
-          ...(envVar('POSTGRES_DATABASE', false) ? { database: envVar('POSTGRES_DATABASE', undefined) } : {}),
-          ssl: envVar('POSTGRES_SSL', false),
-          autoLoadEntities: true,
-          retryAttempts: 3,
-          logging: resolveDatabaseLogLevel(),
-          namingStrategy: new SnakeNamingStrategy(),
-          // this stays on until v1.0.0
-          synchronize: true,
-        }
-      // SQLite
-      : {
-          type: 'better-sqlite3',
-          database: getSQLiteDatabaseLocation(),
-          autoLoadEntities: true,
-          retryAttempts: 3,
-          logging: resolveDatabaseLogLevel(),
-          namingStrategy: new SnakeNamingStrategy(),
-          // this stays on until v1.0.0
-          synchronize: true,
-        },
-    ),
+    TypeOrmModule.forRootAsync({
+      // @ts-expect-error FIXME didn't feel like typing this when converting from vanilla JS
+      useFactory: () => (envVar('CARDINAL_POSTGRES', false)
+        ? {
+            type: 'postgres',
+            host: resolvePostgresHost(),
+            port: envVar('POSTGRES_PORT', 5432),
+            username: envVar('POSTGRES_USER', 'cardinal'),
+            password: envVar('POSTGRES_PASSWORD', 'cardinal'),
+            ...(envVar('POSTGRES_DATABASE', false) ? { database: envVar('POSTGRES_DATABASE', undefined) } : {}),
+            ssl: envVar('POSTGRES_SSL', false),
+            autoLoadEntities: true,
+            retryAttempts: 3,
+            logging: resolveDatabaseLogLevel(),
+            namingStrategy: new SnakeNamingStrategy(),
+            // this stays on until v1.0.0
+            synchronize: true,
+          }
+        // SQLite
+        : {
+            type: 'better-sqlite3',
+            database: getSQLiteDatabaseLocation(),
+            autoLoadEntities: true,
+            retryAttempts: 3,
+            logging: resolveDatabaseLogLevel(),
+            namingStrategy: new SnakeNamingStrategy(),
+            // this stays on until v1.0.0
+            synchronize: true,
+          }),
+      // runs the pre-synchronize schema fixups before TypeORM syncs the entities
+      dataSourceFactory: createDataSource,
+    }),
     ScheduleModule.forRoot(),
     // Initialize modules
     AuthModule,
@@ -145,7 +159,16 @@ const resolvePostgresHost = () => {
     RatingModule,
     InvitationModule,
     PlaybackQueueModule,
+    PopularityModule,
+    RecommendationModule,
     ClaimModule,
+    PortMapperModule,
+    ConnectSDKModule,
+    CorsModule,
+    MuxModule,
+    HttpsModule,
+    RelayModule,
+    PingModule,
     TranscodingModule,
     WaveformModule,
     // Serve static SPAs, for static files like images use "useStaticAssets" in main.js
@@ -192,5 +215,6 @@ export class AppModule implements NestModule {
     consumer.apply(RevokeDisabledUserSessions).forRoutes('*')
     consumer.apply(UserActivity).forRoutes('*')
     consumer.apply(MaybeTriggerClaim).forRoutes('*')
+    consumer.apply(SendPopularityBatch).forRoutes('*')
   }
 }

@@ -18,9 +18,21 @@ export type SubscriptionTier = {
   slug: string,
   provides: {
     seats: number,
+    popularity_data_pool: boolean,
+    // How many Media Servers may hold an active Remote Access credential.
+    // Flat 1 on every tier while the relay cost model is unproven.
+    remote_access_slots: number,
+    /* Relay bandwidth included per billing period, in bytes (decimal GB). Relay is a paid
+       feature, so the free tier gets none. An account can be moved off its tier allowance with
+       the relayQuotaBytes approval rider. */
+    relay_quota_bytes: number,
   },
   prices: {
-    // Use the "Lookup Key" in Stripe for each price
+    /*
+     * Keys of STRIPE_PRICES in the auth server, which is what resolves them to
+     * a Stripe price ID. Deliberately not Stripe's own lookup keys: those are
+     * dated per repricing, and these are the app's stable internal identifier.
+     */
     monthly?: string,
     yearly?: string,
   },
@@ -38,7 +50,11 @@ export const SUBSCRIPTIONS = {
     },
     slug: "free",
     provides: {
-      seats: 2,
+      seats: 1,
+      popularity_data_pool: true,
+      remote_access_slots: 1,
+      // Relay is a paid feature.
+      relay_quota_bytes: 0,
     },
     prices: {},
   },
@@ -52,6 +68,10 @@ export const SUBSCRIPTIONS = {
     slug: "early_adopter",
     provides: {
       seats: 10,
+      popularity_data_pool: true,
+      remote_access_slots: 1,
+      // Nothing included because the tier is retired, not because relay is priced out of it.
+      relay_quota_bytes: 0,
     },
     prices: {
       monthly: 'early_adopter',
@@ -63,7 +83,10 @@ export const SUBSCRIPTIONS = {
     },
     slug: "starter",
     provides: {
-      seats: 5,
+      seats: 2,
+      popularity_data_pool: true,
+      remote_access_slots: 1,
+      relay_quota_bytes: 35_000_000_000,
     },
     prices: {
       monthly: 'starter_monthly',
@@ -76,7 +99,10 @@ export const SUBSCRIPTIONS = {
     },
     slug: "pro",
     provides: {
-      seats: 20,
+      seats: 6,
+      popularity_data_pool: true,
+      remote_access_slots: 1,
+      relay_quota_bytes: 100_000_000_000,
     },
     prices: {
       monthly: 'pro_monthly',
@@ -89,7 +115,10 @@ export const SUBSCRIPTIONS = {
     },
     slug: "ultimate",
     provides: {
-      seats: 40,
+      seats: 12,
+      popularity_data_pool: true,
+      remote_access_slots: 1,
+      relay_quota_bytes: 200_000_000_000,
     },
     prices: {
       monthly: 'ultimate_monthly',

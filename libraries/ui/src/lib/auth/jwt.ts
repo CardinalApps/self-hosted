@@ -156,6 +156,19 @@ export function isJwtExpiringSoon(token: string, secondsBuffer = 60): boolean {
 // Alias
 export const isJWTExpiringSoon = isJwtExpiringSoon
 
+/*
+ * Whether a token is worth renewing before it gets used. A token that cannot be read at all —
+ * truncated, written by an older build — is not renewable on that basis: sending it and letting the
+ * server refuse it is a decision the caller can act on, where throwing here stops the request dead.
+ */
+export function shouldRenewJwt(token: string, secondsBuffer = 60): boolean {
+  try {
+    return isJwtExpiringSoon(token, secondsBuffer)
+  } catch {
+    return false
+  }
+}
+
 /**
  * Returns the header(s) needed for a fetch to the auth servers using these
  * JWTs.

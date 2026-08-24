@@ -7,6 +7,7 @@ import Nav from '../Nav'
 import SettingsPanel from '../SettingsPanel'
 
 import Overview from '../../pages/Overview'
+import CloudServices from '../../pages/CloudServices'
 import Indexing from '../../pages/Indexing'
 import Users from '../../pages/Users'
 import Jobs from '../../pages/Jobs'
@@ -90,6 +91,10 @@ function AppRoot() {
             <Route
               path={AdminRoutes.root}
               element={<Overview />}
+            />
+            <Route
+              path={AdminRoutes.cloud_services}
+              element={<CloudServices />}
             />
             <Route
               path={AdminRoutes.users}

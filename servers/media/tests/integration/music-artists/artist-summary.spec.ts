@@ -7,6 +7,7 @@ import { UserService } from '../../../src/modules/user/user.service'
 import { RatingMediaType } from '../../../src/modules/rating/rating.entity'
 import { MusicArtist } from '../../../src/modules/music-artist/music-artist.entity'
 import { MusicRelease } from '../../../src/modules/music-release/music-release.entity'
+import { MusicReleaseThumbnail } from '../../../src/modules/music-release/music-release-thumbnail.entity'
 import { MusicTrack } from '../../../src/modules/music-track/music-track.entity'
 import { MusicTrackMetadata } from '../../../src/modules/music-track/music-track-metadata.entity'
 import { MusicTrackWaveform } from '../../../src/modules/music-track/music-track-waveform.entity'
@@ -23,6 +24,7 @@ let guest: User
 let artistId: string
 let olderReleaseId: string
 let newerReleaseId: string
+let tracklessReleaseId: string
 const olderTrackIds: string[] = []
 let newerTrackId: string
 
@@ -76,6 +78,28 @@ beforeAll(async () => {
     genres: [progRock],
     releaseType: 'album',
   } as Partial<MusicRelease>)
+
+  // A release the indexer knows about but has no tracks for yet
+  const tracklessRelease = await releases.save({
+    title: 'Trackless Album',
+    artist,
+    artists: [artist],
+    releaseType: 'album',
+  } as Partial<MusicRelease>)
+
+  // Only the newer release has cover art
+  const thumbnails: Repository<MusicReleaseThumbnail> = testApp.moduleRef.get(getRepositoryToken(MusicReleaseThumbnail))
+  await thumbnails.save({
+    thumbnailId: 'thumb-newer-album',
+    absolutePath: '/thumbs/newer.webp',
+    relativeSrc: 'newer.webp',
+    size: 'small_nocrop',
+    format: 'webp',
+    width: 300,
+    height: 300,
+    bytes: 1000,
+    release: newerRelease,
+  } as Partial<MusicReleaseThumbnail>)
 
   // Creates one track, its file on disk, its embedded metadata and its waveform
   const seedTrack = async (options: {
@@ -180,6 +204,7 @@ beforeAll(async () => {
   artistId = (await artists.findOne({ where: { id: artist.id } })).musicArtistId
   olderReleaseId = (await releases.findOne({ where: { id: olderRelease.id } })).musicReleaseId
   newerReleaseId = (await releases.findOne({ where: { id: newerRelease.id } })).musicReleaseId
+  tracklessReleaseId = (await releases.findOne({ where: { id: tracklessRelease.id } })).musicReleaseId
 
   // Two listens on the first track of the older release, nothing on the newer one
   const history: Repository<MusicHistory> = testApp.moduleRef.get(getRepositoryToken(MusicHistory))
@@ -268,7 +293,7 @@ describe('GET /api/v1/music/artist/:id?summary=true', () => {
 
   it('counts the artists releases and tracks', async () => {
     const summary = await getSummary()
-    expect(summary.numReleases).toBe(2)
+    expect(summary.numReleases).toBe(3)
     expect(summary.numTracks).toBe(3)
     expect(summary.runtimeSeconds).toBe(600)
     expect(summary.shortestTrackSeconds).toBe(100)
@@ -356,6 +381,35 @@ describe('GET /api/v1/music/artist/:id?summary=true', () => {
     expect(newer.bytes).toBe(5 * MB)
     expect(newer.extensions).toEqual(['flac'])
     expect(newer.lossless).toBe(true)
+  })
+
+  it('carries each releases identity so the timeline can render without the release rows', async () => {
+    const summary = await getSummary()
+
+    const older = summary.releases.find((release) => release.musicReleaseId === olderReleaseId)
+    const newer = summary.releases.find((release) => release.musicReleaseId === newerReleaseId)
+
+    expect(typeof older.id).toBe('number')
+    expect(older.title).toBe('Older Album')
+    expect(older.releaseType).toBe('album')
+    expect(older.hasArtwork).toBe(false)
+
+    expect(newer.title).toBe('Newer Album')
+    expect(newer.hasArtwork).toBe(true)
+  })
+
+  it('includes releases that have no tracks yet', async () => {
+    const summary = await getSummary()
+
+    const trackless = summary.releases.find((release) => release.musicReleaseId === tracklessReleaseId)
+
+    expect(trackless).toBeDefined()
+    expect(trackless.title).toBe('Trackless Album')
+    expect(trackless.numTracks).toBe(0)
+    expect(trackless.bytes).toBe(0)
+    expect(trackless.year).toBeNull()
+    expect(trackless.extensions).toEqual([])
+    expect(trackless.lossless).toBe(false)
   })
 
   it('reports the current users listening record', async () => {

@@ -8,7 +8,8 @@ import { MusicArtistMetadata } from './music-artist-metadata.entity'
 import { EventService } from '../event/event.service'
 
 import { GetMusicArtistsDto } from './dtos/GetMusicArtists.dto'
-import { sortableString, isNumeric } from '../../utils/string'
+import { sortableString } from '../../utils/string'
+import { isRowId } from '../../utils/identifiers'
 import { LibraryService } from '../library/library.service'
 import { MusicTrackService } from '../music-track/music-track.service'
 import { RatingService } from '../rating/rating.service'
@@ -57,9 +58,9 @@ export class MusicArtistService {
     relations = {},
     computations: MusicArtistTrackComputations = {},
   ): Promise<MusicArtist | null> {
-    const where = isNumeric(id)
-      ? { id: id as number }
-      : { musicArtistId: id as string }
+    const where = isRowId(id)
+      ? { id: Number(id) }
+      : { musicArtistId: String(id) }
 
     const musicArtist = await this.musicArtistRepository.find({
       where,

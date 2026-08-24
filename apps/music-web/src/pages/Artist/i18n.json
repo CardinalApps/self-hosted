@@ -11,11 +11,8 @@
   "music-artist.meta.collection": {
     "en": "Collection"
   },
-  "music-artist.meta.on-disk": {
-    "en": "On Disk"
-  },
   "music-artist.meta.listening": {
-    "en": "Your Listening"
+    "en": "Playback"
   },
   "music-artist.meta.name": {
     "en": "Name"
@@ -38,12 +35,6 @@
   "music-artist.meta.track-length": {
     "en": "Track length"
   },
-  "music-artist.meta.per-track": {
-    "en": "Avg. per track"
-  },
-  "music-artist.meta.formats": {
-    "en": "Formats"
-  },
   "music-artist.meta.sample-rate": {
     "en": "Quality"
   },
@@ -55,9 +46,6 @@
   },
   "music-artist.meta.country": {
     "en": "Country"
-  },
-  "music-artist.meta.loudness": {
-    "en": "Loudness"
   },
   "music-artist.meta.plays": {
     "en": "Plays"
@@ -94,12 +82,6 @@
   },
   "music-artist.meta.bit-depth": {
     "en": "{bits}-bit"
-  },
-  "music-artist.meta.lufs": {
-    "en": "{lufs} LUFS"
-  },
-  "music-artist.meta.peak": {
-    "en": "peak {peak} dB"
   },
   "music-artist.meta.plus-more": {
     "en": "+{count}"
@@ -151,9 +133,6 @@
   },
   "music-artist.timeline.gap": {
     "en": "{years} years"
-  },
-  "music-artist.timeline.heard": {
-    "en": "heard {heard}/{total}"
   },
   "music-artist.timeline.tracks": {
     "en": "{count} tracks"

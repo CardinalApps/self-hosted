@@ -9,10 +9,19 @@ import { File } from '../indexing/entities/file.entity'
 import { EventService } from '../event/event.service'
 
 import { GetMusicTracksDto } from './dtos/GetMusicTracks.dto'
+import { applyReleasedSince } from './released-since.util'
 import { LibraryService } from '../library/library.service'
 import { MusicHistory } from '../music-history/music-history.entity'
 import { Rating, RatingMediaType } from '../rating/rating.entity'
+import { FAVORITE_THRESHOLD } from '../rating/rating.service'
 import { User } from '../user/user.entity'
+
+/* What makes a track "hot": the user got through nearly all of it, more than once, recently.
+   A near-complete play is the strongest signal the library has that a track was wanted, since
+   anything less can be a skip. */
+const HOT_MIN_PROGRESS = 0.9
+const HOT_MIN_PLAYS = 2
+const HOT_WINDOW_DAYS = 14
 
 @Injectable()
 export class MusicTrackService {
@@ -78,12 +87,22 @@ export class MusicTrackService {
       libraries,
       playCount,
       rating,
+      releasedSince,
+      favorites,
+      hot,
     } = getMusicTracksDto
 
     /* Ordering by a computed figure requires computing it, whatever the caller asked for -
        otherwise the sort silently falls back to an arbitrary order. */
     const withPlayCount = playCount || orderBy === 'playCount'
     const withRating = (rating || orderBy === 'rating') && !!user
+    const withFavorites = favorites || orderBy === 'favoritedAt'
+    const withHot = hot || orderBy === 'hotPlays'
+
+    // Favorites and hot tracks are per-user; without a user there is nothing to return
+    if ((withFavorites || withHot) && !user) {
+      return [[], 0]
+    }
 
     const qb = this.musicTrackRepository.createQueryBuilder('music_track')
 
@@ -96,6 +115,50 @@ export class MusicTrackService {
     if (libraries && libraries.length) {
       const libraryEntities = await this.libraryService.getLibraries(libraries)
       qb.innerJoin('music_track.file', ...this.libraryService.createJoinArgs(libraryEntities))
+    }
+
+    if (releasedSince) {
+      applyReleasedSince(qb, 'music_track', releasedSince)
+    }
+
+    // One rating row per user+track, so this join cannot duplicate tracks
+    if (withFavorites) {
+      qb.innerJoin(
+        Rating,
+        'favorite',
+        'favorite.media_type = :favoriteMediaType AND favorite.media_id = music_track.music_track_id AND favorite.user_id = :favoriteUserId AND favorite.rating = :favoriteThreshold',
+        {
+          favoriteMediaType: RatingMediaType.MUSIC_TRACK,
+          favoriteUserId: user.id,
+          favoriteThreshold: FAVORITE_THRESHOLD,
+        },
+      )
+      qb.addSelect('favorite.created_at', 'music_track_favorited_at')
+    }
+
+    /* One row per track that clears the bar, so this join both filters the result down to hot
+       tracks and carries the count that orders them. */
+    if (withHot) {
+      qb.innerJoin(
+        (subQuery) => subQuery
+          .select('history.track_id', 'track_id')
+          .addSelect('COUNT(history.id)', 'hot_plays')
+          .from(MusicHistory, 'history')
+          .where('history.user_id = :hotUserId')
+          .andWhere('history.progress >= :hotMinProgress')
+          .andWhere('history.created_at >= :hotSince')
+          .groupBy('history.track_id')
+          .having('COUNT(history.id) >= :hotMinPlays'),
+        'hot_plays',
+        'hot_plays.track_id = music_track.id',
+      )
+      qb.addSelect('hot_plays.hot_plays', 'music_track_hot_plays')
+      qb.setParameters({
+        hotUserId: user.id,
+        hotMinProgress: HOT_MIN_PROGRESS,
+        hotSince: new Date(Date.now() - HOT_WINDOW_DAYS * 24 * 60 * 60 * 1000),
+        hotMinPlays: HOT_MIN_PLAYS,
+      })
     }
 
     // Join pre-aggregated play counts in a single pass rather than a
@@ -129,6 +192,10 @@ export class MusicTrackService {
       qb.orderBy('music_track_play_count', order)
     } else if (orderBy === 'rating' && withRating) {
       qb.orderBy('music_track_rating', order)
+    } else if (orderBy === 'favoritedAt') {
+      qb.orderBy('music_track_favorited_at', order)
+    } else if (orderBy === 'hotPlays') {
+      qb.orderBy('music_track_hot_plays', order)
     } else {
       qb.orderBy(`music_track.${orderBy}`, order)
     }

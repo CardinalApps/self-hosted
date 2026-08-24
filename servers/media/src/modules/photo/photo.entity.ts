@@ -1,6 +1,7 @@
 import {
   Entity,
   Column,
+  Index,
   OneToOne,
   OneToMany,
   JoinColumn,
@@ -15,6 +16,7 @@ import { PhotoVariation } from  './photo-variation.entity'
 
 @Entity()
 export class Photo extends BaseEntity {
+  @Index({ unique: true })
   @Column()
   photoId: string
 

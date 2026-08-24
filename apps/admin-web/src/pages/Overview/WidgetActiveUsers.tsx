@@ -10,7 +10,7 @@ import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUsers'
 import { formatTimeAgo } from '@cardinalapps/ui/src/lib/formatting/time'
 
-import ReloadButton from './ReloadButton'
+import ReloadButton from '../../components/ReloadButton'
 import i18n from './i18n.json'
 import './styles.css'
 
@@ -29,7 +29,7 @@ function WidgetActiveUsers() {
         <H5>{i18n['active-users.title'][lang]}</H5>
       }
       headerRight={
-        <ReloadButton onClick={() => refetch()} />
+        <ReloadButton title={i18n['reload-button.title'][lang]} onClick={() => refetch()} />
       }
     >
       {activeUsers.length

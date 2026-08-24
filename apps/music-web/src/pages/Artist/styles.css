@@ -12,26 +12,26 @@
   }
 
   .artist-hero-cols {
-    --artist-hero-height: 600px;
-
     display: flex;
     gap: calc(var(--gutter) * 2);
-    align-items: flex-start;
+    align-items: stretch;
   }
 
+  /* The lists set the card's height, and the map takes whatever that turns out to be */
   .artist-disk-map {
     flex: 1 1 0;
     min-width: 0;
     width: auto;
-    height: var(--artist-hero-height);
+    height: auto;
   }
 
   .artist-meta-pane {
-    flex: 1 1 0;
+    flex: 2 1 0;
     min-width: 0;
-    height: var(--artist-hero-height);
     display: flex;
     flex-direction: column;
+    /* The two meta columns collapse against the pane's own width, not the page's */
+    container: artist-meta-pane / inline-size;
   }
 
   .artist-meta-row {
@@ -49,12 +49,6 @@
   }
 
   .artist-meta {
-    min-height: 0;
-    flex-grow: 1;
-    overflow-y: auto;
-    /* Reserved up front, so a classic scrollbar doesn't reflow every right-aligned value the
-       moment the sections finish loading and the list outgrows the map. */
-    scrollbar-gutter: stable;
 
     .meta-section-title {
       margin-bottom: 8px;
@@ -69,10 +63,21 @@
     }
   }
 
+  .artist-meta-cols {
+    display: flex;
+    align-items: flex-start;
+    gap: calc(var(--gutter) * 2);
+  }
+
+  .artist-meta-col {
+    flex: 1;
+    min-width: 0;
+  }
+
   .artist-meta-list {
     width: 100%;
 
-    .item-list-item-name {
+    .item-list-item-label {
       width: 100%;
       display: flex;
       justify-content: space-between;
@@ -87,6 +92,15 @@
         text-align: right;
       }
     }
+  }
+
+  .meta-value-skeleton {
+    align-self: center;
+    width: 90px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: var(--text-color-5);
+    animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
   }
 
   .artist-play-actions {
@@ -152,13 +166,9 @@
       background-color: var(--border-color-3);
     }
 
+    /* Starts at the first dot rather than above it, and runs to the foot of the last release */
     &:first-of-type::before {
       top: 22px;
-    }
-
-    &:last-of-type::before {
-      bottom: auto;
-      height: 22px;
     }
   }
 
@@ -184,6 +194,8 @@
     gap: var(--gutter);
     align-items: flex-start;
     padding: 12px 0;
+    /* Its own width, not the whole page's, is what the favorites grid below needs to collapse against */
+    container: artist-timeline-entry / inline-size;
 
     &::before {
       content: '';
@@ -233,9 +245,10 @@
   }
 
   .artist-timeline-facts {
-    margin-bottom: 10px;
-    font-size: 13px;
-    color: var(--text-color-3);
+    margin-top: 13px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: var(--text-color-2);
 
     span:not(:last-child)::after {
       content: ' · ';
@@ -243,30 +256,91 @@
     }
   }
 
-  .artist-timeline-coverage {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .artist-timeline-beads {
+    padding: 4px 0;
   }
 
-  .artist-timeline-coverage-bar {
-    display: block;
-    width: 140px;
-    height: 6px;
-    border-radius: 3px;
-    background-color: var(--bg-3);
-    overflow: hidden;
+  .artist-timeline-row.is-skeleton {
 
-    > span {
-      display: block;
-      height: 100%;
-      background-color: var(--accent-color);
+    .timeline-skeleton-bar {
+      display: inline-block;
+      width: 120px;
+      height: 14px;
+      border-radius: 7px;
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+
+      &.wide {
+        width: 220px;
+        height: 24px;
+        border-radius: 12px;
+      }
+    }
+
+    .timeline-skeleton-cover {
+      width: 300px;
+      height: 300px;
+      max-width: 100%;
+      border-radius: var(--border-radius);
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
     }
   }
 
-  .artist-timeline-coverage-label {
-    font-size: 12px;
-    color: var(--text-color-4);
+  .artist-timeline-beads-skeleton {
+    padding: 4px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+
+    span {
+      width: 14px;
+      height: 14px;
+      border-radius: 100%;
+      background-color: var(--text-color-5);
+      animation: artist-skeleton-pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  .artist-timeline-favorites {
+    margin-top: var(--gutter);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+
+    /* Grid items default to a content-based min-width, which fights the 1fr columns' shrinking */
+    > .music-track {
+      min-width: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  /* Measured against the entry because the details column is shrink-to-fit, so a percentage here feeds itself */
+  .artist-timeline-ghost {
+    margin-top: var(--gutter);
+    width: min(400px, 100cqi);
+  }
+
+  @media (max-width: 1600px) {
+
+    .artist-timeline-favorites {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 1100px) {
+
+    .artist-timeline-entry {
+      flex-direction: column;
+    }
+  }
+
+  @container artist-timeline-entry (max-width: 760px) {
+
+    .artist-timeline-favorites {
+      grid-template-columns: 1fr;
+    }
   }
 
   @container artist-layout (max-width: 860px) {
@@ -275,24 +349,30 @@
       flex-direction: column;
     }
 
-    /* Stacked, the flex basis measures height instead of width, which would flatten the map */
+    /* Stacked, there is no neighbour to take a height from, so the map states its own again */
     .artist-disk-map {
       order: 2;
       flex: 0 0 auto;
       width: 100%;
+      height: 460px;
     }
 
-    /* Nothing left to match heights with once the map is out from beside it, so the list runs
-       its full length rather than scrolling inside the card. */
     .artist-meta-pane {
       flex: 0 0 auto;
       width: 100%;
-      height: auto;
+    }
+  }
+
+  /* Two lists of label/value pairs stop being readable side by side under about this width */
+  @container artist-meta-pane (max-width: 560px) {
+
+    .artist-meta-cols {
+      flex-direction: column;
+      gap: 0;
     }
 
-    .artist-meta {
-      overflow-y: visible;
-      scrollbar-gutter: auto;
+    .artist-meta-col:not(:first-child) .meta-section-title {
+      margin-top: var(--gutter);
     }
   }
 
@@ -322,5 +402,27 @@
     .artist-play-modes {
       grid-template-columns: 1fr;
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .meta-value-skeleton,
+    .timeline-skeleton-bar,
+    .timeline-skeleton-cover,
+    .artist-timeline-beads-skeleton span {
+      animation: none;
+    }
+  }
+}
+
+@keyframes artist-skeleton-pulse {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.7;
   }
 }

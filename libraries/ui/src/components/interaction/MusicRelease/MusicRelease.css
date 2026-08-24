@@ -99,7 +99,7 @@
     }
     
     .release-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 500;
 
       a {
@@ -113,7 +113,7 @@
     }
 
     .artist-name {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 400;
       white-space: nowrap;
       text-overflow: ellipsis;

@@ -1,0 +1,28 @@
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+
+import { RecommendationController } from './recommendation.controller'
+import { MusicSpotlightService } from './music-spotlight.service'
+import { MusicSpotlightEntry } from './music-spotlight-entry.entity'
+
+import { MusicArtist } from '../music-artist/music-artist.entity'
+import { MusicRelease } from '../music-release/music-release.entity'
+import { MusicTrack } from '../music-track/music-track.entity'
+import { MusicHistory } from '../music-history/music-history.entity'
+import { Rating } from '../rating/rating.entity'
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      MusicArtist,
+      MusicRelease,
+      MusicTrack,
+      MusicHistory,
+      Rating,
+      MusicSpotlightEntry,
+    ]),
+  ],
+  providers: [MusicSpotlightService],
+  controllers: [RecommendationController],
+})
+export class RecommendationModule {}

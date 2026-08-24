@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
@@ -23,11 +23,7 @@ function Indexer() {
   const dispatch = useDispatch()
   const { lang } = useSelector(settingsSelectors.current)
   const indexingServiceState = useSelector(indexingSelectors.serverState)
-  const [runType, setRunType] = useState<'quick' | 'full'>('quick')
-  const [indexMusic, setIndexMusic] = useState(true)
-  const [indexPhotos, setIndexPhotos] = useState(true)
-  const [indexMovies, setIndexMovies] = useState(false)
-  const [indexTV, setIndexTV] = useState(false)
+  const { runType, indexMusic, indexPhotos, indexMovies, indexTV } = useSelector(indexingSelectors.runOptions)
   const [createRun, createRunResult] = useCreateRunMutation()
   const [updateCurrentRunState, updateCurrentRunStateResult] = useUpdateCurrentRunStateMutation()
 
@@ -126,7 +122,7 @@ function Indexer() {
               value={runType}
               multi={false}
               size="s"
-              onChange={(val) => setRunType(val)}
+              onChange={(val) => dispatch(indexingActions.setRunOptions({ runType: val }))}
               options={[
                 { value: 'quick', label: i18n['options.run-type.quick'][lang] },
                 { value: 'full', label: i18n['options.run-type.full'][lang] },
@@ -141,7 +137,7 @@ function Indexer() {
               name="index_music"
               value={indexMusic}
               disabled={indexingServiceState === 'indexing' || indexingServiceState === 'paused'}
-              onChange={(val) => setIndexMusic(val)}
+              onChange={(val) => dispatch(indexingActions.setRunOptions({ indexMusic: val }))}
             />
           </span>
         </div>
@@ -152,7 +148,7 @@ function Indexer() {
               name="index_photos"
               value={indexPhotos}
               disabled={indexingServiceState === 'indexing' || indexingServiceState === 'paused'}
-              onChange={(val) => setIndexPhotos(val)}
+              onChange={(val) => dispatch(indexingActions.setRunOptions({ indexPhotos: val }))}
             />
           </span>
         </div>
@@ -163,7 +159,7 @@ function Indexer() {
               name="index_movies"
               value={indexMovies}
               disabled={true}
-              onChange={(val) => setIndexMovies(val)}
+              onChange={(val) => dispatch(indexingActions.setRunOptions({ indexMovies: val }))}
             />
           </span>
         </div>
@@ -174,7 +170,7 @@ function Indexer() {
               name="index_tv"
               value={indexTV}
               disabled={true}
-              onChange={(val) => setIndexTV(val)}
+              onChange={(val) => dispatch(indexingActions.setRunOptions({ indexTV: val }))}
             />
           </span>
         </div>

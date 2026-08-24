@@ -97,8 +97,8 @@ function CapabilitiesList({
       .sort()
       .map((cap) => {
         return {
-          name: <code>{cap}</code>,
-          value: cap,
+          label: <code>{cap}</code>,
+          id: cap,
         } as ListItem
       })
 

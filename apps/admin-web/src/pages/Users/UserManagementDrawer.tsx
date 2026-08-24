@@ -86,24 +86,24 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
           layout="compact"
           items={[
             {
-              name: i18n['users.settings.info.last-seen'][lang],
-              label: user?.activityStatusUpdatedAt
+              label: i18n['users.settings.info.last-seen'][lang],
+              value: user?.activityStatusUpdatedAt
                 ? `${formatDate(user?.activityStatusUpdatedAt)} (${formatTimeAgo(user?.activityStatusUpdatedAt, lang)})`
                 : i18n['users.settings.info.last-seen.never'][lang],
             },
             {
-              name: i18n['users.settings.info.type'][lang],
-              label: isCloudUser? i18n['users.settings.info.type.cloud'][lang] : i18n['users.settings.info.type.local'][lang],
+              label: i18n['users.settings.info.type'][lang],
+              value: isCloudUser? i18n['users.settings.info.type.cloud'][lang] : i18n['users.settings.info.type.local'][lang],
             },
             {
-              name: i18n['users.settings.info.enabled'][lang],
-              label: user?.enabled
+              label: i18n['users.settings.info.enabled'][lang],
+              value: user?.enabled
                 ? i18n['users.settings.info.enabled.yes'][lang]
                 : i18n['users.settings.info.enabled.no'][lang],
             },
             {
-              name: i18n['users.settings.info.id'][lang],
-              label: user.userId,
+              label: i18n['users.settings.info.id'][lang],
+              value: user.userId,
             },
           ]}
         />
@@ -113,7 +113,7 @@ function UserManagementDrawer({ user, onClose }: UserManagementDrawerProps) {
           maxHeight={220}
           items={user?.roles?.map((roleAssignment) => {
             return {
-              name: ACi18n?.[`role.${roleAssignment.role}.name`]?.[lang],
+              label: ACi18n?.[`role.${roleAssignment.role}.name`]?.[lang],
             }
           })}
         />

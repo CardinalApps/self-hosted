@@ -16,11 +16,11 @@ import './List.css'
 
 export type ListItemControls = 'add' | 'remove' | 'delete' | 'copy' | 'view'
 export type ListItem = {
-  name: string | ReactNode,
+  label: string | ReactNode,
+  value?: string | ReactNode,
+  id?: string,
   title?: string,
-  value?: string,
-  label?: string | React.ReactNode,
-  truncateLabel?: boolean,
+  truncateValue?: boolean,
   avatar?: {
     type: 'image',
     image: string,
@@ -50,6 +50,17 @@ type ListProps = {
   onRemove?: (item: ListItem) => void,
   onDelete?: (item: ListItem) => void,
 }
+
+// A row that fills its value column divides its width differently than a row that doesn't
+const hasValue = (item: ListItem) => item?.value !== undefined && item?.value !== null && item?.value !== ''
+
+/* A plain string value is truncated on sight, since a long one would otherwise wrap into a
+   second line the key never asked for. Anything richer opts in. */
+const truncateValue = (item: ListItem) => item?.truncateValue ?? typeof item?.value === 'string'
+
+// Nothing is hidden by that truncation: the full string is always readable on hover
+const valueTitle = (item: ListItem) => item?.title
+  ?? (typeof item?.value === 'string' ? item.value : undefined)
 
 /**
  * List.
@@ -130,10 +141,11 @@ const List = ({
               return (
                 <li
                   className={clsx(
+                    hasValue(item) && 'has-value',
                     !!item?.pendingAdd && 'pending-add',
                     !!item?.pendingDelete && 'pending-delete',
                   )}
-                  key={item?.value || index}
+                  key={item?.id || index}
                 >
                   {!!item?.avatar && (
                     <span className="item-list-item-avatar">
@@ -145,11 +157,13 @@ const List = ({
                       <Icon {...item.icon} />
                     </span>
                   )}
-                  <span className="item-list-item-name" title={item?.title}>{item?.name}</span>
-                  {typeof item?.label === 'string'
-                    ? <span className={clsx('item-list-item-label', item?.truncateLabel && 'truncate')} title={item?.title}>{item?.label}</span>
-                    : <span className={clsx('item-list-item-label', item?.truncateLabel && 'truncate')}>{item?.label || null}</span>
-                  }
+                  <span className="item-list-item-label" title={item?.title}>{item?.label}</span>
+                  <span
+                    className={clsx('item-list-item-value', truncateValue(item) && 'truncate')}
+                    title={valueTitle(item)}
+                  >
+                    {item?.value ?? null}
+                  </span>
                   {!!controlsToUse?.length && (
                     <span className="item-list-item-controls">
                       {!!controlsToUse.includes('view') && <Icon fa="fas fa-eye" onClick={() => handleOnView(item)} />}

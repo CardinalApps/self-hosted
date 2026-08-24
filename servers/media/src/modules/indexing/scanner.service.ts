@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import * as path from 'path'
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
@@ -18,12 +19,27 @@ import {
 } from '../../utils/media'
 import { log, LogModule, LogLevel } from '../../utils/logging'
 
+const MUSIC_FILE_EXTENSIONS = new Set<string>(Object.values(SupportedMusicFileExtensions))
+
 export type ScanResults = {
   foundPhotos: string[],
   foundMusic: string[],
   foundMovies: string[],
   foundTV: string[],
   suspectedDuplicatePhotos?: string[],
+  musicVerification?: MusicScanVerification,
+}
+
+/**
+ * The outcome of the post-walk verification passes of a music scan. The walk
+ * and the verification passes are both treated as unreliable samples of the
+ * file system; the scan only converges when a full pass discovers nothing new.
+ */
+export type MusicScanVerification = {
+  passes: number,
+  recoveredFiles: string[],
+  unreadableDirs: string[],
+  converged: boolean,
 }
 
 @Injectable()
@@ -112,13 +128,13 @@ export class ScannerService {
   }
 
   /**
-   * Starts a new scan of the music directory. Returns true if the scan was
-   * started, otherwise false.
+   * Starts a new scan of the music directory, then verifies the walk before
+   * returning. Returns the scan results, including the verification outcome.
    */
   async scanMusic(
     onFileFound: (file, type: MediaType) => void,
     abortController: AbortController,
-  ): Promise<boolean> {
+  ): Promise<ScanResults> {
     const mediaDirs = getMediaDirs()
     const mediaDirPaths = []
 
@@ -139,16 +155,7 @@ export class ScannerService {
     log(LogModule.INDEXING, LogLevel.DEBUG, `Starting scan for music with a ${timeoutSeconds} second timeout`)
 
     try {
-      const glob = globStream(mediaDirPaths, {
-        stat: true,
-        withFileTypes: true,
-        nocase: true,
-        signal: abortController.signal,
-        ignore: {
-          ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
-        },
-        follow: false,
-      })
+      const glob = this.createMusicGlobStream(mediaDirPaths, abortController)
 
       for await (const found of glob) {
         // Cancel the timeout when we find the first file
@@ -162,11 +169,133 @@ export class ScannerService {
       if (error?.message === 'stream destroyed') {
         Logger.warn('Indexing was paused during the initial scan. The music scan in progress has been discarded, and a new scan will begin when indexing is resumed.', 'Indexing')
       } else {
-        Logger.error(error, 'Indexing')
+        // The walk is unreliable over network mounts; the verification passes
+        // below re-enumerate whatever the broken stream did not deliver
+        Logger.error(`The music scan walk failed partway (${error?.message}). Verification will attempt to recover the remainder.`, 'Indexing')
+        Logger.error(error?.stack, 'Indexing')
       }
     }
 
-    return true
+    if (!abortController.signal.aborted) {
+      this.scanResults.musicVerification = await this.verifyMusicScan(mediaDirs.music, onFileFound, abortController)
+    }
+
+    return this.scanResults
+  }
+
+  /**
+   * Creates the glob stream for the music scan walk.
+   */
+  protected createMusicGlobStream(patterns: string[], abortController: AbortController) {
+    return globStream(patterns, {
+      stat: true,
+      withFileTypes: true,
+      nocase: true,
+      signal: abortController.signal,
+      ignore: {
+        ignored: (p: PathPosix) => this.shouldIgnoreFile(p),
+      },
+      follow: false,
+    })
+  }
+
+  /**
+   * Guards the music scan against the walk silently missing files, which has
+   * been observed over SMB mounts: the mount can return partial directory
+   * listings without raising any error, and it can also break the glob stream
+   * partway. Neither failure is trusted to be one-off, so this re-enumerates
+   * the music directory with plain readdir passes (directories and names only,
+   * far cheaper than the stat-heavy walk) until a full pass discovers nothing
+   * new, or the pass cap is reached.
+   *
+   * Recovered files are pushed through the same onFileFound path as the walk,
+   * within the same scan phase of the same run. Results are only ever added
+   * across passes, never removed, so a flaky verification pass cannot discard
+   * files that a previous pass found.
+   */
+  private async verifyMusicScan(
+    musicDir: string,
+    onFileFound: (file, type: MediaType) => void,
+    abortController: AbortController,
+  ): Promise<MusicScanVerification> {
+    const maxPasses = Number(envVar('INDEXING_SCAN_VERIFY_PASSES', 4))
+    const found = new Set(this.scanResults.foundMusic)
+
+    const verification: MusicScanVerification = {
+      passes: 0,
+      recoveredFiles: [],
+      unreadableDirs: [],
+      converged: false,
+    }
+
+    while (verification.passes < maxPasses && !abortController.signal.aborted) {
+      verification.passes++
+
+      const files: string[] = []
+      const unreadableDirs: string[] = []
+      await this.walkMusicFiles(musicDir, files, unreadableDirs)
+
+      const fresh = files.filter((file) => !found.has(file))
+
+      for (const file of fresh) {
+        found.add(file)
+        this.scanResults.foundMusic.push(file)
+        verification.recoveredFiles.push(file)
+        onFileFound(file, MediaType.MUSIC)
+      }
+
+      verification.unreadableDirs = unreadableDirs
+
+      if (fresh.length) {
+        log(LogModule.INDEXING, LogLevel.DEBUG, `Music scan verification pass ${verification.passes} discovered ${fresh.length} files that the walk missed`)
+      }
+
+      if (!fresh.length && !unreadableDirs.length) {
+        verification.converged = true
+        break
+      }
+    }
+
+    if (verification.recoveredFiles.length) {
+      Logger.warn(`Music scan verification recovered ${verification.recoveredFiles.length} files that the initial walk missed`, 'Indexing')
+    }
+
+    if (!verification.converged && !abortController.signal.aborted) {
+      Logger.error(`Music scan verification did not converge after ${verification.passes} passes. ${verification.unreadableDirs.length} directories could not be listed.`, 'Indexing')
+    }
+
+    return verification
+  }
+
+  /**
+   * Recursively collects all supported, non-ignored music files under the
+   * given directory using plain readdir calls. Directories that fail to list
+   * are collected instead of thrown so a single bad directory cannot end the
+   * enumeration.
+   */
+  private async walkMusicFiles(dir: string, files: string[], unreadableDirs: string[]): Promise<void> {
+    let entries: fs.Dirent[]
+
+    try {
+      entries = await fs.promises.readdir(dir, { withFileTypes: true })
+    } catch (error) {
+      unreadableDirs.push(dir)
+      return
+    }
+
+    for (const entry of entries) {
+      const absolutePath = path.join(dir, entry.name)
+
+      if (entry.isDirectory()) {
+        await this.walkMusicFiles(absolutePath, files, unreadableDirs)
+      } else if (entry.isFile()) {
+        const extension = entry.name.split('.').pop()?.toLowerCase()
+
+        if (MUSIC_FILE_EXTENSIONS.has(extension) && !this.shouldIgnoreFile(absolutePath)) {
+          files.push(absolutePath)
+        }
+      }
+    }
   }
 
   /**
@@ -246,8 +375,8 @@ export class ScannerService {
    * Returns false if the file can be kept. Returns true if the file should be
    * filtered out.
    */
-  private shouldIgnoreFile(p: PathPosix): boolean {
-    const absolutePath = p.fullpath()
+  private shouldIgnoreFile(p: PathPosix | string): boolean {
+    const absolutePath = typeof p === 'string' ? p : p.fullpath()
 
     if (
       /@eaDir/i.test(absolutePath) // Synology thumbnail cache dir

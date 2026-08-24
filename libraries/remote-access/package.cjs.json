@@ -1,0 +1,8 @@
+{
+  "name": "@cardinalapps/remote-access",
+  "description": "Isomorphic protocol library for Cardinal Remote Access (types, constants, errors, codecs).",
+  "license": "Licensed under the Freehold License (freeholdlicense.com)",
+  "version": "0.1.0",
+  "author": "Brian <brian@cardinalapps.io> (https://github.com/briiian)",
+  "private": true
+}

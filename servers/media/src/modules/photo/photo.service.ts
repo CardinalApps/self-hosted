@@ -29,6 +29,74 @@ import { log, LogModule, LogLevel } from '../../utils/logging'
 
 import { HeicToJpgWorkerInput } from './types'
 
+/**
+ * Row IDs are a 32 bit signed integer column, so an all-digits identifier that
+ * overflows it cannot be one. Postgres throws on an out of range comparison
+ * where SQLite simply matches nothing, so these are treated as photo IDs and
+ * fall through to a 404.
+ */
+const MAX_ROW_ID = 2147483647
+
+/**
+ * Matches the directory that Google Takeout exports into, for example
+ * `/takeout-20240115T143022Z-001/`. Group 1 is the export date, group 2 the
+ * export time (UTC, per the `z`), and group 3 the batch number.
+ */
+const GOOGLE_TAKEOUT_DIR = /\/takeout-(\d+)t(\d+)z-(\d+)\//i
+
+/**
+ * Matches the Google Photos filename format `{photo_type}_yyyymmdd_hhmmss`,
+ * e.g. `IMG_20240115_143022.jpg`. Both `_` and `-` show up as the separator
+ * before the time in the wild, and Pixel exports append milliseconds to it.
+ */
+const GOOGLE_PHOTOS_FILENAME_DATE = /(?:^|\D)(\d{8})[_-](\d{6})/
+
+/**
+ * Matches a plain `yyyy-mm-dd` date in a filename, e.g. `2024-01-01.jpg` or
+ * `2024-03-10-gps.jpg`.
+ */
+const PLAIN_FILENAME_DATE = /(?:^|\D)(\d{4})-(\d{2})-(\d{2})(?:\D|$)/
+
+/**
+ * Builds a local date from digit strings pulled out of a file path. Returns
+ * null unless the parts describe a real calendar date, so that arbitrary digits
+ * in a filename are not mistaken for one.
+ */
+function dateFromParts(year: number, month: number, day: number, hours = 0, minutes = 0, seconds = 0): Date | null {
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return null
+  }
+
+  if (hours > 23 || minutes > 59 || seconds > 59) {
+    return null
+  }
+
+  const date = new Date(year, month - 1, day, hours, minutes, seconds, 0)
+
+  // Rejects days that don't exist in the month, like February 31st. The time is
+  // deliberately not round-tripped, because a valid local time legitimately
+  // shifts when it lands in a daylight saving gap.
+  const isRealDate = date.getFullYear() === year
+    && date.getMonth() === month - 1
+    && date.getDate() === day
+
+  return isRealDate ? date : null
+}
+
+/**
+ * Formats a date as `YYYY-MM-DDTHH:mm:ss`, which reads as local time because it
+ * carries no timezone designator. A date parsed out of a file name has no zone
+ * to begin with, so emitting one would invent information the name never had.
+ */
+function toLocalDateTimeString(date: Date): string {
+  const pad = (value: number, length = 2) => String(value).padStart(length, '0')
+
+  return [
+    `${pad(date.getFullYear(), 4)}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+    `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`,
+  ].join('T')
+}
+
 @Injectable()
 export class PhotoService {
   constructor(
@@ -131,21 +199,28 @@ export class PhotoService {
   /**
    * Returns the path to the parent Google Takeout directory of a Google Photo.
    */
-  getGoogleTakeoutRootFromPath(absolutePath: string) {
+  getGoogleTakeoutRootFromPath(absolutePath: string): string | null {
     const takeoutPart = this.getGoogleTakeoutFromPath(absolutePath)
+
+    if (!takeoutPart) {
+      return null
+    }
+
     const split = absolutePath.split(takeoutPart)
 
     return path.join(split[0], takeoutPart)
   }
 
   /**
-   * Looks for the Google Takeout datetime in the file path. This would be the
-   * time that the user triggered the Google Takeout export.
+   * Returns the Google Takeout directory segment of the file path, if it has
+   * one. Plenty of Google Photos files live outside a takeout directory (the
+   * path only has to mention GooglePhotos to be treated as one), so callers
+   * have to handle the null.
    */
-  getGoogleTakeoutFromPath(absolutePath: string) {
-    const takeoutDateTimeMatch = absolutePath.match(/\/takeout-(\d+)t(\d+)z-(\d+)\//gmi)
+  getGoogleTakeoutFromPath(absolutePath: string): string | null {
+    const takeoutDateTimeMatch = absolutePath.match(GOOGLE_TAKEOUT_DIR)
 
-    if (!takeoutDateTimeMatch.length) {
+    if (!takeoutDateTimeMatch) {
       return null
     }
 
@@ -169,12 +244,32 @@ export class PhotoService {
 
   /**
    * Looks for the Google Takeout datetime in the file path. This would be the
-   * time that the user triggered the Google Takeout export.
+   * time that the user triggered the Google Takeout export. The directory name
+   * spells it out in UTC, so the returned string is an ISO 8601 timestamp.
    */
-  getGoogleTakeoutDateTimeFromPath(absolutePath: string) {
-    const takeout = this.getGoogleTakeoutFromPath(absolutePath)
-    // TODO
-    return takeout
+  getGoogleTakeoutDateTimeFromPath(absolutePath: string): string | null {
+    const takeoutDateTimeMatch = absolutePath.match(GOOGLE_TAKEOUT_DIR)
+
+    if (!takeoutDateTimeMatch) {
+      return null
+    }
+
+    const [, yyyymmdd, hhmmss] = takeoutDateTimeMatch
+
+    if (yyyymmdd.length !== 8 || hhmmss.length !== 6) {
+      return null
+    }
+
+    const exportedAt = Date.UTC(
+      Number(yyyymmdd.slice(0, 4)),
+      Number(yyyymmdd.slice(4, 6)) - 1,
+      Number(yyyymmdd.slice(6, 8)),
+      Number(hhmmss.slice(0, 2)),
+      Number(hhmmss.slice(2, 4)),
+      Number(hhmmss.slice(4, 6)),
+    )
+
+    return isNaN(exportedAt) ? null : new Date(exportedAt).toISOString()
   }
 
   /**
@@ -186,6 +281,11 @@ export class PhotoService {
    */
   getGoogleTakeoutBatchFromPath(absolutePath: string): string | null {
     const takeout = this.getGoogleTakeoutFromPath(absolutePath)
+
+    if (!takeout) {
+      return null
+    }
+
     const takeoutDateTimeParts = takeout.split('-')
 
     if (takeoutDateTimeParts.length !== 3) {
@@ -374,12 +474,18 @@ export class PhotoService {
   }
 
   /**
-   * Gets a single photo.
+   * Gets a single photo by either of its identifiers: the numeric row ID
+   * (given as a number, or as the all-digits string that arrives in a URL
+   * param) or the UUID photo ID.
    */
   async getPhoto(id: number | string, relations: Record<string, boolean | Record<string, unknown>> = {}): Promise<Photo | null> {
-    const where = typeof id === 'number'
-      ? { id: id }
-      : { photoId: id }
+    const isRowId = typeof id === 'number'
+      ? Number.isInteger(id) && id <= MAX_ROW_ID
+      : /^\d+$/.test(id) && Number(id) <= MAX_ROW_ID
+
+    const where = isRowId
+      ? { id: Number(id) }
+      : { photoId: String(id) }
 
     const photo = await this.photoRepository.find({
       where,
@@ -403,7 +509,7 @@ export class PhotoService {
    * Parses the file path to try and find a date among the many ways it may be
    * stored in a file path.
    */
-  getDateFromFilePath = (absolutePath: string) => {
+  getDateFromFilePath = (absolutePath: string): string | null => {
     const pathParts = absolutePath.split(path.sep)
     const fileName = pathParts[pathParts.length - 1]
 
@@ -426,22 +532,38 @@ export class PhotoService {
     // for date recognition will have the incorrect time/day. This seems like an
     // edge case, but I came across it in my own personal photos, so it may be
     // more common than it seems.
-    const googlePhotosDateFormat = fileName.match(/([^\s]+)_(\d{8})-(\d{6})/mi)
-    if (googlePhotosDateFormat && googlePhotosDateFormat?.length === 4) {
-      try {
-        const yyyymmdd = googlePhotosDateFormat[2]
-        const hhmmss = googlePhotosDateFormat[3]
-        const googlePhotosDate = new Date()
-        googlePhotosDate.setFullYear(Number(`${yyyymmdd[0]}${yyyymmdd[1]}${yyyymmdd[2]}${yyyymmdd[3]}`))
-        googlePhotosDate.setMonth(Number(`${yyyymmdd[4]}${yyyymmdd[5]}`) - 1, Number(`${yyyymmdd[6]}${yyyymmdd[7]}`))
-        googlePhotosDate.setHours(Number(`${hhmmss[0]}${hhmmss[1]}`), Number(`${hhmmss[2]}${hhmmss[3]}`), Number(`${hhmmss[4]}${hhmmss[5]}`))
+    const googlePhotosDateFormat = fileName.match(GOOGLE_PHOTOS_FILENAME_DATE)
+    if (googlePhotosDateFormat) {
+      const [, yyyymmdd, hhmmss] = googlePhotosDateFormat
+      const googlePhotosDate = dateFromParts(
+        Number(yyyymmdd.slice(0, 4)),
+        Number(yyyymmdd.slice(4, 6)),
+        Number(yyyymmdd.slice(6, 8)),
+        Number(hhmmss.slice(0, 2)),
+        Number(hhmmss.slice(2, 4)),
+        Number(hhmmss.slice(4, 6)),
+      )
 
-        return googlePhotosDate.toString()
-      } catch (error) {
-        Logger.error(error)
-        return null
+      if (googlePhotosDate) {
+        return toLocalDateTimeString(googlePhotosDate)
       }
     }
+
+    // Fall back to a plain yyyy-mm-dd filename, which is how plenty of people
+    // name photos that carry no Exif date at all. The same timezone caveat as
+    // above applies, and there is no time of day to go with it, so the photo
+    // lands at local midnight on that day.
+    const plainDateFormat = fileName.match(PLAIN_FILENAME_DATE)
+    if (plainDateFormat) {
+      const [, year, month, day] = plainDateFormat
+      const plainDate = dateFromParts(Number(year), Number(month), Number(day))
+
+      if (plainDate) {
+        return toLocalDateTimeString(plainDate)
+      }
+    }
+
+    return null
   }
 
   /**

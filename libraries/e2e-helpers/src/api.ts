@@ -63,9 +63,10 @@ export async function deleteTestUser(jwt: string): Promise<void> {
   })
 }
 
-// Enable email MFA on the given user. After this call, any subsequent SSO
-// flow into a non-trusted-app or a check-in that resolves the user will
-// include the EMAIL_MFA challenge.
+// Enable email MFA on the given user. The address must already be confirmed —
+// the auth server refuses to arm email MFA on an unproven address. After this
+// call, any subsequent SSO flow into a non-trusted-app or a check-in that
+// resolves the user will include the EMAIL_MFA challenge.
 export async function enableEmailMfa(jwt: string): Promise<void> {
   const res = await fetch(`${AUTH_BASE}/user`, {
     method: 'PATCH',

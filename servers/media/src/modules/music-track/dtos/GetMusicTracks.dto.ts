@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsString, IsOptional, IsIn, IsArray } from 'class-validator'
+import { IsBoolean, IsString, IsOptional, IsIn, IsArray, Matches } from 'class-validator'
 
 import { Pagination } from '../../../dtos/pagination.dto'
 import { toArrayOfStrings } from '../../../utils/transformers'
@@ -13,6 +13,8 @@ enum AllowedMusicTracksOrderBy {
   'bitrate' = 'bitrate',
   'playCount' = 'playCount',
   'rating' = 'rating',
+  'favoritedAt' = 'favoritedAt',
+  'hotPlays' = 'hotPlays',
 }
 
 class MusicTracksPagination extends Pagination {
@@ -58,4 +60,32 @@ export class GetMusicTracksDto extends MusicTracksPagination {
   @IsOptional()
   @IsBoolean()
   rating?: boolean = true
+
+  /**
+   * Only tracks whose metadata says they were released in real life on or after
+   * this date (YYYY-MM-DD). Year-only metadata counts as December 31 of its year.
+   */
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  releasedSince?: string
+
+  /**
+   * Only tracks the current user has favorited. Ordering by favoritedAt turns
+   * this on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  favorites?: boolean = false
+
+  /**
+   * Only tracks the current user is currently hooked on: played through to at
+   * least 90% at least twice in the past 14 days. Ordering by hotPlays turns
+   * this on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  hot?: boolean = false
 }

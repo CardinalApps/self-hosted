@@ -10,6 +10,11 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import * as ip from 'ip'
 
 import { AppModule } from './modules/app/app.module'
+import { CorsService } from './modules/cors/cors.service'
+import { buildCorsOptions } from './modules/cors/cors.options'
+import { HttpsService } from './modules/remote-access/https/https.service'
+import { MuxService } from './modules/remote-access/mux/mux.service'
+import { RelayRequestHandler } from './modules/remote-access/relay/relay-request-handler'
 
 import {
   Env,
@@ -22,6 +27,7 @@ import {
   isContainerEnv,
 } from './utils/env'
 import { setupOpenApiDoc } from './utils/openApi'
+import { getEnabledLogLevels } from './utils/logging'
 
 const PORT = envVar('CARDINAL_HOME_SERVER_PORT', 3080) as number
 
@@ -79,7 +85,9 @@ async function startup() {
   /**
    * Create Nest.js app instance.
    */
-  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: getEnabledLogLevels(),
+  })
 
   app.use(cookieParser())
 
@@ -97,25 +105,11 @@ async function startup() {
   app.useWebSocketAdapter(new WsAdapter(app))
 
   /**
-   * Set CORS rules.
+   * Set CORS rules. The allowlist is dynamic: Cardinal hosted apps, this
+   * server's own hostnames, localhost development, and user-configured
+   * origins.
    */
-  app.enableCors({
-    origin: [
-      'http://localhost:3090',      // Media Server web app
-      'http://localhost:3092',      // Photos web app dev
-      'http://localhost:3094',      // Music web app dev
-      'http://localhost:3096',      // Cinema web app dev
-      'http://127.0.0.1:3090',      // Media Server web app
-      'http://192.168.2.97:3090',   // Media Server web app
-      'http://localhost:3099',      // Component Library development
-      'http://localhost:3000',      // Local prod web app tests
-    ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    exposedHeaders: [
-      'Cardinal-Extra-Message',
-    ],
-    credentials: true,
-  })
+  app.enableCors(buildCorsOptions(app.get(CorsService)))
 
   /**
    * Prefix all endpoints (except public static dirs) with /api/{version}.
@@ -143,9 +137,21 @@ async function startup() {
   }
 
   /**
-   * Start listening on the network.
+   * Start listening on the network. The port is bound by the mux rather than
+   * by Nest, so that TLS connections can be handed to Remote Access and
+   * everything else to the HTTP stack Nest built. Nest's own server never
+   * binds a port; it is fed the connections the mux accepts for it.
    */
-  await app.listen(PORT)
+  await app.init()
+  await app.get(MuxService).listen(PORT, app.getHttpServer())
+
+  /**
+   * Let Remote Access answer TLS on the port above, if enabled and
+   * configured. Relayed Remote Access requests dispatch through the same
+   * Express stack.
+   */
+  app.get(HttpsService).attach(app.getHttpAdapter().getInstance())
+  app.get(RelayRequestHandler).attach(app.getHttpAdapter().getInstance())
 
   /**
    * Welcome message box.

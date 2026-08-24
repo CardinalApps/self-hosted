@@ -3,13 +3,23 @@ import Icon from '../../typography/Icon'
 
 import './Alert.css'
 
+type AlertType = 'success' | 'warning' | 'error' | 'info' | 'neutral'
+
 type AlertProps = {
-  type?: 'success' | 'warning' | 'error' | 'info' | 'neutral',
+  type?: AlertType,
   message: string | React.ReactNode,
   buttons?: Array<{
     label: string,
     onClick: () => void,
   }>,
+}
+
+const ICONS: Record<AlertType, string> = {
+  info: 'fas fa-info-circle',
+  neutral: 'fas fa-info-circle',
+  success: 'fas fa-check-circle',
+  warning: 'fas fa-exclamation-triangle',
+  error: 'fas fa-exclamation-circle',
 }
 
 /**
@@ -20,22 +30,9 @@ const Alert = ({
   message,
   buttons = [],
 }: AlertProps) => {
-  const getIcon = () => {
-    switch (type) {
-      case 'info':
-      case 'neutral':
-        return <Icon fa="fas fa-info-circle" />
-      case 'success':
-        return <Icon fa="fas fa-check-circle" />
-      case 'warning':
-        return <Icon fa="fas fa-exclamation-triangle" />
-      case 'error':
-        return <Icon fa="fas fa-exclamation-circle" />
-    }
-  }
   return (
     <div className={`alert ${type}`}>
-      {getIcon()}
+      <Icon className="alert-icon" fa={ICONS[type]} />
       {typeof message === 'string'
         ? <p>{message}</p>
         : message

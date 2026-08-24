@@ -5,10 +5,151 @@
   "action-buttons.true-shuffle": {
     "en": "True Shuffle"
   },
+  "action-buttons.house-mix": {
+    "en": "House Mix"
+  },
+  "action-buttons.fresh-music": {
+    "en": "Fresh Music"
+  },
+  "action-buttons.fresh-release": {
+    "en": "Fresh Release"
+  },
   "most-played-tracks.title": {
     "en": "Most Played Tracks"
   },
+  "hot-tracks.title": {
+    "en": "Hot Tracks"
+  },
+  "hot-tracks.note": {
+    "en": "Two plays with ≥90% playthrough in a week makes a track hot."
+  },
+  "hot-tracks.empty": {
+    "en": "Tracks you play through more than once will heat up here."
+  },
+  "favorite-tracks.title": {
+    "en": "Favorite Tracks"
+  },
+  "favorite-tracks.empty": {
+    "en": "Tracks that you favorite will appear here."
+  },
+  "action-buttons.spotlight": {
+    "en": "Spotlight"
+  },
+  "artist-spotlight.title": {
+    "en": "Artist Spotlight"
+  },
+  "artist-spotlight.empty": {
+    "en": "Add some music with cover art and an artist will be spotlighted here."
+  },
+  "artist-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had them on repeat lately"
+  },
+  "artist-spotlight.reason.favorited_track": {
+    "en": "Because you favorited {track}"
+  },
+  "artist-spotlight.reason.rediscover": {
+    "en": "Because it's been a while since you played them"
+  },
+  "artist-spotlight.reason.unplayed": {
+    "en": "Because you haven't played them yet"
+  },
+  "artist-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "artist-spotlight.num-releases.singular": {
+    "en": "{num} release"
+  },
+  "artist-spotlight.num-releases.plural": {
+    "en": "{num} releases"
+  },
+  "artist-spotlight.num-tracks.singular": {
+    "en": "{num} track"
+  },
+  "artist-spotlight.num-tracks.plural": {
+    "en": "{num} tracks"
+  },
+  "artist-spotlight.num-plays.singular": {
+    "en": "{num} play"
+  },
+  "artist-spotlight.num-plays.plural": {
+    "en": "{num} plays"
+  },
+  "release-spotlight.title": {
+    "en": "Release Spotlight"
+  },
+  "release-spotlight.empty": {
+    "en": "Add some music with cover art and a release will be spotlighted here."
+  },
+  "release-spotlight.empty-sequence": {
+    "en": "Use the Music app a bit more, then check back tomorrow."
+  },
+  "release-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had it on repeat lately"
+  },
+  "release-spotlight.reason.favorited_track": {
+    "en": "Because you favorited {track}"
+  },
+  "release-spotlight.reason.rediscover": {
+    "en": "Because it's been a while since you played it"
+  },
+  "release-spotlight.reason.unplayed": {
+    "en": "Because you haven't played it yet"
+  },
+  "release-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "release-spotlight.num-tracks.singular": {
+    "en": "{num} track"
+  },
+  "release-spotlight.num-tracks.plural": {
+    "en": "{num} tracks"
+  },
+  "release-spotlight.num-plays.singular": {
+    "en": "{num} play"
+  },
+  "release-spotlight.num-plays.plural": {
+    "en": "{num} plays"
+  },
+  "track-spotlight.title": {
+    "en": "Track Spotlight"
+  },
+  "track-spotlight.empty": {
+    "en": "Add some music with cover art and a track will be spotlighted here."
+  },
+  "track-spotlight.empty-sequence": {
+    "en": "Use the Music app a bit more, then check back tomorrow."
+  },
+  "track-spotlight.reason.heavy_rotation": {
+    "en": "Because you've had it on repeat this week"
+  },
+  "track-spotlight.reason.favorited_track": {
+    "en": "Because you favorited it recently"
+  },
+  "track-spotlight.reason.unplayed": {
+    "en": "Because you've never heard it"
+  },
+  "track-spotlight.reason.library_pick": {
+    "en": "A pick from your library"
+  },
+  "action-buttons.play": {
+    "en": "Play"
+  },
   "recently-added-releases.title": {
-    "en": "Recently Added Releases"
+    "en": "Newest Releases"
+  },
+  "releases-with-favorites.title": {
+    "en": "Releases with Favorites"
+  },
+  "releases-with-favorites.empty": {
+    "en": "Releases containing your favorite tracks will appear here."
+  },
+  "recently-added-artists.title": {
+    "en": "Newest Artists"
+  },
+  "recently-added-artists.empty": {
+    "en": "Artists you've recently added to your library will appear here."
+  },
+  "fin.message": {
+    "en": "Fin."
   }
 }

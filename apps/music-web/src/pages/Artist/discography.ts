@@ -37,6 +37,11 @@ const inAlbumOrder = (tracks: MusicTrackType[]): MusicTrackType[] => (
 /**
  * Builds the artist's discography newest release first.
  *
+ * The summary and the release rows arrive from two queries of very different
+ * weight, so entries are built from whichever has landed: the summary alone
+ * carries everything except the tracks, which fill in when the release rows
+ * arrive.
+ *
  * Releases with no tagged year sort to the end: a missing year says nothing
  * about when something came out, so guessing at a position would be worse than
  * parking it.
@@ -47,24 +52,30 @@ export const buildDiscography = (
 ): DiscographyEntry[] => {
   const figures = new Map((summary?.releases ?? []).map((release) => [release.musicReleaseId, release]))
   const listening = new Map((summary?.listening?.releases ?? []).map((release) => [release.musicReleaseId, release]))
+  const releasesById = new Map(releases.map((release) => [String(release.musicReleaseId ?? ''), release]))
 
-  return releases
-    .map((release) => {
-      const musicReleaseId = String(release.musicReleaseId ?? '')
+  const musicReleaseIds = [
+    ...figures.keys(),
+    ...releases.map((release) => String(release.musicReleaseId ?? '')).filter((id) => !figures.has(id)),
+  ]
+
+  return musicReleaseIds
+    .map((musicReleaseId) => {
       const figure = figures.get(musicReleaseId)
-      const tracks = inAlbumOrder((release.tracks ?? []) as MusicTrackType[])
+      const release = releasesById.get(musicReleaseId)
+      const tracks = inAlbumOrder((release?.tracks ?? []) as MusicTrackType[])
 
       return {
-        id: release.id,
+        id: (figure?.id ?? release?.id) as number,
         musicReleaseId,
-        title: String(release.title ?? ''),
-        releaseType: (release.releaseType as string) ?? null,
+        title: String(figure?.title ?? release?.title ?? ''),
+        releaseType: figure?.releaseType ?? (release?.releaseType as string) ?? null,
         year: figure?.year ?? null,
         numTracks: figure?.numTracks ?? tracks.length,
         runtimeSeconds: figure?.runtimeSeconds ?? tracks.reduce((sum, track) => sum + (Number(track.duration) || 0), 0),
         bytes: figure?.bytes ?? 0,
         extensions: figure?.extensions ?? [],
-        hasArtwork: !!release.thumbnails?.length,
+        hasArtwork: figure?.hasArtwork ?? !!release?.thumbnails?.length,
         tracks,
         listening: listening.get(musicReleaseId),
       }

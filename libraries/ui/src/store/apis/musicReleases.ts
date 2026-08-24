@@ -95,11 +95,12 @@ export const musicReleasesApi = baseHomeServerApi
           artists?: boolean,
           thumbnails?: boolean,
           order?: CommonOrderParams,
-          orderBy?: 'name' | 'createdAt',
+          orderBy?: 'name' | 'createdAt' | 'favoritedAt',
           libraries?: string[],
+          favorites?: boolean,
         }
       >({
-        query: ({ take, skip, order, orderBy, tracks, genres, artists, thumbnails, libraries }) => {
+        query: ({ take, skip, order, orderBy, tracks, genres, artists, thumbnails, libraries, favorites }) => {
           return queryParams('/music/releases', {
             ...(take && { take }),
             ...(skip && { skip }),
@@ -110,8 +111,10 @@ export const musicReleasesApi = baseHomeServerApi
             ...(artists && { artists }),
             ...(thumbnails && { thumbnails }),
             ...(libraries && { libraries }),
+            ...(favorites && { favorites }),
           })
         },
+        providesTags: ['MusicTracks'],
       }),
 
       /**

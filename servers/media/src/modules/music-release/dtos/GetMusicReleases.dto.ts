@@ -7,6 +7,7 @@ import { toArrayOfStrings } from '../../../utils/transformers'
 enum AllowedMusicReleasesOrderBy {
   'createdAt' = 'createdAt',
   'title' = 'title',
+  'favoritedAt' = 'favoritedAt',
 }
 
 class MusicReleasesPagination extends Pagination {
@@ -47,4 +48,13 @@ export class GetMusicReleasesDto extends MusicReleasesPagination {
   @IsArray()
   @IsOptional()
   libraries?: string[]
+
+  /**
+   * Only releases containing at least one track the current user has favorited.
+   * Ordering by favoritedAt turns this on regardless.
+   */
+  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  @IsOptional()
+  @IsBoolean()
+  favorites?: boolean = false
 }

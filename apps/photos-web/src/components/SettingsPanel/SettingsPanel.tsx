@@ -4,8 +4,6 @@ import SettingsPanel from '@cardinalapps/ui/src/components/features/SettingsPane
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import { CardinalApp } from '@cardinalapps/ui/src/lib/env/cardinal'
 
-//import i18n from './i18n.json'
-
 /**
  * Custom settings pages for the Media Server.
  */

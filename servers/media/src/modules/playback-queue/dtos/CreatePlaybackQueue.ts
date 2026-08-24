@@ -3,7 +3,7 @@ import { Library } from '../../library/library.entity'
 import { PlaybackQueueItem } from '../playback-queue-item.entity'
 
 export type QueueType = 'static' | 'dynamic'
-export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore' | 'undertow'
+export type DynamicQueueType = 'true_shuffle' | 'house_mix' | 'encore' | 'undertow' | 'fresh_music' | 'fresh_release'
 export type QueueSeedMediaType = 'music_release' | 'music_artist'
 
 export class CreatePlaybackQueueDto {

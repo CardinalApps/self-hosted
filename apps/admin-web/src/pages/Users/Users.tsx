@@ -21,7 +21,8 @@ import { pluralize } from '@cardinalapps/ui/src/lib/formatting/text'
 import { ToolbarItem } from '@cardinalapps/ui/src/components/interaction/Toolbar/types'
 
 import { PAGE_LAYOUT } from '@cardinalapps/ui/src/store/slices/layout/constants'
-import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
+// TODO enable with remote access
+// import { useGetInvitationsQuery } from '@cardinalapps/ui/src/store/apis/invitations'
 import { useGetLicensingSeatsQuery } from '@cardinalapps/ui/src/store/apis/licensing'
 import { useGetActiveUsersQuery } from '@cardinalapps/ui/src/store/apis/activeUsers'
 
@@ -38,7 +39,8 @@ const TOOLBAR_NAME = 'admin-users'
 function Users() {
   const { lang } = useSelector(settingsSelectors.current)
   const currentUser = useSelector(homeServerUserSelectors.current)
-  const canUserCreateInvitiations = useHasCapability('Invitations.Create')
+  // TODO enable with remote access
+  // const canUserCreateInvitiations = useHasCapability('Invitations.Create')
   const canUserCreateUsers = useHasCapability('Users.Create')
   const [configuringUser, setConfiguringUser] = useState<UserType>()
   const [showManageInvitationsDrawer, setShowManageInvitationsDrawer] = useState<boolean>(false)
@@ -54,8 +56,9 @@ function Users() {
   const licensingSeatsRes = useGetLicensingSeatsQuery({})
   const licensingSeats = licensingSeatsRes?.data
 
-  const activeInvitationsRes = useGetInvitationsQuery({ isExpired: false })
-  const activeIntiations = activeInvitationsRes?.data?.[0] || []
+  // TODO enable with remote access
+  // const activeInvitationsRes = useGetInvitationsQuery({ isExpired: false })
+  // const activeIntiations = activeInvitationsRes?.data?.[0] || []
 
   const totalLocalUsers = users.filter((user) => !user.cardinalId).length
 
@@ -275,9 +278,10 @@ function Users() {
         {
         /*
          * User invitations card.
+         * TODO enable with remote access
          */
         }
-        <CardGrid.Card
+        {/* <CardGrid.Card
           size="s"
           icon={<Icon fa="fas fa-envelope" />}
           header={<H5>{i18n['users.invite-user'][lang]}</H5>}
@@ -301,7 +305,7 @@ function Users() {
               : i18n['users.invite.some-active-links.plural'][lang].replace('{num}', activeIntiations.length)
             : i18n['users.invite.no-active-links'][lang]
           }
-        </CardGrid.Card>
+        </CardGrid.Card> */}
         {/* <CardGrid.Card
           icon={<Icon fa="fas fa-info-circle" />}
           header={<H5>{i18n['users.new-users'][lang]}</H5>}

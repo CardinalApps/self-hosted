@@ -1,7 +1,6 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit'
 import type { Action, ThunkAction } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import merge from 'lodash.merge'
 
 /**
  * Slices
@@ -19,6 +18,7 @@ import jobsSlice from './slices/jobs'
 import layoutSlice from './slices/layout'
 import audioSlice from './slices/music'
 import librarySlice from './slices/library'
+import remoteAccessSlice from './slices/remoteAccess'
 
 /**
  * APIs
@@ -33,17 +33,20 @@ import sseFactoryResetMiddleware from './middleware/sseFactoryReset'
 import sseLatestEventMiddleware from './slices/homeServer/middleware/sseLatestEvent'
 import sseWaveformReadyMiddleware from './slices/music/middleware/sseWaveformReady'
 import sseQueueExtendedMiddleware from './slices/music/middleware/sseQueueExtended'
+import shortcutPlaybackMiddleware from './middleware/shortcutPlayback'
 import logHTTPError from './middleware/logHTTPError'
 
 /**
  * Lifecycle
  */
 import musicBeforeStoreInit from './slices/music/lifecycle/beforeStoreInit'
+import remoteAccessBeforeStoreInit from './slices/remoteAccess/lifecycle/beforeStoreInit'
 
 /**
  * Utils
  */
 import getCachedStore from './utils/getCachedStore'
+import mergeCachedStore from './utils/mergeCachedStore'
 import createDefaultStore from './utils/createDefaultStore'
 import deletePendingRTKCache from './utils/deletePendingRTKCache'
 import triggerLifecycle from './utils/triggerLifecycle'
@@ -72,6 +75,7 @@ const slices = {
   [jobsSlice.reducerPath]: jobsSlice,
   [layoutSlice.reducerPath]: layoutSlice,
   [audioSlice.reducerPath]: audioSlice,
+  [remoteAccessSlice.reducerPath]: remoteAccessSlice,
   [baseHomeServerApi.reducerPath]: baseHomeServerApi,
 }
 
@@ -98,7 +102,7 @@ const createStore = () => {
     clearResetAppQueryParam()
   }
 
-  merge(preloadedState, cachedStore)
+  mergeCachedStore(preloadedState, cachedStore)
 
   // FIXME delete these two once all of the RTK APIs extend the base
   deletePendingRTKCache(preloadedState)
@@ -110,6 +114,7 @@ const createStore = () => {
   // Before store init lifecycle
   triggerLifecycle(preloadedState, [
     musicBeforeStoreInit,
+    remoteAccessBeforeStoreInit,
   ])
 
   const store = configureStore({
@@ -121,6 +126,7 @@ const createStore = () => {
         sseLatestEventMiddleware.middleware,
         sseWaveformReadyMiddleware.middleware,
         sseQueueExtendedMiddleware.middleware,
+        shortcutPlaybackMiddleware.middleware,
         logHTTPError.middleware,
         baseHomeServerApi.middleware,
       )

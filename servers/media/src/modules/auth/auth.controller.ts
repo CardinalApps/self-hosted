@@ -2,6 +2,7 @@ import {
   Controller,
   Logger,
   ForbiddenException,
+  ServiceUnavailableException,
   UnauthorizedException,
   Post,
   Body,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common'
 import {
   ApiHeader,
+  ApiServiceUnavailableResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
@@ -19,7 +21,8 @@ import { LoginDetails } from './dtos/LoginDetails.dto'
 import { AuthService } from './auth.service'
 import { TokenService } from './token.service'
 import { UserService } from '../user/user.service'
-import { CloudUserService } from '../user/cloud-user.service'
+import { CloudUserService, CloudUserLookupError } from '../user/cloud-user.service'
+import { AUTH_ERROR_CODE } from './types'
 
 import { LoginResponse } from './dtos/LoginResponse.dto'
 import { StandardEndpoint } from '../../decorators/StandardEndpoint.decorator'
@@ -27,8 +30,7 @@ import { OriginApp } from '../../decorators/OriginApp'
 import { CardinalApp } from '../../utils/apps'
 import { envVar } from '../../utils/env'
 import { getCardinalTolkienFromHeaders } from '../../utils/jwt'
-
-const REFRESH_TOLKIEN_COOKIE = 'cardinal_refresh_tolkien'
+import { REFRESH_COOKIE_PATH } from './refresh-cookie'
 
 const secureCookies = envVar('SECURE_COOKIES', false) as boolean
 
@@ -36,7 +38,7 @@ const REFRESH_COOKIE_BASE = {
   httpOnly: true,
   secure: secureCookies,
   sameSite: (secureCookies ? 'strict' : 'lax') as 'strict' | 'lax',
-  path: '/api/v1/auth',
+  path: REFRESH_COOKIE_PATH,
 }
 
 const loginEndpointDescription =
@@ -65,7 +67,7 @@ export class LoginController {
   ) {}
 
   /**
-   * Logs a user into this server. Sets the cardinal_refresh_tolkien httpOnly
+   * Logs a user into this server. Sets the instance's refresh tolkien httpOnly
    * cookie and returns a short-lived access token in the response body.
    */
   @Post('/auth/login')
@@ -97,9 +99,10 @@ export class LoginController {
       }
 
       const sessionTimeout = await this.tokenService.getSessionTimeout()
+      const cookieName = await this.tokenService.getRefreshCookieName()
       const maxAge = await this.tokenService.getRefreshCookieMaxAge()
       const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-      res.cookie(REFRESH_TOLKIEN_COOKIE, loginResult.refreshToken, cookieOptions)
+      res.cookie(cookieName, loginResult.refreshToken, cookieOptions)
 
       delete loginResult.refreshToken
       loginResult.scope = (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local'
@@ -118,24 +121,38 @@ export class LoginController {
   @StandardEndpoint({
     auth: false,
     summary: 'Refresh access token using the httpOnly cookie.',
+    cloudUserHeader: true,
+    errors: {
+      401: [`A cloud-linked account sent no cloud token, or one the cloud no longer accepts (code <code>${AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED}</code>). The local session is unaffected: sign back into the Cardinal account and retry`],
+    },
   })
+  @ApiServiceUnavailableResponse({ description: `The Cardinal cloud could not be reached to verify a cloud-linked account (code <code>${AUTH_ERROR_CODE.CLOUD_UNAVAILABLE}</code>). Nothing about the session has changed.` })
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ JWT: string, scope: 'local' | 'session' | 'memory' }> {
-    const refreshToken = req.cookies?.[REFRESH_TOLKIEN_COOKIE]
+    const cookieName = await this.tokenService.getRefreshCookieName()
+    const refreshToken = req.cookies?.[cookieName]
 
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token')
     }
 
-    const payload = this.tokenService.verifyRefreshToken(refreshToken)
+    const verification = this.tokenService.verifyRefreshToken(refreshToken)
 
-    if (!payload) {
-      res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })
+    if (verification.outcome !== 'valid') {
+      /*
+       * Only a tolkien this server signed proves the cookie is this server's to clear. Clearing on a
+       * foreign signature is what let two servers on one host destroy each other's sessions.
+       */
+      if (verification.outcome !== 'foreign') {
+        res.clearCookie(cookieName, { path: REFRESH_COOKIE_PATH })
+      }
+
       throw new UnauthorizedException('Invalid or expired refresh token')
     }
 
+    const payload = verification.payload
     const user = await this.userService.get(payload.uid)
 
     if (!user) {
@@ -144,12 +161,7 @@ export class LoginController {
 
     // Validate status of the cloud account
     if (user.cardinalId) {
-      const cloudJWT = getCardinalTolkienFromHeaders(req.headers)
-      if (!cloudJWT) {
-        throw new UnauthorizedException('Cloud-linked account must present a cloud token')
-      }
-      const cloudUser = await this.cloudUserService.getCardinalCloudUser(cloudJWT)
-      this.cloudUserService.throwIfInvalidCardinalAccount(cloudUser)
+      await this.validateCloudAccount(req)
     }
 
     const newAccessToken = await this.tokenService.createAccessToken(payload.uid)
@@ -162,9 +174,43 @@ export class LoginController {
     const newRefreshToken = await this.tokenService.createRefreshToken(payload.uid)
     const maxAge = await this.tokenService.getRefreshCookieMaxAge()
     const cookieOptions = maxAge !== null ? { ...REFRESH_COOKIE_BASE, maxAge } : REFRESH_COOKIE_BASE
-    res.cookie(REFRESH_TOLKIEN_COOKIE, newRefreshToken, cookieOptions)
+    res.cookie(cookieName, newRefreshToken, cookieOptions)
 
     return { JWT: newAccessToken, scope: (sessionTimeout === 'session' || sessionTimeout === 'memory') ? sessionTimeout : 'local' }
+  }
+
+  /*
+   * Judges the cloud half of a cloud-linked session. Every answer here is coded, because the client
+   * holds two credentials and only ever sees one status line: an uncoded 401 costs it the local
+   * session too, and an outage dressed up as a 401 costs the user both for nothing.
+   */
+  private async validateCloudAccount(req: Request): Promise<void> {
+    const cloudJWT = getCardinalTolkienFromHeaders(req.headers)
+
+    if (!cloudJWT) {
+      throw new UnauthorizedException({
+        code: AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED,
+        message: 'This account is linked to a Cardinal account, so a cloud token must be sent.',
+      })
+    }
+
+    try {
+      const cloudUser = await this.cloudUserService.getCardinalCloudUser(cloudJWT)
+      this.cloudUserService.throwIfInvalidCardinalAccount(cloudUser)
+    } catch (error) {
+      if (error instanceof CloudUserLookupError && !error.cloudAnswered) {
+        Logger.warn(`Could not verify a cloud account while refreshing: ${error.message}`, 'Auth')
+        throw new ServiceUnavailableException({
+          code: AUTH_ERROR_CODE.CLOUD_UNAVAILABLE,
+          message: 'The Cardinal cloud could not be reached. Your session has been left alone.',
+        })
+      }
+
+      throw new UnauthorizedException({
+        code: AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED,
+        message: error?.message || 'This Cardinal account could not be verified.',
+      })
+    }
   }
 
   /**
@@ -175,8 +221,10 @@ export class LoginController {
     auth: false,
     summary: 'Clear the refresh token cookie.',
   })
-  logout(@Res({ passthrough: true }) res: Response): { success: true } {
-    res.clearCookie(REFRESH_TOLKIEN_COOKIE, { path: '/api/v1/auth' })
+  async logout(@Res({ passthrough: true }) res: Response): Promise<{ success: true }> {
+    const cookieName = await this.tokenService.getRefreshCookieName()
+    res.clearCookie(cookieName, { path: REFRESH_COOKIE_PATH })
+
     return { success: true }
   }
 }

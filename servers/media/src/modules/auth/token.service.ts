@@ -3,10 +3,13 @@ import { JwtService } from '@nestjs/jwt'
 import * as ms from 'ms'
 
 import { getJWTPayload } from '../../utils/jwt'
+import { OPTIONS } from '../../utils/options'
 
 import { UserService } from '../user/user.service'
 import { SettingsService } from '../settings/settings.service'
+import { DatabaseService } from '../database/database.service'
 import { CardinalApp } from '../../utils/apps'
+import { buildRefreshCookieName } from './refresh-cookie'
 
 const SESSION_TIMEOUT_TO_MS: Record<string, number | null> = {
   'memory': null,
@@ -21,13 +24,35 @@ const SESSION_TIMEOUT_TO_MS: Record<string, number | null> = {
   '30d': ms('30d'),
 }
 
+/*
+ * A refresh tolkien this server signed is one it may act on, including clearing the cookie it came
+ * in. A tolkien it did not sign belongs to another server sharing the host's cookie jar.
+ */
+export type RefreshTokenVerification =
+  | { outcome: 'valid', payload: { uid: string } }
+  | { outcome: 'expired' }
+  | { outcome: 'invalid' }
+  | { outcome: 'foreign' }
+
 @Injectable()
 export class TokenService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly settingsService: SettingsService,
+    private readonly databaseService: DatabaseService,
   ) {}
+
+  /**
+   * Returns the name this server stores its refresh tolkien cookie under. Read
+   * fresh every time because a factory reset issues a new instance ID without
+   * restarting the process.
+   */
+  async getRefreshCookieName(): Promise<string> {
+    const instanceId = await this.databaseService.getOption(OPTIONS.INSTANCE_ID.name)
+
+    return buildRefreshCookieName(instanceId as string)
+  }
 
   /**
    * Returns the current inactive_session_timeout setting value (e.g. '7d').
@@ -121,19 +146,24 @@ export class TokenService {
     }
   }
 
-  /**
-   * Verifies a refresh token and returns its payload. Returns null for anything
-   * invalid or expired.
+  /*
+   * Verifies a refresh token, separating this server's own bad tokens from tokens it never signed.
+   * jsonwebtoken checks the signature before the claims, so a TokenExpiredError proves the token is
+   * ours; every other failure leaves that unproven and counts as foreign.
    */
-  verifyRefreshToken(token: string): { uid: string } | null {
+  verifyRefreshToken(token: string): RefreshTokenVerification {
     try {
       const result = this.jwtService.verify(token)
+
       if (typeof result === 'object' && result.type === 'refresh' && 'uid' in result) {
-        return result as { uid: string }
+        return { outcome: 'valid', payload: result as { uid: string } }
       }
-      return null
-    } catch {
-      return null
+
+      return { outcome: 'invalid' }
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') return { outcome: 'expired' }
+      if (error?.name === 'NotBeforeError') return { outcome: 'invalid' }
+      return { outcome: 'foreign' }
     }
   }
 }

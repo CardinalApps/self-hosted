@@ -13,7 +13,7 @@ import { CreateThumbnailsOptions } from '../../thumbnail/types'
 import { JobProcessor } from '../types'
 import { JobTaskType, JobTaskStatus } from '../enums'
 
-import { SupportedPhotoFileExtensions } from '../../../utils/media'
+import { SupportedPhotoFileExtensions, canonicalExtension } from '../../../utils/media'
 
 /**
  * The photo_thumbnails job creates and manages thumbnails for all photos in the
@@ -95,9 +95,9 @@ export class PhotoThumbnailsJobService implements JobProcessor {
 
     // Use the jpeg variation if one exists to avoid converting the source
     // format to jpeg
-    const jpegVariation = photo?.variations?.find?.((variation) => variation.format === SupportedPhotoFileExtensions.JPEG)
+    const jpegVariation = photo?.variations?.find?.((variation) => canonicalExtension(variation.format) === SupportedPhotoFileExtensions.JPEG)
     const absoluteFilePath = jpegVariation
-      ? photo.variations[0].absolutePath
+      ? jpegVariation.absolutePath
       : photo.file.absolutePath
 
     // Create thumbnails

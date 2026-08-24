@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { globalActions } from '../../constants/actions'
+import { globalActions, shortcutActions } from '../../constants/actions'
 
 import { STORE_KEY, SIDEBAR_MODE, PAGE_LAYOUT } from './constants'
 
 export type ActionButton = {
   gradientAnimation?: string,
+  /** Which button last claimed this queue's party animation, for when multiple buttons can resolve to the same queue. */
+  activeButtonId?: string,
 }
 
 export type VirtualView = {
@@ -180,6 +182,22 @@ const layoutSlice = createSlice({
         return {
           ...state,
         }
+      })
+      // Esc is what closes the panel, so pressing the shortcut again leaves it open
+      .addCase(shortcutActions.OPEN_SETTINGS, (state) => {
+        state.settingsPanelOpen = true
+      })
+      .addCase(shortcutActions.TOGGLE_PLAYBACK_SIDEBAR, (state) => {
+        state.playbackSidebarOpen = !state.playbackSidebarOpen
+      })
+      // Records the choice as well as applying it, the same as the sidebar's own collapse button
+      .addCase(shortcutActions.TOGGLE_NAV_SIDEBAR, (state) => {
+        const next = state.sidebarMode === SIDEBAR_MODE.collapsed
+          ? SIDEBAR_MODE.expanded
+          : SIDEBAR_MODE.collapsed
+
+        state.sidebarMode = next
+        state.userSelectedSidebarMode = next
       })
   },
   selectors: {

@@ -5,13 +5,15 @@ import { SettingsController } from './settings.controller'
 import { SettingsService } from './settings.service'
 import { Setting } from './setting.entity'
 
+import { EventModule } from '../event/event.module'
+
 /**
  * The Settings module stores the settings of Cardinal client apps and settings
  * for itself. It handles settings synchronization and settings persistance
  * between client cache wipes.
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Setting])],
+  imports: [TypeOrmModule.forFeature([Setting]), EventModule],
   exports: [TypeOrmModule, SettingsService],
   providers: [SettingsService],
   controllers: [SettingsController],

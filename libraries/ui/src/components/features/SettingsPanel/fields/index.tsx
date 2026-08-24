@@ -4,6 +4,7 @@ import musicFields from './music'
 import adminServerFields from './admin'
 
 import titleField from '../layout/Title'
+import KeyboardShortcuts from '../KeyboardShortcuts'
 import ThemeEditor from '../ThemeEditor'
 
 import i18n from '../i18n'
@@ -26,6 +27,14 @@ export const getFields = (app, lang) => {
       commonFields.enableCustomContextMenu,
       commonFields.developerMode,
     ],
+  }
+
+  // The keyboard shortcuts tab, identical for all apps
+  const keyboardShortcutsTab = {
+    tabId: 'keyboard-shortcuts',
+    tabName: i18n['settings.tab-name-keyboard-shortcuts'][lang],
+    tabIcon: 'fas fa-keyboard',
+    tabContent: <KeyboardShortcuts app={app} />,
   }
 
   // The bespoke theme editor tab, identical for all apps
@@ -54,6 +63,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
         // --- Server administration (system-wide, all users) ---
         // Server settings tab
         {
@@ -107,6 +117,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
         // Music settings tab
         {
           // The "Music" section heading is rendered before this tab.
@@ -128,6 +139,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
         // People settings tab
         // {
         //   // The "Photos" section heading is rendered before this tab.
@@ -152,6 +164,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
         // Cinema settings tab
         // {
         //   // The "Cinema" section heading is rendered before this tab.
@@ -166,6 +179,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
         // Books settings tab
         // {
         //   // The "Books" section heading is rendered before this tab.
@@ -181,6 +195,7 @@ export const getFields = (app, lang) => {
       return [
         generalTab,
         themeTab,
+        keyboardShortcutsTab,
       ]
   }
 }

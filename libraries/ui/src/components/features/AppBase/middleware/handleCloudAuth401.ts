@@ -1,44 +1,39 @@
-import refreshToken from '../../../../store/slices/cloudUser/thunks/refreshToken'
-import { deleteJwt, JWT_TYPE } from '../../../../lib/auth/jwt'
+import { runCloudTokenRefresh } from '../../../../lib/auth/authAPI'
+import { cloudLogout, isCredentialRejection } from '../../../../lib/auth/cloudSession'
 
-// Prevents concurrent 401 responses from triggering multiple simultaneous
-// refresh attempts
-let isRefreshing = false
+/* The logout thunk's call, exactly: DELETE /user/session and nothing else. Its neighbours on the
+   Sessions page — GET /user/sessions, and DELETE /user/session?sid= to revoke another device — are
+   ordinary requests whose 401 deserves a refresh, not a sign-out. */
+const isSelfLogout = (endpoint: string, method: string) => method === 'DELETE' && endpoint === '/user/session'
 
-function cloudLogout(dispatch) {
-  deleteJwt(JWT_TYPE.CLOUD_USER)
-  dispatch({ type: 'cloudUser/logout/fulfilled' })
-}
-
-/**
- * On a 401 from the cloud auth server, attempt to refresh the cloud access
- * token using the httpOnly refresh cookie. If the refresh fails, clear the
- * cloud JWT and dispatch a logout so the UI resets to the sign-in state.
+/*
+ * On a 401 from the cloud auth server, renew the access token with the httpOnly refresh cookie so
+ * the next request goes out authorized. The request that got the 401 stays failed either way; this
+ * only decides what happens to the session behind it.
  *
- * Skips refresh if the 401 came from /auth/refresh itself to prevent an
- * infinite loop.
+ * A credential the server refuses is the end of that session, and there are three ways to hear it:
+ * the refresh endpoint itself turning us down, a 401 on the way out the door, or a refresh rejected
+ * mid-flight. Everything else — an unreachable server, an aborted request, a 503 — is temporary,
+ * and leaves both the access token and the refresh cookie alone to be tried again.
  */
-export default async function handleCloudAuth401(res: Response, endpoint: string, _method, _body, dispatch) {
+export default async function handleCloudAuth401(res: Response, endpoint: string, method, _body, dispatch) {
   if (res.status !== 401) return
 
-  // Skip refresh for endpoints that should trigger logout directly:
-  // - /auth/refresh itself (would cause infinite loop)
-  // - /user/session DELETE (logout — a 401 here means the session is already
-  //   gone, so retrying with a fresh token serves no purpose)
-  if (endpoint.includes('/auth/refresh') || endpoint.includes('/user/session')) {
+  if (endpoint.includes('/auth/refresh') || isSelfLogout(endpoint, method)) {
     cloudLogout(dispatch)
     return
   }
 
-  if (isRefreshing) return
+  const refresh = runCloudTokenRefresh()
 
-  isRefreshing = true
+  // Nothing here can renew the token, but nothing here says the session is over either
+  if (!refresh) return
 
   try {
-    await dispatch(refreshToken()).unwrap()
-  } catch {
-    cloudLogout(dispatch)
-  } finally {
-    isRefreshing = false
+    await refresh
+  } catch (error) {
+    if (isCredentialRejection(error)) {
+      cloudLogout(dispatch)
+    }
   }
 }

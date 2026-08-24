@@ -96,8 +96,8 @@ function UserInvitations({ getExpiration }: DrawIntitationTabType) {
             items={data?.map((invitation) => {
               return {
                 // TODO show cardinal public name
-                name: invitation?.invitationId.split('-')[0],
-                label: <Span truncate={true}>{getExpiration(invitation?.expiresAt)}</Span>,
+                label: invitation?.invitationId.split('-')[0],
+                value: <Span truncate={true}>{getExpiration(invitation?.expiresAt)}</Span>,
                 title: getExpiration(invitation?.expiresAt, true),
                 controls: ['delete'],
                 onDelete: () => {

@@ -11,7 +11,9 @@ export class GetPhotoBlobDto {
    * 1. HEIC/HEIF images will be converted to JPEG for clients that are not
    *    macOS and not Windows 11.
    */
-  @Transform(({ value }) => value?.toLowerCase() === 'true')
+  // A repeated query param arrives as an array rather than a string, so the
+  // value cannot be assumed to answer to toLowerCase().
+  @Transform(({ value }) => value === undefined ? true : String(value).toLowerCase() === 'true')
   @IsOptional()
   @IsBoolean()
   autoConvert?: boolean = true

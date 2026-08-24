@@ -133,8 +133,8 @@ function RunsHistory() {
             : run?.status === 'not_started'
               ? { fa: 'fas fa-times', className: 'success-color' }
               : null,
-        name: runSummaryString(run),
-        label: formatTimeAgo(shownAt, lang, 'exact'),
+        label: runSummaryString(run),
+        value: formatTimeAgo(shownAt, lang, 'exact'),
         controls: ['view'],
         onView: () => handleOpenLogs(run.id, run.runId),
       } as ListItem

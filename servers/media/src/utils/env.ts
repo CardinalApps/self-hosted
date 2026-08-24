@@ -35,6 +35,8 @@ export type ENV_VAR =
   'CARDINAL_CONTAINER' |
   'CARDINAL_ENABLE_DEV_ENDPOINTS' |
   'KIOSK_MODE' |
+  'CONNECT_HOST' |
+  'CONNECT_RELAY_HOST' |
 
   // Publicly documented
   'CARDINAL_POSTGRES' |
@@ -51,6 +53,7 @@ export type ENV_VAR =
   'TRANSCODER_LOG_LEVEL' |
   'DATABASE_LOG_LEVEL' |
   'INDEXING_SCAN_TIMEOUT' |
+  'INDEXING_SCAN_VERIFY_PASSES' |
   'HEIF_CONVERSION_TIMEOUT' |
   'MAX_CONCURRENT_JOBS' |
   'FFMPEG_PATH' |
@@ -62,7 +65,9 @@ export type ENV_VAR =
   'RESET_LOCAL_USER_PW' |
   'SQLITE_WAL' |
   'SQLITE_PATH' |
-  'SECURE_COOKIES'
+  'SECURE_COOKIES' |
+  'CONNECT_HTTPS_PORT' |
+  'CONNECT_LAN_IPS'
 
 /**
  * Returns the value of an environment variable, or the supplied fallback value.

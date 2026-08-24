@@ -70,8 +70,8 @@ export class MusicReleaseController {
     summary: 'Query music releases.',
     capabilities: ['MusicReleases.Read'],
   })
-  async getMusicReleases(@Query() query: GetMusicReleasesDto): Promise<[MusicRelease[], number]> {
-    return await this.musicReleaseService.query(query)
+  async getMusicReleases(@CurrentUser() user, @Query() query: GetMusicReleasesDto): Promise<[MusicRelease[], number]> {
+    return await this.musicReleaseService.query(query, user)
   }
 
   /**

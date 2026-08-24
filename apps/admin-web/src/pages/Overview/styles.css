@@ -1,19 +1,3 @@
-.reloadButton {
-  width: 30px;
-  height: 30px;
-  color: var(--text-color-1);
-  border: none;
-  cursor: pointer;
-  background: none;
-
-  i {
-    display: flex;
-    font-size: 17px !important;
-    margin-right: 0 !important;
-    transform: scaleX(-1);
-  }
-}
-
 .active-users-widget {
 
   .active-users {
@@ -21,23 +5,23 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
 
-  .active-user {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    .active-user {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
-    .time-ago {
-      font-size: 11px;
-      padding: 4px 5px;
-      text-transform: uppercase;
-      font-weight: 800;
-      line-height: 1em;
-      border-radius: 3px;
-      white-space: nowrap;
-      background-color: var(--bg-4);
+      p.time-ago {
+        font-size: 11px;
+        padding: 4px 5px;
+        text-transform: uppercase;
+        font-weight: 800;
+        line-height: 1em;
+        border-radius: 3px;
+        white-space: nowrap;
+        background-color: var(--bg-4);
+      }
     }
   }
 }
@@ -99,9 +83,5 @@
 
   .server-info-list {
     width: 100%;
-
-    .item-list-item-name {
-      min-width: 35%;
-    }
   }
 }

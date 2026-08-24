@@ -27,6 +27,17 @@ function Nav({ children }: PropsWithChildren) {
         </Link>
       </li>
 
+      {/* Cloud Services */}
+      <li
+        className={activeItem === AdminRoutes.cloud_services ? 'active' : ''}
+        key="cloud-services"
+      >
+        <Link to={AdminRoutes.cloud_services}>
+          <Icon fa="fas fa-cloud" />
+          <span>{i18n['nav.cloud-services']['en']}</span>
+        </Link>
+      </li>
+
       {/* Indexing */}
       <li
         className={`${activeItem === AdminRoutes.indexing ? 'active' : ''}`}

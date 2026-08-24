@@ -94,6 +94,10 @@ export class InvitationController {
   ): Promise<boolean> {
     const invitiation = await this.invitationService.get(id)
 
+    if (!invitiation) {
+      throw new NotFoundException()
+    }
+
     if (invitiation.createdBy?.userId !== user?.userId) {
       throw new ForbiddenException()
     }

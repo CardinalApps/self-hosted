@@ -73,7 +73,7 @@ const AppHeader = ({
     const badges = []
 
     if (kioskMode) {
-      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><Icon fa="fas fa-store" />{i18n['major-badge.kiosk'][lang]}</span>)
+      badges.push(<span key="kiosk" onClick={() => setShowBadgeModal('kiosk')} style={{ background: '#e1531c' }}><Icon fa="fas fa-store" style={{ color: '#fff' }} />{i18n['major-badge.kiosk'][lang]}</span>)
     }
     if (app === CardinalApp.CINEMA || app === CardinalApp.PHOTOS) {
       badges.push(<span key="coming-soon" className="static" style={{ background: 'var(--accent-color)' }}><Icon fa="fas fa-clock" style={{ color: '#fff' }} />{i18n['major-badge.coming-soon'][lang]}</span>)

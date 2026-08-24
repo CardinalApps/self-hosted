@@ -5,6 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 
+import { AUTH_ERROR_CODE } from '../modules/auth/types'
+
 /**
  * Ensures that the request object has a local user object and/or a cloud user
  * object. If they exist, then they have been validated and attached by the
@@ -19,21 +21,27 @@ export class AuthGuard implements CanActivate {
       throw new Error('Could not get request context.')
     }
 
-    const attachedUser = request?.user?.userId
+    const attachedUser = request?.user
 
-    if (!attachedUser) {
+    if (!attachedUser?.userId) {
       throw new UnauthorizedException()
     }
 
-    // Verify offline user
-    if (!attachedUser?.cardinalId) {
-      // The offline user only needs to have a user ID
-      return !!request?.user?.userId
+    // An offline user answers to this server alone
+    if (!attachedUser.cardinalId) {
+      return true
     }
-    // Verify online user
-    else {
-      // The online user must have a cached user object in the request
-      return !!request?.cardinalUser
+
+    /* An online user is let through on the cached copy of their cloud account as readily as on a
+       cloud token verified this request. The cache is what lets these accounts keep working on a
+       LAN with no route to the internet, so only an account with neither is turned away. */
+    if (request?.cardinalUser || attachedUser.cachedCloudUser) {
+      return true
     }
+
+    throw new UnauthorizedException({
+      code: AUTH_ERROR_CODE.CLOUD_TOKEN_REQUIRED,
+      message: 'This account is linked to a Cardinal account, which must be signed in at least once.',
+    })
   }
 }

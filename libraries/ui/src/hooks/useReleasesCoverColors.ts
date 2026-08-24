@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import homeServerAPI from '../lib/homeserver/homeServerAPI'
-import queryParams from '../lib/net/queryParams'
 import { sampleImageColors } from '../lib/color/sampleImageColors'
-import type { ReleaseCoverSize } from './useReleaseCover'
+import type { ReleaseCover } from './useReleaseCovers'
 
 const NUM_BLOTCHES = 3
 
@@ -53,23 +51,23 @@ export function planCoverSamples(releaseIds: string[], numColors: number): Sampl
 }
 
 /**
- * Samples a palette across several release covers at once, for backgrounds that
- * should represent a whole discography rather than one album.
+ * Samples a palette across several already-loaded release covers at once, for
+ * backgrounds that should represent a whole discography rather than one album.
  *
- * Pass only releases that actually have artwork. The picks are re-rolled
- * whenever the release list changes, so each visit to a page gets a different
+ * Pass the map that useReleaseCovers returns; the sampling reuses those blob
+ * URLs rather than fetching anything of its own. The picks are re-rolled
+ * whenever the set of covers changes, so each visit to a page gets a different
  * cut of a large discography.
  */
 export function useReleasesCoverColors(
-  releaseIds: string[],
+  covers: Record<string, ReleaseCover>,
   numColors: number = NUM_BLOTCHES,
-  size: ReleaseCoverSize = 'small_nocrop',
 ): string[] {
   const [colors, setColors] = useState<string[]>([])
 
-  // Re-roll only when the set of releases actually changes, not on every render
-  const releaseKey = releaseIds.join(',')
-  const plan = useMemo(() => planCoverSamples(releaseIds, numColors), [releaseKey, numColors])
+  // Re-roll only when the set of covers actually changes, not on every render
+  const coverKey = Object.keys(covers).join(',')
+  const plan = useMemo(() => planCoverSamples(Object.keys(covers), numColors), [coverKey, numColors])
 
   useEffect(() => {
     if (!plan.length) {
@@ -81,14 +79,9 @@ export function useReleasesCoverColors(
 
     Promise.all(plan.map(async (entry) => {
       try {
-        const { blobUrl } = await homeServerAPI<{ blobUrl: string }>(
-          queryParams(`/music/releases/${entry.releaseId}/cover`, { size }),
-          'GET',
-          { blob: true },
-        )
-        return await sampleImageColors(blobUrl, entry.numColors)
+        return await sampleImageColors(covers[entry.releaseId].src, entry.numColors)
       } catch {
-        // A release whose cover can't be read simply contributes nothing
+        // A cover that can't be read simply contributes nothing
         return []
       }
     }))
@@ -101,7 +94,7 @@ export function useReleasesCoverColors(
     return () => {
       stale = true
     }
-  }, [plan, size])
+  }, [plan])
 
   return colors
 }

@@ -2,9 +2,14 @@ import { useContext, type CSSProperties } from 'react'
 import { useSelector } from 'react-redux'
 
 import MusicRelease from '@cardinalapps/ui/src/components/interaction/MusicRelease'
+import MusicTrack from '@cardinalapps/ui/src/components/interaction/MusicTrack'
+import MusicTrackGhost from '@cardinalapps/ui/src/components/interaction/MusicTrackGhost'
+import Beads from '@cardinalapps/ui/src/components/layout/Beads'
 import H3 from '@cardinalapps/ui/src/components/typography/H3'
 import { RouterContext } from '@cardinalapps/ui/src/context/router'
 import { formatBytes } from '@cardinalapps/ui/src/components/interaction/DiskMap'
+import { secondsToMMSS } from '@cardinalapps/ui/src/lib/formatting/time'
+import { isFavorite } from '@cardinalapps/ui/src/lib/media/ratings'
 import { getAppUrl } from '@cardinalapps/ui/src/lib/net/router'
 import { settingsSelectors } from '@cardinalapps/ui/src/store/slices/settings'
 import type { MusicTrackType } from '@cardinalapps/ui/src/store/apis/musicTracks'
@@ -13,23 +18,27 @@ import type { DiscographyEntry } from './discography'
 
 import i18n from './i18n.json'
 
-const COVER_SIZE = 200
+const COVER_SIZE = 300
 // Below this many years apart, releases are just a normal gap between albums
 const GAP_YEARS = 3
 
 type ArtistTimelineProps = {
   /** Newest release first. */
   discography: DiscographyEntry[],
+  /** Draws skeleton rows in place of the timeline while the discography is on its way. */
+  loading?: boolean,
+  /** Reserves shimmer space where the per-track figures go while they are on their way. */
+  tracksPending?: boolean,
 }
+
+const SKELETON_ROWS = 4
 
 /**
  * The discography as a dated spine, newest first, with release types mixed
  * rather than bucketed — which is also the only way releases whose type never
  * got tagged still land in the right place.
  */
-function ArtistTimeline({
-  discography,
-}: ArtistTimelineProps) {
+function ArtistTimeline({ discography, loading = false, tracksPending = false }: ArtistTimelineProps) {
   const { Link } = useContext(RouterContext)
   const { lang } = useSelector(settingsSelectors.current)
 
@@ -57,6 +66,29 @@ function ArtistTimeline({
       : extensions[0].toUpperCase()
   }
 
+  if (loading && !discography.length) {
+    return (
+      <section className="artist-timeline">
+        <H3>{t('music-artist.timeline.title')}</H3>
+
+        <ol className="artist-timeline-rows" aria-hidden="true">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <li key={index} className="artist-timeline-row is-skeleton">
+              <div className="artist-timeline-entry">
+                <p className="artist-timeline-year"><span className="timeline-skeleton-bar" /></p>
+                <div className="artist-timeline-cover timeline-skeleton-cover" />
+                <div className="artist-timeline-details">
+                  <p className="artist-timeline-title"><span className="timeline-skeleton-bar wide" /></p>
+                  <p className="artist-timeline-facts"><span className="timeline-skeleton-bar" /></p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+
   return (
     <section className="artist-timeline">
       <H3>{t('music-artist.timeline.title')}</H3>
@@ -65,7 +97,6 @@ function ArtistTimeline({
         {discography.map((entry, index) => {
           const previous = discography[index - 1]
           const gap = previous?.year && entry.year ? previous.year - entry.year : 0
-          const heard = entry.listening?.tracksHeard ?? 0
           const releaseLink = getAppUrl('release', { params: { ':id': entry.musicReleaseId } })
 
           const facts = [
@@ -74,6 +105,9 @@ function ArtistTimeline({
             entry.bytes ? formatBytes(entry.bytes) : null,
             formatLabel(entry.extensions),
           ].filter(Boolean)
+
+          // Track order, same as the beads above it
+          const favoriteTracks = entry.tracks.filter((track) => isFavorite(track.rating))
 
           return (
             <li
@@ -113,18 +147,51 @@ function ArtistTimeline({
                     {facts.map((fact) => <span key={fact}>{fact}</span>)}
                   </p>
 
-                  {!!entry.numTracks && (
-                    <p className="artist-timeline-coverage">
-                      <span className="artist-timeline-coverage-bar">
-                        <span style={{ width: `${(heard / entry.numTracks) * 100}%` }} />
-                      </span>
-                      <span className="artist-timeline-coverage-label">
-                        {template('music-artist.timeline.heard', {
-                          heard: String(heard),
-                          total: String(entry.numTracks),
-                        })}
-                      </span>
-                    </p>
+                  {!entry.tracks.length && tracksPending && !!entry.numTracks && (
+                    <div className="artist-timeline-beads-skeleton" aria-hidden="true">
+                      {Array.from({ length: entry.numTracks }, (_, beadIndex) => (
+                        <span key={beadIndex} />
+                      ))}
+                    </div>
+                  )}
+
+                  {!!entry.tracks.length && (
+                    <Beads
+                      className="artist-timeline-beads"
+                      beads={entry.tracks.map((track) => ({
+                        id: track.musicTrackId,
+                        value: track.playCount,
+                        // Unplayed tracks read as an outline rather than the smallest filled bead
+                        ...(track.playCount > 0 ? {} : { color: 'transparent', borderColor: 'var(--accent-color)' }),
+                      }))}
+                    />
+                  )}
+
+                  {!!entry.tracks.length && !favoriteTracks.length && (
+                    <div className="artist-timeline-ghost">
+                      <MusicTrackGhost />
+                    </div>
+                  )}
+
+                  {!!favoriteTracks.length && (
+                    <div className="artist-timeline-favorites">
+                      {favoriteTracks.map((track, favoriteIndex) => {
+                        // Queue only this favorite and the ones after it, not the rest of the release
+                        const musicTrackIds = favoriteTracks.slice(favoriteIndex).map((t) => t.musicTrackId)
+
+                        return (
+                          <MusicTrack
+                            key={track.musicTrackId}
+                            musicTrackId={track.musicTrackId}
+                            trackTitle={track.title}
+                            duration={secondsToMMSS(Number(track.duration) || 0)}
+                            plays={track.playCount}
+                            rating={track.rating}
+                            musicTrackIds={musicTrackIds}
+                          />
+                        )
+                      })}
+                    </div>
                   )}
                 </div>
               </div>

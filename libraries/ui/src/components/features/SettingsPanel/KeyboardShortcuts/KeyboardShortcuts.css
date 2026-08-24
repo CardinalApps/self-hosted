@@ -1,0 +1,121 @@
+.keyboard-shortcuts {
+  width: 100%;
+
+  .shortcut-set-header {
+    width: 100%;
+    margin: 20px 0 10px;
+    padding-bottom: 14px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color-3);
+
+    .custom-select {
+      min-width: 200px;
+    }
+  }
+
+  .shortcut-set-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .shortcut-set-rename {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .shortcut-row {
+    width: 100%;
+    padding: 6px 0;
+    display: grid;
+    grid-template-columns: minmax(130px, 200px) 1fr 40px;
+    gap: 12px;
+    align-items: center;
+
+    &.heading {
+      padding-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-color-3);
+      border-bottom: 1px solid var(--border-color-3);
+    }
+
+  }
+
+  .shortcut-keys {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .keys-button {
+      min-height: 34px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      border: 1px dashed var(--border-color-3);
+      border-radius: 6px;
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        border-color: var(--border-color-focus);
+      }
+
+      &.recording {
+        border-style: solid;
+        border-color: var(--accent-color);
+      }
+
+      &.conflicted {
+        border-color: var(--danger);
+      }
+    }
+
+    .recording-prompt {
+      font-size: 13px;
+      color: var(--text-color-3);
+    }
+
+    .error-icon,
+    .fa-exclamation-triangle {
+      font-size: 13px;
+      color: var(--danger);
+    }
+  }
+
+  .shortcut-action {
+    min-width: 0;
+  }
+
+  .shortcut-controls {
+    display: flex;
+    justify-content: flex-end;
+
+    .remove {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-color-3);
+      background-color: transparent;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--danger);
+        background-color: var(--bg-4);
+      }
+    }
+  }
+
+  > .button {
+    margin-top: 16px;
+  }
+}

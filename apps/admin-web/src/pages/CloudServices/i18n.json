@@ -1,0 +1,236 @@
+{
+  "title": {
+    "en": "Cloud Services"
+  },
+  "cloud-service.criteria.free": {
+    "en": "Log in with any Cardinal account to use this."
+  },
+  "cloud-service.criteria.subscribed": {
+    "en": "Log in with a subscribed Cardinal account to use this."
+  },
+  "pdp.title": {
+    "en": "Popularity Data Pool"
+  },
+  "pdp.desc-1": {
+    "en": "Join the Popularity Data Pool with this media server to contribute anonymous play counts from your Music and Cinema apps."
+  },
+  "pdp.desc-2": {
+    "en": "In return, your self-hosted apps receive popularity data from all Cardinal users to use in their features."
+  },
+  "pdp.plays-contributed": {
+    "en": "Plays contributed"
+  },
+  "pdp.confirm-disable.title": {
+    "en": "Disable the Popularity Data Pool?"
+  },
+  "pdp.confirm-disable.desc": {
+    "en": "Leaving the Popularity Data Pool will disable trend data in your Music and Cinema apps."
+  },
+  "ra.title": {
+    "en": "Remote Access"
+  },
+  "ra.desc": {
+    "en": "Enable remote access for this media server to reach your self-hosted apps from anywhere."
+  },
+  "ra.connection.label": {
+    "en": "Connection status"
+  },
+  "ra.public-url.label": {
+    "en": "Public URL"
+  },
+  "ra.request-access.title": {
+    "en": "Request beta access"
+  },
+  "ra.request-access.desc-p1": {
+    "en": "Remote Access is in Closed Beta. Once enabled, you will remain in a queue until there is room for your media server. There is a maximum of one (1) media server per user during the beta."
+  },
+  "ra.request-access.desc-p2": {
+    "en": "Inactive servers may be pruned from the Closed Beta. Feel free to requeue at any time."
+  },
+  "ra.queued.desc": {
+    "en": "This server is queued for Remote Access."
+  },
+  "ra.unavailable.desc": {
+    "en": "This server is not approved for Remote Access yet."
+  },
+  "ra.declined.desc": {
+    "en": "Cardinal declined Remote Access for this account."
+  },
+  "ra.unknown.desc": {
+    "en": "Remote Access servers cannot be reached."
+  },
+  "ra.reload": {
+    "en": "Reload Remote Access state"
+  },
+  "ra.confirm-disable.title": {
+    "en": "Disable Remote Access?"
+  },
+  "ra.confirm-disable.desc": {
+    "en": "This media server will stop being reachable from outside your network, and its remote URLs will stop working."
+  },
+  "ra.configure": {
+    "en": "Configure"
+  },
+  "ra.drawer.title": {
+    "en": "Configure Remote Access"
+  },
+  "ra.drawer.direct.title": {
+    "en": "Direct Connection"
+  },
+  "ra.drawer.relay.title": {
+    "en": "Relay Connection"
+  },
+  "ra.drawer.relay.active": {
+    "en": "Relay will be used automatically when a direct connection is not possible."
+  },
+  "ra.upnp.label": {
+    "en": "Automatic port forwarding (UPnP)"
+  },
+  "ra.upnp.status.active": {
+    "en": "Active"
+  },
+  "ra.upnp.status.failed": {
+    "en": "Failed"
+  },
+  "ra.upnp.status.waiting": {
+    "en": "Waiting for the HTTPS listener"
+  },
+  "ra.upnp.reason.port_conflict": {
+    "en": "No free external port on the router"
+  },
+  "ra.upnp.reason.no_gateway": {
+    "en": "No UPnP gateway found on this network"
+  },
+  "ra.upnp.reason.docker_bridge": {
+    "en": "Unavailable on this container network"
+  },
+  "ra.upnp.reason.unknown": {
+    "en": "Port mapping failed"
+  },
+  "ra.upnp.docker-bridge-banner": {
+    "en": "UPnP requires host networking. Switch your compose template to enable automatic port forwarding."
+  },
+  "ra.status.label": {
+    "en": "Connection"
+  },
+  "ra.status.connected": {
+    "en": "Established"
+  },
+  "ra.status.reconnecting": {
+    "en": "Connecting…"
+  },
+  "ra.status.auth-failed": {
+    "en": "Authorization failed"
+  },
+  "ra.status.not-approved": {
+    "en": "Queued for access"
+  },
+  "ra.status.suspended": {
+    "en": "Suspended"
+  },
+  "ra.status.disabled": {
+    "en": "Disabled"
+  },
+  "ra.auth-failed.desc": {
+    "en": "Cardinal Cloud rejected this server's credentials. Sign in again to re-enable Remote Access."
+  },
+  "ra.auth-failed.cta": {
+    "en": "Sign in again"
+  },
+  "ra.declined.detail": {
+    "en": "Cardinal declined Remote Access for this account. This server keeps asking on its own, but it cannot connect unless Cardinal revisits that decision."
+  },
+  "ra.suspended.desc": {
+    "en": "Cardinal suspended Remote Access for this account. Signing in again will not lift it. This server keeps retrying on its own and reconnects if the suspension is lifted."
+  },
+  "ra.https.label": {
+    "en": "HTTPS listener"
+  },
+  "ra.https.running": {
+    "en": "Running"
+  },
+  "ra.https.stopped": {
+    "en": "Stopped"
+  },
+  "ra.https.error": {
+    "en": "Error"
+  },
+  "ra.vanity.title": {
+    "en": "Custom address"
+  },
+  "ra.vanity.desc": {
+    "en": "Replace the assigned address with a name of your own."
+  },
+  "ra.vanity.placeholder": {
+    "en": "myserver"
+  },
+  "ra.vanity.checking": {
+    "en": "Checking availability…"
+  },
+  "ra.vanity.available": {
+    "en": "Available"
+  },
+  "ra.vanity.taken": {
+    "en": "Not available"
+  },
+  "ra.vanity.invalid": {
+    "en": "3 to 30 characters, using lowercase letters, numbers and dashes"
+  },
+  "ra.vanity.state.pending": {
+    "en": "Setting up"
+  },
+  "ra.vanity.state.live": {
+    "en": "Active"
+  },
+  "ra.vanity.state.failed": {
+    "en": "Couldn't be set up"
+  },
+  "ra.vanity.failed.desc": {
+    "en": "This address couldn't be set up. Cardinal keeps retrying on its own, and it starts working as soon as one of those attempts lands."
+  },
+  "ra.vanity.cert-deferred.desc": {
+    "en": "The address is yours, but Cardinal has no certificate to spare right now. Setup finishes on its own once the budget frees up."
+  },
+  "ra.vanity.error.invalid_name": {
+    "en": "Use 3 to 30 characters: lowercase letters, numbers and dashes."
+  },
+  "ra.vanity.error.name_unavailable": {
+    "en": "That address is not available. Try another one."
+  },
+  "ra.vanity.error.label_limit_reached": {
+    "en": "Your plan allows a maximum of {limit} on this server. Release an address before taking another."
+  },
+  "ra.vanity.error.rename_cooldown": {
+    "en": "Custom addresses can only be changed occasionally. Try again in {wait}."
+  },
+  "ra.vanity.error.unknown": {
+    "en": "That address could not be set. Try again in a moment."
+  },
+  "ra.vanity.confirm-release.title": {
+    "en": "Release this address?"
+  },
+  "ra.vanity.confirm-release.desc": {
+    "en": "The address stops working right away, and it stays out of circulation for a while afterwards. This server remains reachable at its assigned address."
+  },
+  "ra.cors.title": {
+    "en": "Custom CORS origins"
+  },
+  "ra.cors.desc": {
+    "en": "Let your own web apps at these origins call this media server remotely."
+  },
+  "ra.cors.placeholder": {
+    "en": "https://example.com"
+  },
+  "ra.cors.invalid": {
+    "en": "Enter a valid http:// or https:// origin without a path"
+  },
+  "ra.cors.duplicate": {
+    "en": "That origin is already on the list"
+  },
+  "ra.cors.confirm-delete.title": {
+    "en": "Remove this origin?"
+  },
+  "ra.cors.confirm-delete.desc": {
+    "en": "Apps served from this origin will lose remote access to this media server."
+  }
+}

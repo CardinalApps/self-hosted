@@ -62,6 +62,10 @@
       position: relative;
       color: var(--text-color-2);
 
+      i {
+        font-size: inherit;
+      }
+
       &.size-l {
         font-size: 26px;
       }

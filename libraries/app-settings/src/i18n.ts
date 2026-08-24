@@ -191,10 +191,82 @@ export default {
   "settings.enable-half-ratings.desc": {
     "en": "Allow ratings in half-star increments.",
   },
+  "settings.enable-popularity-data-pool.label": {
+    "en": "Enable the Popularity Data Pool",
+  },
+  "settings.enable-popularity-data-pool.desc": {
+    "en": "Contribute anonymized play counts to the Popularity Data Pool and let users access global trends.",
+  },
+  "settings.enable-remote-access.label": {
+    "en": "Enable Remote Access",
+  },
+  "settings.enable-remote-access.desc": {
+    "en": "Reach this Media Server from outside your network.",
+  },
+  "settings.enable-remote-access-direct.label": {
+    "en": "Enable direct remote connections",
+  },
+  "settings.enable-remote-access-direct.desc": {
+    "en": "Let apps connect straight to this Media Server instead of going through Cardinal.",
+  },
+  "settings.enable-remote-access-relay.label": {
+    "en": "Enable metered relay connections",
+  },
+  "settings.enable-remote-access-relay.desc": {
+    "en": "Let apps reach this Media Server through Cardinal's relay when a direct connection is not possible.",
+  },
+  "settings.enable-remote-access-upnp.label": {
+    "en": "Automatic port forwarding (UPnP)",
+  },
+  "settings.enable-remote-access-upnp.desc": {
+    "en": "Ask your router to forward a port to this Media Server so direct connections can reach it.",
+  },
   "settings.inactive-session-timeout.label": {
     "en": "Session timeout",
   },
   "settings.inactive-session-timeout.desc": {
     "en": "How long users stay logged in for after their last activity. Changing this setting takes up to 15 minutes to apply. Reducing the timeout will not immediately expire existing sessions.",
+  },
+  "settings.shortcut-set.label": {
+    "en": "Shortcut set",
+  },
+  "settings.shortcut-set.default": {
+    "en": "Default",
+  },
+  "settings.custom-shortcut-sets.label": {
+    "en": "Saved shortcut sets",
+  },
+  "settings.single-key-shortcuts.label": {
+    "en": "Use single-key shortcuts without a modifier key",
+  },
+  "settings.single-key-shortcuts.desc": {
+    "en": "Shortcuts that only use Cmd or Ctrl fire from the key on its own. Shortcuts with another modifier are unchanged.",
+  },
+  "settings.shortcuts.action.open-settings": {
+    "en": "Open settings",
+  },
+  "settings.shortcuts.action.toggle-nav-sidebar": {
+    "en": "Collapse or expand the navigation sidebar",
+  },
+  "settings.shortcuts.action.toggle-playback-sidebar": {
+    "en": "Open or close the playback sidebar",
+  },
+  "settings.shortcuts.action.play-pause": {
+    "en": "Play or pause",
+  },
+  "settings.shortcuts.action.previous-track": {
+    "en": "Previous track",
+  },
+  "settings.shortcuts.action.next-track": {
+    "en": "Next track",
+  },
+  "settings.shortcuts.action.mute": {
+    "en": "Mute or unmute",
+  },
+  "settings.shortcuts.action.volume-up": {
+    "en": "Volume up",
+  },
+  "settings.shortcuts.action.volume-down": {
+    "en": "Volume down",
   },
 }

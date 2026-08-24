@@ -9,9 +9,7 @@
   }
 
   .carousel-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-color-2);
+    margin-bottom: 0;
   }
 
   .carousel-pagination {
@@ -34,6 +32,20 @@
     flex: 0 0 var(--slide-size);
     min-width: 0;
     padding-left: var(--slide-spacing);
+
+    &.columns {
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-columns: repeat(var(--slide-columns, 1), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--slide-rows, 4), auto);
+      column-gap: var(--slide-spacing);
+
+      @media (max-width: 1200px) {
+        grid-auto-flow: row;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: none;
+      }
+    }
   }
 }
 

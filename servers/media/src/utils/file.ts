@@ -145,3 +145,24 @@ export const serializeMetadataValue = (value): string => {
 export async function readEmbeddedMusicMetadata(absolutePath: string): Promise<IAudioMetadata> {
   return await musicMetadata.parseFile(absolutePath)
 }
+
+/**
+ * Reads file stats with retries. Network mounts (namely SMB) can fail stat
+ * calls transiently even for files that were successfully enumerated moments
+ * earlier, so a short retry loop recovers most of these. Returns null once
+ * all attempts fail.
+ */
+export async function statWithRetry(absolutePath: string, attempts = 3, delayMs = 250): Promise<fs.Stats | null> {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fs.promises.stat(absolutePath)
+    } catch (error) {
+      if (attempt === attempts) {
+        return null
+      }
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+    }
+  }
+
+  return null
+}

@@ -16,13 +16,6 @@
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
     }
-
-    .toolbar-item {
-     
-      .toolbar-button {
-        background-color: transparent;
-      }
-    }
   }
 
   .toolbar-collider {
@@ -44,7 +37,7 @@
       border: none;
       cursor: pointer;
       border-radius: 100%;
-      background-color: var(--bg-1);
+      background-color: transparent;
       transition: transform 200ms;
 
       &:hover, &:focus-visible {

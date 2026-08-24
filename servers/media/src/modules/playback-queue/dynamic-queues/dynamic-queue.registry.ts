@@ -7,6 +7,8 @@ import { TrueShuffleQueue } from './true-shuffle-queue.service'
 import { HouseMixQueue } from './house-mix-queue.service'
 import { EncoreQueue } from './encore-queue.service'
 import { UndertowQueue } from './undertow-queue.service'
+import { FreshMusicQueue } from './fresh-music-queue.service'
+import { FreshReleaseQueue } from './fresh-release-queue.service'
 
 /*
   Every dynamic queue type the server knows about. Adding one is a new
@@ -18,6 +20,8 @@ export const DYNAMIC_QUEUE_SERVICES = [
   HouseMixQueue,
   EncoreQueue,
   UndertowQueue,
+  FreshMusicQueue,
+  FreshReleaseQueue,
 ]
 
 /**

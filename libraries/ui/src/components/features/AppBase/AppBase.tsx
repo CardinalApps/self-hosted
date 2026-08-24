@@ -21,6 +21,7 @@ import
   removeHomeServerAPIMiddleware,
   registerTokenRefreshProvider,
 } from '../../../lib/homeserver/homeServerAPI'
+import { registerCloudBearerTokenProvider } from '../../../lib/auth/cloudBearerToken'
 import refreshToken from '../../../store/slices/homeServerUser/thunks/refreshToken'
 import handle401 from './middleware/handle401'
 import handle410 from './middleware/handle410'
@@ -48,6 +49,8 @@ import { useGetInstanceQuery } from '../../../store/apis/instance'
 import useServerSideEvents from '../../../hooks/useServerSideEvents'
 import useHowler from '../../../hooks/useHowler'
 import useAppliedTheme from '../../../hooks/useAppliedTheme'
+import useCanLogIntoApp from '../../../hooks/useCanLogIntoApp'
+import useKeyboardShortcuts from '../../../hooks/useKeyboardShortcuts'
 
 import { getJWT, isJwtExpired, JWT_TYPE } from '../../../lib/auth/jwt'
 import { CardinalApp } from '../../../lib/env/cardinal'
@@ -112,6 +115,7 @@ function AppBase({
 }: AppBaseProps) {
   useServerSideEvents()
   useHowler()
+  useKeyboardShortcuts()
   const dispatch = useAppDispatch()
   const [tokenReady, setTokenReady] = useState(false)
   const { navigate, location } = router
@@ -129,6 +133,7 @@ function AppBase({
   const latestHealthResponse = useSelector(homeServerSelectors.latestHealthResponse)
   const firstTimeSetupComplete = useSelector(homeServerSelectors.firstTimeSetupComplete)
   const homeServerUserLoggedIn = useSelector(homeServerUserSelectors.loggedIn)
+  const canLoginToApp = useCanLogIntoApp(app)
   const {
     lang,
     enable_custom_context_menu,
@@ -154,6 +159,7 @@ function AppBase({
     registerHomeServerAPIMiddleware('handle_401', (...args) => handle401(args[0], args[1], args[2], args[3], dispatch, lang))
     registerHomeServerAPIMiddleware('handle_410', (...args) => handle410(args[0], args[1], args[2], args[3], dispatch, lang))
     registerTokenRefreshProvider(() => dispatch(refreshToken()).unwrap())
+    registerCloudBearerTokenProvider()
     return () => {
       removeHomeServerAPIMiddleware('handle_401')
       removeHomeServerAPIMiddleware('handle_410')
@@ -299,7 +305,7 @@ function AppBase({
               <DrawerLayer />
               {!!developer_mode && <DevTools />}
               {health && tokenReady
-                ? homeServerUserLoggedIn
+                ? homeServerUserLoggedIn && canLoginToApp
                   ? <AppPrivate
                       header={header || defaultHeader}
                       sidebarOptions={sidebarOptions}
