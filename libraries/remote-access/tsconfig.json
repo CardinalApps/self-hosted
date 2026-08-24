@@ -1,0 +1,14 @@
+{
+  "extends": ["../../config/typescript/library"],
+  "compilerOptions": {
+    "outDir": "dist/cjs",
+    "lib": ["ES2022", "WebWorker"]
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}
